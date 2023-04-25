@@ -1,0 +1,5 @@
+image:
+  symbol: Ar
+  crystal_structure: fcc
+  a: 3.4
+prefix: Ar_LJ

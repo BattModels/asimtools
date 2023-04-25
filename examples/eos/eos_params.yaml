@@ -1,0 +1,8 @@
+image:
+  symbol: Ar
+  crystal_structure: fcc
+  a: 3.4
+prefix: Ar_LJ
+submit: true
+overwrite: true
+scale_range: [0.95, 1.05]
