@@ -1,4 +1,4 @@
-# Project Title
+# Atomic SIMulation Tools
 
 This package is for optimizing and standardizing production runs for atomistic simulations. By using in-built or user-defined scripts,
 users can run their own simulation recipes and scale them on slurm based clusters. The core idea is to separate the dependence of the
