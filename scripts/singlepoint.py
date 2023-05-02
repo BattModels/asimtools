@@ -19,10 +19,6 @@ Atoms = TypeVar('Atoms')
 
 def single_point(
     calc_input: dict,
-    # atoms: Atoms = None,
-    # symbol: str = None,
-    # crystal_structure: str = None,
-    # input_file: str = None,
     image: dict = None,
     prefix: str = '',
     **kwargs
