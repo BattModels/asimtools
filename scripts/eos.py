@@ -8,11 +8,9 @@ Author: mkphuthi@github.com
 #pylint: disable=too-many-arguments
 from typing import TypeVar, Union, Tuple
 import sys
-from pathlib import Path
 import numpy as np
 from asimtools.job import UnitJob, Job, check_jobs
 from asimtools.utils import (
-    write_yaml,
     write_csv_from_dict,
     get_atoms,
     join_names,
