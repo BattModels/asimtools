@@ -1,0 +1,18 @@
+name: NequIP
+calc:
+  model_path: /home/mphuthi/Li/models/nequip/cache/run1-6_v0-1_i0-3_surf1-8/1d8qae5s/best_model
+job:
+  use_slurm: false
+  interactive: true
+slurm:
+  flags:
+    - -n 2
+    - --gres=gpu:1
+    - -p gpu
+    - -A venkvis_gpu
+    - -J nq_test
+  precommands:
+    - source ~/.bashrc
+    - conda activate nequip
+  postcommands:
+    - echo "POSTCOMMAND EXAMPLE"

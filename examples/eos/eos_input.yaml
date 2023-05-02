@@ -1,0 +1,9 @@
+image:
+  symbol: Li
+  crystal_structure: bcc
+  a: 3.427
+prefix: Li
+submit: true
+overwrite: false
+scale_range: [0.95, 1.05]
+nimages: 3

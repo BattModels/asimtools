@@ -1,0 +1,15 @@
+name: LennardJones
+slurm: true
+interactive: false
+slurm_params:
+  flags:
+    - -n 2
+    - --gres=gpu:1
+    - -p gpu
+    - -A venkvis_gpu
+    - -J lj_test
+  precommands:
+    - source ~/.bashrc
+    - conda activate ase-plot
+  postcommands:
+    - echo "POSTCOMMAND"

@@ -1,0 +1,12 @@
+name: LennardJones
+job:
+  use_slurm: false
+  interactive: true
+# slurm:
+#   flags:
+#     - -n 2
+#     - --gres=gpu:1
+#   precommands:
+#     - source activate ase
+#   postcommands:
+#     - echo "POSTCOMMAND"

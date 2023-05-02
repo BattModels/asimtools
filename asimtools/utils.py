@@ -4,21 +4,21 @@ standards
 '''
 import getopt
 import sys
+from typing import Sequence
 import yaml
 import pandas as pd
 from ase.io import read
 from ase.build import bulk
-from typing import Sequence
 
-def read_yaml(yaml_file):
+def read_yaml(yaml_path):
     ''' Read a yaml file'''
-    with open(yaml_file, 'r', encoding='utf-8') as f:
+    with open(yaml_path, 'r', encoding='utf-8') as f:
         output = yaml.safe_load(f)
     return output
 
-def write_yaml(yaml_file, yaml_dict):
+def write_yaml(yaml_path, yaml_dict):
     ''' Write a yaml file '''
-    with open(yaml_file, 'w', encoding='utf-8') as f:
+    with open(yaml_path, 'w', encoding='utf-8') as f:
         yaml.dump(yaml_dict, f)
 
 def write_csv_from_dict(fname: str, data: dict, columns: Sequence = None):

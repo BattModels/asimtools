@@ -1,3 +1,6 @@
+'''
+Template for wrting scrip test
+'''
 import pytest
 
 @pytest.fixture

@@ -1,7 +1,9 @@
-name: LennardJones
-slurm: true
-batch: false
-interactive: true
+calc:
+  name: LennardJones
+job:
+  slurm: true
+  batch: false
+  interactive: true
 slurm_params:
   flags:
     - -n 2

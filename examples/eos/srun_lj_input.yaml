@@ -1,0 +1,15 @@
+name: LennardJones
+job:
+  use_slurm: true
+  interactive: true
+slurm:
+  flags:
+    - -n 2
+    - --gres=gpu:1
+    - -p gpu
+    - -A venkvis_gpu
+    - -J lj_test
+  precommands:
+    - source activate ase
+  postcommands:
+    - echo "POSTCOMMAND EXAMPLE"

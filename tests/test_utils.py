@@ -1,5 +1,5 @@
 import pytest
-from simtools.utils import join_names
+from asimtools.utils import join_names
 
 # @pytest.fixture
 # def input_value():
