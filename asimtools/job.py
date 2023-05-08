@@ -143,10 +143,6 @@ class Job():
         ''' Set working directory '''
         self.workdir = workdir
 
-    # def set_atoms(self, atoms: Atoms) -> None:
-    #     ''' Set associated atoms object - Duplicate of set_input_image '''
-    #     self.atoms = atoms
-
     def check_job_status(self) -> None:
         ''' Check job status '''
         output = self.get_output()
