@@ -16,3 +16,11 @@ from asimtools.utils import join_names
 ])
 def test_join_names(input, expected):
     assert join_names(input) == expected
+
+#TODO
+def test_get_atoms():
+    pass
+
+#TODO
+def test_get_images():
+    pass

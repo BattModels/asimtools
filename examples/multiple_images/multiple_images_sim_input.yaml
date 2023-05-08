@@ -1,0 +1,11 @@
+prefix: Li
+submit: true
+overwrite: false
+images:
+  pattern: structures/*.pwi
+  format: espresso-in
+subscript_input:
+  script: eos.py
+  scale_range: [0.95, 1.05]
+  nimages: 3
+  submit: True

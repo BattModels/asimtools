@@ -34,6 +34,7 @@ def single_point(
 
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)
+
     try:
         energy = atoms.get_potential_energy()
     except Exception:
@@ -45,6 +46,7 @@ def single_point(
 
     job.update_output({'energy': float(energy)})
     job.add_output_files({'image': image_file})
+
     job.complete()
     return job.get_output()
 

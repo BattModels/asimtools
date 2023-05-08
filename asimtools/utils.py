@@ -4,24 +4,27 @@ standards
 '''
 import getopt
 import sys
-from typing import Sequence
+from typing import TypeVar, Iterable
+from glob import glob
 import yaml
 import pandas as pd
 from ase.io import read
 from ase.build import bulk
 
-def read_yaml(yaml_path):
+Atoms = TypeVar('Atoms')
+
+def read_yaml(yaml_path: str) -> dict:
     ''' Read a yaml file'''
     with open(yaml_path, 'r', encoding='utf-8') as f:
         output = yaml.safe_load(f)
     return output
 
-def write_yaml(yaml_path, yaml_dict):
+def write_yaml(yaml_path: str, yaml_dict: dict) -> None:
     ''' Write a yaml file '''
     with open(yaml_path, 'w', encoding='utf-8') as f:
         yaml.dump(yaml_dict, f)
 
-def write_csv_from_dict(fname: str, data: dict, columns: Sequence = None):
+def write_csv_from_dict(fname: str, data: dict, columns: Iterable = None) -> pd.DataFrame:
     ''' Write a csv from entries in a dictionary '''
 
     if columns is None:
@@ -29,26 +32,28 @@ def write_csv_from_dict(fname: str, data: dict, columns: Sequence = None):
 
     csv_data = pd.DataFrame(data, columns=columns)
     csv_data.to_csv(fname, index=False)
+    return csv_data
 
-def join_names(substrs):
+def strip_symbols(substr: str) -> str:
+    ''' 
+    Helper for join_names. Strips symbols used for special purposes
+    '''
+    bad_symbols = ['_', '-', '.', ' ']
+    if len(substr) == 0:
+        return ''
+    if substr[0] in bad_symbols or substr[-1] in bad_symbols:
+        for bad_symbol in bad_symbols:
+            substr = substr.strip(bad_symbol)
+        return strip_symbols(substr)
+    return substr
+
+def join_names(substrs: Iterable[str]) -> str:
     ''' 
     Join multiple parts of a file/dir name using a standard format where
     individual parts of a file name are separated by one underscore with no
     hyphens, periods or underscores next to an underscore
     '''
     name = ''
-    bad_symbols = ['_', '-', '.', ' ']
-
-    def strip_symbols(substr):
-        if len(substr) == 0:
-            return ''
-        elif substr[0] in bad_symbols or substr[-1] in bad_symbols:
-            for bad_symbol in bad_symbols:
-                substr = substr.strip(bad_symbol)
-            return strip_symbols(substr)
-        else:
-            return substr
-
     new_substrs = []
     for substr in substrs:
         new_substrs.append(strip_symbols(substr))
@@ -64,9 +69,9 @@ def get_atoms(
     symbol: str = None,
     crystal_structure: str = None,
     input_file: str = None,
-    atoms: str = None,
+    atoms: Atoms = None,
     **kwargs
-):
+) -> Atoms:
     '''
     Helper for returning an Atoms object by ASE specification, input
     file or directly using an atoms object
@@ -89,7 +94,40 @@ def get_atoms(
 
     return atoms
 
-def parse_command_line(argv):
+def get_images(
+    input_file: str = None,
+    pattern: str = None,
+    images: Iterable[Atoms] = None,
+    format: str = None,
+    index: slice = slice(0,-1),
+) -> list:
+    '''
+    Helper for returning an Atoms object by ASE specification, input
+    file or directly using an atoms object
+    '''
+    assert (input_file is not None) or \
+        (pattern is not None) or \
+        (images is not None), \
+        "Please specify file, pattern or iterable"
+
+    if input_file is not None:
+        images = read(input_file, index=index, format=format)
+    elif pattern is not None:
+        image_files = glob(pattern)
+        images = [
+            read(image_file, format=format) for image_file in image_files
+        ]
+    elif images is not None:
+        # images = eval(f'images[{index}]')
+        images = images[index]
+    else:
+        images = []
+
+    assert len(images) > 0, 'No images found'
+
+    return images
+
+def parse_command_line(argv) -> tuple[dict, dict]:
     ''' Parse command line inputs for simulation script '''
     usage = 'python singlepoint.py calc_params.yaml sim_params.yaml [-h]'
 
