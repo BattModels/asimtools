@@ -170,10 +170,11 @@ def qe_scaling(
 
     job.add_output_files({'qe_scaling': table_file})
 
-    nprocs = data['MPI processes']
+    nprocs = np.array(data['MPI processes'])
     _, ax = plt.subplots()
-    wall_speedup = data['WALL'][0]/data['WALL']
-    cpu_speedup = data['CPU'][0]/data['CPU']
+    wall_speedup = np.array(data['WALL'][0]/data['WALL'])
+    cpu_speedup = np.array(data['CPU'][0]/data['CPU'])
+    print(nprocs, cpu_speedup)
     ax.loglog(nprocs, cpu_speedup, 'ro', label='CPU')
     ax.loglog(nprocs, wall_speedup, 'b*', label='WALL')
     ax.loglog(
@@ -193,7 +194,7 @@ def qe_scaling(
     plt.savefig(join_names([prefix, 'strong_scaling.png']), bbox_inches='tight')
 
     _, ax = plt.subplots()
-    ax.loglog(nprocs, data['RAM per process'], 'o')
+    ax.loglog(nprocs, np.array(data['RAM per process']), 'o')
     ax.set_xlabel('Num. of MPI Processes')
     ax.set_ylabel('Estimated memory per process (GB)')
     ax.set_xticks(nprocs)

@@ -8,6 +8,7 @@ Author: mkphuthi@github.com
 import subprocess
 import os
 from pathlib import Path
+from typing import List, TypeVar
 from ase.io import read
 import numpy as np
 from asimtools.utils import (
@@ -16,6 +17,7 @@ from asimtools.utils import (
     join_names,
 )
 
+Atoms = TypeVar('Atoms')
 
 class Job():
     ''' Abstract class for the job object '''
@@ -26,70 +28,81 @@ class Job():
         calc_input: dict,
         sim_input: dict,
         workdir: str = None,
+        atoms = None,
     ):
 
         self.calc_input = calc_input.copy()
         self.sim_input = sim_input.copy()
+        self.atoms = atoms
         if workdir is None:
             self.workdir = Path('.')
         else:
             self.workdir = Path(workdir)
 
-    def mkworkdir(self):
+    def mkworkdir(self) -> None:
         ''' Creates the work directory if it doesn't exist '''
         if not self.workdir.exists():
             self.workdir.mkdir()
 
-    def start(self):
-        ''' Updates the output to signal that the job was started '''
-        self.update_output({'status': 'started'})
-
-    def complete(self):
-        ''' Updates the output to signal that the job was started '''
-        self.update_output({'status': 'complete'})
-
-    def update_status(self, status):
+    def update_status(self, status: str) -> None:
         ''' Updates job status to specificied value '''
         self.update_output({'status': status})
 
-    def add_output_files(self, file_dict):
+    def start(self) -> None:
+        ''' Updates the output to signal that the job was started '''
+        self.update_status('started')
+
+    def complete(self) -> None:
+        ''' Updates the output to signal that the job was started '''
+        self.update_status('complete')
+
+    def add_output_files(self, file_dict: dict) -> None:
         ''' Adds a file to the output file list '''
         files = self.get_output().get('files', {})
         files.update(file_dict)
         self.update_output({'files': file_dict})
 
-    def get_sim_input(self):
+    def set_input_image(self, atoms: Atoms) -> None:
+        ''' Adds and writes the input image for simulation '''
+        prefix = self.get_prefix()
+        atoms_input_file = join_names([prefix, 'input_atoms.xyz'])
+        self.sim_input['image'] = {
+            'input_file': atoms_input_file
+        }
+        self.atoms = atoms
+
+    def get_sim_input(self) -> dict:
         ''' Get simulation input '''
         return self.sim_input
 
-    def get_prefix(self):
+    def get_prefix(self) -> str:
         ''' Get current job prefix '''
         return self.sim_input.get('prefix', '')
 
-    def get_output_yaml(self):
+    def get_output_yaml(self) -> dict:
         ''' Get current output file '''
         prefix = self.get_prefix()
         out_fname = join_names([prefix, 'output.yaml'])
         output_yaml = self.workdir / out_fname
         return output_yaml
 
-    def get_calc_input(self):
+    def get_calc_input(self) -> dict:
         ''' Get calculator input '''
         return self.calc_input
 
-    def get_calc_params(self):
+    def get_calc_params(self) -> dict:
         ''' Get calculator parameters '''
         return self.calc_input.get('calc', {})
 
-    def get_job_params(self):
+    def get_job_params(self) -> dict:
         ''' Get job parameters '''
         return self.calc_input.get('job', {})
 
-    def get_workdir(self):
+    def get_workdir(self) -> Path:
         ''' Get working directory '''
         return self.workdir
 
-    def get_output(self):
+    def get_output(self) -> dict:
         ''' Get values in output.yaml '''
         output_yaml = self.get_output_yaml()
         if output_yaml.exists():
@@ -97,16 +110,15 @@ class Job():
         else:
             return {}
 
-    def get_output_images(self, ext='xyz'):
-        ''' Get all the output Atoms objects '''
+    def get_output_images(self, ext='xyz') -> List:
+        ''' Get all the output Atoms objects in workdir'''
         image_files = self.workdir / '*images_output.'+ext
         images = [read(image_file) for image_file in image_files]
-        if len(images) > 0:
-            return images
+        assert len(images) > 0, f'No output images in {self.workdir}'
 
-        return None
+        return images
 
-    def get_output_image(self, ext='extxyz'):
+    def get_output_image(self, ext='extxyz') -> Atoms:
         ''' Get the output Atoms object '''
         files = self.get_output().get('files', {})
         image_file = files.get('image', False)
@@ -115,26 +127,34 @@ class Job():
         else:
             return None
 
-    def set_sim_input(self, new_params):
+    def get_atoms(self) -> Atoms:
+        ''' Get associated atoms object '''
+        return self.atoms
+
+    def set_sim_input(self, new_params) -> None:
         ''' Update simulation parameters '''
         self.sim_input.update(new_params)
 
-    def set_calc_input(self, new_params):
+    def set_calc_input(self, new_params) -> None:
         ''' Update calculator parameters '''
         self.calc_input.update(new_params)
 
-    def set_workdir(self, workdir):
+    def set_workdir(self, workdir) -> None:
         ''' Set working directory '''
         self.workdir = workdir
 
-    def check_job_status(self):
+    # def set_atoms(self, atoms: Atoms) -> None:
+    #     ''' Set associated atoms object - Duplicate of set_input_image '''
+    #     self.atoms = atoms
+
+    def check_job_status(self) -> None:
         ''' Check job status '''
         output = self.get_output()
         status = output.get('status', 'clean')
         complete = status == 'complete'
         return complete, status
 
-    def update_output(self, output_update: dict):
+    def update_output(self, output_update: dict) -> None:
         ''' Update output.yaml if it exists or write a new one '''
         output = self.get_output()
         output.update(output_update)
@@ -153,7 +173,7 @@ class UnitJob(Job):
 
         self.script = sim_input.get('script', None)
 
-    def _gen_run_command(self):
+    def _gen_run_command(self) -> str:
         '''
         Generates the command to run the job, independent of slurm
         '''
@@ -169,7 +189,7 @@ class UnitJob(Job):
         txt += f'{run_suffix} '
         return txt
 
-    def _gen_slurm_script(self, write: bool = True):
+    def _gen_slurm_script(self, write: bool = True) -> None:
         '''
         Generates a slurm job file and if necessary writes it in the work
         directory for the job
@@ -193,7 +213,7 @@ class UnitJob(Job):
             slurm_file = self.workdir / 'job.sh'
             slurm_file.write_text(txt)
 
-    def _gen_slurm_interactive_txt(self):
+    def _gen_slurm_interactive_txt(self) -> str:
         '''
         Generates an srun command to run the job
         '''
@@ -205,7 +225,7 @@ class UnitJob(Job):
 
         return txt
 
-    def gen_input_files(self):
+    def gen_input_files(self) -> None:
         ''' Write input files to working directory '''
         workdir = self.workdir
         sim_input = self.sim_input.copy()
@@ -221,11 +241,17 @@ class UnitJob(Job):
                 workdir.mkdir()
             write_yaml(workdir / 'sim_input.yaml', sim_input)
             write_yaml(workdir / 'calc_input.yaml', calc_input)
+            if self.atoms is not None:
+                atoms_input_file = self.sim_input['image']['input_file']
+                self.atoms.write(self.get_workdir() / atoms_input_file)
         if use_slurm and not interactive:
             self._gen_slurm_script()
 
-    def submit(self):
+    def submit(self) -> None:
         ''' Submit a job using slurm, interactively or in the terminal '''
+
+        if not self.workdir.exists():
+            self.gen_input_files()
 
         _, status = self.check_job_status()
         if status not in ('clean', 'discard'):
@@ -279,14 +305,52 @@ def prepare_job(
     calc_input: dict,
     sim_input: dict,
     workdir: str,
-):
+) -> Job:
     ''' Prepares a job's input files and gives a job object to handle '''
     job = UnitJob(calc_input, sim_input, workdir)
     job.gen_input_files()
     return job
 
 
-def check_jobs(jobs: Job):
+def gen_slurm_array_txt(calc_input: dict, sim_input: dict) -> str:
+    ''' 
+    Generates the job array script from given data following standard pattern 
+    '''
+    slurm_params = calc_input['slurm_params']
+    script = sim_input['script']
+    flags = slurm_params['flags']
+    precommands = slurm_params['precommands']
+    postcommands = slurm_params['postcommands']
+    txt = '#!/usr/bin/bash\n'
+    txt += '\n'.join([f'#SBATCH {flag}' for flag in flags])
+    txt += '\n'
+    txt += 'if [[ ! -z ${SLURM_ARRAY_TASK_ID} ]]; then\n'
+    txt += '    fls=( id_* )\n'
+    txt += '    WORKDIR=${fls[${SLURM_ARRAY_TASK_ID}]}\n'
+    txt += 'fi\n\n'
+    txt += 'cd ${WORKDIR}\n'
+    txt += 'echo "Job started on `hostname` at `date`"\n'
+    txt += '\n'.join(precommands)
+    txt += f'{script} calc_input sim_input'
+    txt += '\n'.join(postcommands)
+    txt += 'echo "Job Ended at `date`"'
+
+    return txt
+
+# TODO: Decide on how to implement job arrays
+# def prepare_array_jobs(jobs):
+#     ''' Prepares multiple jobs and a job array for them '''
+#     workdirs = []
+#     prefixes = []
+#     for job in jobs:
+#         job.gen_input_files()
+#         workdirs.append(job.get_workdir())
+
+#     slurm_params = job.get_calc_input()['slurm']
+#     script = job.get_sim_input()['script']
+#     gen_slurm_array_txt(script, slurm_params, workdirs, prefixes)
+
+def check_jobs(jobs) -> bool:
     ''' Checks status of jobs and prints a report '''
 
     completed = []

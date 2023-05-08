@@ -1,0 +1,4 @@
+image:
+  input_file: /home/mphuthi/Na/data/run5/id_0034/input
+nprocs_list: [1,2,4,8,16,32,48]
+submit: true

@@ -1,6 +1,7 @@
 name: QuantumEspresso
 calc:
-  kspacing: 0.02
+  # kspacing: 0.02
+  kpts: [1,1,1]
   pseudopotentials:
     Na: Na.pbe-spn-kjpaw_psl.1.0.0.UPF
   input_data:
@@ -11,7 +12,7 @@ calc:
     occupations: smearing
     smearing: mp
     degauss: 0.02
-    outdir: /tmp/out
+    outdir: ./out
     disk_io: medium
     electron_maxstep: 2
   command: srun --mpi=pmix pw.x -nk 1 -in PREFIX.pwi > PREFIX.pwo

@@ -54,11 +54,9 @@ def eos(
         new_atoms = atoms.copy()
         new_atoms.set_cell(new_cell)
         xprefix = join_names([prefix, f'x{scale:.2f}'])
-        atoms_input_file = join_names([xprefix, 'input_atoms.xyz'])
         sp_sim_input = kwargs
         sp_sim_input.update({
             'script': 'singlepoint.py',
-            'image': {'input_file': atoms_input_file},
             'prefix': xprefix,
         })
 
@@ -67,13 +65,14 @@ def eos(
             sp_sim_input,
             xprefix,
         )
+        unitjob.set_input_image(new_atoms)
         unitjob.gen_input_files()
-        new_atoms.write(unitjob.get_workdir() / atoms_input_file)
         sp_jobs.append(unitjob)
 
     if kwargs.get('submit', True):
         for sp_job in sp_jobs:
             sp_job.submit()
+
     # Figure out if all the jobs are finished
     all_jobs_finished = check_jobs(sp_jobs)
 
@@ -110,10 +109,10 @@ def eos(
 
 def main(argv):
     ''' Main '''
-    calc_params, sim_params = parse_command_line(argv)
+    calc_input, sim_input = parse_command_line(argv)
     eos(
-        calc_params,
-        **sim_params,
+        calc_input,
+        **sim_input,
     )
 
 
