@@ -16,6 +16,8 @@ your local machine for development and testing purposes.
 Requirements for the software and other tools to build, test and push 
 - [ASE](https://wiki.fysik.dtu.dk/ase/index.html)
 - [PyMatgen](https://pymatgen.org/)
+- Pandas
+- PyYaml
 
 In addition to the universal requirements, individual calculators may need external packages
 for loading those calculators. It is up to the user to make sure those are installed.
@@ -36,6 +38,20 @@ And repeat
 End with an example of getting some data out of the system or using it
 for a little demo
 
+## Adding package and scripts to path
+
+As we are still in development, this package cannot yet be installed. Instead, you will have to add the package 
+to your `PYTHONPATH` using e.g.
+
+    export PYTHONPATH=path/to/asimtools/root:$PYTHONPATH
+
+You can also add this to your `.bashrc`
+
+Similarly, if you want to add the supported scripts to your path, you should add the scripts directory to 
+your `PATH` using
+
+    export PATH=path/to/asimtools/root/scripts:$PATH
+
 ## Running the tests
 
 To run all tests from the tests directory, call:
@@ -45,6 +61,15 @@ To run all tests from the tests directory, call:
 To run the test suite on a component `component.py` , call:
 
     pytest component.py
+    
+## Basic example
+
+Simulations are run by providing a `*calc_input.yaml` and `*sim_input.yaml` file which specify 
+the calculator (and the environment it runs in) and the simulation parameters which are specific 
+to the simulation being run. Once these are provided, a user defined or built-in script such as 
+`eos.py` can be run using:
+
+    path/to/eos.py calc_input.py sim_input.py
 
 ## Contributing
 
