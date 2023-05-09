@@ -6,7 +6,7 @@ Author: mkphuthi@github.com
 '''
 
 #pylint: disable=too-many-arguments
-from typing import TypeVar, Union, Tuple
+from typing import TypeVar, Tuple
 import sys
 import numpy as np
 from asimtools.job import UnitJob, Job, check_jobs
@@ -25,11 +25,11 @@ def eos(
     image: dict,
     prefix: str = '',
     nimages: int = 5,
-    scale_range: Tuple[Union[float, float]] = (0.95, 1.05),
+    scale_range: Tuple[float] = (0.95, 1.05),
     # plot: bool = True,
     workdir: str = '.',
     **kwargs
-):
+) -> dict:
     '''
     Calculate EOS
     '''

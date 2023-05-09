@@ -1,7 +1,8 @@
 name: LennardJones
-slurm: true
-interactive: false
-slurm_params:
+job:
+  use_slurm: true
+  interactive: false
+slurm:
   flags:
     - -n 2
     - --gres=gpu:1

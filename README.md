@@ -60,7 +60,7 @@ To run all tests from the tests directory, call:
 
 To run the test suite on a component `component.py` , call:
 
-    pytest component.py
+    pytest test_*.py
     
 ## Basic example
 

@@ -5,7 +5,7 @@ Calculates single point energy
 Author: mkphuthi@github.com
 '''
 import sys
-from typing import TypeVar
+from typing import TypeVar, Tuple
 from asimtools.calculators import load_calc
 from asimtools.job import Job
 from asimtools.utils import (
@@ -21,8 +21,9 @@ def single_point(
     calc_input: dict,
     image: dict = None,
     prefix: str = '',
+    properties: Tuple[str] = ('energy', 'forces'),
     **kwargs
-):
+) -> dict:
     ''' 
     Calculates the single point energy, forces and stresses where possible
     '''
@@ -35,11 +36,29 @@ def single_point(
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)
 
-    try:
-        energy = atoms.get_potential_energy()
-    except Exception:
-        job.update_status('failed')
-        raise
+    if 'energy' in properties:
+        try:
+            energy = atoms.get_potential_energy()
+        except Exception:
+            job.update_status('failed')
+            print('Failed to calculate energy')
+            raise
+
+    if 'forces' in properties:
+        try:
+            atoms.get_forces()
+        except Exception:
+            job.update_status('failed')
+            print('Failed to calculate forces')
+            raise
+
+    if 'stress' in properties:
+        try:
+            atoms.get_stress()
+        except Exception:
+            job.update_status('failed')
+            print('Failed to calculate stress')
+            raise
 
     image_file = join_names([prefix, 'image_output.xyz'])
     atoms.write(image_file, format='extxyz')

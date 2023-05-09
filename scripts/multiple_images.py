@@ -3,9 +3,14 @@
 Calculates EOS
 
 Author: mkphuthi@github.com
+
+This is a breaking case of the current architecture, will need to 
+rethink fundamental parts of the Job object and how it handles jobs
+with different submission requirements e.g. a job needing one core
+vs 32 cores. Basically a way to hand scripts calling other scripts
+at various levels.
 '''
 
-#pylint: disable=too-many-arguments
 from typing import TypeVar
 import sys
 from asimtools.job import UnitJob, Job, check_jobs
@@ -24,7 +29,7 @@ def multiple_images(
     prefix: str = '',
     workdir: str = '.',
     **kwargs
-):
+) -> dict:
     '''
     Repeat a script on multiple images
     '''

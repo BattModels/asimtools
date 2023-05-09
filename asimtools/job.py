@@ -215,7 +215,7 @@ class UnitJob(Job):
         '''
         slurm_params = self.calc_input.get('slurm', False)
 
-        txt = 'srun -u '
+        txt = 'srun --unbuffered ' # Use unbuffered to avoid IO lag
         txt += ' '.join(slurm_params.get('flags'))
         txt += self._gen_run_command()
 
@@ -258,7 +258,7 @@ class UnitJob(Job):
 
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
-        job_params = self.calc_input.get('job')
+        job_params = self.calc_input.get('job', {})
         sim_input = self.sim_input
         use_slurm = job_params.get('use_slurm', True)
         interactive = job_params.get('interactive', False)
@@ -291,60 +291,9 @@ class UnitJob(Job):
                     err_file.write(completed_process.stderr)
                 completed_process.check_returncode()
 
-            #TODO: Get slurm job ID from stdout
-
         os.chdir(cur_dir)
 
         return None
-
-def prepare_job(
-    calc_input: dict,
-    sim_input: dict,
-    workdir: str,
-) -> Job:
-    ''' Prepares a job's input files and gives a job object to handle '''
-    job = UnitJob(calc_input, sim_input, workdir)
-    job.gen_input_files()
-    return job
-
-
-def gen_slurm_array_txt(calc_input: dict, sim_input: dict) -> str:
-    ''' 
-    Generates the job array script from given data following standard pattern 
-    '''
-    slurm_params = calc_input['slurm_params']
-    script = sim_input['script']
-    flags = slurm_params['flags']
-    precommands = slurm_params['precommands']
-    postcommands = slurm_params['postcommands']
-    txt = '#!/usr/bin/bash\n'
-    txt += '\n'.join([f'#SBATCH {flag}' for flag in flags])
-    txt += '\n'
-    txt += 'if [[ ! -z ${SLURM_ARRAY_TASK_ID} ]]; then\n'
-    txt += '    fls=( id_* )\n'
-    txt += '    WORKDIR=${fls[${SLURM_ARRAY_TASK_ID}]}\n'
-    txt += 'fi\n\n'
-    txt += 'cd ${WORKDIR}\n'
-    txt += 'echo "Job started on `hostname` at `date`"\n'
-    txt += '\n'.join(precommands)
-    txt += f'{script} calc_input sim_input'
-    txt += '\n'.join(postcommands)
-    txt += 'echo "Job Ended at `date`"'
-
-    return txt
-
-# TODO: Decide on how to implement job arrays
-# def prepare_array_jobs(jobs):
-#     ''' Prepares multiple jobs and a job array for them '''
-#     workdirs = []
-#     prefixes = []
-#     for job in jobs:
-#         job.gen_input_files()
-#         workdirs.append(job.get_workdir())
-
-#     slurm_params = job.get_calc_input()['slurm']
-#     script = job.get_sim_input()['script']
-#     gen_slurm_array_txt(script, slurm_params, workdirs, prefixes)
 
 def check_jobs(jobs) -> bool:
     ''' Checks status of jobs and prints a report '''
@@ -365,3 +314,51 @@ def check_jobs(jobs) -> bool:
         return True
     else:
         return False
+
+# def prepare_job(
+#     calc_input: dict,
+#     sim_input: dict,
+#     workdir: str,
+# ) -> Job:
+#     ''' Prepares a job's input files and gives a job object to handle '''
+#     job = UnitJob(calc_input, sim_input, workdir)
+#     job.gen_input_files()
+#     return job
+
+
+# def gen_slurm_array_txt(calc_input: dict, sim_input: dict) -> str:
+#     ''' 
+#     Generates the job array script from given data following standard pattern 
+#     '''
+#     slurm_params = calc_input['slurm_params']
+#     script = sim_input['script']
+#     flags = slurm_params['flags']
+#     precommands = slurm_params['precommands']
+#     postcommands = slurm_params['postcommands']
+#     txt = '#!/usr/bin/bash\n'
+#     txt += '\n'.join([f'#SBATCH {flag}' for flag in flags])
+#     txt += '\n'
+#     txt += 'if [[ ! -z ${SLURM_ARRAY_TASK_ID} ]]; then\n'
+#     txt += '    fls=( id_* )\n'
+#     txt += '    WORKDIR=${fls[${SLURM_ARRAY_TASK_ID}]}\n'
+#     txt += 'fi\n\n'
+#     txt += 'cd ${WORKDIR}\n'
+#     txt += 'echo "Job started on `hostname` at `date`"\n'
+#     txt += '\n'.join(precommands)
+#     txt += f'{script} calc_input sim_input'
+#     txt += '\n'.join(postcommands)
+#     txt += 'echo "Job Ended at `date`"'
+
+#     return txt
+
+# def prepare_array_jobs(jobs):
+#     ''' Prepares multiple jobs and a job array for them '''
+#     workdirs = []
+#     prefixes = []
+#     for job in jobs:
+#         job.gen_input_files()
+#         workdirs.append(job.get_workdir())
+
+#     slurm_params = job.get_calc_input()['slurm']
+#     script = job.get_sim_input()['script']
+#     gen_slurm_array_txt(script, slurm_params, workdirs, prefixes)

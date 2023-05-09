@@ -1,12 +1,14 @@
 name: LennardJones
 job:
-  use_slurm: false
-  interactive: true
-# slurm:
-#   flags:
-#     - -n 2
-#     - --gres=gpu:1
-#   precommands:
-#     - source activate ase
-#   postcommands:
-#     - echo "POSTCOMMAND"
+  use_slurm: true
+  interactive: false
+slurm:
+  flags:
+    - -n 1
+    - -p idle
+    - --mem-per-cpu=1000
+  precommands:
+    - source ~/.bashrc
+    - conda activate ase-plot
+  postcommands:
+    - echo "POSTCOMMAND"

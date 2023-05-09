@@ -1,5 +1,4 @@
-calc:
-  name: LennardJones
+name: LennardJones
 job:
   slurm: true
   batch: false

@@ -3,3 +3,4 @@ image:
   crystal_structure: fcc
   a: 3.4
 prefix: Ar_LJ
+properties: [energy, forces, stress]

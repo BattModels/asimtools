@@ -103,7 +103,7 @@ def qe_scaling(
     prefix: str = '',
     workdir: str = '.',
     **kwargs
-):
+) -> dict:
     '''
     Get runtimes and memory usage
     '''
