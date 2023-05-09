@@ -1,3 +1,4 @@
+script: singlepoint
 image:
   symbol: Ar
   crystal_structure: fcc
