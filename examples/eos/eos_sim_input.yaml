@@ -1,3 +1,4 @@
+script: eos
 image:
   symbol: Li
   crystal_structure: bcc

@@ -17,7 +17,7 @@ from asimtools.utils import (
 Atoms = TypeVar('Atoms')
 # pylint: disable=too-many-arguments
 
-def single_point(
+def singlepoint(
     calc_input: dict,
     image: dict = None,
     prefix: str = '',
@@ -79,7 +79,7 @@ def main(argv):
     )
 
     try:
-        single_point(calc_input, **sim_input)
+        singlepoint(calc_input, **sim_input)
         sys.exit(0)
     except Exception:
         print('Failed to run singlepoint')
