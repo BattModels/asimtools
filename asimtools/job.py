@@ -9,6 +9,7 @@ import subprocess
 import os
 from pathlib import Path
 from typing import List, TypeVar
+from copy import deepcopy
 from ase.io import read
 import numpy as np
 from asimtools.utils import (
@@ -31,8 +32,8 @@ class Job():
         atoms = None,
     ):
 
-        self.calc_input = calc_input.copy()
-        self.sim_input = sim_input.copy()
+        self.calc_input = deepcopy(calc_input)
+        self.sim_input = deepcopy(sim_input)
         self.atoms = atoms
         if workdir is None:
             self.workdir = Path('.')
@@ -196,12 +197,12 @@ class UnitJob(Job):
         for flag in slurm_params.get('flags'):
             txt += f'#SBATCH {flag}\n'
         txt += '\n'
-        for command in slurm_params.get('precommands'):
+        for command in slurm_params.get('precommands', []):
             txt += command + '\n'
         txt += '\n'
         txt += 'echo "Job started on `hostname` at `date`"\n'
         txt += self._gen_run_command() + '\n'
-        for command in slurm_params.get('postcommands'):
+        for command in slurm_params.get('postcommands', []):
             txt += command + '\n'
         txt += 'echo "Job ended at `date`"'
 
@@ -224,7 +225,7 @@ class UnitJob(Job):
     def gen_input_files(self) -> None:
         ''' Write input files to working directory '''
         workdir = self.workdir
-        sim_input = self.sim_input.copy()
+        sim_input = self.sim_input
         calc_input = self.calc_input
         job_params = calc_input.get('job', {})
         use_slurm = job_params.get('use_slurm', False)
@@ -237,6 +238,7 @@ class UnitJob(Job):
                 workdir.mkdir()
             write_yaml(workdir / 'sim_input.yaml', sim_input)
             write_yaml(workdir / 'calc_input.yaml', calc_input)
+            write_yaml(self.get_output_yaml(), {'status': 'clean'})
             if self.atoms is not None:
                 atoms_input_file = self.sim_input['image']['input_file']
                 self.atoms.write(self.get_workdir() / atoms_input_file)
@@ -312,8 +314,8 @@ def check_jobs(jobs) -> bool:
 
     if np.all(completed):
         return True
-    else:
-        return False
+
+    return False
 
 # def prepare_job(
 #     calc_input: dict,
@@ -327,7 +329,7 @@ def check_jobs(jobs) -> bool:
 
 
 # def gen_slurm_array_txt(calc_input: dict, sim_input: dict) -> str:
-#     ''' 
+#     '''
 #     Generates the job array script from given data following standard pattern 
 #     '''
 #     slurm_params = calc_input['slurm_params']
