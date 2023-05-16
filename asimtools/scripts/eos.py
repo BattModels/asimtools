@@ -56,8 +56,8 @@ def eos(
         xprefix = join_names([prefix, f'x{scale:.2f}'])
         sp_sim_input = kwargs
         sp_sim_input.update({
-            # 'script': 'singlepoint.py',
-            'script': 'asim-run',
+            'script': 'singlepoint.py',
+            # 'script': 'asim-run',
             'prefix': xprefix,
         })
 

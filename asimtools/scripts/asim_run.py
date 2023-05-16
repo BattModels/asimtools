@@ -31,9 +31,9 @@ def main(args=None):
     ''' Main '''
     calc_input, sim_input = parse_command_line(args)
     script = sim_input['script']
-    out = importlib.util.find_spec('.'+script,'asimtools.scripts')
-    print(out)
-    if out is not None:
+    script = script.split('.py')[0]
+    spec = importlib.util.find_spec('.'+script,'asimtools.scripts')
+    if spec is not None:
         sim_module = importlib.import_module('.'+script,'asimtools.scripts')
     else:
         sim_module = importlib.import_module(script)

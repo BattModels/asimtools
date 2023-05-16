@@ -182,7 +182,7 @@ class UnitJob(Job):
         run_suffix = job_params.get('run_suffix', '')
 
         txt = f'{run_prefix} '
-        txt += f'{script} calc_input.yaml sim_input.yaml '
+        txt += f'asim-run calc_input.yaml sim_input.yaml '
         txt += f'{run_suffix} '
         return txt
 
@@ -279,8 +279,9 @@ class UnitJob(Job):
             run_job = True
 
         if run_job:
+            print(command)
             completed_process = subprocess.run(
-                command, check=False, capture_output=True, text=True
+                command, check=False, capture_output=True, text=True,
             )
 
             with open('outputs.txt', 'w', encoding='utf-8') as output_file:
@@ -295,6 +296,8 @@ class UnitJob(Job):
                 with open('errors.txt', 'w', encoding='utf-8') as err_file:
                     err_file.write(completed_process.stderr)
                 completed_process.check_returncode()
+
+            
 
         os.chdir(cur_dir)
 
