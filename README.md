@@ -12,18 +12,21 @@ These instructions will give you a copy of the project up and running on
 your local machine for development and testing purposes.
 
 ### Installing
-
+You can install asimtools in a new conda environment using:
 ```
-conda install -n asimtools python=3.9
+conda create -n asimtools python=3.9
 conda activate asimtools
 
 conda install ase -c conda-forge
 
-pip install .
+cd path/to/asimtools/root/
+pip install -e .
 ```
 
-This installs the base package. Individual calculators may need external packages
-for loading those calculators. It is up to the user to make sure those are installed.
+This installs the base package in developer mode so that you do not have to
+reinstall every time you make changes.
+
+Individual calculators may need external packages for loading those calculators. It is up to the user to make sure those are installed.
 
 ## Examples
 TODO: A step by step series of examples that tell you how to get a development
