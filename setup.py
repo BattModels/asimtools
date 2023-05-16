@@ -17,7 +17,7 @@ setup(
     entry_points={
         # make the scripts available as command line scripts
         "console_scripts": [
-            "asim-run = asimtools.scripts.asim_execute:main",
+            "asim-run = asimtools.scripts.asim_run:main",
         ]
     },
     install_requires=[

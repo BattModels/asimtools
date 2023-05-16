@@ -283,6 +283,9 @@ class UnitJob(Job):
                 command, check=False, capture_output=True, text=True
             )
 
+            with open('outputs.txt', 'w', encoding='utf-8') as output_file:
+                output_file.write(completed_process.stdout)
+
             if completed_process.returncode != 0:
                 err_txt = f'Failed to run {sim_input.get("script")} in '
                 err_txt += f'{self.workdir} with command:\n'
