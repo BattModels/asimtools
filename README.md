@@ -11,19 +11,21 @@ analysis pipelines can be used across users
 These instructions will give you a copy of the project up and running on
 your local machine for development and testing purposes.
 
-### Prerequisites
-
-Requirements for the software and other tools to build, test and push 
-- [ASE](https://wiki.fysik.dtu.dk/ase/index.html)
-- [PyMatgen](https://pymatgen.org/)
-- Pandas
-- PyYaml
-
-In addition to the universal requirements, individual calculators may need external packages
-for loading those calculators. It is up to the user to make sure those are installed.
-
 ### Installing
 
+```
+conda install -n asimtools python=3.9
+conda activate asimtools
+
+conda install ase -c conda-forge
+
+pip install .
+```
+
+This installs the base package. Individual calculators may need external packages
+for loading those calculators. It is up to the user to make sure those are installed.
+
+## Examples
 TODO: A step by step series of examples that tell you how to get a development
 environment running
 
@@ -38,19 +40,6 @@ And repeat
 End with an example of getting some data out of the system or using it
 for a little demo
 
-## Adding package and scripts to path
-
-As we are still in development, this package cannot yet be installed. Instead, you will have to add the package 
-to your `PYTHONPATH` using e.g.
-
-    export PYTHONPATH=path/to/asimtools/root:$PYTHONPATH
-
-You can also add this to your `.bashrc`
-
-Similarly, if you want to add the supported scripts to your path, you should add the scripts directory to 
-your `PATH` using
-
-    export PATH=path/to/asimtools/root/scripts:$PATH
 
 ## Running the tests
 
