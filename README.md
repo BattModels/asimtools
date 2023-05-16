@@ -57,13 +57,9 @@ Simulations are run by providing a `*calc_input.yaml` and `*sim_input.yaml` file
 the calculator (and the environment it runs in) and the simulation parameters which are specific 
 to the simulation being run. The recommended method for calling scripts is to use
 
-    path/to/asim_tools/scripts/asim_execute.py calc_input.yaml sim_input.yaml
-
-if you have specified `script` in the sim_input.yaml
-
-Alternatively, a user defined or built-in script such as `eos.py` can be run using:
-
-    path/to/eos.py calc_input.yaml sim_input.yaml
+```
+asim-run *calc_input.yaml *sim_input.yaml
+```
 
 ## Contributing
 
