@@ -66,9 +66,9 @@ class Job():
     def set_input_image(self, atoms: Atoms) -> None:
         ''' Adds and writes the input image for simulation '''
         prefix = self.get_prefix()
-        atoms_input_file = join_names([prefix, 'input_atoms.xyz'])
+        image_file = join_names([prefix, 'input_atoms.xyz'])
         self.sim_input['image'] = {
-            'input_file': atoms_input_file
+            'image_file': image_file
         }
         self.atoms = atoms
 
@@ -240,8 +240,8 @@ class UnitJob(Job):
             write_yaml(workdir / 'calc_input.yaml', calc_input)
             write_yaml(self.get_output_yaml(), {'status': 'clean'})
             if self.atoms is not None:
-                atoms_input_file = self.sim_input['image']['input_file']
-                self.atoms.write(self.get_workdir() / atoms_input_file)
+                image_file = self.sim_input['image']['image_file']
+                self.atoms.write(self.get_workdir() / image_file)
         if use_slurm and not interactive:
             self._gen_slurm_script()
 

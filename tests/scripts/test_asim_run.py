@@ -6,9 +6,9 @@ from asimtools.utils import write_yaml, read_yaml
 from asimtools.scripts.asim_run import main as asim_run
 
 # Path of script that does nothing
-DO_NOTHING_PATH = os.path.join(
+SCRIPT_DIR = os.path.join(
     os.path.dirname(os.path.realpath(__file__)),
-    '../data/do_nothing_script.py',
+    '../data/scripts/do_nothing_script.py',
 )
 
 def test_asim_run_singlepoint(
@@ -47,7 +47,7 @@ def test_asim_run_do_nothing(
     write_yaml(calc_input_file, lj_interactive_calc_input)
 
     sim_input = do_nothing_sim_input.copy()
-    sim_input['script'] = DO_NOTHING_PATH
+    sim_input['script'] = SCRIPT_DIR
     write_yaml(sim_input_file, sim_input)
 
     asim_run([calc_input_file, sim_input_file])

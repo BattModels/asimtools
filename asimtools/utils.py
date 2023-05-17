@@ -2,13 +2,13 @@
 Utilities and helper functions for reading and writing data using set
 standards
 '''
-from typing import TypeVar, Iterable, Tuple
+from typing import TypeVar, Iterable, Tuple, Union
 from glob import glob
 import argparse
 import yaml
 import pandas as pd
 from ase.io import read
-from ase.build import bulk
+import ase.build
 
 Atoms = TypeVar('Atoms')
 
@@ -65,59 +65,82 @@ def join_names(substrs: Iterable[str]) -> str:
     return name
 
 def get_atoms(
-    symbol: str = None,
-    crystal_structure: str = None,
-    input_file: str = None,
+    image_file: str = None,
+    builder: str = 'bulk',
     atoms: Atoms = None,
+    repeat: Tuple[int, int, int] = None,
+    rattle_stdev: float = None,
     **kwargs
 ) -> Atoms:
     '''
-    Helper for returning an Atoms object by ASE specification, input
+    Helper for returning an Atoms object by ASE specification, image
     file or directly using an atoms object
     '''
-    assert (crystal_structure is not None and symbol is not None) or \
-            input_file is not None or \
-            atoms is not None, \
-            "Please specify atoms or input structure and symbol or file"
+    assert image_file is not None or \
+        len(kwargs) > 0 or \
+        atoms is not None, \
+        "Specify atoms, image_file or use ase.build tools"
 
-    if input_file is not None:
-        assert isinstance(input_file, str), "Input file must be a path to\
-            an ASE readable structure"
-        atoms = read(input_file)
+    if image_file is not None:
+        atoms = read(image_file, **kwargs)
     elif atoms is None:
-        assert kwargs.get('a', False), \
-            "Please specify at least lattice parameter a"
-        atoms = bulk(symbol, crystal_structure, **kwargs)
+        builder_func = getattr(ase.build, builder)
+        try:
+            atoms = builder_func(**kwargs)
+        except ValueError:
+            print('Make sure you choose a valid builder and appropriate\
+                arguments matching the functions in ase.build. \n\
+                See https://wiki.fysik.dtu.dk/ase/ase/build/build.html')
+            raise
     else:
-        assert atoms is not None, 'Please give an input structure'
+        assert atoms is not None, 'Specify an input structure'
+
+    if repeat is not None:
+        atoms = atoms.repeat(repeat)
+
+    if rattle_stdev is not None:
+        atoms.rattle(stdev=rattle_stdev)
 
     return atoms
 
+def parse_slice(value):
+    """
+    Parses a `slice()` from string, like `start:stop:step`.
+    """
+    if value:
+        parts = value.split(':')
+        if len(parts) == 1:
+            parts = [None, parts[0]]
+    else:
+        parts = []
+    return slice(*[int(p) if p else None for p in parts])
+
 def get_images(
-    input_file: str = None,
+    image_file: str = None,
     pattern: str = None,
     images: Iterable[Atoms] = None,
-    format: str = None,
-    index: slice = slice(0,-1),
-) -> list:
+    index: Union[str, int] = ':',
+    **kwargs
+) -> list[Atoms]:
     '''
     Helper for returning an Atoms object by ASE specification, input
     file or directly using an atoms object
     '''
-    assert (input_file is not None) or \
+    assert (image_file is not None) or \
         (pattern is not None) or \
         (images is not None), \
         "Please specify file, pattern or iterable"
 
-    if input_file is not None:
-        images = read(input_file, index=index, format=format)
+    index = parse_slice(str(index))
+    if image_file is not None:
+        images = read(image_file, index=index, **kwargs)
     elif pattern is not None:
         image_files = glob(pattern)
+        assert len(image_files) > 0, 'No images matching pattern'
         images = [
-            read(image_file, format=format) for image_file in image_files
+            read(image_file, **kwargs) for image_file in image_files
         ]
     elif images is not None:
-        # images = eval(f'images[{index}]')
         images = images[index]
     else:
         images = []

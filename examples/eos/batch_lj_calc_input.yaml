@@ -1,4 +1,7 @@
 name: LennardJones
+calc:
+  sigma: 3.54
+  epsilon: 0.00802236
 job:
   use_slurm: true
   interactive: false

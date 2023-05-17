@@ -1,7 +1,7 @@
 script: singlepoint
 image:
-  symbol: Ar
-  crystal_structure: fcc
-  a: 3.4
+  name: Ar
+  crystalstructure: 'fcc'
+  a: 2.4
 prefix: Ar_LJ
 properties: [energy, forces, stress]
