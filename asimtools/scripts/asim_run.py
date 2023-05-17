@@ -6,33 +6,8 @@ Author: mkphuthi@github.com
 '''
 
 import importlib
-from typing import Tuple
 import sys
-import argparse
-from asimtools.utils import read_yaml
-
-def parse_command_line(args) -> Tuple[dict, dict]:
-    ''' Parse command line input '''
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        'calc_input_file',
-        metavar='calculator_configuration_file',
-        type=str,
-        help='calculator configuration yaml file'
-    )
-    parser.add_argument(
-        'sim_input_file',
-        metavar='simulation_configuration_file',
-        type=str,
-        help='calculator configuration yaml file'
-    )
-    args = parser.parse_args(args)
-
-    calc_params = read_yaml(args.calc_input_file)
-    sim_params = read_yaml(args.sim_input_file)
-
-    return calc_params, sim_params
-
+from asimtools.utils import parse_command_line
 
 def main(args=None):
     ''' Main '''

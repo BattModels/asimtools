@@ -19,7 +19,8 @@ conda activate asimtools
 
 conda install ase -c conda-forge
 
-cd path/to/asimtools/root/
+git clone https://github.com/BattModels/asimtools.git
+cd asimtools
 pip install -e .
 ```
 
@@ -52,7 +53,7 @@ To run all tests from the tests directory, call:
 
 To run the test suite on a component `component.py` , call:
 
-    pytest test_*.py
+    pytest test_component.py
     
 ## Basic example
 

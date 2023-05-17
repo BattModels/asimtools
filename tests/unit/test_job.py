@@ -4,40 +4,7 @@ Test Job class
 #pylint: disable=missing-function-docstring
 #pylint: disable=redefined-outer-name
 
-import pytest
 from asimtools.job import UnitJob
-
-
-@pytest.fixture
-def slurm_batch_calc_input():
-    calc_input = {
-        'job': {
-            'use_slurm': True,
-            'interactive': False,
-        },
-        'slurm': {
-            'flags': ['-n 2', '--gres=gpu:1']
-        }
-    }
-    return calc_input
-
-@pytest.fixture
-def interactive_calc_input():
-    calc_input = {
-        'job': {
-            'use_slurm': False,
-            'interactive': True,
-        }
-    }
-    return calc_input
-
-@pytest.fixture
-def singlepoint_sim_input():
-    sim_input = {
-        'script': 'singlepoint',
-        'prefix': 'test_',
-    }
-    return sim_input
 
 def test_gen_input_files(
     slurm_batch_calc_input,

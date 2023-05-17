@@ -2,54 +2,56 @@
 Tests for running scripts using asim_run.py
 """
 import os
-import yaml
-
+from asimtools.utils import write_yaml, read_yaml
 from asimtools.scripts.asim_run import main as asim_run
 
-def test_asim_run_singlepoint():
+# Path of script that does nothing
+DO_NOTHING_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)),
+    '../data/do_nothing_script.py',
+)
 
-    calculator_file_name = 'calc.yaml'
-    simulation_file_name = 'sim.yaml'
+def test_asim_run_singlepoint(
+    tmp_path,
+    lj_interactive_calc_input,
+    singlepoint_sim_input
+):
+    ''' 
+    Test asim_run ability to launch and complete a script using LJ
+    '''
+    # Create input files in temporary directory that will 
+    # be automatically deleted using the fixtures in conftest.py
+    os.chdir(tmp_path)
+    calc_input_file = 'calc_input.yaml'
+    sim_input_file = 'sim_input.yaml'
+    write_yaml(calc_input_file, lj_interactive_calc_input)
+    write_yaml(sim_input_file, singlepoint_sim_input)
 
-    calc_config = {
-        'name': 'LennardJones',
-        'job': {
-            'slurm': 'true',
-            'batch': 'false',
-            'interactive': 'true',
-        },
-    }
-    sim_config = {
-        'script': 'singlepoint',
-        'image': {
-            'symbol': 'Ar',
-            'crystal_structure': 'fcc',
-            'a': 3.4,
-        },
-        'prefix': 'Ar_LJ',
-        'properties': ['energy', 'forces', 'stress'],
-    }
+    asim_run([calc_input_file, sim_input_file])
 
-    with open(calculator_file_name,'w',encoding='utf8') as fl:
-        yaml.dump(calc_config,fl)
-    with open(simulation_file_name,'w',encoding='utf8') as fl:
-        yaml.dump(sim_config,fl)
+    # Check job completion
+    output = read_yaml('test_output.yaml')
+    assert output.get('status', False) == 'complete'
 
-    asim_run([calculator_file_name,simulation_file_name])
+def test_asim_run_do_nothing(
+    tmp_path,
+    lj_interactive_calc_input,
+    do_nothing_sim_input,
+):
+    ''' Test running an arbitrary script defined by user '''
+    # Create input files in temporary directory that will 
+    # be automatically deleted using the fixtures in conftest.py
+    os.chdir (tmp_path)
+    calc_input_file = 'calc_input.yaml'
+    sim_input_file = 'sim_input.yaml'
+    write_yaml(calc_input_file, lj_interactive_calc_input)
 
-    ## some checks
-    output_file_name = sim_config['prefix'] + '_output.yaml'
-    with open(output_file_name,'r',encoding='utf8') as fl:
-        output = yaml.load(fl,Loader=yaml.FullLoader)
+    sim_input = do_nothing_sim_input.copy()
+    sim_input['script'] = DO_NOTHING_PATH
+    write_yaml(sim_input_file, sim_input)
 
-    assert output.get('status') == 'complete'
+    asim_run([calc_input_file, sim_input_file])
 
-    ### cleanup
-    output_image_file_name = sim_config['prefix'] + '_image_output.xyz'
-    os.remove(calculator_file_name)
-    os.remove(simulation_file_name)
-    os.remove(output_file_name)
-    os.remove(output_image_file_name)
-
-if __name__ == '__main__':
-    test_asim_run_singlepoint()
+    # Check job completion
+    output = read_yaml('output.yaml')
+    assert output.get('status', False) == 'complete'
