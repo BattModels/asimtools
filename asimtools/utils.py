@@ -4,7 +4,7 @@ standards
 '''
 import getopt
 import sys
-from typing import TypeVar, Iterable
+from typing import TypeVar, Iterable, Tuple
 from glob import glob
 import yaml
 import pandas as pd
@@ -127,7 +127,7 @@ def get_images(
 
     return images
 
-def parse_command_line(argv) -> tuple[dict, dict]:
+def parse_command_line(argv) -> Tuple[dict, dict]:
     ''' Parse command line inputs for simulation script '''
     usage = 'python singlepoint.py calc_params.yaml sim_params.yaml [-h]'
 

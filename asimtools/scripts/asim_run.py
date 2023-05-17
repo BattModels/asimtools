@@ -26,7 +26,7 @@ def parse_command_line(args) -> Tuple[dict, dict]:
         type=str,
         help='calculator configuration yaml file'
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     calc_params = read_yaml(args.calc_input_file)
     sim_params = read_yaml(args.sim_input_file)
