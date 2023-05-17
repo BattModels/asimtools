@@ -182,7 +182,7 @@ class UnitJob(Job):
         run_suffix = job_params.get('run_suffix', '')
 
         txt = f'{run_prefix} '
-        txt += f'{script} calc_input.yaml sim_input.yaml '
+        txt += 'asim-run calc_input.yaml sim_input.yaml '
         txt += f'{run_suffix} '
         return txt
 
@@ -279,17 +279,21 @@ class UnitJob(Job):
             run_job = True
 
         if run_job:
+            
             completed_process = subprocess.run(
-                command, check=False, capture_output=True, text=True
+                command, check=False, capture_output=True, text=True,
             )
+
+            with open('stdout.txt', 'w', encoding='utf-8') as output_file:
+                output_file.write(completed_process.stdout)
 
             if completed_process.returncode != 0:
                 err_txt = f'Failed to run {sim_input.get("script")} in '
                 err_txt += f'{self.workdir} with command:\n'
                 err_txt += f'{" ".join(command)}\n'
-                err_txt += f'See {self.workdir / "errors.txt"} for details.'
+                err_txt += f'See {self.workdir / "stderr.txt"} for details.'
                 print(err_txt)
-                with open('errors.txt', 'w', encoding='utf-8') as err_file:
+                with open('stderr.txt', 'w', encoding='utf-8') as err_file:
                     err_file.write(completed_process.stderr)
                 completed_process.check_returncode()
 

@@ -2,10 +2,9 @@
 Utilities and helper functions for reading and writing data using set
 standards
 '''
-import getopt
-import sys
-from typing import TypeVar, Iterable
+from typing import TypeVar, Iterable, Tuple
 from glob import glob
+import argparse
 import yaml
 import pandas as pd
 from ase.io import read
@@ -127,38 +126,24 @@ def get_images(
 
     return images
 
-def parse_command_line(argv) -> tuple[dict, dict]:
-    ''' Parse command line inputs for simulation script '''
-    usage = 'python singlepoint.py calc_params.yaml sim_params.yaml [-h]'
+def parse_command_line(args) -> Tuple[dict, dict]:
+    ''' Parse command line input '''
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'calc_input_file',
+        metavar='calculator_configuration_file',
+        type=str,
+        help='calculator configuration yaml file'
+    )
+    parser.add_argument(
+        'sim_input_file',
+        metavar='simulation_configuration_file',
+        type=str,
+        help='calculator configuration yaml file'
+    )
+    args = parser.parse_args(args)
 
-    assert len(argv) >= 2, usage
-    try:
-        calc_inputfile = argv[0]
-        calc_params = read_yaml(calc_inputfile)
-    except IndexError:
-        print('Failed to load calc_inputfile\n', usage)
-        raise
-
-    try:
-        sim_inputfile = argv[1]
-        sim_params = read_yaml(sim_inputfile)
-    except FileNotFoundError:
-        print(f'Failed to load {sim_inputfile}\n', usage)
-        raise
-
-    try:
-        opts, _ = getopt.getopt(
-            argv[2:],
-            "h",
-            []
-        )
-    except getopt.GetoptError:
-        print(usage)
-        raise
-
-    for opt, _ in opts:
-        if opt == '-h':
-            print(usage)
-            sys.exit()
+    calc_params = read_yaml(args.calc_input_file)
+    sim_params = read_yaml(args.sim_input_file)
 
     return calc_params, sim_params

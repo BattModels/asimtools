@@ -57,6 +57,7 @@ def eos(
         sp_sim_input = kwargs
         sp_sim_input.update({
             'script': 'singlepoint.py',
+            # 'script': 'asim-run',
             'prefix': xprefix,
         })
 

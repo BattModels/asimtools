@@ -73,7 +73,7 @@ def singlepoint(
 def main(argv):
     ''' main '''
     calc_input, sim_input = parse_command_line(argv)
-    single_point(
+    singlepoint(
         calc_input,
         **sim_input,
     )
