@@ -1,9 +1,7 @@
 script: eos
 image:
-  symbol: Li
-  crystal_structure: bcc
-  a: 3.427
-prefix: Li
+  name: Ar
+prefix: Ar_LJ
 submit: true
 overwrite: false
 scale_range: [0.95, 1.05]

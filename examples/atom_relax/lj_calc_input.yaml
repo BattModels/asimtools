@@ -3,16 +3,14 @@ calc:
   sigma: 3.54
   epsilon: 0.00802236
 job:
-  use_slurm: true
+  slurm: false
+  batch: false
   interactive: true
-slurm:
+slurm_params:
   flags:
     - -n 2
     - --gres=gpu:1
-    - -p gpu
-    - -A venkvis_gpu
-    - -J lj_test
   precommands:
     - source activate ase
   postcommands:
-    - echo "POSTCOMMAND EXAMPLE"
+    - echo "Job ended on `date`"

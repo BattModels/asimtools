@@ -6,7 +6,8 @@ Author: mkphuthi@github.com
 '''
 
 #pylint: disable=too-many-arguments
-from typing import TypeVar, Tuple
+#pylint: disable=too-many-locals
+from typing import TypeVar, Tuple, Dict
 import sys
 import numpy as np
 from asimtools.job import UnitJob, Job, check_jobs
@@ -14,7 +15,6 @@ from asimtools.utils import (
     write_csv_from_dict,
     get_atoms,
     join_names,
-    parse_command_line,
 )
 
 Atoms = TypeVar('Atoms')
@@ -29,7 +29,7 @@ def eos(
     # plot: bool = True,
     workdir: str = '.',
     **kwargs
-) -> dict:
+) -> Dict:
     '''
     Calculate EOS
     '''
@@ -106,16 +106,3 @@ def eos(
     job.complete()
     results.update(job.get_output())
     return results
-
-
-def main(argv):
-    ''' Main '''
-    calc_input, sim_input = parse_command_line(argv)
-    eos(
-        calc_input,
-        **sim_input,
-    )
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])

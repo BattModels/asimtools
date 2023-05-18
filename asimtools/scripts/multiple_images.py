@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Calculates EOS
+Apply the same script on multiple images
 
 Author: mkphuthi@github.com
 
@@ -11,25 +11,22 @@ vs 32 cores. Basically a way to hand scripts calling other scripts
 at various levels.
 '''
 
-from typing import TypeVar
+from typing import TypeVar, Dict
 import sys
 from asimtools.job import UnitJob, Job, check_jobs
-from asimtools.utils import (
-    get_images,
-    parse_command_line,
-)
+from asimtools.utils import get_images
 
 Atoms = TypeVar('Atoms')
 
 
 def multiple_images(
-    calc_input: dict,
-    images: dict,
-    subscript_input: dict,
+    calc_input: Dict,
+    images: Dict,
+    subscript_input: Dict,
     prefix: str = '',
     workdir: str = '.',
     **kwargs
-) -> dict:
+) -> Dict:
     '''
     Repeat a script on multiple images
     '''
@@ -69,16 +66,3 @@ def multiple_images(
     job.complete()
 
     return job.get_output()
-
-
-def main(argv):
-    ''' Main '''
-    calc_input, sim_input = parse_command_line(argv)
-    multiple_images(
-        calc_input,
-        **sim_input,
-    )
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])

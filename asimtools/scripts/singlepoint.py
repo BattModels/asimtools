@@ -4,26 +4,25 @@ Calculates single point energy
 
 Author: mkphuthi@github.com
 '''
-import sys
-from typing import TypeVar, Tuple
+
+#pylint: disable=unused-argument
+# pylint: disable=too-many-arguments
+
+from typing import Tuple, Dict
 from asimtools.calculators import load_calc
 from asimtools.job import Job
 from asimtools.utils import (
     get_atoms,
     join_names,
-    parse_command_line,
 )
 
-Atoms = TypeVar('Atoms')
-# pylint: disable=too-many-arguments
-
 def singlepoint(
-    calc_input: dict,
-    image: dict = None,
+    calc_input: Dict,
+    image: Dict = None,
     prefix: str = '',
     properties: Tuple[str] = ('energy', 'forces'),
     **kwargs
-) -> dict:
+) -> Dict:
     ''' 
     Calculates the single point energy, forces and stresses where possible
     '''
@@ -68,23 +67,3 @@ def singlepoint(
 
     job.complete()
     return job.get_output()
-
-
-def main(argv):
-    ''' main '''
-    calc_input, sim_input = parse_command_line(argv)
-    singlepoint(
-        calc_input,
-        **sim_input,
-    )
-
-    try:
-        singlepoint(calc_input, **sim_input)
-        sys.exit(0)
-    except Exception:
-        print('Failed to run singlepoint')
-        raise
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
