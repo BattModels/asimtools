@@ -1,0 +1,12 @@
+script: lammps
+# image:
+#   symbol: Ar
+template: npt_template.lammps
+variables:
+  NSTEPS: 100
+  THERMO_FREQ: 10
+  DUMP_FREQ: 10
+  TEMP: 900.0
+  PRES: 1.0
+  TAU_T: 0.1
+  TAU_P: 0.5

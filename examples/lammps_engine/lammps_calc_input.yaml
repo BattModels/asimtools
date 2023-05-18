@@ -1,0 +1,16 @@
+name: LAMMPS
+calc:
+  lmp_command: mpirun lmp
+job:
+  use_slurm: false
+  interactive: true
+slurm:
+  flags:
+    - -n 2
+    - -p idle
+    - -A venkvis
+    - -J lmp_test
+  precommands:
+    - module load lammps/manybody
+  postcommands:
+    - echo "EXAMPLE POSTCOMMAND"
