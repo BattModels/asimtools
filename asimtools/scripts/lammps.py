@@ -1,28 +1,29 @@
 #!/usr/bin/env python
 '''
-Calculates single point energy 
+Runs a user defined lammps script or template 
 
 Author: mkphuthi@github.com
 '''
-import sys
+from typing import Dict
 import subprocess
 from asimtools.job import Job
 from asimtools.utils import (
     get_atoms,
     join_names,
-    parse_command_line,
 )
 
 # pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
+# pylint: disable=dangerous-default-value
 
 def lammps(
-    calc_input: dict,
+    calc_input: Dict,
     template: str,
-    image: dict = None,
+    image: Dict = None,
     prefix: str = '',
-    variables: dict = {},
+    variables: Dict = {},
     **kwargs
-) -> dict:
+) -> Dict:
     ''' 
     Runs a lammps simulation based on a template lammps input script
     '''
@@ -77,23 +78,3 @@ def lammps(
     job.add_output_files({'log': 'log.lammps'})
     job.complete()
     return job.get_output()
-
-
-def main(argv):
-    ''' main '''
-    calc_input, sim_input = parse_command_line(argv)
-    lammps(
-        calc_input,
-        **sim_input,
-    )
-
-    try:
-        lammps(calc_input, **sim_input)
-        sys.exit(0)
-    except Exception:
-        print('Failed to run singlepoint')
-        raise
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])

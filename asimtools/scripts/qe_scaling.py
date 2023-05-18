@@ -1,23 +1,22 @@
 #!/usr/bin/env python
 '''
-Calculate core and memory scaling of a particular system
+Calculate core and memory scaling for QE.
+This example is broken
 
 Author: mkphuthi@github.com
 '''
 
 #pylint: disable=too-many-arguments
 from typing import Sequence
-import sys
 from datetime import datetime
 from parse_tools import get_str_btn
 import numpy as np
-from asimtools.job import UnitJob, Job, check_jobs
 import matplotlib.pyplot as plt
+from asimtools.job import UnitJob, Job
 from asimtools.utils import (
     write_csv_from_dict,
     get_atoms,
     join_names,
-    parse_command_line,
 )
 
 def get_run_stats(outf: str, prog: str = 'PWSCF'):
@@ -208,16 +207,3 @@ def qe_scaling(
 
     results.update(job.get_output())
     return results
-
-
-def main(argv):
-    ''' Main '''
-    calc_input, sim_input = parse_command_line(argv)
-    qe_scaling(
-        calc_input,
-        **sim_input,
-    )
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])

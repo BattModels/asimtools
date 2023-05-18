@@ -2,7 +2,7 @@
 Utilities and helper functions for reading and writing data using set
 standards
 '''
-from typing import TypeVar, Iterable, Tuple, Union, List
+from typing import TypeVar, Iterable, Tuple, Union, List, Dict
 from glob import glob
 import argparse
 import yaml
@@ -12,18 +12,18 @@ import ase.build
 
 Atoms = TypeVar('Atoms')
 
-def read_yaml(yaml_path: str) -> dict:
+def read_yaml(yaml_path: str) -> Dict:
     ''' Read a yaml file'''
     with open(yaml_path, 'r', encoding='utf-8') as f:
         output = yaml.safe_load(f)
     return output
 
-def write_yaml(yaml_path: str, yaml_dict: dict) -> None:
+def write_yaml(yaml_path: str, yaml_Dict: Dict) -> None:
     ''' Write a yaml file '''
     with open(yaml_path, 'w', encoding='utf-8') as f:
-        yaml.dump(yaml_dict, f)
+        yaml.dump(yaml_Dict, f)
 
-def write_csv_from_dict(fname: str, data: dict, columns: Iterable = None) -> pd.DataFrame:
+def write_csv_from_Dict(fname: str, data: Dict, columns: Iterable = None) -> pd.DataFrame:
     ''' Write a csv from entries in a dictionary '''
 
     if columns is None:
@@ -149,7 +149,7 @@ def get_images(
 
     return images
 
-def parse_command_line(args) -> Tuple[dict, dict]:
+def parse_command_line(args) -> Tuple[Dict, Dict]:
     ''' Parse command line input '''
     parser = argparse.ArgumentParser()
     parser.add_argument(

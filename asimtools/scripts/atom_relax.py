@@ -1,31 +1,31 @@
 #!/usr/bin/env python
 '''
-Calculates single point energy 
+Relaxes structure using ASE
 
 Author: mkphuthi@github.com
 '''
-import sys
-from typing import Sequence
+
+#pylint: disable=unused-argument
+#pylint: disable=too-many-locals
+#pylint: disable=too-many-arguments
+
+from typing import Sequence, Dict
 import numpy as np
 import ase.optimize
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
 from asimtools.job import Job
-from asimtools.utils import (
-    get_atoms,
-    join_names,
-    parse_command_line,
-)
+from asimtools.utils import get_atoms, join_names
 
 def atom_relax(
-    calc_input: dict,
-    image: dict = None,
+    calc_input: Dict,
+    image: Dict = None,
     prefix: str = '',
     optimizer: str = 'GPMin', #GPMin is fastest according to docs
     properties: Sequence[str] = ('energy', 'forces'),
     fmax: float = 0.05,
     **kwargs
-) -> dict:
+) -> Dict:
     ''' 
     Relaxes the given structure using ASE
     '''
@@ -71,23 +71,3 @@ def atom_relax(
 
     job.complete()
     return job.get_output()
-
-
-def main(argv):
-    ''' main '''
-    calc_input, sim_input = parse_command_line(argv)
-    atom_relax(
-        calc_input,
-        **sim_input,
-    )
-
-    try:
-        atom_relax(calc_input, **sim_input)
-        sys.exit(0)
-    except Exception:
-        print('Failed to run singlepoint')
-        raise
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])

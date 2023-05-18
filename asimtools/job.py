@@ -26,8 +26,8 @@ class Job():
     # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
-        calc_input: dict,
-        sim_input: dict,
+        calc_input: Dict,
+        sim_input: Dict,
         workdir: str = None,
         atoms = None,
     ):
@@ -57,7 +57,7 @@ class Job():
         ''' Updates the output to signal that the job was started '''
         self.update_status('complete')
 
-    def add_output_files(self, file_dict: dict) -> None:
+    def add_output_files(self, file_dict: Dict) -> None:
         ''' Adds a file to the output file list '''
         files = self.get_output().get('files', {})
         files.update(file_dict)
@@ -72,7 +72,7 @@ class Job():
         }
         self.atoms = atoms
 
-    def get_sim_input(self) -> dict:
+    def get_sim_input(self) -> Dict:
         ''' Get simulation input '''
         return self.sim_input
 
@@ -80,22 +80,22 @@ class Job():
         ''' Get current job prefix '''
         return self.sim_input.get('prefix', '')
 
-    def get_output_yaml(self) -> dict:
+    def get_output_yaml(self) -> Dict:
         ''' Get current output file '''
         prefix = self.get_prefix()
         out_fname = join_names([prefix, 'output.yaml'])
         output_yaml = self.workdir / out_fname
         return output_yaml
 
-    def get_calc_input(self) -> dict:
+    def get_calc_input(self) -> Dict:
         ''' Get calculator input '''
         return self.calc_input
 
-    def get_calc_params(self) -> dict:
+    def get_calc_params(self) -> Dict:
         ''' Get calculator parameters '''
         return self.calc_input.get('calc', {})
 
-    def get_job_params(self) -> dict:
+    def get_job_params(self) -> Dict:
         ''' Get job parameters '''
         return self.calc_input.get('job', {})
 
@@ -103,7 +103,7 @@ class Job():
         ''' Get working directory '''
         return self.workdir
 
-    def get_output(self) -> dict:
+    def get_output(self) -> Dict:
         ''' Get values in output.yaml '''
         output_yaml = self.get_output_yaml()
         if output_yaml.exists():
@@ -151,7 +151,7 @@ class Job():
         complete = status == 'complete'
         return complete, status
 
-    def update_output(self, output_update: dict) -> None:
+    def update_output(self, output_update: Dict) -> None:
         ''' Update output.yaml if it exists or write a new one '''
         output = self.get_output()
         output.update(output_update)
@@ -162,8 +162,8 @@ class UnitJob(Job):
     ''' Unit job object with ability to submit slurm jobs '''
     def __init__(
         self,
-        calc_input: dict,
-        sim_input: dict,
+        calc_input: Dict,
+        sim_input: Dict,
         workdir = None,
     ):
         super().__init__(calc_input, sim_input, workdir)
@@ -322,8 +322,8 @@ def check_jobs(jobs) -> bool:
     return False
 
 # def prepare_job(
-#     calc_input: dict,
-#     sim_input: dict,
+#     calc_input: Dict,
+#     sim_input: Dict,
 #     workdir: str,
 # ) -> Job:
 #     ''' Prepares a job's input files and gives a job object to handle '''
@@ -332,7 +332,7 @@ def check_jobs(jobs) -> bool:
 #     return job
 
 
-# def gen_slurm_array_txt(calc_input: dict, sim_input: dict) -> str:
+# def gen_slurm_array_txt(calc_input: Dict, sim_input: Dict) -> str:
 #     '''
 #     Generates the job array script from given data following standard pattern 
 #     '''
