@@ -2,7 +2,7 @@
 Utilities and helper functions for reading and writing data using set
 standards
 '''
-from typing import TypeVar, Iterable, Tuple, Union
+from typing import TypeVar, Iterable, Tuple, Union, List
 from glob import glob
 import argparse
 import yaml
@@ -121,7 +121,7 @@ def get_images(
     images: Iterable[Atoms] = None,
     index: Union[str, int] = ':',
     **kwargs
-) -> list[Atoms]:
+) -> List[Atoms]:
     '''
     Helper for returning an Atoms object by ASE specification, input
     file or directly using an atoms object

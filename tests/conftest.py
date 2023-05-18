@@ -63,8 +63,8 @@ def singlepoint_sim_input():
         'script': 'singlepoint',
         'prefix': 'test_',
         'image': {
-            'symbol': 'Ar',
-            'crystal_structure': 'fcc',
+            'name': 'Ar',
+            'crystalstructure': 'fcc',
             'a': 5.4,
         }
     }
