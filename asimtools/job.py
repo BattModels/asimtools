@@ -8,7 +8,7 @@ Author: mkphuthi@github.com
 import subprocess
 import os
 from pathlib import Path
-from typing import List, TypeVar
+from typing import List, TypeVar, Dict
 from copy import deepcopy
 from ase.io import read
 import numpy as np
