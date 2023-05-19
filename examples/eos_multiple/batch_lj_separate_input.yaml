@@ -1,0 +1,3 @@
+calculator_filenames:
+  - batch_lj_calc_eos_input.yaml
+  - batch_lj_postprocess_input.yaml

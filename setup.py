@@ -21,6 +21,7 @@ setup(
         ]
     },
     install_requires=[
+        "pytest",
         "pandas",
         "pyyaml",
         "pymatgen",

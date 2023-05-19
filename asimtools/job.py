@@ -8,17 +8,19 @@ Author: mkphuthi@github.com
 import subprocess
 import os
 from pathlib import Path
-from typing import List, TypeVar, Dict
+from typing import List, TypeVar, Dict, Union
 from copy import deepcopy
+from ase import Atoms
 from ase.io import read
 import numpy as np
+
+
 from asimtools.utils import (
     read_yaml,
     write_yaml,
     join_names,
 )
 
-Atoms = TypeVar('Atoms')
 
 class Job():
     ''' Abstract class for the job object '''
@@ -29,7 +31,7 @@ class Job():
         calc_input: Dict,
         sim_input: Dict,
         workdir: str = None,
-        atoms = None,
+        atoms=None,
     ):
 
         self.calc_input = deepcopy(calc_input)
@@ -160,11 +162,12 @@ class Job():
 
 class UnitJob(Job):
     ''' Unit job object with ability to submit slurm jobs '''
+
     def __init__(
         self,
         calc_input: Dict,
         sim_input: Dict,
-        workdir = None,
+        workdir=None,
     ):
         super().__init__(calc_input, sim_input, workdir)
 
@@ -181,7 +184,7 @@ class UnitJob(Job):
         run_prefix = job_params.get('run_prefix', '')
         run_suffix = job_params.get('run_suffix', '')
 
-        txt = f'{run_prefix} '
+        txt = f'{run_prefix}'
         txt += 'asim-run calc_input.yaml sim_input.yaml '
         txt += f'{run_suffix} '
         return txt
@@ -216,7 +219,7 @@ class UnitJob(Job):
         '''
         slurm_params = self.calc_input.get('slurm', False)
 
-        txt = 'srun --unbuffered ' # Use unbuffered to avoid IO lag
+        txt = 'srun --unbuffered '  # Use unbuffered to avoid IO lag
         txt += ' '.join(slurm_params.get('flags'))
         txt += self._gen_run_command()
 
@@ -245,7 +248,7 @@ class UnitJob(Job):
         if use_slurm and not interactive:
             self._gen_slurm_script()
 
-    def submit(self) -> None:
+    def submit(self, dependency: List = None) -> Union[None, int]:
         ''' Submit a job using slurm, interactively or in the terminal '''
 
         if not self.workdir.exists():
@@ -266,7 +269,18 @@ class UnitJob(Job):
         interactive = job_params.get('interactive', False)
         # Maybe want to do something clever with the exit code here
         if use_slurm and not interactive:
-            command = ['sbatch', 'job.sh']
+            if dependency is not None:
+                dependstr = None
+                for dep in dependency:
+                    if dependstr is None:
+                        dependstr = str(dep) if dep is not None else None
+                    else:
+                        dependstr += f':{dep}' if dep is not None else ''
+
+                command = ['sbatch', '-d', f'afterok:{dependstr}', 'job.sh']
+            else:
+                command = ['sbatch', 'job.sh']
+
         elif use_slurm and interactive:
             command = self._gen_slurm_interactive_txt().split()
         else:
@@ -279,11 +293,9 @@ class UnitJob(Job):
             run_job = True
 
         if run_job:
-            
             completed_process = subprocess.run(
                 command, check=False, capture_output=True, text=True,
             )
-
             with open('stdout.txt', 'w', encoding='utf-8') as output_file:
                 output_file.write(completed_process.stdout)
 
@@ -298,10 +310,14 @@ class UnitJob(Job):
                 completed_process.check_returncode()
 
         os.chdir(cur_dir)
+        if use_slurm:
+            job_id = int(completed_process.stdout.split(' ')[-1])
+            return job_id
 
         return None
 
-def check_jobs(jobs) -> bool:
+
+def check_jobs(jobs: List[Job]) -> bool:
     ''' Checks status of jobs and prints a report '''
 
     completed = []
@@ -321,6 +337,26 @@ def check_jobs(jobs) -> bool:
 
     return False
 
+
+def load_jobs_from_directory(
+    work_directory: Union[str, List]
+) -> List[UnitJob]:
+    if isinstance(work_directory, list):
+        job_list = []
+        for wd in work_directory:
+            job_list += load_jobs_from_directory(wd)
+    else:
+        calc_input = read_yaml(
+            os.path.join(work_directory, 'calc_input.yaml')
+        )
+        sim_input = read_yaml(
+            os.path.join(work_directory, 'sim_input.yaml')
+        )
+        job_list = [
+            UnitJob(calc_input, sim_input, work_directory)
+        ]
+
+    return job_list
 # def prepare_job(
 #     calc_input: Dict,
 #     sim_input: Dict,
@@ -334,7 +370,7 @@ def check_jobs(jobs) -> bool:
 
 # def gen_slurm_array_txt(calc_input: Dict, sim_input: Dict) -> str:
 #     '''
-#     Generates the job array script from given data following standard pattern 
+#     Generates the job array script from given data following standard pattern
 #     '''
 #     slurm_params = calc_input['slurm_params']
 #     script = sim_input['script']

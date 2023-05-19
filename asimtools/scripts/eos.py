@@ -5,49 +5,29 @@ Calculates EOS
 Author: mkphuthi@github.com
 '''
 
-#pylint: disable=too-many-arguments
-#pylint: disable=too-many-locals
-from typing import TypeVar, Tuple, Dict
-import sys
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
+from typing import Tuple, Dict, List
 import numpy as np
-from asimtools.job import UnitJob, Job, check_jobs
+from ase import Atoms
+from asimtools.job import UnitJob
 from asimtools.utils import (
-    write_csv_from_dict,
     get_atoms,
     join_names,
+    read_yaml,
 )
 
-Atoms = TypeVar('Atoms')
 
-
-def eos(
-    calc_input: dict,
-    image: dict,
-    prefix: str = '',
-    nimages: int = 5,
-    scale_range: Tuple[float] = (0.95, 1.05),
-    # plot: bool = True,
-    workdir: str = '.',
+def singlepoint_jobs(
+    atoms: Atoms,
+    scales: List,
+    prefix: str,
+    calc_input: Dict,
     **kwargs
-) -> Dict:
-    '''
-    Calculate EOS
-    '''
-    job = Job(calc_input, {'prefix': prefix, 'workdir': workdir})
-    job.start()
-
-    # Fail early principle. There should usually be assert statements here
-    # to make sure inputs are correct
-    assert scale_range[0] < scale_range[1], 'x_scale[0] should be smaller than\
-         x_scale[1]'
-
-    atoms = get_atoms(**image)
-
-    # Preprocessing the data, structures and data structures
-    scales = np.linspace(scale_range[0], scale_range[1], nimages)
-
-    # single point calculation script called here. Note that this will
-    # automatically submit nimages jobs
+) -> List[UnitJob]:
+    """
+    Generate list of singlepoint calculations
+    """
     sp_jobs = []
     for scale in scales:
         new_cell = atoms.get_cell() * scale
@@ -70,39 +50,75 @@ def eos(
         unitjob.gen_input_files()
         sp_jobs.append(unitjob)
 
-    if kwargs.get('submit', True):
-        for sp_job in sp_jobs:
-            sp_job.submit()
+    return sp_jobs
 
-    # Figure out if all the jobs are finished
-    all_jobs_finished = check_jobs(sp_jobs)
 
-    # If they are not finished, print the statues of each job
-    if not all_jobs_finished:
-        sys.exit()
+def eos(
+    calc_input: dict,
+    image: dict,
+    prefix: str = '',
+    nimages: int = 5,
+    scale_range: Tuple[float] = (0.95, 1.05),
+    # plot: bool = True,
+    # workdir: str = '.',
+    **kwargs
+) -> Dict:
+    '''
+    Calculate EOS
+    '''
 
-    # If all jobs are finished, prepare and write of results
-    volumes = []
-    energies = []
-    for sp_job in sp_jobs:
-        # You can get outputs directly from *output.yaml for saved outputs
-        energy = sp_job.get_output().get('energy')
-        energies.append(energy)
+    # Fail early principle. There should usually be assert statements here
+    # to make sure inputs are correct
+    assert scale_range[0] < scale_range[1], 'x_scale[0] should be smaller than\
+         x_scale[1]'
 
-        # You can get outputs directly from *image_output.xyz for special cases
-        volume = sp_job.get_output_image().get_volume()
-        volumes.append(volume)
+    atoms = get_atoms(**image)
 
-    results = {
-        'scales': scales,
-        'volumes': volumes,
-        'energies': energies,
+    # Preprocessing the data, structures and data structures
+    scales = np.linspace(scale_range[0], scale_range[1], nimages)
+
+    # single point calculation script called here. Note that this will
+    # automatically submit nimages jobs
+
+    calculator_inputs = calc_input.get('calculator_filenames')
+    if isinstance(calculator_inputs,list):
+        eos_input = read_yaml(calculator_inputs.pop(0))
+    else:
+        eos_input = calc_input
+
+    sp_jobs = singlepoint_jobs(
+        atoms,
+        scales,
+        prefix,
+        eos_input,
+        **kwargs
+    )
+    work_directories = [str(sp_job.workdir.resolve()) for sp_job in sp_jobs]
+    
+    eos_postprocess_job_input = {
+        **kwargs,
+        'script': 'eos_postprocess.py',
+        'prefix': 'postprocess',
+        'sp_work_directories': work_directories,
+        'scales': scales.tolist(),
+        # **kwargs
     }
 
-    eos_table_file = join_names([prefix, 'eos_output.csv'])
-    write_csv_from_dict(eos_table_file, results)
+    if isinstance(calculator_inputs,list):
+        postprocess_input = read_yaml(calculator_inputs.pop(0))
+    else:
+        postprocess_input = calc_input
+    
+    eos_postprocess_job = UnitJob(
+        postprocess_input,
+        eos_postprocess_job_input,
+        eos_postprocess_job_input['prefix']
+    )
+    eos_postprocess_job.gen_input_files()
 
-    job.add_output_files({'eos': eos_table_file})
-    job.complete()
-    results.update(job.get_output())
-    return results
+    if kwargs.get('submit', True):
+        job_ids = []
+        for sp_job in sp_jobs:
+            job_ids.append(sp_job.submit())
+        print(job_ids)
+        eos_postprocess_job.submit(dependency=job_ids)

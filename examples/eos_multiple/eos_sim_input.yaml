@@ -1,0 +1,9 @@
+script: eos
+image:
+  name: Ar
+  crystalstructure: fcc
+prefix: Ar_LJ
+submit: true
+overwrite: true
+scale_range: [0.95, 1.05]
+nimages: 3

@@ -1,0 +1,15 @@
+job:
+  use_slurm: true
+  interactive: false
+slurm:
+  flags:
+    - -n 1
+    - --gres=gpu:1
+    - -p gpu
+    - -A venkvis_gpu
+    - -J lj_test
+  precommands:
+    - source ~/.bashrc
+    - conda activate asimtools
+  postcommands:
+    - echo "POSTCOMMAND"

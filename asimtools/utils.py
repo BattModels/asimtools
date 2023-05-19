@@ -23,7 +23,7 @@ def write_yaml(yaml_path: str, yaml_Dict: Dict) -> None:
     with open(yaml_path, 'w', encoding='utf-8') as f:
         yaml.dump(yaml_Dict, f)
 
-def write_csv_from_Dict(fname: str, data: Dict, columns: Iterable = None) -> pd.DataFrame:
+def write_csv_from_dict(fname: str, data: Dict, columns: Iterable = None) -> pd.DataFrame:
     ''' Write a csv from entries in a dictionary '''
 
     if columns is None:
