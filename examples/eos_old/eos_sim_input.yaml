@@ -1,0 +1,8 @@
+script: eos
+image:
+  name: Ar
+prefix: Ar_LJ
+submit: true
+overwrite: false
+scale_range: [0.95, 1.05]
+nimages: 3

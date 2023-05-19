@@ -1,14 +1,8 @@
 #!/usr/bin/env python
 '''
-Apply the same script on multiple images
+Apply the same script on multiple images/calc inputs
 
 Author: mkphuthi@github.com
-
-This is a breaking case of the current architecture, will need to 
-rethink fundamental parts of the Job object and how it handles jobs
-with different submission requirements e.g. a job needing one core
-vs 32 cores. Basically a way to hand scripts calling other scripts
-at various levels.
 '''
 
 from typing import TypeVar, Dict
@@ -16,13 +10,12 @@ import sys
 from asimtools.job import UnitJob, Job, check_jobs
 from asimtools.utils import get_images
 
-Atoms = TypeVar('Atoms')
 
-
-def multiple_images(
+def distribute_script(
     calc_input: Dict,
-    images: Dict,
-    subscript_input: Dict,
+    script: str,
+    images: Dict = None,
+    image: Dict = None,
     prefix: str = '',
     workdir: str = '.',
     **kwargs
@@ -36,8 +29,13 @@ def multiple_images(
     # Fail early principle. There should usually be assert statements here
     # to make sure inputs are correct
 
-    images = get_images(**images)
+    if images is not None:
+        images = get_images(**images)
+    else:
+        images = [get_atoms(**image)]
 
+    configs = 
+    if 
     unitjobs = []
     for ind, atoms in enumerate(images):
         unitjob = UnitJob(

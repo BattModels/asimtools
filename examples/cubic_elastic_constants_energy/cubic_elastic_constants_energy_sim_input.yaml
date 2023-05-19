@@ -1,0 +1,13 @@
+script: cubic_elastic_constants_energy
+step_1:
+  image:
+    name: Li
+  prefix: Li
+  submit: true
+  overwrite: false
+  scale_range: [0.95, 1.05]
+  nimages: 3
+step_2:
+  strains: [-0.005, 0.0, 0.005]
+step_3:
+  submit: false

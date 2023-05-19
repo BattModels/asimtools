@@ -1,108 +1,95 @@
-#!/usr/bin/env python
-'''
-Calculates EOS
+'''.Xauthority'''
 
-Author: mkphuthi@github.com
-'''
-
-#pylint: disable=too-many-arguments
-#pylint: disable=too-many-locals
-from typing import TypeVar, Tuple, Dict
-import sys
+from typing import Dict, Tuple, List
 import numpy as np
-from asimtools.job import UnitJob, Job, check_jobs
+import matplotlib.pyplot as plt
+from ase.eos import EquationOfState
 from asimtools.utils import (
-    write_csv_from_dict,
-    get_atoms,
-    join_names,
+    get_atoms
 )
 
-Atoms = TypeVar('Atoms')
-
-
-def eos(
-    calc_input: dict,
-    image: dict,
-    prefix: str = '',
-    nimages: int = 5,
-    scale_range: Tuple[float] = (0.95, 1.05),
-    # plot: bool = True,
-    workdir: str = '.',
-    **kwargs
-) -> Dict:
-    '''
-    Calculate EOS
-    '''
-    job = Job(calc_input, {'prefix': prefix, 'workdir': workdir})
-    job.start()
-
+@step(job_type='process')
+def preprocess(
+    image: Dict,
+    scale_range: Tuple[float, float] = (0.95,1.05),
+    nimages: int = 5
+) -> Tuple[bool,List,List]:
+    ''' Get the images for the eos calculation '''
     # Fail early principle. There should usually be assert statements here
     # to make sure inputs are correct
-    assert scale_range[0] < scale_range[1], 'x_scale[0] should be smaller than\
-         x_scale[1]'
+    assert scale_range[0] < scale_range[1], 'x_scale[0] should be \
+        smaller than x_scale[1]'
 
     atoms = get_atoms(**image)
 
     # Preprocessing the data, structures and data structures
     scales = np.linspace(scale_range[0], scale_range[1], nimages)
-
-    # single point calculation script called here. Note that this will
-    # automatically submit nimages jobs
-    sp_jobs = []
+    images = []
     for scale in scales:
         new_cell = atoms.get_cell() * scale
         new_atoms = atoms.copy()
         new_atoms.set_cell(new_cell)
-        xprefix = join_names([prefix, f'x{scale:.2f}'])
-        sp_sim_input = kwargs
-        sp_sim_input.update({
-            'script': 'singlepoint.py',
-            # 'script': 'asim-run',
-            'prefix': xprefix,
+        images.append(new_atoms)
+
+    return True, singlepoint_sim_inputs
+
+@step(job_type='simulation')
+def calculate_energies(images, sim_input, scales):
+    ''' Performs the energy calculations '''
+    distribute_script(images, sim_inputs)
+
+@step(job_type='process')
+def postprocess(eos_output_csv):
+    ''' plot things '''
+    data = np.genfromtxt(eos_output_csv, delimiter=',')
+    volumes = data[:,1]
+    energies = data[:,0]
+    eos_fit = EquationOfState(volumes, energies)
+    try:
+        v0, e0, B = eos_fit.fit()
+    except ValueError:
+        print('ERROR: Could not fit EOS, check structures')
+        v0, e0, B = None, None, None
+        job.update_status('failed')
+
+    fig, ax = plt.subplots()
+    if v0 is not None:
+        B_GPa = B / kJ * 1.0e24 # eV/Ang^3 to GPa
+        eos_fit.plot(ax=ax)
+
+        # Get equilibrium lattice scaling by interpolation
+        xs2 = np.linspace(scale_range[0], scale_range[1], 100)
+        vs2 = []
+        for i in xs2:
+            samp_atoms = atoms.copy()
+            samp_atoms.cell = samp_atoms.cell*i
+            vs2.append(samp_atoms.get_volume())
+        x0 = np.interp(v0, vs2, xs2)
+
+        job.update_output({
+            'equilibrium_volume': float(v0),
+            'equilibrium_energy': float(e0),
+            'equilibrium_scale': float(x0),
+            'bulk_modulus': float(B_GPa),
         })
+    else:
+        ax.plot(volumes, energies)
+    ax.set_xlabel(r'Volume ($\AA$)')
+    ax.set_ylabel(r'Energy (eV)')
+    plt.savefig(join_names([job.get_prefix(), 'eos.png']))
+    plt.close(fig)
 
-        unitjob = UnitJob(
-            calc_input,
-            sp_sim_input,
-            xprefix,
-        )
-        unitjob.set_input_image(new_atoms)
-        unitjob.gen_input_files()
-        sp_jobs.append(unitjob)
+def eos(
+    calc_input: Dict,
+    image: dict,
+    prefix: str = '',
+    nimages: int = 5,
+    scale_range: Tuple[float] = (0.95, 1.05),
+    workdir: str = '.',
+    **kwargs
+) -> Dict:
 
-    if kwargs.get('submit', True):
-        for sp_job in sp_jobs:
-            sp_job.submit()
+    status, images, scales = preprocess(image, scale_range, nimages)
+    sim_results = calculate_energies(images, scales)
+    analysis_results = postprocess(sim_results)
 
-    # Figure out if all the jobs are finished
-    all_jobs_finished = check_jobs(sp_jobs)
-
-    # If they are not finished, print the statues of each job
-    if not all_jobs_finished:
-        sys.exit()
-
-    # If all jobs are finished, prepare and write of results
-    volumes = []
-    energies = []
-    for sp_job in sp_jobs:
-        # You can get outputs directly from *output.yaml for saved outputs
-        energy = sp_job.get_output().get('energy')
-        energies.append(energy)
-
-        # You can get outputs directly from *image_output.xyz for special cases
-        volume = sp_job.get_output_image().get_volume()
-        volumes.append(volume)
-
-    results = {
-        'scales': scales,
-        'volumes': volumes,
-        'energies': energies,
-    }
-
-    eos_table_file = join_names([prefix, 'eos_output.csv'])
-    write_csv_from_dict(eos_table_file, results)
-
-    job.add_output_files({'eos': eos_table_file})
-    job.complete()
-    results.update(job.get_output())
-    return results

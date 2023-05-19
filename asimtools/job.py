@@ -279,7 +279,6 @@ class UnitJob(Job):
             run_job = True
 
         if run_job:
-            
             completed_process = subprocess.run(
                 command, check=False, capture_output=True, text=True,
             )
