@@ -1,13 +1,16 @@
-name: LennardJones
+submit: True
+overwrite: True
+calc:
+  name: LennardJones
+  module: ase.calculators.lj
+  label: 'LJ' #optional
+  args:
+    sigma: 3.54
+    epsilon: 0.00802236
 job:
-  slurm: true
-  batch: false
+  use_slurm: false
   interactive: true
-slurm_params:
-  flags:
-    - -n 2
-    - --gres=gpu:1
-  precommands:
-    - source activate ase
-  postcommands:
-    - echo "Job ended on `date`"
+  # process:
+  #   job:
+  #     use_slurm: false
+  #     interactive: true

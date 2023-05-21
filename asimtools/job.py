@@ -8,7 +8,8 @@ Author: mkphuthi@github.com
 import subprocess
 import os
 from pathlib import Path
-from typing import List, TypeVar, Dict
+import functools
+from typing import List, TypeVar, Dict, Tuple, Union
 from copy import deepcopy
 from ase.io import read
 import numpy as np
@@ -26,19 +27,16 @@ class Job():
     # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
-        calc_input: Dict,
+        config_input: Dict,
         sim_input: Dict,
-        workdir: str = None,
-        atoms = None,
     ):
 
-        self.calc_input = deepcopy(calc_input)
+        self.config_input = deepcopy(config_input)
         self.sim_input = deepcopy(sim_input)
-        self.atoms = atoms
-        if workdir is None:
-            self.workdir = Path('.')
-        else:
-            self.workdir = Path(workdir)
+        self.workdir = Path(
+            sim_input.get('workdir', '.')
+        ).resolve()
+        self.launchdir = Path(os.getcwd())
 
     def mkworkdir(self) -> None:
         ''' Creates the work directory if it doesn't exist '''
@@ -57,24 +55,42 @@ class Job():
         ''' Updates the output to signal that the job was started '''
         self.update_status('complete')
 
+    def fail(self) -> None:
+        ''' Updates status to failed '''
+        self.update_status('failed')
+
+    def discard(self) -> None:
+        ''' Updates status to discarded '''
+        self.update_status('discard')
+
+    def go_to_workdir(self) -> None:
+        ''' Go to workdir '''
+        if not self.workdir.exists():
+            self.mkworkdir()
+        os.chdir(self.workdir)
+
+    def leave_workdir(self) -> None:
+        ''' goes to directory from which job was launched '''
+        os.chdir(self.launchdir)
+
     def add_output_files(self, file_dict: Dict) -> None:
         ''' Adds a file to the output file list '''
         files = self.get_output().get('files', {})
         files.update(file_dict)
         self.update_output({'files': file_dict})
 
-    def set_input_image(self, atoms: Atoms) -> None:
-        ''' Adds and writes the input image for simulation '''
-        prefix = self.get_prefix()
-        image_file = join_names([prefix, 'input_atoms.xyz'])
-        self.sim_input['image'] = {
-            'image_file': image_file
-        }
-        self.atoms = atoms
+    # def set_input_image(self, atoms: Atoms) -> None:
+    #     ''' Adds and writes the input image for simulation '''
+    #     prefix = self.get_prefix()
+    #     image_file = join_names([prefix, 'input_atoms.xyz'])
+    #     self.sim_input['image'] = {
+    #         'image_file': image_file
+    #     }
+    #     self.atoms = atoms
 
     def get_sim_input(self) -> Dict:
         ''' Get simulation input '''
-        return self.sim_input
+        return deepcopy(self.sim_input)
 
     def get_prefix(self) -> str:
         ''' Get current job prefix '''
@@ -87,17 +103,17 @@ class Job():
         output_yaml = self.workdir / out_fname
         return output_yaml
 
-    def get_calc_input(self) -> Dict:
+    def get_config_input(self) -> Dict:
         ''' Get calculator input '''
-        return self.calc_input
+        return deepcopy(self.config_input)
 
-    def get_calc_params(self) -> Dict:
-        ''' Get calculator parameters '''
-        return self.calc_input.get('calc', {})
+    # def get_calc_params(self) -> Dict:
+    #     ''' Get calculator parameters '''
+    #     return self.calc_input.get('calc', {})
 
-    def get_job_params(self) -> Dict:
-        ''' Get job parameters '''
-        return self.calc_input.get('job', {})
+    # def get_job_params(self) -> Dict:
+    #     ''' Get job parameters '''
+    #     return self.calc_input.get('job', {})
 
     def get_workdir(self) -> Path:
         ''' Get working directory '''
@@ -128,23 +144,23 @@ class Job():
         else:
             return None
 
-    def get_atoms(self) -> Atoms:
-        ''' Get associated atoms object '''
-        return self.atoms
+    # def get_atoms(self) -> Atoms:
+    #     ''' Get associated atoms object '''
+    #     return self.atoms
 
-    def set_sim_input(self, new_params) -> None:
+    def update_sim_input(self, new_params) -> None:
         ''' Update simulation parameters '''
         self.sim_input.update(new_params)
 
-    def set_calc_input(self, new_params) -> None:
+    def update_calc_input(self, new_params) -> None:
         ''' Update calculator parameters '''
-        self.calc_input.update(new_params)
+        self.config_input.update(new_params)
 
     def set_workdir(self, workdir) -> None:
         ''' Set working directory '''
         self.workdir = workdir
 
-    def check_job_status(self) -> None:
+    def check_job_status(self) -> Tuple[bool,str]:
         ''' Check job status '''
         output = self.get_output()
         status = output.get('status', 'clean')
@@ -157,25 +173,25 @@ class Job():
         output.update(output_update)
         write_yaml(self.get_output_yaml(), output)
 
-
 class UnitJob(Job):
     ''' Unit job object with ability to submit slurm jobs '''
     def __init__(
         self,
-        calc_input: Dict,
+        config_input: Dict,
         sim_input: Dict,
-        workdir = None,
     ):
-        super().__init__(calc_input, sim_input, workdir)
+        super().__init__(config_input, sim_input)
 
         self.script = sim_input.get('script', None)
+        self.config_id = sim_input.get('config_id', None)
+        self.calc_input = config_input[self.config_id]
 
-    def _gen_run_command(self) -> str:
+    def gen_run_command(self) -> str:
         '''
         Generates the command to run the job, independent of slurm
         '''
         script = self.sim_input.get('script', False)
-        assert script, 'Specify an existing script in sim_input'
+        assert script, 'Specify a script in sim_input'
 
         job_params = self.calc_input.get('job', {})
         run_prefix = job_params.get('run_prefix', '')
@@ -201,7 +217,7 @@ class UnitJob(Job):
             txt += command + '\n'
         txt += '\n'
         txt += 'echo "Job started on `hostname` at `date`"\n'
-        txt += self._gen_run_command() + '\n'
+        txt += self.gen_run_command() + '\n'
         for command in slurm_params.get('postcommands', []):
             txt += command + '\n'
         txt += 'echo "Job ended at `date`"'
@@ -216,9 +232,9 @@ class UnitJob(Job):
         '''
         slurm_params = self.calc_input.get('slurm', False)
 
-        txt = 'srun --unbuffered ' # Use unbuffered to avoid IO lag
+        txt = 'srun --unbuffered ' # To avoid IO lag
         txt += ' '.join(slurm_params.get('flags'))
-        txt += self._gen_run_command()
+        txt += self.gen_run_command()
 
         return txt
 
@@ -230,32 +246,41 @@ class UnitJob(Job):
         job_params = calc_input.get('job', {})
         use_slurm = job_params.get('use_slurm', False)
         interactive = job_params.get('interactive', False)
-        overwrite = self.sim_input.get('overwrite', False)
+        overwrite = self.calc_input.get('overwrite', False)
         if workdir.exists() and not overwrite:
             print(f'Skipped writing in {self.workdir}')
         else:
             if not workdir.exists():
                 workdir.mkdir()
+
+            # If we passed an atoms object, write to disk and link it
+            atoms = sim_input['args'].get('image', {}).get('atoms', False)
+            if atoms:
+                image_file = str('image_input.xyz')
+                atoms.write(self.get_workdir() / image_file)
+                sim_input['args']['image']['image_file'] = image_file
+                del sim_input['args']['image']['atoms']
             write_yaml(workdir / 'sim_input.yaml', sim_input)
             write_yaml(workdir / 'calc_input.yaml', calc_input)
             write_yaml(self.get_output_yaml(), {'status': 'clean'})
-            if self.atoms is not None:
-                image_file = self.sim_input['image']['image_file']
-                self.atoms.write(self.get_workdir() / image_file)
+
         if use_slurm and not interactive:
             self._gen_slurm_script()
 
-    def submit(self) -> None:
+    def get_calc_input(self):
+        ''' Get calc_input for this job specifically '''
+        return deepcopy(self.calc_input)
+
+    def submit(self, dependency: List = None) -> Union[None,List[str]]:
         ''' Submit a job using slurm, interactively or in the terminal '''
 
-        if not self.workdir.exists():
-            self.gen_input_files()
+        self.gen_input_files()
 
         _, status = self.check_job_status()
         if status not in ('clean', 'discard'):
             return None
 
-        if not self.sim_input.get('submit', False):
+        if not self.calc_input.get('submit', False):
             return None
 
         cur_dir = Path('.').resolve()
@@ -266,11 +291,21 @@ class UnitJob(Job):
         interactive = job_params.get('interactive', False)
         # Maybe want to do something clever with the exit code here
         if use_slurm and not interactive:
-            command = ['sbatch', 'job.sh']
+            if dependency is not None:
+                dependstr = None
+                for dep in dependency:
+                    if dependstr is None:
+                        dependstr = str(dep) if dep is not None else None
+                    else:
+                        dependstr += f':{dep}' if dep is not None else ''
+
+                command = ['sbatch', '-d', f'afterok:{dependstr}', 'job.sh']
+            else:
+                command = ['sbatch', 'job.sh']
         elif use_slurm and interactive:
             command = self._gen_slurm_interactive_txt().split()
         else:
-            command = self._gen_run_command().split()
+            command = self.gen_run_command().split()
 
         run_job = False
         overwrite = sim_input.get('overwrite', False)
@@ -298,27 +333,377 @@ class UnitJob(Job):
 
         os.chdir(cur_dir)
 
+        if use_slurm:
+            job_ids = [int(completed_process.stdout.split(' ')[-1])]
+            return job_ids
         return None
 
-def check_jobs(jobs) -> bool:
-    ''' Checks status of jobs and prints a report '''
+class DistributedJob(Job):
+    ''' Array job object with ability to submit simultaneous jobs '''
+    def __init__(
+        self,
+        config_input: Dict,
+        sim_input: Dict,
+    ):
+        super().__init__(config_input, sim_input)
 
-    completed = []
-    print('+'*20)
-    print('Job statuses: ')
-    print('+'*20)
-    for job in jobs:
-        complete, status = job.check_job_status()
-        print(f'{status}: {job.get_workdir()}')
-        if complete or status == 'discard':
-            completed.append(True)
+        # self.script = sim_input.get('script', None)
+        # self.config_id = sim_input.get('config_id', None)
+        # self.calc_input = config_input[self.config_id]
+
+        # Set a standard for all subdirectories to start
+        # with "id-{job_id}" followed by user labels
+        new_sim_input = {}
+        for i, (sim_id, subsim_input) in enumerate(sim_input.items()):
+            assert 'script' in subsim_input, 'Check sim_input format,\
+                must have script and each job with a unique key'
+
+            if not sim_id.startswith('id-'):
+                new_sim_id = join_names([f'id-{i}',sim_id])
+                new_sim_input[new_sim_id] = deepcopy(sim_input[sim_id])
+
+        sim_input = new_sim_input
+        unitjobs = []
+        for sim_id, subsim_input in sim_input.items():
+            assert 'script' in subsim_input, 'Check sim_input format,\
+                must have script and each job with a unique key'
+
+            if not subsim_input.get('workdir', False):
+                subsim_input['workdir'] = sim_id
+            unitjob = UnitJob(config_input, subsim_input)
+            unitjobs.append(unitjob)
+
+        # If all the jobs have the same config, use a job array
+        config_id = unitjobs[0].config_id
+        config0 = config_input[config_id]
+        same_config = np.all(
+            [(uj.config_id == config_id) for uj in unitjobs]
+        )
+
+        if same_config and config0['job'].get('use_slurm', False):
+            self.use_array = True
         else:
-            completed.append(False)
+            self.use_array = False
 
-    if np.all(completed):
-        return True
+        self.unitjobs = unitjobs
 
-    return False
+    def submit_jobs(self) -> Union[None,List[str]]:
+        '''
+        Submits the jobs. If submitting lots of batch jobs, we 
+        recommend using DistributedJob.submit_array
+        '''
+        job_ids = []
+        for unitjob in self.unitjobs:
+            job_id = unitjob.submit()
+            job_ids.append(job_id)
+        return job_ids
+
+    def submit_array(
+        self,
+        array_max=None,
+        dependency: List = None
+    ) -> Union[None,List[str]]:
+        '''
+        Submits a job array if all the jobs have the same config_id
+        '''
+        self.gen_input_files()
+
+        njobs = len(self.unitjobs)
+
+        arr_max_str = ''
+        if array_max is not None:
+            arr_max_str = f'%{array_max}'
+        
+        command = f'sbatch --array=[0-{njobs-1}] job_array.sh'
+        if dependency is not None:
+            dependstr = None
+            for dep in dependency:
+                if dependstr is None:
+                    dependstr = str(dep) if dep is not None else None
+                else:
+                    dependstr += f':{dep}' if dep is not None else ''
+
+            command = [
+                'sbatch',
+                f'--array=[0-{njobs-1}]{arr_max_str}',
+                '-d', f'afterok:{dependstr}',
+                'job_array.sh'
+            ]
+        else:
+            command = [
+                'sbatch',
+                f'--array=[0-{njobs-1}]{arr_max_str}',
+                'job_array.sh'
+            ]
+
+        command = command.split(' ')
+        completed_process = subprocess.run(
+            command, check=False, capture_output=True, text=True,
+        )
+
+        with open('stdout.txt', 'w', encoding='utf-8') as output_file:
+            output_file.write(completed_process.stdout)
+
+        if completed_process.returncode != 0:
+            err_txt = 'Failed to run array in '
+            err_txt += f'{self.workdir} with command:\n'
+            err_txt += f'{" ".join(command)}\n'
+            err_txt += f'See {self.workdir / "stderr.txt"} for details.'
+            print(err_txt)
+            with open('stderr.txt', 'w', encoding='utf-8') as err_file:
+                err_file.write(completed_process.stderr)
+            completed_process.check_returncode()
+
+        job_ids = [int(completed_process.stdout.split(' ')[-1])]
+        return job_ids
+
+    def _gen_array_script(self, write: bool = True) -> None:
+        '''
+        Generates a slurm job array file and if necessary 
+        writes it in the work directory for the job. Only works
+        if there is one config_id for all jobs
+        '''
+        config_id = self.unitjobs[0].config_id
+        config = self.config_input[config_id]
+
+        slurm_params = config.get('slurm', {})
+
+        txt = '#!/usr/bin/sh\n'
+        for flag in slurm_params.get('flags'):
+            txt += f'#SBATCH {flag}\n'
+
+        txt += 'if [[ ! -z ${SLURM_ARRAY_TASK_ID} ]]; then\n'
+        txt += '    fls=( id-* )\n'
+        txt += '    WORKDIR=${fls[${SLURM_ARRAY_TASK_ID}]}\n'
+        txt += 'fi\n\n'
+        txt += 'CUR_DIR=`pwd`\n'
+        txt += 'cd ${WORKDIR}\n'
+        txt += '\n'
+        txt += '\n'.join(slurm_params.get('precommands', []))
+        txt += '\n'
+        txt += 'echo "LAUNCHDIR: and ${CUR_DIR}"\n'
+        txt += 'echo "WORKDIR: ${WORKDIR}"\n'
+        txt += 'echo "Job started on `hostname` at `date`"\n'
+        txt += self.unitjobs[0].gen_run_command() + '\n'
+        txt += '\n'.join(slurm_params.get('postcommands', []))
+        txt += '\n'
+        txt += 'cd ${CUR_DIR}\n'
+        txt += 'echo "Job ended at `date`"'
+
+        if write:
+            slurm_file = self.workdir / 'job_array.sh'
+            slurm_file.write_text(txt)
+
+    def gen_input_files(self) -> None:
+        ''' Write input files to working directory '''
+        if self.use_array:
+            self._gen_array_script()
+        for unitjob in self.unitjobs:
+            unitjob.gen_input_files()
+
+    def submit(self) -> None:
+        ''' 
+        Submit a job using slurm, interactively or in the terminal
+        '''
+
+        if not self.workdir.exists():
+            self.gen_input_files()
+
+        _, status = self.check_job_status()
+
+        if status in ('completed'):
+            if not self.sim_input.get('overwrite', False):
+                return None
+
+        if not self.sim_input.get('submit', True):
+            return None
+        cur_dir = Path('.').resolve()
+        os.chdir(self.workdir)
+
+        job_ids = None
+        if self.use_array:
+            job_ids = self.submit_array()
+        else:
+            job_ids = self.submit_jobs()
+
+        os.chdir(cur_dir)
+        return job_ids
+
+class ChainedJob(Job):
+    ''' Jobs made of smaller sequential jobs '''
+    def __init__(
+        self,
+        config_input: Dict,
+        sim_input: Dict,
+    ):
+        super().__init__(config_input, sim_input)
+
+        assert np.all([key.startswith('step-') for key in sim_input]),\
+            'Keys should take the form "step-{step_id}" from 1'
+
+        # workdir naming should follow pattern. Might loosen this
+        # eventually
+        for sim_id, subsim_input in sim_input.items():
+            subsim_input['workdir'] = sim_id
+
+        unitjobs = []
+        for i in range(len(sim_input)):
+            subsim_input = deepcopy(sim_input[f'step-{i}'])
+            unitjob = UnitJob(config_input, subsim_input)
+            unitjobs.append(unitjob)
+
+        # # If all the jobs have the same config, use a job array
+        # config_id = unitjobs[0].config_id
+        # config0 = config_input[config_id]
+        # same_config = np.all(
+        #     [(uj.config_id == config_id) for uj in unitjobs]
+        # )
+
+        # if same_config and config0['job'].get('use_slurm', False):
+        #     self.use_array = True
+        # else:
+        #     self.use_array = False
+
+        self.unitjobs = unitjobs
+
+
+    def get_current_step(self):
+        ''' Gets current step in the chain '''
+        raise NotImplementedError
+
+    def submit(self, dependency: List = None) -> List:
+        ''' 
+        Submit a job using slurm, interactively or in the terminal
+        '''
+
+        # if not self.workdir.exists():
+        #     self.mkworkdir()
+
+        # _, status = self.check_job_status()
+
+        # if status in ('completed'):
+        #     if not self.sim_input.get('overwrite', False):
+        #         return None
+
+        # if not self.sim_input.get('submit', True):
+        #     return None
+
+        cur_dir = Path('.').resolve()
+        os.chdir(self.workdir)
+
+        step = 0 #self.get_current_step()
+        are_interactive_jobs = [
+            uj.get_calc_input()['job'].get('interactive', False) \
+                for uj in self.unitjobs
+        ]
+        use_batch = not np.any(are_interactive_jobs)
+        if use_batch:
+            if step != len(self.unitjobs):
+                dependency = None
+                for unitjob in self.unitjobs[step:]:
+                    dependency = unitjob.submit(dependency=dependency)
+
+            job_ids = dependency
+        else:
+            for unitjob in self.unitjobs[step:]:
+                job_ids = unitjob.submit()
+
+        os.chdir(cur_dir)
+
+        return job_ids
+
+# def check_jobs(jobs) -> bool:
+#     ''' Checks status of jobs and prints a report '''
+
+#     completed = []
+#     print('+'*20)
+#     print('Job statuses: ')
+#     print('+'*20)
+#     for job in jobs:
+#         complete, status = job.check_job_status()
+#         print(f'{status}: {job.get_workdir()}')
+#         if complete or status == 'discard':
+#             completed.append(True)
+#         else:
+#             completed.append(False)
+
+#     if np.all(completed):
+#         return True
+
+#     return False
+
+def leaf(func):
+    ''' 
+    Step wrapper. This handles things like:
+    - Going to the correct workdir
+    - initializing output files for progress tracking
+    while being minimally invasive
+    '''
+    # functools makes it so that the docs work instead of giving the
+    # wrapper docstring
+    @functools.wraps(func)
+    def wrapper(*arg, **kwargs):
+        workdir = kwargs.get('workdir', '.')
+        prefix = kwargs.get('prefix', '')
+        sim_input = {
+            'workdir': workdir,
+            'prefix': prefix,
+        }
+        job = Job(*arg, sim_input=sim_input)
+        job.go_to_workdir()
+        job.start()
+        try:
+            results = func(*arg, **kwargs)
+        except:
+            job.fail()
+            raise
+        job.update_output(results)
+        job.complete()
+        job.leave_workdir()
+        return results
+    return wrapper
+
+def branch(func, tag=None):
+    ''' Step wrapper '''
+    @functools.wraps(func)
+    def wrapper(*arg, **kwargs):
+        config_input = arg[0]
+        try:
+            calc_input = config_input[tag]
+        except ValueError:
+            print(f'Tag {tag} not in input file')
+            raise
+
+        job = Job(calc_input, *arg[1:], **kwargs)
+        job.start()
+        try:
+            results = func(calc_input, **kwargs)
+        except:
+            job.fail()
+            raise
+        job.complete()
+        return results
+    return wrapper
+
+def load_jobs_from_directory(
+    work_directory: Union[str, List]
+) -> List[UnitJob]:
+    if isinstance(work_directory, list):
+        job_list = []
+        for wd in work_directory:
+            job_list += load_jobs_from_directory(wd)
+    else:
+        calc_input = read_yaml(
+            os.path.join(work_directory, 'calc_input.yaml')
+        )
+        sim_input = read_yaml(
+            os.path.join(work_directory, 'sim_input.yaml')
+        )
+        job_list = [
+            UnitJob(calc_input, sim_input)
+        ]
+
+    return job_list
 
 # def prepare_job(
 #     calc_input: Dict,

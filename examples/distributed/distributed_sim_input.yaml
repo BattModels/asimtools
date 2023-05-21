@@ -1,0 +1,12 @@
+script: image_array
+config: inline
+args:
+  workdir: results
+  images:
+    pattern: /home/mphuthi/tests/asimtools/examples2/image_array/structures/Ar*.cif
+  subscript_input:
+    script: singlepoint
+    config_id: inline
+    args:
+      properties: ['energy', 'forces']
+

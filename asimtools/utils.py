@@ -8,6 +8,7 @@ import argparse
 import yaml
 import pandas as pd
 from ase.io import read
+import ase.db
 import ase.build
 
 Atoms = TypeVar('Atoms')
@@ -170,3 +171,8 @@ def parse_command_line(args) -> Tuple[Dict, Dict]:
     sim_params = read_yaml(args.sim_input_file)
 
     return calc_params, sim_params
+
+def new_db(dbname):
+    with open(dbname, 'w') as f:
+        f.write("")
+    return ase.db.connect(dbname)

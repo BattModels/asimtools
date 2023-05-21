@@ -1,0 +1,13 @@
+name: LennardJones
+job:
+  slurm: true
+  batch: false
+  interactive: true
+slurm_params:
+  flags:
+    - -n 2
+    - --gres=gpu:1
+  precommands:
+    - source activate ase
+  postcommands:
+    - echo "Job ended on `date`"

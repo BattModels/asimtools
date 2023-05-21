@@ -31,7 +31,7 @@ def main(args=None):
     sim_func = getattr(sim_module, module_name)
     sim_func(
         calc_input,
-        **sim_input,
+        **sim_input['args'],
     )
 
 

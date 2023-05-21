@@ -2,6 +2,7 @@
 Tools for loading and returning ASE calculator objects for use in simulations
 '''
 
+import importlib
 # pylint: disable=import-outside-toplevel
 # pylint: disable=import-error
 
@@ -9,15 +10,19 @@ Tools for loading and returning ASE calculator objects for use in simulations
 #     ''' Loads a generic ASE calculator which follows the standard format '''
 #     from ase.calculators.eam import EAM
 
-
-def load_calc(calc_input):
+def load_calc(calc_params):
     ''' Finds the correct loader and load the calc '''
-    name = calc_input.get('name', None)
-    assert name, f'{name} calculator is not implemented. Calcs are {calc_dict.keys()}'
-    loader = calc_dict.get(name)
 
-    calc_params = calc_input.get('calc', {})
-    # assert calc_params, 'Provide calc_params specific to chosen calculator'
+    name = calc_params.get('name', None)
+    if 'module' in calc_params:
+        loader = _load_ase_calc
+    else:
+        try:
+            loader = external_calcs[name]
+        except KeyError:
+            print(f'Provide ASE module for calc or \
+                one of {external_calcs.keys()}')
+            raise
 
     calc = loader(calc_params=calc_params)
     label = calc_params.get('label', name)
@@ -34,6 +39,18 @@ def _load_nequip(calc_params):
         calc = NequIPCalculator.from_deployed_model(**calc_params)
     except Exception:
         print(f"Failed to load NequIP with parameters:\n {calc_params}")
+        raise
+
+    return calc
+
+def _load_dp(calc_params):
+    ''' Loads a DP Calculator '''
+    from deepmd.calculator import DP
+
+    try:
+        calc = DP(**calc_params)
+    except Exception:
+        print(f"Failed to load DP with parameters:\n {calc_params}")
         raise
 
     return calc
@@ -94,9 +111,31 @@ def _load_lj(calc_params):
 
     return calc
 
+def _load_ase_calc(calc_params):
+    ''' Load any builtin ASE calculator '''
+    module_name = calc_params.get('module', '')
+    try:
+        module = importlib.import_module(module_name)
+    except:
+        print("Check calc module")
+        raise
+    name = calc_params.get('name', None)
+    try:
+        calc_class = getattr(module, name)
+    except:
+        print("Check calc name")
+        raise
+    calc_args = calc_params.get('args', {})
+    try:
+        calc = calc_class(**calc_args)
+    except:
+        print("Check calc args")
+        raise
+    return calc
 
-calc_dict = {
+external_calcs = {
     'NequIP': _load_nequip,
-    'LennardJones': _load_lj,
+    'Allegro': _load_nequip,
     'QuantumEspresso': _load_quantumespresso,
+    'DeepPotential': _load_dp,
 }
