@@ -1,5 +1,5 @@
 script: singlepoint
-config_id: simulation
+config_id: inline
 args:
   workdir: 'results'
   prefix: Ar_LJ

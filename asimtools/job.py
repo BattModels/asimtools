@@ -9,14 +9,16 @@ import subprocess
 import os
 from pathlib import Path
 import functools
+from glob import glob
 from typing import List, TypeVar, Dict, Tuple, Union
 from copy import deepcopy
-from ase.io import read
+import ase.io
 import numpy as np
 from asimtools.utils import (
     read_yaml,
     write_yaml,
     join_names,
+    get_atoms,
 )
 
 Atoms = TypeVar('Atoms')
@@ -37,6 +39,13 @@ class Job():
             sim_input.get('workdir', '.')
         ).resolve()
         self.launchdir = Path(os.getcwd())
+
+        # Track if the job has associated image input file
+        image = self.sim_input.get('args', {}).get('image', False)
+        if image:
+            self.atoms = get_atoms(**image)
+        else:
+            self.atoms = None
 
     def mkworkdir(self) -> None:
         ''' Creates the work directory if it doesn't exist '''
@@ -79,14 +88,14 @@ class Job():
         files.update(file_dict)
         self.update_output({'files': file_dict})
 
-    # def set_input_image(self, atoms: Atoms) -> None:
-    #     ''' Adds and writes the input image for simulation '''
-    #     prefix = self.get_prefix()
-    #     image_file = join_names([prefix, 'input_atoms.xyz'])
-    #     self.sim_input['image'] = {
-    #         'image_file': image_file
-    #     }
-    #     self.atoms = atoms
+    def set_input_image(self, atoms: Atoms) -> None:
+        ''' Adds and writes the input image for simulation '''
+        prefix = self.get_prefix()
+        image_file = join_names([prefix, 'input_atoms.xyz'])
+        self.sim_input['image'] = {
+            'image_file': image_file
+        }
+        self.atoms = atoms
 
     def get_sim_input(self) -> Dict:
         ''' Get simulation input '''
@@ -107,14 +116,6 @@ class Job():
         ''' Get calculator input '''
         return deepcopy(self.config_input)
 
-    # def get_calc_params(self) -> Dict:
-    #     ''' Get calculator parameters '''
-    #     return self.calc_input.get('calc', {})
-
-    # def get_job_params(self) -> Dict:
-    #     ''' Get job parameters '''
-    #     return self.calc_input.get('job', {})
-
     def get_workdir(self) -> Path:
         ''' Get working directory '''
         return self.workdir
@@ -130,7 +131,7 @@ class Job():
     def get_output_images(self, ext='xyz') -> List:
         ''' Get all the output Atoms objects in workdir'''
         image_files = self.workdir / '*images_output.'+ext
-        images = [read(image_file) for image_file in image_files]
+        images = [ase.io.read(image_file) for image_file in image_files]
         assert len(images) > 0, f'No output images in {self.workdir}'
 
         return images
@@ -140,13 +141,13 @@ class Job():
         files = self.get_output().get('files', {})
         image_file = files.get('image', False)
         if image_file:
-            return read(self.workdir / image_file, format=ext)
+            return ase.io.read(self.workdir / image_file, format=ext)
         else:
             return None
 
-    # def get_atoms(self) -> Atoms:
-    #     ''' Get associated atoms object '''
-    #     return self.atoms
+    def get_atoms(self) -> Atoms:
+        ''' Get associated atoms object '''
+        return self.atoms.copy()
 
     def update_sim_input(self, new_params) -> None:
         ''' Update simulation parameters '''
@@ -220,6 +221,7 @@ class UnitJob(Job):
         txt += self.gen_run_command() + '\n'
         for command in slurm_params.get('postcommands', []):
             txt += command + '\n'
+        txt += 'sleep 5\n'
         txt += 'echo "Job ended at `date`"'
 
         if write:
@@ -242,6 +244,7 @@ class UnitJob(Job):
         ''' Write input files to working directory '''
         workdir = self.workdir
         sim_input = self.sim_input
+        config_input = self.config_input
         calc_input = self.calc_input
         job_params = calc_input.get('job', {})
         use_slurm = job_params.get('use_slurm', False)
@@ -253,15 +256,38 @@ class UnitJob(Job):
             if not workdir.exists():
                 workdir.mkdir()
 
-            # If we passed an atoms object, write to disk and link it
-            atoms = sim_input['args'].get('image', {}).get('atoms', False)
-            if atoms:
+            # # If we passed an atoms object, write to disk and link it
+            # atoms = sim_input['args'].get('image', {}).get('atoms', False)
+            # if atoms:
+            #     image_file = str('image_input.xyz')
+            #     atoms.write(self.get_workdir() / image_file)
+            #     sim_input['args']['image']['image_file'] = image_file
+            #     del sim_input['args']['image']['atoms']
+
+            # Write the associated input image
+            if self.atoms is not None:
                 image_file = str('image_input.xyz')
-                atoms.write(self.get_workdir() / image_file)
-                sim_input['args']['image']['image_file'] = image_file
-                del sim_input['args']['image']['atoms']
+                self.atoms.write(self.get_workdir() / image_file)
+                sim_input['args']['image'] = {'image_file': image_file}
+
+            images = self.sim_input['args'].get('images', False)
+            if images:
+                input_images_file = 'input_images.xyz'
+                ase.io.write(input_images_file, images, format='extxyz')
+                self.sim_input['args']['images'] = {
+                    'image_file': input_images_file,
+                }
+
+
+            # # If we passed an atoms object, delete it otherwise
+            # # the yamls can't store atoms objects
+            # atoms = sim_input['args'].get('image', {}).get('atoms', False)
+            # if atoms:
+            #     del sim_input['args']['image']['atoms']
+
             write_yaml(workdir / 'sim_input.yaml', sim_input)
-            write_yaml(workdir / 'calc_input.yaml', calc_input)
+            # TODO: Consistency btn config and calc naming
+            write_yaml(workdir / 'calc_input.yaml', config_input)
             write_yaml(self.get_output_yaml(), {'status': 'clean'})
 
         if use_slurm and not interactive:
@@ -413,8 +439,8 @@ class DistributedJob(Job):
         arr_max_str = ''
         if array_max is not None:
             arr_max_str = f'%{array_max}'
-        
-        command = f'sbatch --array=[0-{njobs-1}] job_array.sh'
+
+        # command = f'sbatch --array=[0-{njobs-1}] job_array.sh'
         if dependency is not None:
             dependstr = None
             for dep in dependency:
@@ -436,7 +462,6 @@ class DistributedJob(Job):
                 'job_array.sh'
             ]
 
-        command = command.split(' ')
         completed_process = subprocess.run(
             command, check=False, capture_output=True, text=True,
         )
@@ -488,6 +513,9 @@ class DistributedJob(Job):
         txt += '\n'.join(slurm_params.get('postcommands', []))
         txt += '\n'
         txt += 'cd ${CUR_DIR}\n'
+        # Wait a few seconds for the so that files written to disk
+        # don't lag. Might be worth switching to sbatch --unbuffered
+        txt += 'sleep 3\n'
         txt += 'echo "Job ended at `date`"'
 
         if write:
@@ -496,6 +524,13 @@ class DistributedJob(Job):
 
     def gen_input_files(self) -> None:
         ''' Write input files to working directory '''
+        # # If we passed an atoms object or images, delete. Otherwise
+        # # the yamls can't store atoms objects
+        # images = self.sim_input['args'].get('images', False)
+        # if images:
+        #     ase.io.write('input_images.xyz', images, format='extxyz')
+        #     del self.sim_input['args']['images']['images']
+
         if self.use_array:
             self._gen_array_script()
         for unitjob in self.unitjobs:
@@ -566,6 +601,9 @@ class ChainedJob(Job):
 
         self.unitjobs = unitjobs
 
+    def get_last_output(self) -> Dict:
+        ''' Returns the output of the last job in the chain '''
+        return self.unitjobs[-1].get_output()
 
     def get_current_step(self):
         ''' Gets current step in the chain '''
@@ -645,6 +683,41 @@ def leaf(func):
     def wrapper(*arg, **kwargs):
         workdir = kwargs.get('workdir', '.')
         prefix = kwargs.get('prefix', '')
+        config_id = kwargs.get('config_id', False)
+        assert config_id, 'No config_id in leaf'
+        sim_input = {
+            'workdir': workdir,
+            'prefix': prefix,
+        }
+        config_input = arg[0]
+        calc_input = config_input[config_id]
+        job = Job(*arg, sim_input=sim_input)
+        job.go_to_workdir()
+        job.start()
+        try:
+            results = func(calc_input, *arg[1:], **kwargs)
+        except:
+            job.fail()
+            raise
+        job.update_output(results)
+        job.complete()
+        job.leave_workdir()
+        return results
+    return wrapper
+
+def branch(func):
+    ''' 
+    Step wrapper. This handles things like:
+    - Going to the correct workdir
+    - initializing output files for progress tracking
+    while being minimally invasive
+    '''
+    # functools makes it so that the docs work instead of giving the
+    # wrapper docstring
+    @functools.wraps(func)
+    def wrapper(*arg, **kwargs):
+        workdir = kwargs.get('workdir', '.')
+        prefix = kwargs.get('prefix', '')
         sim_input = {
             'workdir': workdir,
             'prefix': prefix,
@@ -663,47 +736,157 @@ def leaf(func):
         return results
     return wrapper
 
-def branch(func, tag=None):
-    ''' Step wrapper '''
-    @functools.wraps(func)
-    def wrapper(*arg, **kwargs):
-        config_input = arg[0]
-        try:
-            calc_input = config_input[tag]
-        except ValueError:
-            print(f'Tag {tag} not in input file')
-            raise
-
-        job = Job(calc_input, *arg[1:], **kwargs)
-        job.start()
-        try:
-            results = func(calc_input, **kwargs)
-        except:
-            job.fail()
-            raise
-        job.complete()
-        return results
-    return wrapper
 
 def load_jobs_from_directory(
-    work_directory: Union[str, List]
+    workdir: str = None,
+    workdirs: list = None,
+    pattern: str = None,
 ) -> List[UnitJob]:
-    if isinstance(work_directory, list):
-        job_list = []
-        for wd in work_directory:
+    ''' Loads all jobs from a given directory/directories '''
+
+    assert [workdir, workdirs, pattern].count(None) == 2, \
+        'Provide exactly one of workdir, workdirs or pattern'
+
+    job_list = []
+    if pattern is not None:
+        job_list += load_jobs_from_directory(glob(pattern))
+    elif workdirs is not None:
+        for wd in workdirs:
             job_list += load_jobs_from_directory(wd)
     else:
         calc_input = read_yaml(
-            os.path.join(work_directory, 'calc_input.yaml')
+            os.path.join(workdir, 'calc_input.yaml')
         )
         sim_input = read_yaml(
-            os.path.join(work_directory, 'sim_input.yaml')
+            os.path.join(workdir, 'sim_input.yaml')
         )
-        job_list = [
-            UnitJob(calc_input, sim_input)
-        ]
+        job_list += [UnitJob(calc_input, sim_input)]
 
     return job_list
+
+def load_outputs(
+    workdir: str = None,
+    workdirs: list = None,
+    pattern: str = None,
+) -> List[UnitJob]:
+    ''' Loads all jobs from a given directory/directories '''
+
+    assert [workdir, workdirs, pattern].count(None) == 2, \
+        'Provide exactly one of workdir, workdirs or pattern'
+
+    if workdirs is not None or pattern is not None:
+        outputs = []
+        if pattern is not None:
+            workdirs = glob(pattern)
+
+        for workdir in workdirs:
+            outputs += load_outputs(workdir=workdir)
+    else:
+        output_files = glob(str(Path(workdir) / '*output.yaml'))
+        assert len(output_files) == 1, \
+            f'{len(output_files)} output files in {workdir}'
+
+        outputs = [{
+            'path': str(workdir),
+            'output': read_yaml(output_files[0])
+        }]
+
+    return outputs
+
+def load_output_property(
+    prop: str,
+    workdir: str = None,
+    workdirs: list = None,
+    pattern: str = None,
+) -> List[UnitJob]:
+    ''' Loads all jobs from a given directory/directories '''
+
+    assert [workdir, workdirs, pattern].count(None) == 2, \
+        'Provide exactly one of workdir, workdirs or pattern'
+
+    outputs = load_outputs(
+        workdir=workdir,
+        workdirs=workdirs,
+        pattern=pattern
+    )
+    properties = []
+    for output in outputs:
+        properties.append(output[prop])
+
+    return properties
+
+# def load_output_images(
+#     workdir: str = None,
+#     workdirs: list = None,
+#     pattern: str = None,
+# ) -> List[UnitJob]:
+#     ''' Loads all jobs from a given directory/directories '''
+
+#     output_files = load_output_property(
+#         'files',
+#         workdir=workdir,
+#         workdirs=workdirs,
+#         pattern=pattern
+#     )
+
+#     image_files = [outf['image'] for outf in output_files]
+#     output_images = []
+#     for image_file in image_files:
+#         output_images.append(ase.io.read(image_file))
+
+#     return output_images
+
+def load_input_images(
+    workdir: str = None,
+    workdirs: list = None,
+    pattern: str = None,
+) -> List[UnitJob]:
+    ''' Loads all jobs from a given directory/directories '''
+
+    assert [workdir, workdirs, pattern].count(None) == 2, \
+        'Provide exactly one of workdir, workdirs or pattern'
+
+    if workdirs is not None or pattern is not None:
+        if pattern is not None:
+            workdirs = glob(pattern)
+
+        for workdir in workdirs:
+            input_images += load_input_images(workdir=workdir)
+    else:
+        input_images = glob(str(Path(workdir) / 'image_input.xyz'))
+        assert len(input_images) == 1, \
+            f'{len(input_images)} input image files in {workdir}'
+
+        input_images = [ase.io.read(input_images[0])]
+
+    return input_images
+
+def load_output_images(
+    workdir: str = None,
+    workdirs: list = None,
+    pattern: str = None,
+) -> List[UnitJob]:
+    ''' Loads all jobs from a given directory/directories '''
+
+    assert [workdir, workdirs, pattern].count(None) == 2, \
+        'Provide exactly one of workdir, workdirs or pattern'
+
+    if workdirs is not None or pattern is not None:
+        if pattern is not None:
+            workdirs = glob(pattern)
+
+        output_images = []
+        for workdir in workdirs:
+            output_images += load_output_images(workdir=workdir)
+    else:
+        output_images = glob(str(Path(workdir) / 'image_output.xyz'))
+        import os; print('CWD', os.getcwd())
+        assert len(output_images) == 1, \
+            f'{len(output_images)} output image files in {workdir}'
+
+        output_images = [ase.io.read(output_images[0])]
+
+    return output_images
 
 # def prepare_job(
 #     calc_input: Dict,

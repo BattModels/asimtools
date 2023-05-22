@@ -14,6 +14,7 @@ def main(args=None):
     calc_input, sim_input = parse_command_line(args)
     script = sim_input['script']
     module_name = script.split('/')[-1].split('.py')[0]
+    func_name = module_name.split('.')[-1]
     spec = importlib.util.find_spec('.'+module_name,'asimtools.scripts')
 
     if spec is not None:
@@ -28,10 +29,11 @@ def main(args=None):
         sys.modules[module_name] = sim_module
         spec.loader.exec_module(sim_module)
 
-    sim_func = getattr(sim_module, module_name)
+    sim_func = getattr(sim_module, func_name)
     sim_func(
         calc_input,
         **sim_input['args'],
+        config_id=sim_input['config_id']
     )
 
 

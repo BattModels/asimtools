@@ -7,9 +7,9 @@ Author: mkphuthi@github.com
 '''
 
 from typing import Dict
-from asimtools.job import leaf, ChainedJob
+from asimtools.job import branch, ChainedJob
 
-@leaf
+@branch
 def chained(
     config_input: Dict,
     steps: Dict,

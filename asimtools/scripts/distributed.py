@@ -7,9 +7,9 @@ Author: mkphuthi@github.com
 '''
 
 from typing import Dict
-from asimtools.job import leaf, DistributedJob
+from asimtools.job import branch, DistributedJob
 
-@leaf
+@branch
 def distributed(
     config_input: Dict,
     subscripts: Dict,

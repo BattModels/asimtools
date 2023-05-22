@@ -8,10 +8,10 @@ Author: mkphuthi@github.com
 
 from typing import Dict, Sequence
 from copy import deepcopy
-from asimtools.job import leaf, DistributedJob
+from asimtools.job import branch, DistributedJob
 from asimtools.utils import get_images
 
-@leaf
+@branch
 def image_array(
     config_input: Dict,
     images: Dict,

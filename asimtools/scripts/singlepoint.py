@@ -5,7 +5,7 @@ Calculates single point energy
 Author: mkphuthi@github.com
 '''
 
-#pylint: disable=unused-argument
+# pylint: disable=unused-argument
 # pylint: disable=too-many-arguments
 
 from typing import Tuple, Dict

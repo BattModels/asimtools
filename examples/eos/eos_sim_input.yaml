@@ -1,0 +1,13 @@
+script: eos.eos.py
+config_id: inline
+args:
+  image:
+    name: Ar
+    builder: bulk
+    crystalstructure: 'fcc'
+    a: 5.45
+  workdir: results
+  preprocess_config_id: inline
+  singlepoint_config_id: inline
+  nimages: 5
+  scale_range: [0.95, 1.05]

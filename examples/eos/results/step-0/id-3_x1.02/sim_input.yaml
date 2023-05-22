@@ -1,0 +1,8 @@
+args:
+  image:
+    image_file: image_input.xyz
+  properties:
+  - energy
+config_id: inline
+script: singlepoint
+workdir: id-3_x1.02

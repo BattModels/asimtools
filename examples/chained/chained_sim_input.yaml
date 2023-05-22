@@ -1,5 +1,5 @@
 script: chained
-config: inline
+config_id: inline
 args:
   workdir: results
   steps:
