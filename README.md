@@ -6,6 +6,18 @@ atomistic potential/calculator and the simulations steps thereby allowing the sa
 the same calculator to be used for multiple simulations. Input and output files must follow a strict format so that consistent 
 analysis pipelines can be used across users
 
+## Developer philosophy
+The main goal of asimtools is to push all the complexity workflow management, best-practice, file management etc. into the back-end such that he everyday user only has to handle input files for existing workflows and script files for workflows they want to implement. The following are the guiding principles for how asimtools should work:
+
+- Scripts should resemble boilerplate ASE code as much as possible.
+- Scripts should not explicitly depend on a calculator
+- Scripts should not explicitly depend on the context in which they run
+- It should be easy to debug individual scripts in large workflows. In addition, it should always be possible to debug/resubmit jobs without using asimtools.
+- input file structure and format should staandard across all scripts. In addition all inputs should match how they would like without asimtools i.e. do not provide an API! This means extensive use of importlib.
+- output file structure should be predictable across all scripts
+- Job progress tracking must be incorporated
+- Best practices should be built-in e.g. if multiple jobs of the same context are submitted simulataneously, it must be a job array
+
 ## Getting Started
 
 These instructions will give you a copy of the project up and running on
