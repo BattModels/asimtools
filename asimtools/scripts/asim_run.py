@@ -9,7 +9,7 @@ import importlib
 import sys
 from asimtools.utils import parse_command_line
 
-def main(args=None):
+def main(args=None) -> None:
     ''' Main '''
     calc_input, sim_input = parse_command_line(args)
     script = sim_input['script']

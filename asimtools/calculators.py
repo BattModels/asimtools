@@ -136,6 +136,6 @@ def _load_ase_calc(calc_params):
 external_calcs = {
     'NequIP': _load_nequip,
     'Allegro': _load_nequip,
-    'QuantumEspresso': _load_quantumespresso,
+    # 'QuantumEspresso': _load_quantumespresso,
     'DeepPotential': _load_dp,
 }

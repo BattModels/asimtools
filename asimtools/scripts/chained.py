@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 '''
-Distributes a number of simulations at the same level
+Submits a chain of scripts in the order specified by steps
+in input
 
 Author: mkphuthi@github.com
 
 '''
 
-from typing import Dict
+from typing import Dict, Tuple
 from asimtools.job import branch, ChainedJob
 
 @branch
@@ -14,14 +15,14 @@ def chained(
     config_input: Dict,
     steps: Dict,
     **kwargs
-):
+) -> Tuple[list,Dict]:
     '''
-    Submits multiple scripts simultaneously and handles
-    file management based on standard
+    Submits a chain of scripts in the order specified by steps
+    in input
     '''
 
     cjob = ChainedJob(config_input, steps)
-    cjob.submit()
+    job_ids = cjob.submit()
 
     results = cjob.unitjobs[-1].get_output()
-    return results
+    return job_ids, results

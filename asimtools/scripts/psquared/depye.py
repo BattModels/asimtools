@@ -25,7 +25,7 @@ def eos(
                 'preprocess_config_id': preprocess_config_id,
                 'nimages': nimages,
                 'scale_range': scale_range,
-            }
+            },
         },
         'step-1': {
             'script': 'eos.postprocess',
@@ -33,8 +33,16 @@ def eos(
             'args': {
                 'step0_dir': '../step-0',
                 'scale_range': scale_range,
-            }
-        }
+            },
+        },
+        'step-2': {
+            'script': 'depye.gthermo_calculations',
+            'config_id': preprocess_config_id,
+            'args': {
+                'step1_dir': '../step-1',
+                'scale_range': scale_range,
+            },
+        },
     }
     chain = ChainedJob(config_input, sim_input)
     job_ids = chain.submit()

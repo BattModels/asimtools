@@ -2,7 +2,8 @@
 
 from typing import Dict, Tuple
 import numpy as np
-from asimtools.job import branch, UnitJob
+from asimtools.job import branch
+from asimtools.scripts.image_array import image_array
 from asimtools.utils import (
     get_atoms,
 )
@@ -16,7 +17,7 @@ def singlepoint_calculations(
     nimages: int = 5,
     scale_range: Tuple[float,float] = (0.95, 1.05),
     **kwargs
-):
+) -> Tuple[None,Dict]:
     ''' Does calculations for eos '''
 
     assert scale_range[0] < scale_range[1], 'x_scale[0] should be smaller than\
@@ -35,23 +36,37 @@ def singlepoint_calculations(
         scaled_atoms.append(new_atoms)
         scaled_ids.append(f'x{scale:.2f}')
 
-    image_array_input = {
-        'script': 'image_array',
-        'config_id': preprocess_config_id,
+    # image_array_input = {
+    #     'script': 'image_array',
+    #     'config_id': preprocess_config_id,
+    #     'args': {
+    #         'workdir': '.',
+    #         'images': scaled_atoms,
+    #         'ids': scaled_ids,
+    #         'subscript_input': {
+    #             'script': 'singlepoint',
+    #             'config_id': singlepoint_config_id,
+    #             'args': {
+    #                 'properties': ['energy'],
+    #             }
+    #         }
+    #     }
+    # }
+
+    # image_array_job = UnitJob(config_input, image_array_input)
+    # job_ids = image_array_job.submit()
+
+    subscript_input = {
+        'script': 'singlepoint',
+        'config_id': singlepoint_config_id,
         'args': {
-            'workdir': '.',
-            'images': scaled_atoms,
-            'ids': scaled_ids,
-            'subscript_input': {
-                'script': 'singlepoint',
-                'config_id': singlepoint_config_id,
-                'args': {
-                    'properties': ['energy'],
-                }
-            }
+            'properties': ['energy'],
         }
     }
-
-    image_array_job = UnitJob(config_input, image_array_input)
-    image_array_job.submit()
-    return {}
+    job_ids, results = image_array(
+        config_input,
+        images={'images': scaled_atoms},
+        subscript_input=subscript_input,
+        ids=scaled_ids
+    )
+    return job_ids, results

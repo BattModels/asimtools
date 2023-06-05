@@ -19,11 +19,11 @@ from asimtools.utils import (
 @leaf
 def singlepoint(
     config_input: Dict,
-    image: Dict = None,
+    image: Dict,
     prefix: str = '',
     properties: Tuple[str] = ('energy', 'forces'),
     **kwargs
-) -> Dict:
+) -> Tuple[None,Dict]:
     ''' 
     Calculates the single point energy, forces and stresses where possible
     '''
@@ -60,4 +60,4 @@ def singlepoint(
         'energy': float(energy),
         'files': {'image': image_file}
     }
-    return results
+    return None, results

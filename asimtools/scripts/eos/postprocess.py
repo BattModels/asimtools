@@ -1,23 +1,21 @@
 '''.Xauthority'''
 
-from typing import Dict, Tuple, List
-from copy import deepcopy
+from typing import Dict, Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 from ase.eos import EquationOfState
 from ase. units import kJ
-from asimtools.job import branch, load_output_images, load_input_images
+from asimtools.job import leaf, load_output_images, load_input_images
 from asimtools.utils import (
-    get_atoms,
+    write_csv_from_dict
 )
 
-@branch
+@leaf
 def postprocess(
     config_input: Dict,
-    step0_dir: str,
     scale_range: Tuple[float, float],
     **kwargs
-):
+) -> Tuple[None,Dict]:
     ''' plot things '''
     # Should we standardize to using pandas? Issue is that switching
     # between np and pandas is probably not good
@@ -27,7 +25,12 @@ def postprocess(
     images = load_output_images(pattern='../step-0/id-*')
     volumes = np.array([at.get_volume() for at in images])
     energies = np.array([at.get_potential_energy() for at in images])
+    write_csv_from_dict(
+        'eos_output.csv',
+        {'volumes': volumes, 'energies': energies}
+    )
     eos_fit = EquationOfState(volumes, energies)
+    print('here')
     try:
         v0, e0, B = eos_fit.fit()
     except ValueError:
@@ -62,4 +65,4 @@ def postprocess(
     ax.set_ylabel(r'Energy (eV)')
     plt.savefig('eos.png')
     plt.close(fig)
-    return results
+    return None, results

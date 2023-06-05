@@ -6,7 +6,7 @@ Author: mkphuthi@github.com
 
 '''
 
-from typing import Dict, Sequence
+from typing import Dict, Sequence, Tuple
 from copy import deepcopy
 from asimtools.job import branch, DistributedJob
 from asimtools.utils import get_images
@@ -16,9 +16,9 @@ def image_array(
     config_input: Dict,
     images: Dict,
     subscript_input: Dict,
-    ids: Sequence[str] = None,
+    ids: Sequence = None,
     **kwargs
-):
+) -> Tuple[list,Dict]:
     ''' Submits same script on multiple images '''
     images = get_images(**images)
     array_sim_input = {}
@@ -38,7 +38,7 @@ def image_array(
         array_sim_input[f'{ids[i]}'] = new_subscript_input
 
     djob = DistributedJob(config_input, array_sim_input)
-    djob.submit()
+    job_ids = djob.submit()
 
     results = {}
-    return results
+    return job_ids, results

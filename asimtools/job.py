@@ -221,7 +221,7 @@ class UnitJob(Job):
         txt += self.gen_run_command() + '\n'
         for command in slurm_params.get('postcommands', []):
             txt += command + '\n'
-        txt += 'sleep 5\n'
+        # txt += 'sleep 5\n'
         txt += 'echo "Job ended at `date`"'
 
         if write:
@@ -515,7 +515,7 @@ class DistributedJob(Job):
         txt += 'cd ${CUR_DIR}\n'
         # Wait a few seconds for the so that files written to disk
         # don't lag. Might be worth switching to sbatch --unbuffered
-        txt += 'sleep 3\n'
+        # txt += 'sleep 3\n'
         txt += 'echo "Job ended at `date`"'
 
         if write:
@@ -614,17 +614,17 @@ class ChainedJob(Job):
         Submit a job using slurm, interactively or in the terminal
         '''
 
-        # if not self.workdir.exists():
-        #     self.mkworkdir()
+        if not self.workdir.exists():
+            self.mkworkdir()
 
-        # _, status = self.check_job_status()
+        _, status = self.check_job_status()
 
-        # if status in ('completed'):
-        #     if not self.sim_input.get('overwrite', False):
-        #         return None
+        if status in ('completed'):
+            if not self.sim_input.get('overwrite', False):
+                return None
 
-        # if not self.sim_input.get('submit', True):
-        #     return None
+        if not self.sim_input.get('submit', True):
+            return None
 
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
@@ -695,14 +695,14 @@ def leaf(func):
         job.go_to_workdir()
         job.start()
         try:
-            results = func(calc_input, *arg[1:], **kwargs)
+            job_ids, results = func(calc_input, *arg[1:], **kwargs)
         except:
             job.fail()
             raise
         job.update_output(results)
         job.complete()
         job.leave_workdir()
-        return results
+        return job_ids, results
     return wrapper
 
 def branch(func):
@@ -726,14 +726,14 @@ def branch(func):
         job.go_to_workdir()
         job.start()
         try:
-            results = func(*arg, **kwargs)
+            job_ids, results = func(*arg, **kwargs)
         except:
             job.fail()
             raise
         job.update_output(results)
         job.complete()
         job.leave_workdir()
-        return results
+        return job_ids, results
     return wrapper
 
 
