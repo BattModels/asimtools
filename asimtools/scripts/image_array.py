@@ -6,30 +6,32 @@ Author: mkphuthi@github.com
 
 '''
 
-from typing import Dict, Sequence, Tuple
+from typing import Dict, Sequence, Tuple, Union
 from copy import deepcopy
-from asimtools.job import branch, DistributedJob
+from asimtools.job import DistributedJob
 from asimtools.utils import get_images
 
-@branch
+# @branch
 def image_array(
-    config_input: Dict,
     images: Dict,
     subscript_input: Dict,
+    calc_input: Union[Dict,None] = None,
+    env_input: Union[Dict,None] = None,
     ids: Sequence = None,
-    **kwargs
 ) -> Tuple[list,Dict]:
     ''' Submits same script on multiple images '''
+    print('image_array', images)
     images = get_images(**images)
     array_sim_input = {}
 
-    # Allow user to customize subdirectories if needed
+    # Allow user to customize subdirectory names if needed
     if ids is None:
         ids = [str(i) for i in range(len(images))]
     else:
         assert len(ids) == len(images), \
-            'Num. of images must match nim. of ids'
+            'Num. of images must match num. of ids'
 
+    # Make individual sim_inputs for each image
     for i, image in enumerate(images):
         new_subscript_input = deepcopy(subscript_input)
         new_subscript_input['args']['image'] = {
@@ -37,8 +39,9 @@ def image_array(
         }
         array_sim_input[f'{ids[i]}'] = new_subscript_input
 
-    djob = DistributedJob(config_input, array_sim_input)
+    # Create a distributed job object
+    djob = DistributedJob(array_sim_input, env_input, calc_input)
     job_ids = djob.submit()
 
-    results = {}
-    return job_ids, results
+    results = {'job_ids': job_ids}
+    return results

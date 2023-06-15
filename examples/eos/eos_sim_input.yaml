@@ -1,13 +1,14 @@
 script: eos.eos.py
-config_id: inline
+env_id: inline
+workdir: results
 args:
   image:
-    name: Ar
+    name: Li
     builder: bulk
-    crystalstructure: 'fcc'
-    a: 5.45
-  workdir: results
-  preprocess_config_id: inline
-  singlepoint_config_id: inline
+    # crystalstructure: 'fcc'
+    # a: 5.45
   nimages: 5
   scale_range: [0.95, 1.05]
+  singlepoint_env_id: batch
+  singlepoint_calc_id: qe_li
+  preprocess_env_id: batch

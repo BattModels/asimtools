@@ -4,7 +4,9 @@ standards
 '''
 from typing import TypeVar, Iterable, Tuple, Union, List, Dict
 from glob import glob
-import argparse
+import os
+import subprocess
+from pathlib import Path
 import yaml
 import pandas as pd
 from ase.io import read
@@ -137,7 +139,8 @@ def get_images(
         images = read(image_file, index=index, **kwargs)
     elif pattern is not None:
         image_files = glob(pattern)
-        assert len(image_files) > 0, 'No images matching pattern'
+        assert len(image_files) > 0, \
+            f'No images matching pattern "{pattern}" in "{os.getcwd()}"'
         images = [
             read(image_file, **kwargs) for image_file in image_files
         ]
@@ -150,29 +153,70 @@ def get_images(
 
     return images
 
-def parse_command_line(args) -> Tuple[Dict, Dict]:
-    ''' Parse command line input '''
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        'calc_input_file',
-        metavar='calculator_configuration_file',
-        type=str,
-        help='calculator configuration yaml file'
-    )
-    parser.add_argument(
-        'sim_input_file',
-        metavar='simulation_configuration_file',
-        type=str,
-        help='calculator configuration yaml file'
-    )
-    args = parser.parse_args(args)
-
-    calc_params = read_yaml(args.calc_input_file)
-    sim_params = read_yaml(args.sim_input_file)
-
-    return calc_params, sim_params
-
 def new_db(dbname):
-    with open(dbname, 'w') as f:
+    ''' Creates a new ASE database overwriting any existing one '''
+    with open(dbname, 'w', encoding='utf-8') as f:
         f.write("")
     return ase.db.connect(dbname)
+
+def get_env_input():
+    ''' Gets the global env_input specified by Environment variable '''
+    env_input_file = os.getenv('ASIMTOOLS_ENV_INPUT')
+    if env_input_file is None:
+        dotfile = Path('~/.asimtools')
+        if dotfile.exists():
+            with open(dotfile, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            for line in lines:
+                if line.startswith('ENV_INPUT_FILE'):
+                    env_input_file = Path(line.split('='))
+                    break
+            if env_input_file.exists():
+                try:
+                    env_input = read_yaml(env_input_file)
+                    return env_input
+                except Exception:
+                    print('WARNING: No env_input yaml found')
+    else:
+        env_input = read_yaml(env_input_file)
+        return env_input
+    return {}
+
+def get_calc_input():
+    ''' Gets the global calc_input specified by calcironment variable '''
+    calc_input_file = os.getenv('ASIMTOOLS_CALC_INPUT')
+    if calc_input_file is None:
+        dotfile = Path('~/.asimtools')
+        if dotfile.exists():
+            with open(dotfile, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            for line in lines:
+                if line.startswith('CALC_INPUT_FILE'):
+                    calc_input_file = Path(line.split('='))
+                    break
+            if calc_input_file.exists():
+                try:
+                    calc_input = read_yaml(calc_input_file)
+                    return calc_input
+                except Exception:
+                    print('WARNING: No calc_input yaml found')
+    else:
+        calc_input = read_yaml(calc_input_file)
+        return calc_input
+    return {}
+
+def check_if_slurm_job_is_running(slurm_job_id):
+    ''' Checks if the job with the given slurm ID is running '''
+    completed_process = subprocess.run(
+        ['squeue', '--job', str(slurm_job_id)], 
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    stdout = completed_process.stdout
+    # I know, I know. Not 100% safe but should work most of the time 
+    if str(slurm_job_id) in stdout:
+        return True
+    else:
+        return False
+    

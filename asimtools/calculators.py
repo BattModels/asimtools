@@ -3,6 +3,7 @@ Tools for loading and returning ASE calculator objects for use in simulations
 '''
 
 import importlib
+from asimtools.utils import get_calc_input
 # pylint: disable=import-outside-toplevel
 # pylint: disable=import-error
 
@@ -10,9 +11,19 @@ import importlib
 #     ''' Loads a generic ASE calculator which follows the standard format '''
 #     from ase.calculators.eam import EAM
 
-def load_calc(calc_params):
+def load_calc(calc_id=None, calc_params=None):
     ''' Finds the correct loader and load the calc '''
-
+    if calc_id is not None:
+        calc_input = get_calc_input()
+        try:
+            calc_params = calc_input[calc_id]
+        except KeyError:
+            print(f'Calculator with calc_id: {calc_id} not found in \
+                calc_input {calc_input}')
+            raise
+        except AttributeError:
+            print('No calc_input found')
+            raise
     name = calc_params.get('name', None)
     if 'module' in calc_params:
         loader = _load_ase_calc

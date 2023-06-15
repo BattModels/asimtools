@@ -1,8 +1,9 @@
 script: singlepoint
-config_id: inline
+env_id: srun
+workdir: 'results'
+overwrite: true
 args:
-  workdir: 'results'
-  prefix: Ar_LJ
+  calc_id: lj
   image:
     name: Ar
     builder: bulk

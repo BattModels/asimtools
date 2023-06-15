@@ -23,5 +23,5 @@ def distributed(
     djob = DistributedJob(config_input, subscripts)
     job_ids = djob.submit()
 
-    results = {}
-    return job_ids, results
+    results = {'job_ids': job_ids}
+    return results

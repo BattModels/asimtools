@@ -3,39 +3,62 @@
 from typing import Dict, Tuple
 from asimtools.job import ChainedJob, branch
 
-@branch
+# @branch
 def eos(
-    config_input: Dict,
     image: dict,
-    preprocess_config_id: str,
-    singlepoint_config_id: str,
+    singlepoint_env_id: str,
+    singlepoint_calc_id: str,
+    preprocess_env_id: str,
     nimages: int = 5,
     scale_range: Tuple[float] = (0.95, 1.05),
-    **kwargs
 ) -> Tuple[list,Dict]:
     ''' EOS calculation '''
 
     sim_input = {
         'step-0': {
-            'script': 'eos.singlepoint_calculations',
-            'config_id': preprocess_config_id,
+            'script': 'eos.preprocess',
+            'env_id': preprocess_env_id,
             'args': {
                 'image': image,
-                'singlepoint_config_id': singlepoint_config_id,
-                'preprocess_config_id': preprocess_config_id,
                 'nimages': nimages,
                 'scale_range': scale_range,
             }
         },
         'step-1': {
-            'script': 'eos.postprocess',
-            'config_id': preprocess_config_id,
+            'script': 'image_array',
+            'env_id': preprocess_env_id,
             'args': {
-                'step0_dir': '../step-0',
+                'images': {'image_file': 'step-0/preprocess_images_output.xyz'},
+                'subscript_input': {
+                    'script': 'singlepoint',
+                    'env_id': singlepoint_env_id,
+                    'args': {
+                        'calc_id': singlepoint_calc_id,
+                        'properties': ['energy'],
+                    }
+                }
+            }
+        },
+        'step-2': {
+            'script': 'eos.postprocess',
+            'env_id': preprocess_env_id,
+            'args': {
+                'images': {'pattern': '../step-1/id-*/image_output.xyz'},
                 'scale_range': scale_range,
             }
         }
     }
-    chain = ChainedJob(config_input, sim_input)
+    # preprocess_step = UnitJob(sim_input={
+    #     'script': 'eos.preprocess',
+    #     'env_id': preprocess_env_id,
+    #     'args': {
+    #         'image': image,
+    #         'nimages': nimages,
+    #         'scale_range': scale_range,
+    # }})
+
+    
+
+    chain = ChainedJob(sim_input, env_input=None, calc_input=None)
     job_ids = chain.submit()
-    return job_ids, chain.get_last_output()
+    return chain.get_last_output()

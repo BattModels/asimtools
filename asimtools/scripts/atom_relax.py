@@ -14,10 +14,8 @@ import numpy as np
 import ase.optimize
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
-from asimtools.job import leaf
 from asimtools.utils import get_atoms, join_names
 
-@leaf
 def atom_relax(
     config_input: Dict,
     image: Dict = None,
@@ -64,4 +62,4 @@ def atom_relax(
         'traj': traj_file,
         }
     }
-    return None, results
+    return results

@@ -19,6 +19,10 @@ from asimtools.utils import (
     write_yaml,
     join_names,
     get_atoms,
+    get_images,
+    get_env_input,
+    get_calc_input,
+    check_if_slurm_job_is_running,
 )
 
 Atoms = TypeVar('Atoms')
@@ -29,23 +33,31 @@ class Job():
     # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
-        config_input: Dict,
         sim_input: Dict,
+        env_input: Union[Dict,None] = None,
+        calc_input: Union[Dict,None] = None,
     ):
 
-        self.config_input = deepcopy(config_input)
+        if env_input is None:
+            env_input = get_env_input()
+        if calc_input is None:
+            calc_input = get_calc_input()
+        self.env_input = deepcopy(env_input)
+        self.calc_input = deepcopy(calc_input)
         self.sim_input = deepcopy(sim_input)
         self.workdir = Path(
             sim_input.get('workdir', '.')
         ).resolve()
+        # Any subsequent input files should use the full path
+        self.sim_input['workdir'] = str(self.workdir)
         self.launchdir = Path(os.getcwd())
 
-        # Track if the job has associated image input file
-        image = self.sim_input.get('args', {}).get('image', False)
-        if image:
-            self.atoms = get_atoms(**image)
-        else:
-            self.atoms = None
+        # # Track if the job has associated image input file
+        # image = self.sim_input.get('args', {}).get('image', False)
+        # if image:
+        #     self.atoms = get_atoms(**image)
+        # else:
+        #     self.atoms = None
 
     def mkworkdir(self) -> None:
         ''' Creates the work directory if it doesn't exist '''
@@ -88,18 +100,26 @@ class Job():
         files.update(file_dict)
         self.update_output({'files': file_dict})
 
-    def set_input_image(self, atoms: Atoms) -> None:
-        ''' Adds and writes the input image for simulation '''
-        prefix = self.get_prefix()
-        image_file = join_names([prefix, 'input_atoms.xyz'])
-        self.sim_input['image'] = {
-            'image_file': image_file
-        }
-        self.atoms = atoms
+    # def set_input_image(self, atoms: Atoms) -> None:
+    #     ''' Adds and writes the input image for simulation '''
+    #     prefix = self.get_prefix()
+    #     image_file = join_names([prefix, 'input_atoms.xyz'])
+    #     self.sim_input['image'] = {
+    #         'image_file': image_file
+    #     }
+    #     self.atoms = atoms
 
     def get_sim_input(self) -> Dict:
         ''' Get simulation input '''
         return deepcopy(self.sim_input)
+
+    def get_calc_input(self) -> Dict:
+        ''' Get calculator input '''
+        return deepcopy(self.calc_input)
+
+    def get_env_input(self) -> Dict:
+        ''' Get environment input '''
+        return deepcopy(self.env_input)
 
     def get_prefix(self) -> str:
         ''' Get current job prefix '''
@@ -111,10 +131,6 @@ class Job():
         out_fname = join_names([prefix, 'output.yaml'])
         output_yaml = self.workdir / out_fname
         return output_yaml
-
-    def get_config_input(self) -> Dict:
-        ''' Get calculator input '''
-        return deepcopy(self.config_input)
 
     def get_workdir(self) -> Path:
         ''' Get working directory '''
@@ -130,11 +146,14 @@ class Job():
 
     def get_output_images(self, ext='xyz') -> List:
         ''' Get all the output Atoms objects in workdir'''
-        image_files = self.workdir / '*images_output.'+ext
-        images = [ase.io.read(image_file) for image_file in image_files]
-        assert len(images) > 0, f'No output images in {self.workdir}'
-
-        return images
+        files = self.get_output().get('files', {})
+        image_file = files.get('images', False)
+        if image_file:
+            return ase.io.read(
+                self.workdir / image_file, format=ext, index=':',
+            )
+        else:
+            return None
 
     def get_output_image(self, ext='extxyz') -> Atoms:
         ''' Get the output Atoms object '''
@@ -145,27 +164,41 @@ class Job():
         else:
             return None
 
-    def get_atoms(self) -> Atoms:
-        ''' Get associated atoms object '''
-        return self.atoms.copy()
-
     def update_sim_input(self, new_params) -> None:
         ''' Update simulation parameters '''
         self.sim_input.update(new_params)
 
     def update_calc_input(self, new_params) -> None:
         ''' Update calculator parameters '''
-        self.config_input.update(new_params)
+        self.calc_input.update(new_params)
+
+    def update_env_input(self, new_params) -> None:
+        ''' Update calculator parameters '''
+        self.env_input.update(new_params)
 
     def set_workdir(self, workdir) -> None:
         ''' Set working directory '''
         self.workdir = workdir
 
-    def check_job_status(self) -> Tuple[bool,str]:
+    # def set_atoms(self, atoms) -> None:
+    #     ''' Set atoms object '''
+    #     self.atoms = atoms
+
+    def get_status(self, display=False) -> Tuple[bool,str]:
         ''' Check job status '''
         output = self.get_output()
-        status = output.get('status', 'clean')
-        complete = status == 'complete'
+        job_id = output.get('job_id', False)
+        running = False
+        if job_id:
+            running = check_if_slurm_job_is_running(job_id)
+        if running:
+            status = 'started'
+            self.update_status(status)
+            complete = False
+        else:
+            status = output.get('status', 'clean')
+            complete = status == 'complete'
+        print(f'{status}: {self.workdir}')
         return complete, status
 
     def update_output(self, output_update: Dict) -> None:
@@ -175,17 +208,33 @@ class Job():
         write_yaml(self.get_output_yaml(), output)
 
 class UnitJob(Job):
-    ''' Unit job object with ability to submit slurm jobs '''
+    ''' 
+    Unit job object with ability to submit a slurm/interactive job.
+    Unit jobs run in a specific environment and if required, run a 
+    specific calculator. More complex workflows are built up of unit
+    jobs
+    '''
     def __init__(
         self,
-        config_input: Dict,
         sim_input: Dict,
+        env_input: Union[Dict,None] = None,
+        calc_input: Union[Dict,None] = None,
     ):
-        super().__init__(config_input, sim_input)
+        super().__init__(sim_input, env_input, calc_input)
+        self.env_id = self.sim_input.get('env_id', None)
+        if self.env_id is not None:
+            self.env = self.env_input[self.env_id]
+        else:
+            self.env = {'mode': {
+                    'use_slurm': False,
+                    'interactive': True,
+                }
+            }
 
-        self.script = sim_input.get('script', None)
-        self.config_id = sim_input.get('config_id', None)
-        self.calc_input = config_input[self.config_id]
+        print('unitjob init', calc_input)
+        self.calc_id = self.sim_input.get('calc_id', None)
+        if self.calc_id is not None:
+            self.calc_params = self.calc_input[self.calc_id]
 
     def gen_run_command(self) -> str:
         '''
@@ -194,21 +243,23 @@ class UnitJob(Job):
         script = self.sim_input.get('script', False)
         assert script, 'Specify a script in sim_input'
 
-        job_params = self.calc_input.get('job', {})
-        run_prefix = job_params.get('run_prefix', '')
-        run_suffix = job_params.get('run_suffix', '')
+        mode_params = self.env_input.get('mode', {
+            'use_slurm': False, 'interactive': True
+        })
+        run_prefix = mode_params.get('run_prefix', '')
+        run_suffix = mode_params.get('run_suffix', '')
 
         txt = f'{run_prefix} '
-        txt += 'asim-run calc_input.yaml sim_input.yaml '
+        txt += 'asim-run sim_input.yaml calc_input.yaml'
         txt += f'{run_suffix} '
         return txt
 
     def _gen_slurm_script(self, write: bool = True) -> None:
         '''
-        Generates a slurm job file and if necessary writes it in the work
-        directory for the job
+        Generates a slurm job file and if necessary writes it in 
+        the work directory for the job
         '''
-        slurm_params = self.calc_input.get('slurm', {})
+        slurm_params = self.env.get('slurm', {})
 
         txt = '#!/usr/bin/sh\n'
         for flag in slurm_params.get('flags'):
@@ -232,9 +283,9 @@ class UnitJob(Job):
         '''
         Generates an srun command to run the job
         '''
-        slurm_params = self.calc_input.get('slurm', False)
+        slurm_params = self.env.get('slurm', False)
 
-        txt = 'srun --unbuffered ' # To avoid IO lag
+        txt = 'srun --unbuffered ' # unbuffered to avoid IO lag
         txt += ' '.join(slurm_params.get('flags'))
         txt += self.gen_run_command()
 
@@ -243,80 +294,103 @@ class UnitJob(Job):
     def gen_input_files(self) -> None:
         ''' Write input files to working directory '''
         workdir = self.workdir
-        sim_input = self.sim_input
-        config_input = self.config_input
-        calc_input = self.calc_input
-        job_params = calc_input.get('job', {})
-        use_slurm = job_params.get('use_slurm', False)
-        interactive = job_params.get('interactive', False)
-        overwrite = self.calc_input.get('overwrite', False)
-        if workdir.exists() and not overwrite:
-            print(f'Skipped writing in {self.workdir}')
-        else:
-            if not workdir.exists():
-                workdir.mkdir()
+        sim_input = deepcopy(self.sim_input)
+        # The sim_input file will already be in the work directory
+        sim_input['workdir'] = '.'
+        mode_params = self.env.get('mode', {})
+        use_slurm = mode_params.get('use_slurm', False)
+        interactive = mode_params.get('interactive', False)
+        # overwrite = self.sim_input.get('overwrite', False)
+        # if workdir.exists() and not overwrite:
+        #     print(f'Skipped writing in {self.workdir}')
+        # else:
+        if not workdir.exists():
+            workdir.mkdir()
 
-            # # If we passed an atoms object, write to disk and link it
-            # atoms = sim_input['args'].get('image', {}).get('atoms', False)
-            # if atoms:
-            #     image_file = str('image_input.xyz')
-            #     atoms.write(self.get_workdir() / image_file)
-            #     sim_input['args']['image']['image_file'] = image_file
-            #     del sim_input['args']['image']['atoms']
+        # # If we passed an atoms object, write to disk and link it
+        # atoms = sim_input['args'].get('image', {}).get('atoms', False)
+        # if atoms:
+        #     image_file = str('image_input.xyz')
+        #     atoms.write(self.get_workdir() / image_file)
+        #     sim_input['args']['image']['image_file'] = image_file
+        #     del sim_input['args']['image']['atoms']
 
-            # Write the associated input image
-            if self.atoms is not None:
-                image_file = str('image_input.xyz')
-                self.atoms.write(self.get_workdir() / image_file)
-                sim_input['args']['image'] = {'image_file': image_file}
+        # # Write the associated input image
+        # if self.atoms is not None:
+        #     image_file = str('image_input.xyz')
+        #     self.atoms.write(self.get_workdir() / image_file)
+        #     sim_input['args']['image'] = {'image_file': image_file}
+        image = self.sim_input.get('args', {}).get('image', False)
 
-            images = self.sim_input['args'].get('images', False)
-            if images:
-                input_images_file = 'input_images.xyz'
+        if image:
+            # if image.get('atoms', False):
+            atoms = get_atoms(**image)
+            input_image_file = self.workdir / 'input_image.xyz'
+            atoms.write(input_image_file, format='extxyz')
+            self.sim_input['args']['image'] = {
+                'image_file': str(input_image_file),
+            }
+
+        images = self.sim_input.get('args', {}).get('images', False)
+        if images:
+            if images.get('images', False):
+                images = get_images(**images)
+                input_images_file = self.workdir / 'input_images.xyz'
+                # print('writing images', image, images)
                 ase.io.write(input_images_file, images, format='extxyz')
                 self.sim_input['args']['images'] = {
-                    'image_file': input_images_file,
+                    'image_file': str(input_images_file),
                 }
+                # print('new image', self.sim_input)
+            elif images.get('image_file', False):
+                # import os
+                # print('image_file cwd', os.getcwd())
+                # print('image_file before', images['image_file'])
+                input_images_file = Path(images['image_file']).resolve()
+                self.sim_input['args']['images'] = {
+                    'image_file': str(input_images_file),
+                }
+                # print('image_file after', input_images_file)
 
-
-            # # If we passed an atoms object, delete it otherwise
-            # # the yamls can't store atoms objects
-            # atoms = sim_input['args'].get('image', {}).get('atoms', False)
-            # if atoms:
-            #     del sim_input['args']['image']['atoms']
-
-            write_yaml(workdir / 'sim_input.yaml', sim_input)
-            # TODO: Consistency btn config and calc naming
-            write_yaml(workdir / 'calc_input.yaml', config_input)
-            write_yaml(self.get_output_yaml(), {'status': 'clean'})
+        # # If we passed an atoms object, delete it otherwise
+        # # the yamls can't store atoms objects
+        # atoms = sim_input['args'].get('image', {}).get('atoms', False)
+        # if atoms:
+        #     del sim_input['args']['image']['atoms']
+        print('input files', sim_input)
+        write_yaml(workdir / 'sim_input.yaml', self.sim_input)
+        write_yaml(workdir / 'calc_input.yaml', self.calc_input)
+        write_yaml(workdir / 'env_input.yaml', self.env_input)
+        write_yaml(self.get_output_yaml(), {'status': 'clean'})
 
         if use_slurm and not interactive:
             self._gen_slurm_script()
 
-    def get_calc_input(self):
-        ''' Get calc_input for this job specifically '''
-        return deepcopy(self.calc_input)
-
     def submit(self, dependency: List = None) -> Union[None,List[str]]:
-        ''' Submit a job using slurm, interactively or in the terminal '''
-
+        '''
+        Submit a job using slurm, interactively or in the terminal
+        '''
         self.gen_input_files()
-
-        _, status = self.check_job_status()
-        if status not in ('clean', 'discard'):
+        print('unitjob submit: start')
+        _, status = self.get_status(display=True)
+        if status in ('started', 'discard'):
             return None
+        # if status not in ('clean', 'discard'):
+        #     return None
 
-        if not self.calc_input.get('submit', False):
+        if not self.sim_input.get('submit', True):
             return None
-
+        print('unitjob submit: overwritten files')
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
-        job_params = self.calc_input.get('job', {})
+        mode_params = self.env.get('mode', {})
+        print('unitjob mode_params:', mode_params)
         sim_input = self.sim_input
-        use_slurm = job_params.get('use_slurm', True)
-        interactive = job_params.get('interactive', False)
-        # Maybe want to do something clever with the exit code here
+        use_slurm = mode_params.get('use_slurm', False)
+        interactive = mode_params.get('interactive', True)
+        print('unitjob submit: setup parameters')
         if use_slurm and not interactive:
+            print('unitjob submit: using slurm')
             if dependency is not None:
                 dependstr = None
                 for dep in dependency:
@@ -329,16 +403,21 @@ class UnitJob(Job):
             else:
                 command = ['sbatch', 'job.sh']
         elif use_slurm and interactive:
+            #TODO: Should eventually use salloc instead
+            print('unitjob submit: interactive slurm')
             command = self._gen_slurm_interactive_txt().split()
         else:
+            print('unitjob submit: inline')
             command = self.gen_run_command().split()
 
         run_job = False
         overwrite = sim_input.get('overwrite', False)
-        _, status = self.check_job_status()
+        _, status = self.get_status()
         if overwrite or status == 'clean':
             run_job = True
 
+        print(f'unitjob submit: overwrite: {overwrite}, status: {status}')
+        print('unitjob submit: runjob: ', run_job)
         if run_job:
             completed_process = subprocess.run(
                 command, check=False, capture_output=True, text=True,
@@ -358,25 +437,24 @@ class UnitJob(Job):
                 completed_process.check_returncode()
 
         os.chdir(cur_dir)
-
-        if use_slurm:
+        print('unitjob submit: finished job')
+        if use_slurm and not interactive:
+            print('completed_process:', completed_process.stdout)
             job_ids = [int(completed_process.stdout.split(' ')[-1])]
+            print('unitjob submit: job_ids:', job_ids)
             return job_ids
+
         return None
 
 class DistributedJob(Job):
     ''' Array job object with ability to submit simultaneous jobs '''
     def __init__(
         self,
-        config_input: Dict,
         sim_input: Dict,
+        env_input: Union[None,Dict] = None,
+        calc_input: Union[None,Dict] = None,
     ):
-        super().__init__(config_input, sim_input)
-
-        # self.script = sim_input.get('script', None)
-        # self.config_id = sim_input.get('config_id', None)
-        # self.calc_input = config_input[self.config_id]
-
+        super().__init__(sim_input, env_input, calc_input)
         # Set a standard for all subdirectories to start
         # with "id-{job_id}" followed by user labels
         new_sim_input = {}
@@ -394,19 +472,27 @@ class DistributedJob(Job):
             assert 'script' in subsim_input, 'Check sim_input format,\
                 must have script and each job with a unique key'
 
-            if not subsim_input.get('workdir', False):
-                subsim_input['workdir'] = sim_id
-            unitjob = UnitJob(config_input, subsim_input)
+            # if not subsim_input.get('workdir', False):
+            subsim_input['workdir'] = sim_id
+            unitjob = UnitJob(subsim_input, env_input, calc_input)
             unitjobs.append(unitjob)
 
         # If all the jobs have the same config, use a job array
-        config_id = unitjobs[0].config_id
-        config0 = config_input[config_id]
-        same_config = np.all(
-            [(uj.config_id == config_id) for uj in unitjobs]
+        env_id = unitjobs[0].env_id
+        # env0 = env_input[env_id]
+        same_env = np.all(
+            [(uj.env_id == env_id) for uj in unitjobs]
+        )
+        # calc_id = unitjobs[0].calc_id
+        # calc0 = calc_input[calc_id]
+        # same_calc = np.all(
+        #     [(uj.calc_id == calc_id) for uj in unitjobs]
+        # )
+        all_slurm = np.all(
+            [uj.env['mode'].get('use_slurm', False) for uj in unitjobs]
         )
 
-        if same_config and config0['job'].get('use_slurm', False):
+        if same_env and all_slurm:
             self.use_array = True
         else:
             self.use_array = False
@@ -430,7 +516,7 @@ class DistributedJob(Job):
         dependency: List = None
     ) -> Union[None,List[str]]:
         '''
-        Submits a job array if all the jobs have the same config_id
+        Submits a job array if all the jobs have the same env and use slurm
         '''
         self.gen_input_files()
 
@@ -488,10 +574,10 @@ class DistributedJob(Job):
         writes it in the work directory for the job. Only works
         if there is one config_id for all jobs
         '''
-        config_id = self.unitjobs[0].config_id
-        config = self.config_input[config_id]
+        env_id = self.unitjobs[0].env_id
+        env = self.env_input[env_id]
 
-        slurm_params = config.get('slurm', {})
+        slurm_params = env.get('slurm', {})
 
         txt = '#!/usr/bin/sh\n'
         for flag in slurm_params.get('flags'):
@@ -540,27 +626,29 @@ class DistributedJob(Job):
         ''' 
         Submit a job using slurm, interactively or in the terminal
         '''
+        print('djob: submit')
+        # if not self.workdir.exists():
+        #     self.gen_input_files()
+        # self.gen_input_files()
+        # _, status = self.check_job_status()
 
-        if not self.workdir.exists():
-            self.gen_input_files()
+        # if status in ('completed'):
+        #     if not self.sim_input.get('overwrite', False):
+        #         return None
 
-        _, status = self.check_job_status()
-
-        if status in ('completed'):
-            if not self.sim_input.get('overwrite', False):
-                return None
-
-        if not self.sim_input.get('submit', True):
-            return None
+        # if not self.sim_input.get('submit', True):
+        #     return None
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
 
         job_ids = None
         if self.use_array:
+            print('djob: submit array')
             job_ids = self.submit_array()
         else:
+            print('djob: submit individual jobs')
             job_ids = self.submit_jobs()
-
+        print('djob job_ids', job_ids)
         os.chdir(cur_dir)
         return job_ids
 
@@ -568,13 +656,14 @@ class ChainedJob(Job):
     ''' Jobs made of smaller sequential jobs '''
     def __init__(
         self,
-        config_input: Dict,
         sim_input: Dict,
+        env_input: Union[None,Dict] = None,
+        calc_input: Union[None,Dict] = None,
     ):
-        super().__init__(config_input, sim_input)
+        super().__init__(sim_input, env_input, calc_input)
 
         assert np.all([key.startswith('step-') for key in sim_input]),\
-            'Keys should take the form "step-{step_id}" from 1'
+            'Keys should take the form "step-{step_id}" from step_id=0'
 
         # workdir naming should follow pattern. Might loosen this
         # eventually
@@ -584,7 +673,7 @@ class ChainedJob(Job):
         unitjobs = []
         for i in range(len(sim_input)):
             subsim_input = deepcopy(sim_input[f'step-{i}'])
-            unitjob = UnitJob(config_input, subsim_input)
+            unitjob = UnitJob(subsim_input, env_input, calc_input)
             unitjobs.append(unitjob)
 
         # # If all the jobs have the same config, use a job array
@@ -614,32 +703,59 @@ class ChainedJob(Job):
         Submit a job using slurm, interactively or in the terminal
         '''
 
-        if not self.workdir.exists():
-            self.mkworkdir()
+        # if not self.workdir.exists():
+        #     self.mkworkdir()
 
-        _, status = self.check_job_status()
+        # _, status = self.check_job_status()
 
-        if status in ('completed'):
-            if not self.sim_input.get('overwrite', False):
-                return None
+        # if status in ('completed'):
+        #     if not self.sim_input.get('overwrite', False):
+        #         return None
 
-        if not self.sim_input.get('submit', True):
-            return None
+        # if not self.sim_input.get('submit', True):
+        #     return None
 
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
 
         step = 0 #self.get_current_step()
         are_interactive_jobs = [
-            uj.get_calc_input()['job'].get('interactive', False) \
+            uj.env['mode'].get('interactive', False) \
                 for uj in self.unitjobs
         ]
-        use_batch = not np.any(are_interactive_jobs)
-        if use_batch:
+        all_interactive = np.all(are_interactive_jobs)
+        all_not_interactive = np.sum(are_interactive_jobs) == 0
+        assert all_interactive or all_not_interactive, \
+            'All jobs in chain must be interactive or not interactive'
+
+        are_using_slurm = [
+            uj.env['mode'].get('use_slurm', False) \
+                for uj in self.unitjobs
+        ]
+        all_slurm = np.all(are_using_slurm)
+        all_not_slurm = np.sum(are_using_slurm) == 0
+
+        assert all_slurm or all_not_slurm, \
+            'All jobs in chain must use slurm or none'
+
+        # Only use slurm depndencies if all the jobs are batch jobs
+        if all_slurm and all_not_interactive:
             if step != len(self.unitjobs):
                 dependency = None
-                for unitjob in self.unitjobs[step:]:
-                    dependency = unitjob.submit(dependency=dependency)
+                for i, unitjob in enumerate(self.unitjobs[step:]):
+                    # if step + i > 0:
+                    #     prev_step_complete, _ = self.unitjobs[step:][i-1].get_status()
+                    # else:
+                    #     prev_step_complete = True
+                    # print(f'step: {step+i}, prev_complete: {prev_step_complete}')
+                    # if prev_step_complete:
+                    cur_step_complete, status = unitjob.get_status()
+                    print(f'step: {step+i}, cur_complete: {cur_step_complete}')
+                    if not cur_step_complete and status != 'started':
+                        unitjob.env['slurm']['flags'].append(f'-J step-{step+i}')
+                        print('Dependency:', dependency, unitjob.sim_input)
+                        dependency = unitjob.submit(dependency=dependency)
+                        print('Dependency next:', dependency)
 
             job_ids = dependency
         else:
@@ -670,7 +786,7 @@ class ChainedJob(Job):
 
 #     return False
 
-def leaf(func):
+def wrap_job(func):
     ''' 
     Step wrapper. This handles things like:
     - Going to the correct workdir
@@ -680,30 +796,90 @@ def leaf(func):
     # functools makes it so that the docs work instead of giving the
     # wrapper docstring
     @functools.wraps(func)
-    def wrapper(*arg, **kwargs):
-        workdir = kwargs.get('workdir', '.')
-        prefix = kwargs.get('prefix', '')
-        config_id = kwargs.get('config_id', False)
-        assert config_id, 'No config_id in leaf'
-        sim_input = {
-            'workdir': workdir,
-            'prefix': prefix,
-        }
-        config_input = arg[0]
-        calc_input = config_input[config_id]
-        job = Job(*arg, sim_input=sim_input)
-        job.go_to_workdir()
+    def wrapper(*args, **kwargs):
+        sim_input = {}
+        job = Job(sim_input=sim_input)
+        # job.go_to_workdir()
         job.start()
         try:
-            job_ids, results = func(calc_input, *arg[1:], **kwargs)
+            job_ids, results = func(*args[:], **kwargs)
+            job.complete()
         except:
             job.fail()
             raise
         job.update_output(results)
-        job.complete()
         job.leave_workdir()
         return job_ids, results
     return wrapper
+
+def uses_calc(func):
+    ''' 
+    Step wrapper. This handles things like:
+    - Going to the correct workdir
+    - initializing output files for progress tracking
+    while being minimally invasive
+    '''
+    # functools makes it so that the docs work instead of giving the
+    # wrapper docstring
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        calc_params = kwargs.get('calc_params', False)
+        assert calc_params, 'Provide calc_params for simulation'
+        print(kwargs)
+        workdir = kwargs.get('workdir', '.')
+        sim_input = {
+            'workdir': workdir,
+        }
+        job = Job(sim_input=sim_input)
+        job.go_to_workdir()
+        job.start()
+        try:
+            job_ids, results = func(*args[:], **kwargs)
+            job.complete()
+        except:
+            job.fail()
+            raise
+        job.update_output(results)
+        job.leave_workdir()
+        return job_ids, results
+    return wrapper
+
+# def uses_calc(func):
+#     ''' 
+#     Step wrapper. This handles things like:
+#     - Going to the correct workdir
+#     - initializing output files for progress tracking
+#     while being minimally invasive
+#     '''
+#     # functools makes it so that the docs work instead of giving the
+#     # wrapper docstring
+#     @functools.wraps(func)
+#     def wrapper(*args, **kwargs):
+#         env_input = kwargs.get('env_input', {})
+#         calc_input = kwargs.get('calc_input', False)
+#         sim_input = kwargs.get('sim_input', {})
+#         assert calc_input, 'Provide calc_input for simulation'
+#         workdir = kwargs.get('workdir', '.')
+#         calc_id = kwargs.get('calc_id', False)
+#         assert calc_id, 'Provide calc_id in sim_input'
+#         calc_params = calc_input[calc_id]
+#         job = UnitJob(
+#             sim_input=sim_input,
+#             env_input=env_input,
+#             calc_input=calc_input
+#         )
+#         job.go_to_workdir()
+#         job.start()
+#         try:
+#             job_ids, results = func(calc_params, *args[:], **kwargs)
+#             job.complete()
+#         except:
+#             job.fail()
+#             raise
+#         job.update_output(results)
+#         job.leave_workdir()
+#         return job_ids, results
+#     return wrapper
 
 def branch(func):
     ''' 
@@ -735,6 +911,33 @@ def branch(func):
         job.leave_workdir()
         return job_ids, results
     return wrapper
+
+def load_job_from_directory(workdir: str):
+    ''' Loads a job from a given directory '''
+    workdir = Path(workdir)
+    sim_inputs = glob(str(workdir / 'sim_input.yaml'))
+    if len(sim_inputs) != 1:
+        print(f'WARNING: Multiple or no sim_input files in {workdir}')
+    try:
+        sim_input = read_yaml(glob(str(workdir / 'sim_input.yaml'))[0])
+    except:
+        print('sim_input.yaml not found')
+        raise
+
+    env_inputs = glob(str(workdir / 'env_input.yaml'))
+    if len(env_inputs) == 1:
+        env_input = read_yaml(env_inputs[0])
+    else:
+        env_input = None
+
+    calc_inputs = glob(str(workdir / 'calc_input.yaml'))
+    if len(calc_inputs) == 1:
+        calc_input = read_yaml(calc_inputs[0])
+    else:
+        calc_input = None
+
+    job = Job(sim_input, env_input, calc_input)
+    return job
 
 
 def load_jobs_from_directory(
@@ -880,7 +1083,6 @@ def load_output_images(
             output_images += load_output_images(workdir=workdir)
     else:
         output_images = glob(str(Path(workdir) / 'image_output.xyz'))
-        import os; print('CWD', os.getcwd())
         assert len(output_images) == 1, \
             f'{len(output_images)} output image files in {workdir}'
 

@@ -10,26 +10,25 @@ Author: mkphuthi@github.com
 
 from typing import Tuple, Dict
 from asimtools.calculators import load_calc
-from asimtools.job import leaf
+# from asimtools.job import uses_calc
 from asimtools.utils import (
     get_atoms,
     join_names,
 )
 
-@leaf
+# @uses_calc
 def singlepoint(
-    config_input: Dict,
+    calc_id: str,
     image: Dict,
     prefix: str = '',
     properties: Tuple[str] = ('energy', 'forces'),
     **kwargs
 ) -> Tuple[None,Dict]:
-    ''' 
+    '''
     Calculates the single point energy, forces and stresses where possible
     '''
-    calc = load_calc(config_input['calc'])
+    calc = load_calc(calc_id)
     atoms = get_atoms(**image)
-
     atoms.set_calculator(calc)
 
     if 'energy' in properties:
@@ -60,4 +59,4 @@ def singlepoint(
         'energy': float(energy),
         'files': {'image': image_file}
     }
-    return None, results
+    return results
