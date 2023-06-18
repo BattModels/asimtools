@@ -1,0 +1,23 @@
+script: lammps
+env_id: inline
+workdir: 'results'
+overwrite: true
+args:
+  # template needs full path right now
+  template: /home/mphuthi/tests/asimtools/examples2/lammps/lj_npt_template.lammps
+  # image:
+  #   name: Ar
+  #   builder: bulk
+  #   crystalstructure: 'fcc'
+  #   a: 5.3
+  variables:  
+    NSTEPS : 100
+    THERMO_FREQ:  10
+    DUMP_FREQ:  10
+    TEMP : 900.0
+    PRES : 1.0
+    TAU_T : 0.1
+    TAU_P : 0.5
+
+
+
