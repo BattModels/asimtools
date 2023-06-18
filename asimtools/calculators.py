@@ -11,10 +11,12 @@ from asimtools.utils import get_calc_input
 #     ''' Loads a generic ASE calculator which follows the standard format '''
 #     from ase.calculators.eam import EAM
 
-def load_calc(calc_id=None, calc_params=None):
+def load_calc(calc_id=None, calc_input=None):
     ''' Finds the correct loader and load the calc '''
     if calc_id is not None:
-        calc_input = get_calc_input()
+        if calc_input is None:
+            calc_input = get_calc_input()
+        print('calcs calc input:', calc_input)
         try:
             calc_params = calc_input[calc_id]
         except KeyError:

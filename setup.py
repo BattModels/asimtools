@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
-from pathlib import Path
-
+# from pathlib import Path
 # see https://packaging.python.org/guides/single-sourcing-package-version/
 # version_dict = {}
 # with open(Path(__file__).parents[0] / "nequip/_version.py") as fp:
@@ -18,6 +17,7 @@ setup(
         # make the scripts available as command line scripts
         "console_scripts": [
             "asim-run = asimtools.scripts.asim_run:main",
+            "asim-execute = asimtools.scripts.asim_execute:main",
         ]
     },
     install_requires=[

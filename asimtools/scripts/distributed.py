@@ -6,21 +6,24 @@ Author: mkphuthi@github.com
 
 '''
 
-from typing import Dict, Tuple
-from asimtools.job import branch, DistributedJob
+from typing import Dict, Optional
+from asimtools.job import DistributedJob
 
-@branch
 def distributed(
-    config_input: Dict,
     subscripts: Dict,
-    **kwargs
-) -> Tuple[list,Dict]:
+    env_input: Optional[Dict] = None,
+    calc_input: Optional[Dict] = None,
+) -> Dict:
     '''
     Submits multiple scripts simultaneously and handles
     file management based on standard
     '''
 
-    djob = DistributedJob(config_input, subscripts)
+    djob = DistributedJob(
+        sim_input=subscripts,
+        env_input=env_input,
+        calc_input=calc_input
+    )
     job_ids = djob.submit()
 
     results = {'job_ids': job_ids}

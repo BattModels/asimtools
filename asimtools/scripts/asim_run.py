@@ -8,9 +8,10 @@ Author: mkphuthi@github.com
 import importlib
 import sys
 import os
+from pathlib import Path
 import argparse
 from typing import Dict, Tuple
-from asimtools.utils import read_yaml, get_calc_input
+from asimtools.utils import read_yaml
 from asimtools.job import load_job_from_directory
 
 
@@ -19,30 +20,32 @@ def parse_command_line(args) -> Tuple[Dict, Dict]:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'sim_input_file',
-        metavar='simulation_configuration_file',
+        metavar='simulation_input_file',
         type=str,
-        help='calculator configuration yaml file'
+        help='simulation input yaml file'
     )
     parser.add_argument(
-        'calc_input_file',
-        metavar='calculator_configuration_file',
+        '-c',
+        '--calc',
+        metavar='calculator_input_file',
         type=str,
-        help='calculator configuration yaml file'
+        help='calculator input yaml file'
     )
     args = parser.parse_args(args)
 
     sim_input = read_yaml(args.sim_input_file)
-    if args.calc_input_file != 'none':
-        calc_input = read_yaml(args.calc_input_file)
-    else:
-        calc_input = get_calc_input()
+    calc_input_file = args.calc
 
-    return sim_input, calc_input
+    return sim_input, calc_input_file
 
 
 def main(args=None) -> None:
     ''' Main '''
-    sim_input, _ = parse_command_line(args)
+    sim_input, calc_input_file = parse_command_line(args)
+    if calc_input_file is not None:
+        assert Path(calc_input_file).exists(), 'Specify valid calc input file'
+        os.environ["ASIMTOOLS_CALC_INPUT"] = calc_input_file
+        print('WARNING: ASIMTOOLS_CALC_INPUT variable changed')
     script = sim_input['script']
     module_name = script.split('/')[-1].split('.py')[0]
     func_name = module_name.split('.')[-1]
@@ -69,10 +72,15 @@ def main(args=None) -> None:
     except:
         print(f'ERROR: Failed to run {func_name}')
         raise
+
     job = load_job_from_directory('.')
     if success:
-        job_id = os.getenv('SLURM_JOB_ID')
-        results['job_id'] = job_id
+        # Get job IDs from internally run scripts if any
+        job_ids = results.get('job_ids', False)
+        # Otherwise get job_ids from wherever this script is running
+        if not job_ids:
+            job_ids = os.getenv('SLURM_JOB_ID')
+            results['job_ids'] = job_ids
         job.update_output(results)
         job.complete()
     else:

@@ -1,4 +1,4 @@
-lj: 
+j: 
   name: LennardJones
   module: ase.calculators.lj
   args:

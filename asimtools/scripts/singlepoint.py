@@ -5,9 +5,6 @@ Calculates single point energy
 Author: mkphuthi@github.com
 '''
 
-# pylint: disable=unused-argument
-# pylint: disable=too-many-arguments
-
 from typing import Tuple, Dict
 from asimtools.calculators import load_calc
 # from asimtools.job import uses_calc
@@ -16,14 +13,12 @@ from asimtools.utils import (
     join_names,
 )
 
-# @uses_calc
 def singlepoint(
     calc_id: str,
     image: Dict,
     prefix: str = '',
     properties: Tuple[str] = ('energy', 'forces'),
-    **kwargs
-) -> Tuple[None,Dict]:
+) -> Dict:
     '''
     Calculates the single point energy, forces and stresses where possible
     '''

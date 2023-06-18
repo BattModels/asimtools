@@ -1,7 +1,7 @@
 '''.Xauthority'''
 
 from typing import Dict, Tuple
-from asimtools.job import ChainedJob, branch
+from asimtools.job import ChainedJob
 
 # @branch
 def eos(
@@ -11,7 +11,7 @@ def eos(
     preprocess_env_id: str,
     nimages: int = 5,
     scale_range: Tuple[float] = (0.95, 1.05),
-) -> Tuple[list,Dict]:
+) -> Dict:
     ''' EOS calculation '''
 
     sim_input = {
@@ -42,6 +42,7 @@ def eos(
         'step-2': {
             'script': 'eos.postprocess',
             'env_id': preprocess_env_id,
+            'submit': False, #Fails if previous step is in a slurm queue
             'args': {
                 'images': {'pattern': '../step-1/id-*/image_output.xyz'},
                 'scale_range': scale_range,
@@ -57,8 +58,6 @@ def eos(
     #         'scale_range': scale_range,
     # }})
 
-    
-
     chain = ChainedJob(sim_input, env_input=None, calc_input=None)
-    job_ids = chain.submit()
+    chain.submit()
     return chain.get_last_output()

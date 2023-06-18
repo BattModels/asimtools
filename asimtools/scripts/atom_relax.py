@@ -9,7 +9,7 @@ Author: mkphuthi@github.com
 #pylint: disable=too-many-locals
 #pylint: disable=too-many-arguments
 
-from typing import Sequence, Dict
+from typing import Dict, Tuple
 import numpy as np
 import ase.optimize
 from ase.io.trajectory import Trajectory
@@ -17,19 +17,18 @@ from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms, join_names
 
 def atom_relax(
-    config_input: Dict,
-    image: Dict = None,
+    calc_id: str,
+    image: Dict,
     prefix: str = '',
-    optimizer: str = 'GPMin', #GPMin is fastest according to docs
-    properties: Sequence[str] = ('energy', 'forces'),
+    optimizer: str = 'GPMin', #GPMin is fastest according to ASE docs
+    properties: Tuple[str] = ('energy', 'forces'),
     fmax: float = 0.02,
-    **kwargs
 ) -> Dict:
     ''' 
     Relaxes the given structure using ASE
     '''
-    calc = load_calc(config_input['calc'])
-
+    calc = load_calc(calc_id)
+    print('Running relax')
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)
 

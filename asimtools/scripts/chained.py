@@ -7,15 +7,15 @@ Author: mkphuthi@github.com
 
 '''
 
-from typing import Dict, Tuple, Union
+from typing import Dict, Optional
 from asimtools.job import ChainedJob
 
 
 def chained(
     steps: Dict,
-    env_input: Union[Dict,None] = None,
-    calc_input: Union[Dict,None] = None,
-) -> Tuple[list,Dict]:
+    env_input: Optional[Dict] = None,
+    calc_input: Optional[Dict] = None,
+) -> Dict:
     '''
     Submits a chain of scripts in the order specified by steps
     in input

@@ -183,7 +183,7 @@ def get_env_input():
     return {}
 
 def get_calc_input():
-    ''' Gets the global calc_input specified by calcironment variable '''
+    ''' Gets the global calc_input specified by environment variable '''
     calc_input_file = os.getenv('ASIMTOOLS_CALC_INPUT')
     if calc_input_file is None:
         dotfile = Path('~/.asimtools')

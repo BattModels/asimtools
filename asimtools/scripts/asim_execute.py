@@ -14,36 +14,38 @@ from asimtools.job import UnitJob
 
 def parse_command_line(args) -> Tuple[Dict, Dict]:
     ''' Parse command line input '''
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(add_help=True)
     parser.add_argument(
         'sim_input_file',
-        metavar='simulation_configuration_file',
+        metavar='simulation_input_file',
         type=str,
-        help='calculator configuration yaml file',
+        help='simulation input yaml file',
     )
     parser.add_argument(
-        'env_input_file',
-        metavar='environment_configuration_file',
+        '-e',
+        '--env',
+        metavar='environment_input_file',
         type=str,
-        help='environment configuration yaml file',
+        help='environment input yaml file',
     )
     parser.add_argument(
-        'calc_input_file',
-        metavar='calculator_configuration_file',
+        '-c',
+        '--calc',
+        metavar='calculator_input_file',
         type=str,
-        help='calculator configuration yaml file',
+        help='calculator input yaml file',
     )
     args = parser.parse_args(args)
-    #TODO: Take inputs as optional arguments rather than using none
+
     sim_input = read_yaml(args.sim_input_file)
-    if args.env_input_file != 'none':
-        env_input = read_yaml(args.env_input_file)
-    else:
-        env_input = None
-    if args.calc_input_file != 'none':
-        calc_input = read_yaml(args.calc_input_file)
-    else:
-        calc_input = None
+    calc_input = args.calc
+    env_input = args.env
+    if env_input is not None:
+        env_input = read_yaml(env_input)
+
+    calc_input = args.calc
+    if calc_input is not None:
+        calc_input = read_yaml(calc_input)
 
     return sim_input, env_input, calc_input
 
@@ -60,7 +62,7 @@ def main(args=None) -> None:
     job.go_to_workdir()
     job.start()
     try:
-        job_ids = job.submit()
+        job.submit()
     except:
         job.fail()
         raise

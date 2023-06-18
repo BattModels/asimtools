@@ -11,7 +11,7 @@ def preprocess(
     image: Dict,
     nimages: int = 5,
     scale_range: Tuple[float,float] = (0.95, 1.05),
-) -> Tuple[None,Dict]:
+) -> Dict:
     ''' Prepares structures for EOS calculation '''
 
     assert scale_range[0] < scale_range[1], 'x_scale[0] should be smaller than\

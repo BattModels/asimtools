@@ -1,0 +1,28 @@
+script: strong_scaling
+overwrite: true
+workdir: results
+env_id: inline
+args:
+  ntask_array: [1,2,4,8,16,32]
+  image:
+    name: Li
+    builder: bulk
+  subscript_sim_input:
+    script: singlepoint
+    overwrite: true
+    args:
+      calc_id: qe_li
+      properties: ['energy', 'forces']
+  subscript_env_input:
+    mode:
+      use_slurm: true
+      interactive: false
+    slurm:
+      flags:
+        - -p idle
+      precommands:
+        - source ~/.bashrc
+        - conda activate asimtools
+        - module load qe
+
+

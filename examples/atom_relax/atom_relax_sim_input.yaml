@@ -1,0 +1,11 @@
+script: atom_relax
+env_id: srun
+workdir: 'results'
+overwrite: true
+args:
+  calc_id: lj
+  image:
+    name: Ar
+    builder: bulk
+    crystalstructure: 'fcc'
+  fmax: 0.05

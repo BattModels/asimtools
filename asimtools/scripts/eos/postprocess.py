@@ -6,15 +6,13 @@ import matplotlib.pyplot as plt
 from ase.eos import EquationOfState
 from ase.io import read
 from ase. units import GPa
-from asimtools.job import load_output_images, load_input_images
+# from asimtools.job import load_output_images, load_input_images
 from asimtools.utils import (
     write_csv_from_dict,
     get_images,
 )
 
-# @leaf
 def postprocess(
-    scale_range: Tuple[float, float],
     images: Dict = None,
 ) -> Tuple[None,Dict]:
     ''' plot things '''

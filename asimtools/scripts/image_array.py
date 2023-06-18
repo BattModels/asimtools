@@ -6,21 +6,19 @@ Author: mkphuthi@github.com
 
 '''
 
-from typing import Dict, Sequence, Tuple, Union
+from typing import Dict, Sequence, Optional
 from copy import deepcopy
 from asimtools.job import DistributedJob
 from asimtools.utils import get_images
 
-# @branch
 def image_array(
     images: Dict,
     subscript_input: Dict,
-    calc_input: Union[Dict,None] = None,
-    env_input: Union[Dict,None] = None,
+    calc_input: Optional[Dict] = None,
+    env_input: Optional[Dict] = None,
     ids: Sequence = None,
-) -> Tuple[list,Dict]:
+) -> Dict:
     ''' Submits same script on multiple images '''
-    print('image_array', images)
     images = get_images(**images)
     array_sim_input = {}
 
