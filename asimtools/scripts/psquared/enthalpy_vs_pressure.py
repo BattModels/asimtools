@@ -5,7 +5,6 @@ import numpy as np
 from scipy import interpolate
 import matplotlib.pyplot as plt
 from pymatgen.analysis.eos import EOS
-from asimtools.job import branch
 from asimtools.utils import get_atoms
 
 
@@ -17,9 +16,7 @@ def vinet_pv_eos(E0: float, B0: float, B1: float, V0: float):
 
     return _func
 
-@branch
 def enthalpy_vs_pressure(
-    config_input: Dict,
     image: Dict,
     ev_csv: str,
     plogspace: Tuple[float,float,float] = (-5,-2,10),
@@ -66,7 +63,7 @@ def enthalpy_vs_pressure(
     np.savetxt(
         'pressure_vs_volume.csv',
         pv_data,
-        header=f'Formula:{formula}, Spacegroup:{spacegroup}\nP(eV/Ang), H(eV)',
+        header=f'Formula:{formula}, Spacegroup:{spacegroup}\nP(eV/Ang^3), V(Ang^3)',
         delimiter=','
     )
 
@@ -99,5 +96,5 @@ def enthalpy_vs_pressure(
     ax.set_ylabel('Enthalpy (eV)')
     ax.set_xlabel('Pressure (eV/$\AA^3$)')
     plt.savefig('enthalpy_vs_pressure.png')
-    return None, {}
+    return {}
     
