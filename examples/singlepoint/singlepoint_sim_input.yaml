@@ -1,7 +1,12 @@
 script: singlepoint
-image:
-  name: Ar
-  crystalstructure: 'fcc'
-  a: 2.4
-prefix: Ar_LJ
-properties: [energy, forces, stress]
+env_id: srun
+workdir: 'results'
+overwrite: true
+args:
+  calc_id: lj
+  image:
+    name: Ar
+    builder: bulk
+    crystalstructure: 'fcc'
+    a: 3.0
+  properties: ['energy', 'forces']

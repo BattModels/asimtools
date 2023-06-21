@@ -1,0 +1,9 @@
+script: atom_relax
+optimizer: GPMin
+image:
+  name: Ar
+  rattle_stdev: 0.1
+  repeat: [2,2,2]
+prefix: Ar_LJ
+properties: [energy, forces, stress]
+fmax: 0.03

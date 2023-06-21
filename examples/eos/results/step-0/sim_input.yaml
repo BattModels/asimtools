@@ -1,0 +1,18 @@
+args:
+  ids:
+  - x0.95
+  - x0.97
+  - x1.00
+  - x1.02
+  - x1.05
+  images:
+    image_file: input_images.xyz
+  subscript_input:
+    args:
+      properties:
+      - energy
+    config_id: inline
+    script: singlepoint
+  workdir: .
+config_id: inline
+script: image_array

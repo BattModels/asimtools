@@ -1,0 +1,22 @@
+submit: True
+configs:
+  simulation:
+    calc_name: LennardJones
+    calc:
+      sigma: 3.54
+      epsilon: 0.00802236
+    job:
+      use_slurm: false
+      interactive: true
+  process:
+    job:
+      use_slurm: false
+      interactive: true
+# slurm:
+#   flags:
+#     - -n 2
+#     - --gres=gpu:1
+#   precommands:
+#     - source activate ase
+#   postcommands:
+#     - echo "POSTCOMMAND"

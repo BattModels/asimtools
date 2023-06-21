@@ -1,0 +1,8 @@
+args:
+  scale_range:
+  - 0.95
+  - 1.05
+  step0_dir: ../step-0
+config_id: inline
+script: eos.postprocess
+workdir: step-1

@@ -1,8 +1,14 @@
-script: eos
-image:
-  name: Ar
-prefix: Ar_LJ
-submit: true
-overwrite: false
-scale_range: [0.95, 1.05]
-nimages: 3
+script: eos.eos.py
+env_id: inline
+workdir: results
+args:
+  image:
+    name: Li
+    builder: bulk
+    # crystalstructure: 'fcc'
+    # a: 5.45
+  nimages: 5
+  scale_range: [0.95, 1.05]
+  singlepoint_env_id: batch
+  singlepoint_calc_id: qe_li
+  preprocess_env_id: batch

@@ -1,0 +1,7 @@
+script: singlepoint
+image:
+  name: Ar
+  crystalstructure: 'fcc'
+  a: 2.4
+prefix: Ar_LJ
+properties: [energy, forces, stress]

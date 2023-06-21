@@ -1,9 +1,11 @@
 script: atom_relax
-optimizer: GPMin
-image:
-  name: Ar
-  rattle_stdev: 0.1
-  repeat: [2,2,2]
-prefix: Ar_LJ
-properties: [energy, forces, stress]
-fmax: 0.03
+env_id: srun
+workdir: 'results'
+overwrite: true
+args:
+  calc_id: lj
+  image:
+    name: Ar
+    builder: bulk
+    crystalstructure: 'fcc'
+  fmax: 0.05

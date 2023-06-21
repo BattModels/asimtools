@@ -1,0 +1,50 @@
+batch:
+  calc:
+    args:
+      epsilon: 0.00802236
+      sigma: 3.54
+    module: ase.calculators.lj
+    name: LennardJones
+  job:
+    interactive: true
+    use_slurm: true
+  overwrite: true
+  slurm:
+    flags:
+    - -n 2
+    - -p idle
+    precommands:
+    - source ~/.bashrc
+    - conda activate asimtools
+  submit: true
+inline:
+  calc:
+    args:
+      epsilon: 0.00802236
+      sigma: 3.54
+    module: ase.calculators.lj
+    name: LennardJones
+  job:
+    interactive: true
+    use_slurm: false
+  overwrite: true
+  submit: true
+srun:
+  calc:
+    args:
+      epsilon: 0.00802236
+      sigma: 3.54
+    module: ase.calculators.lj
+    name: LennardJones
+  job:
+    interactive: false
+    use_slurm: true
+  overwrite: true
+  slurm:
+    flags:
+    - -n 2
+    - -p idle
+    precommands:
+    - source ~/.bashrc
+    - conda activate asimtools
+  submit: true

@@ -1,19 +1,54 @@
 #!/usr/bin/env python
 '''
-Calculates EOS
+Run a script
 
 Author: mkphuthi@github.com
 '''
 
 import importlib
 import sys
-from asimtools.utils import parse_command_line
+import os
+from pathlib import Path
+import argparse
+from typing import Dict, Tuple
+from asimtools.utils import read_yaml
+from asimtools.job import load_job_from_directory
 
-def main(args=None):
+
+def parse_command_line(args) -> Tuple[Dict, Dict]:
+    ''' Parse command line input '''
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'sim_input_file',
+        metavar='simulation_input_file',
+        type=str,
+        help='simulation input yaml file'
+    )
+    parser.add_argument(
+        '-c',
+        '--calc',
+        metavar='calculator_input_file',
+        type=str,
+        help='calculator input yaml file'
+    )
+    args = parser.parse_args(args)
+
+    sim_input = read_yaml(args.sim_input_file)
+    calc_input_file = args.calc
+
+    return sim_input, calc_input_file
+
+
+def main(args=None) -> None:
     ''' Main '''
-    calc_input, sim_input = parse_command_line(args)
+    sim_input, calc_input_file = parse_command_line(args)
+    if calc_input_file is not None:
+        assert Path(calc_input_file).exists(), 'Specify valid calc input file'
+        os.environ["ASIMTOOLS_CALC_INPUT"] = calc_input_file
+        print('WARNING: ASIMTOOLS_CALC_INPUT variable changed')
     script = sim_input['script']
     module_name = script.split('/')[-1].split('.py')[0]
+    func_name = module_name.split('.')[-1]
     spec = importlib.util.find_spec('.'+module_name,'asimtools.scripts')
 
     if spec is not None:
@@ -28,11 +63,28 @@ def main(args=None):
         sys.modules[module_name] = sim_module
         spec.loader.exec_module(sim_module)
 
-    sim_func = getattr(sim_module, module_name)
-    sim_func(
-        calc_input,
-        **sim_input,
-    )
+    sim_func = getattr(sim_module, func_name)
+
+    print(f'asim-run: running {func_name}')
+    try:
+        results = sim_func(**sim_input['args'])
+        success = True
+    except:
+        print(f'ERROR: Failed to run {func_name}')
+        raise
+
+    job = load_job_from_directory('.')
+    if success:
+        # Get job IDs from internally run scripts if any
+        job_ids = results.get('job_ids', False)
+        # Otherwise get job_ids from wherever this script is running
+        if not job_ids:
+            job_ids = os.getenv('SLURM_JOB_ID')
+            results['job_ids'] = job_ids
+        job.update_output(results)
+        job.complete()
+    else:
+        job.fail()
 
 
 if __name__ == "__main__":

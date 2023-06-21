@@ -1,0 +1,31 @@
+j: 
+  name: LennardJones
+  module: ase.calculators.lj
+  args:
+    sigma: 3.54
+    epsilon: 0.00802236
+qe:
+  name: Espresso
+  module: ase.calculators.espresso
+  args:
+    kspacing: 0.08
+    pseudopotentials:
+      Li: Li.pbe-s-kjpaw_psl.1.0.0.UPF
+    input_data:
+      ecutwfc: 60
+      calculation: scf
+      tstress: True
+      tprnfor: True
+      occupations: smearing
+      smearing: mp
+      degauss: 0.03
+      outdir: ./out
+    command: srun --mpi=pmix pw.x -in PREFIX.pwi > PREFIX.pwo
+gpaw:
+  name: GPAW
+  module: gpaw.calculator
+  args:
+    kpts: [2,2,2]
+    h: 0.1
+    xc: PBE
+    txt: gpaw_output.txt
