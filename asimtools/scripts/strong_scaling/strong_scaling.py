@@ -1,50 +1,58 @@
-#!/usr/bin/env python
 '''
-Apply the same script on multiple images
-
-Author: mkphuthi@github.com
-
+Very broken, idea is to standarize how we do strong scaling for 
+DFT calculation benchmarks
 '''
 
-from typing import Dict, Optional, List
-from copy import deepcopy
-from asimtools.job import DistributedJob
+from typing import Dict, Tuple
+from asimtools.job import ChainedJob
 
+# @branch
 def strong_scaling(
-    ntask_array: List[int], 
-    subscript_sim_input: Dict,
-    subscript_env_input: Optional[Dict] = None,
-    calc_input: Optional[Dict] = None,
+    image: dict,
+    singlepoint_env_id: str,
+    singlepoint_calc_id: str,
+    preprocess_env_id: str,
+    nimages: int = 5,
+    scale_range: Tuple[float] = (0.95, 1.05),
 ) -> Dict:
-    ''' Submits same script on multiple images '''
+    ''' EOS calculation '''
 
-    assert subscript_env_input['mode'].get('use_slurm', False), \
-        'Scaling only makes sense if "use_slurm=True in subscript_env_input'
+    sim_input = {
+        'step-0': {
+            'script': 'eos.preprocess',
+            'env_id': preprocess_env_id,
+            'args': {
+                'image': image,
+                'nimages': nimages,
+                'scale_range': scale_range,
+            }
+        },
+        'step-1': {
+            'script': 'image_array',
+            'env_id': preprocess_env_id,
+            'args': {
+                'images': {'image_file': 'step-0/preprocess_images_output.xyz'},
+                'subscript_input': {
+                    'script': 'singlepoint',
+                    'env_id': singlepoint_env_id,
+                    'args': {
+                        'calc_id': singlepoint_calc_id,
+                        'properties': ['energy'],
+                    }
+                }
+            }
+        },
+        'step-2': {
+            'script': 'eos.postprocess',
+            'env_id': preprocess_env_id,
+            'submit': False, #Fails if previous step is in a slurm queue
+            'args': {
+                'images': {'pattern': '../step-1/id-*/image_output.xyz'},
+                'scale_range': scale_range,
+            }
+        }
+    }
 
-    flags = subscript_env_input.get('slurm', {}).get('flags', [])
-    for flag in flags:
-        assert '-n' not in flag, 'Do not specify tasks in slurm parameters in \
-            subscript_env_input e.g. ' + {flag}
-
-    env_inputs = {}
-    array_sim_input = {}
-    for ntask in ntask_array:
-        env_input = deepcopy(subscript_env_input)
-        if not env_input.get('slurm', False):
-            env_input['slurm'] = {}
-        if len(flags) == 0:
-            env_input['slurm']['flags'] = []
-        
-
-        env_input['slurm']['flags'].append(f'-n {ntask}')
-        ntask_id = f'ntask-{ntask}'
-        env_inputs[ntask_id] = env_input
-        subscript_sim_input['env_id'] = ntask_id
-        array_sim_input[ntask_id] = subscript_sim_input
-
-    # Create a distributed job object
-    djob = DistributedJob(array_sim_input, env_inputs, calc_input)
-    job_ids = djob.submit()
-
-    results = {'job_ids': job_ids}
-    return results
+    djob = DistributedJob(sim_input, env_input=None, calc_input=None)
+    djob.submit()
+    return djob.get_out()
