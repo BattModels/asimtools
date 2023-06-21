@@ -1,4 +1,4 @@
-script: eos.eos.py
+script: eos.eos
 env_id: inline
 workdir: results
 args:

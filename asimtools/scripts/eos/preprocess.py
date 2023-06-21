@@ -32,4 +32,4 @@ def preprocess(
     scaled_images_file = 'preprocess_images_output.xyz'
     write(scaled_images_file, scaled_images, format='extxyz')
 
-    return {'files':{'images': scaled_images_file}}
+    return {'files': {'images': scaled_images_file}}

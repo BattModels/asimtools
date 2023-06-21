@@ -10,7 +10,6 @@ import matplotlib
 import matplotlib.patches as mpatches
 from pymatgen.analysis.phase_diagram import PhaseDiagram, PDEntry, Element, PDPlotter
 from pymatgen.core import Composition
-from asimtools.job import branch
 from asimtools.utils import write_csv_from_dict
 matplotlib.use('Agg')
 
@@ -28,9 +27,8 @@ def plot_phd(x, y, Z, qhull_formulas, fname='phase_diagram.png', log=True):
         plt.xscale('log')
     plt.savefig(fname)
 
-@branch
+# @branch
 def psquared_diagram(
-    config_input: Dict,
     gp_files_pattern: str,
     pH: float,
     H_ref_csv: str,
@@ -126,16 +124,14 @@ def psquared_diagram(
         #     plot_fname=f'pb/p{pressure:.2E}_pourbaix.png'
         # )
         pb_grid, grid_formulas = Pourbaix_H_2(
-            {},
             formula=pd_formulas[:],
             E=Gf_energies[:],
             nu=nUs,
             nph=300,
             ulim=(-1.1,0.2),
             phlim=(-2,14),
-            plot=True,
+            plot=False,
             plot_fname=f'pb/p{pressure:.2E}_pourbaix.png',
-            **kwargs
         )
         # pb_slice = pb_grid[:,0] # Get only the slice for the pH we want
         # print('shape', pb_grid)
@@ -153,7 +149,6 @@ def psquared_diagram(
     return None, {}
 
 def convhull_pourbaix(
-    config_input,
     formulas,
     energies,
     nUs=200,
@@ -161,7 +156,7 @@ def convhull_pourbaix(
     ulim=(-1.1,0.2),
     pHlim=(-2,14),
     T=300,
-    plot=True,
+    plot=False,
     plot_fname='pourbaix_diagram.png',
     **kwargs
 ):
@@ -179,9 +174,9 @@ def convhull_pourbaix(
 
     entries = [PDEntry(formulas[i], energies[i]) for i in range(len(formulas))]
     phd =  PhaseDiagram(entries)
-    plot = PDPlotter(phd, backend='matplotlib')
-    plot.get_plot()
-    plt.savefig(f'convhulls/hull{np.random.randint(1000)}.png')
+    # plot = PDPlotter(phd, backend='matplotlib')
+    # plot.get_plot()
+    # plt.savefig(f'convhulls/hull{np.random.randint(1000)}.png')
     # Get compositions on the hull and their hydrogen fractions
     stable_entries = [
         entry for entry in phd.qhull_entries if \
@@ -227,7 +222,6 @@ def convhull_pourbaix(
     return phase_grid, qhull_formulas
 
 def Pourbaix_H_2(
-    config_input,
     formula,
     E,
     nu=200,
@@ -257,9 +251,9 @@ def Pourbaix_H_2(
     stability=[PhaseDiagram(entry).get_decomp_and_e_above_hull(i,allow_negative=True)[1] for i in entry[:-1]]
 
     phd =  PhaseDiagram(entry)
-    plot = PDPlotter(phd, backend='matplotlib')
-    plot.get_plot()
-    plt.savefig(f'convhulls/hull{np.random.randint(1000)}.png')
+    # plot = PDPlotter(phd, backend='matplotlib')
+    # plot.get_plot()
+    # plt.savefig(f'convhulls/hull{np.random.randint(1000)}.png')
     
     # Compositions on the convex hull
     comp_convex=[comp[i] for i in range(len(comp)) if stability[i]==0]
