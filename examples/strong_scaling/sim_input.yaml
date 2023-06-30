@@ -1,16 +1,17 @@
-script: strong_scaling
+script: strong_scaling.strong_scaling.py
 overwrite: true
 workdir: results
-env_id: inline
 args:
-  ntask_array: [1,2,4,8,16,32]
-  image:
-    name: Li
-    builder: bulk
-  subscript_sim_input:
+  ntasks: [1,2,4,8,16]
+  subscript_input:
     script: singlepoint
     overwrite: true
     args:
+      image:
+        builder: bulk
+        name: Li
+        repeat: [2,2,2]
+        rattle_stdev: 0.01
       calc_id: qe_li
       properties: ['energy', 'forces']
   subscript_env_input:
@@ -19,10 +20,8 @@ args:
       interactive: false
     slurm:
       flags:
-        - -p idle
+        - -p cpu
+        - --tmp=40G
       precommands:
         - source ~/.bashrc
         - conda activate asimtools
-        - module load qe
-
-

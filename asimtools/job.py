@@ -343,7 +343,7 @@ class UnitJob(Job):
         # atoms = sim_input['args'].get('image', {}).get('atoms', False)
         # if atoms:
         #     del sim_input['args']['image']['atoms']
-        print('input files', sim_input)
+        # print('input files', sim_input)
         write_yaml(workdir / 'sim_input.yaml', self.sim_input)
         write_yaml(workdir / 'calc_input.yaml', self.calc_input)
         write_yaml(workdir / 'env_input.yaml', self.env_input)
@@ -614,7 +614,7 @@ class DistributedJob(Job):
         ''' 
         Submit a job using slurm, interactively or in the terminal
         '''
-        print('djob: submit')
+        # print('djob: submit')
         # if not self.workdir.exists():
         #     self.gen_input_files()
         # self.gen_input_files()
@@ -631,12 +631,12 @@ class DistributedJob(Job):
 
         job_ids = None
         if self.use_array:
-            print('djob: submit array')
+            # print('djob: submit array')
             job_ids = self.submit_array()
         else:
-            print('djob: submit individual jobs')
+            # print('djob: submit individual jobs')
             job_ids = self.submit_jobs()
-        print('djob job_ids', job_ids)
+        # print('djob job_ids', job_ids)
         os.chdir(cur_dir)
         return job_ids
 
@@ -746,11 +746,11 @@ class ChainedJob(Job):
                     print(f'step: {step+i}, cur_complete: {cur_step_complete}')
                     if not cur_step_complete and status != 'started':
                         unitjob.env['slurm']['flags'].append(f'-J step-{step+i}')
-                        print('Dependency:', dependency, unitjob.sim_input)
+                        # print('Dependency:', dependency, unitjob.sim_input)
                         dependency = unitjob.submit(dependency=dependency)
                         # print('Dependency uj output:', unitjob.get_output())
                         # dependency = unitjob.get_output().get('job_ids', None)
-                        print('Dependency next:', dependency)
+                        # print('Dependency next:', dependency)
 
             job_ids = dependency
         else:

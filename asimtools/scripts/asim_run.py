@@ -8,6 +8,7 @@ Author: mkphuthi@github.com
 import importlib
 import sys
 import os
+from datetime import datetime
 from pathlib import Path
 import argparse
 from typing import Dict, Tuple
@@ -66,12 +67,17 @@ def main(args=None) -> None:
     sim_func = getattr(sim_module, func_name)
 
     print(f'asim-run: running {func_name}')
+    start = datetime.now()
     try:
         results = sim_func(**sim_input['args'])
         success = True
+        stop = datetime.now()
     except:
         print(f'ERROR: Failed to run {func_name}')
         raise
+
+    results['start_time'] = str(start)
+    results['end_time'] = str(stop)
 
     job = load_job_from_directory('.')
     if success:
@@ -84,6 +90,7 @@ def main(args=None) -> None:
         job.update_output(results)
         job.complete()
     else:
+        job.update_output(results)
         job.fail()
 
 
