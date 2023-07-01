@@ -25,9 +25,9 @@ def env_array(
         ids = [str(i) for i in range(len(env_ids))]
     else:
         assert len(ids) == len(env_ids), \
-            'Num. of images must match num. of ids'
+            'Num. of env_ids must match num. of ids'
 
-    # Make individual sim_inputs for each image
+    # Make individual sim_inputs for each env
     for i, env_id in enumerate(env_ids):
         new_subscript_input = deepcopy(subscript_input)
         new_subscript_input['env_id'] = env_id

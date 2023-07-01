@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Apply the same script on multiple images
+Apply the sim script using multiple calculators
 
 Author: mkphuthi@github.com
 
@@ -9,37 +9,36 @@ Author: mkphuthi@github.com
 from typing import Dict, Sequence, Optional
 from copy import deepcopy
 from asimtools.job import DistributedJob
-from asimtools.utils import get_images
 
-def image_array(
-    images: Dict,
+def calc_array(
+    calc_ids: Sequence[str],
     subscript_input: Dict,
-    calc_input: Optional[Dict] = None,
+    env_ids: Optional[Sequence[str]] = None,
+    calc_input: Optional[Dict] = None, #This doesn't work yet
     env_input: Optional[Dict] = None,
-    ids: Sequence[str] = None,
-    env_ids: Sequence[str] = None
+    ids: Sequence = None,
 ) -> Dict:
-    ''' Submits same script on multiple images '''
-    images = get_images(**images)
+    ''' 
+    Submits same sim script using multiple calculators and if necessary, 
+    in different envs
+    '''
     array_sim_input = {}
 
     # Allow user to customize subdirectory names if needed
     if ids is None:
-        ids = [str(i) for i in range(len(images))]
+        ids = [calc_id for calc_id in calc_ids]
     else:
-        assert len(ids) == len(images), \
-            'Num. of images must match num. of ids'
+        assert len(ids) == len(calc_ids), \
+            'Num. of calc_ids must match num. of ids'
 
     if env_ids is not None:
-        assert len(env_ids) == len(images), \
-            f'Num. images ({len(images)}) must match env_ids ({len(env_ids)})'
+        assert len(env_ids) == len(calc_ids), \
+            'Num. of calc_ids must match num. of env_ids'
 
-    # Make individual sim_inputs for each image
-    for i, image in enumerate(images):
+    # Make individual sim_inputs for each calc
+    for i, calc_id in enumerate(calc_ids):
         new_subscript_input = deepcopy(subscript_input)
-        new_subscript_input['args']['image'] = {
-            'atoms': image
-        }
+        new_subscript_input['args']['calc_id'] = calc_id
         array_sim_input[f'{ids[i]}'] = new_subscript_input
 
         if env_ids is not None:
