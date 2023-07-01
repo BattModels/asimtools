@@ -9,39 +9,41 @@ Author: mkphuthi@github.com
 #pylint: disable=too-many-locals
 #pylint: disable=too-many-arguments
 
-from typing import Dict, Tuple
-import numpy as np
+from typing import Dict, Optional, Sequence
 import ase.optimize
+from ase.constraints import StrainFilter
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms, join_names
 
-def atom_relax(
+def cell_relax(
     calc_id: str,
     image: Dict,
     prefix: str = '',
-    optimizer: str = 'GPMin', #GPMin is fastest according to ASE docs
-    properties: Tuple[str] = ('energy', 'forces'),
-    fmax: float = 0.02,
+    optimizer: str = 'BFGS',
+    smax: float = 0.002,
+    mask: Optional[Sequence] = None,
 ) -> Dict:
     ''' 
-    Relaxes the given structure using ASE
+    Relaxes the given lattice using ASE up to the threshold smax,
+    needs stresses to be implemented in calculator.
     '''
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)
 
-    traj_file = join_names([prefix, 'atom_relax.traj'])
-    dyn = getattr(ase.optimize, optimizer)(atoms)
+    traj_file = join_names([prefix, 'cell_relax.traj'])
+    sf = StrainFilter(atoms, mask=mask)
+    dyn = getattr(ase.optimize, optimizer)(sf)
     traj = Trajectory(
         traj_file,
         'w',
         atoms,
-        properties=properties
+        properties=['energy', 'forces', 'stress'],
     )
     dyn.attach(traj)
     try:
-        dyn.run(fmax=fmax)
+        dyn.run(fmax=smax)
     except Exception:
         print('Failed to optimize atoms')
         raise
@@ -50,11 +52,11 @@ def atom_relax(
     atoms.write(image_file, format='extxyz')
 
     energy = float(atoms.get_potential_energy())
-    final_fmax = float(np.sqrt((atoms.get_forces() ** 2).sum(axis=1).max()))
+    final_smax = float(atoms.get_stress().max())
 
     results = {
         'energy': energy,
-        'final_fmax': final_fmax,
+        'final_smax': final_smax,
         'files':{
             'image': image_file,
             'traj': traj_file,
