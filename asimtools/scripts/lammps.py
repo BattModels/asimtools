@@ -2,8 +2,6 @@
 '''
 Runs a user defined lammps script or template 
 
-### BROKEN ###
-
 Author: mkphuthi@github.com
 '''
 from typing import Dict

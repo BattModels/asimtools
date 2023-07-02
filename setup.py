@@ -24,6 +24,7 @@ setup(
         "pandas",
         "pyyaml",
         "pymatgen",
+        "ase",
     ],
     zip_safe=True,
 )

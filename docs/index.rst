@@ -7,11 +7,12 @@ Welcome to asimtools's documentation!
 =====================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 12
    :caption: Contents:
 
-   usage/installation
-   usage/quickstart
+   README <include_readme>
+   API Docs <modules>
+   
 
 
 
