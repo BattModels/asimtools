@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, find_namespace_packages
 # from pathlib import Path
 # see https://packaging.python.org/guides/single-sourcing-package-version/
 # version_dict = {}
@@ -12,7 +12,11 @@ setup(
     description="Atomic Simulation Tools",
     author="Keith Phuthi and Emil Annevelink",
     python_requires=">=3.9",
-    packages=find_packages(include=["asimtools", "asimtools.*"]),
+    packages=find_packages(include=[
+        "asimtools",
+        "asimtools.*",
+        "asimtools.scripts.*.*",
+    ]),
     entry_points={
         # make the scripts available as command line scripts
         "console_scripts": [
