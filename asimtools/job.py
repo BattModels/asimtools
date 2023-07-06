@@ -510,9 +510,16 @@ class DistributedJob(Job):
 
         njobs = len(self.unitjobs)
 
-        arr_max_str = ''
+        # For limiting number of jobs launched in array
         if array_max is not None:
             arr_max_str = f'%{array_max}'
+        else:
+            arr_max = self.unitjobs[0].env['mode'].get('array_max', False)
+            if arr_max:
+                arr_max_str = f'%{arr_max}'
+            else:
+                arr_max_str = ''
+
 
         # command = f'sbatch --array=[0-{njobs-1}] job_array.sh'
         if dependency is not None:
@@ -610,7 +617,7 @@ class DistributedJob(Job):
         for unitjob in self.unitjobs:
             unitjob.gen_input_files()
 
-    def submit(self) -> None:
+    def submit(self, **kwargs) -> None:
         ''' 
         Submit a job using slurm, interactively or in the terminal
         '''
@@ -632,10 +639,10 @@ class DistributedJob(Job):
         job_ids = None
         if self.use_array:
             # print('djob: submit array')
-            job_ids = self.submit_array()
+            job_ids = self.submit_array(**kwargs)
         else:
             # print('djob: submit individual jobs')
-            job_ids = self.submit_jobs()
+            job_ids = self.submit_jobs(**kwargs)
         # print('djob job_ids', job_ids)
         os.chdir(cur_dir)
         return job_ids

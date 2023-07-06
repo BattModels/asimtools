@@ -17,7 +17,8 @@ def image_array(
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
     ids: Sequence[str] = None,
-    env_ids: Sequence[str] = None
+    env_ids: Sequence[str] = None,
+    array_max: Optional[int] = None,
 ) -> Dict:
     ''' Submits same script on multiple images '''
     images = get_images(**images)
@@ -47,7 +48,7 @@ def image_array(
 
     # Create a distributed job object
     djob = DistributedJob(array_sim_input, env_input, calc_input)
-    job_ids = djob.submit()
+    job_ids = djob.submit(array_max=array_max)
 
     results = {'job_ids': job_ids}
     return results
