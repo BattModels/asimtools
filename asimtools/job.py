@@ -487,7 +487,7 @@ class DistributedJob(Job):
 
         self.unitjobs = unitjobs
 
-    def submit_jobs(self) -> Union[None,List[str]]:
+    def submit_jobs(self, **kwargs) -> Union[None,List[str]]:
         '''
         Submits the jobs. If submitting lots of batch jobs, we 
         recommend using DistributedJob.submit_array
@@ -635,7 +635,6 @@ class DistributedJob(Job):
         #     return None
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
-
         job_ids = None
         if self.use_array:
             # print('djob: submit array')
