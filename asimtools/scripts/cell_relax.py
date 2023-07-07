@@ -24,10 +24,23 @@ def cell_relax(
     smax: float = 0.002,
     mask: Optional[Sequence] = None,
 ) -> Dict:
-    ''' 
-    Relaxes the given lattice using ASE up to the threshold smax,
-    needs stresses to be implemented in calculator.
-    '''
+    """Relax cell using ASE Optimizer
+
+    :param calc_id: Key for calculator provided in calc_input
+    :type calc_id: str
+    :param image: Image parameters, see :func: asimtools.utils.get_atoms
+    :type image: Dict
+    :param prefix: Prefix to output files, defaults to ''
+    :type prefix: str, optional
+    :param optimizer: Optimizer class to use from ase.optimize, defaults to 'BFGS'
+    :type optimizer: str, optional
+    :param smax: Maximum stress in eV/$\AA^3$, defaults to 0.002
+    :type smax: float, optional
+    :param mask: Mask to constrain cell deformation while relaxing, defaults to None
+    :type mask: Optional[Sequence], optional
+    :return: Dictionary of results including, final energy, stress and output files
+    :rtype: Dict
+    """
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)

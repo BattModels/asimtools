@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 '''
-Run a script
-
-Author: mkphuthi@github.com
+Execute a workflow given the sim_input.yaml and optionally,
+a calc_input.yaml. The called script will be run directly in the current
+directory and environment
 '''
 
 import importlib
