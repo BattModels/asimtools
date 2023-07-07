@@ -6,10 +6,10 @@ and pring out the result
 Author: mkphuthi@github.com
 '''
 import sys
-from colorama import Fore
 from pathlib import Path
 import argparse
 from typing import Dict, Tuple
+from colorama import Fore
 from asimtools.utils import read_yaml
 from asimtools.job import load_job_from_directory
 
