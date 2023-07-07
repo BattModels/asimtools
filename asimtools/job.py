@@ -8,6 +8,7 @@ Author: mkphuthi@github.com
 import subprocess
 import os
 from pathlib import Path
+from datetime import datetime
 # import functools
 from glob import glob
 from typing import List, TypeVar, Dict, Tuple, Union
@@ -62,10 +63,13 @@ class Job():
 
     def start(self) -> None:
         ''' Updates the output to signal that the job was started '''
+        self.update_output({'start_time': datetime.now()})
         self.update_status('started')
+        print(self.get_output())
 
     def complete(self) -> None:
         ''' Updates the output to signal that the job was started '''
+        self.update_output({'end_time': datetime.now()})
         self.update_status('complete')
 
     def fail(self) -> None:
@@ -129,25 +133,25 @@ class Job():
         else:
             return {}
 
-    def get_output_images(self, ext='xyz') -> List:
-        ''' Get all the output Atoms objects in workdir'''
-        files = self.get_output().get('files', {})
-        image_file = files.get('images', False)
-        if image_file:
-            return ase.io.read(
-                self.workdir / image_file, format=ext, index=':',
-            )
-        else:
-            return None
+    # def get_output_images(self, ext='xyz') -> List:
+    #     ''' Get all the output Atoms objects in workdir'''
+    #     files = self.get_output().get('files', {})
+    #     image_file = files.get('images', False)
+    #     if image_file:
+    #         return ase.io.read(
+    #             self.workdir / image_file, format=ext, index=':',
+    #         )
+    #     else:
+    #         return None
 
-    def get_output_image(self, ext='extxyz') -> Union[Atoms,None]:
-        ''' Get the output Atoms object '''
-        files = self.get_output().get('files', {})
-        image_file = files.get('image', False)
-        if image_file:
-            return ase.io.read(self.workdir / image_file, format=ext)
-        else:
-            return None
+    # def get_output_image(self, ext='extxyz') -> Union[Atoms,None]:
+    #     ''' Get the output Atoms object '''
+    #     files = self.get_output().get('files', {})
+    #     image_file = files.get('image', False)
+    #     if image_file:
+    #         return ase.io.read(self.workdir / image_file, format=ext)
+    #     else:
+    #         return None
 
     def update_sim_input(self, new_params) -> None:
         ''' Update simulation parameters '''
@@ -236,7 +240,7 @@ class UnitJob(Job):
         run_suffix = mode_params.get('run_suffix', '')
 
         txt = f'{run_prefix} '
-        txt += 'asim-run sim_input.yaml'
+        txt += 'asim-run sim_input.yaml -c calc_input.yaml'
         txt += f'{run_suffix} '
         return txt
 
@@ -271,7 +275,7 @@ class UnitJob(Job):
         '''
         slurm_params = self.env.get('slurm', False)
 
-        txt = 'srun --unbuffered ' # unbuffered to avoid IO lag
+        txt = 'salloc --unbuffered ' # unbuffered to avoid IO lag
         txt += ' '.join(slurm_params.get('flags'))
         txt += self.gen_run_command()
 
@@ -286,26 +290,19 @@ class UnitJob(Job):
         mode_params = self.env.get('mode', {})
         use_slurm = mode_params.get('use_slurm', False)
         interactive = mode_params.get('interactive', False)
-        # overwrite = self.sim_input.get('overwrite', False)
-        # if workdir.exists() and not overwrite:
-        #     print(f'Skipped writing in {self.workdir}')
-        # else:
+        overwrite = self.sim_input.get('overwrite', False)
+        output_file = workdir / 'output.yaml'
+        sim_input_file = workdir / 'sim_input.yaml'
+        if output_file.exists() and sim_input_file.exists():
+            started = read_yaml(output_file).get('start_time', False)
+            if started and not overwrite:
+                txt = f'Skipped writing in {self.workdir}, job already '
+                txt += 'started. Set overwrite=True to overwrite'
+                print(txt)
+                return None
         if not workdir.exists():
             workdir.mkdir()
 
-        # # If we passed an atoms object, write to disk and link it
-        # atoms = sim_input['args'].get('image', {}).get('atoms', False)
-        # if atoms:
-        #     image_file = str('image_input.xyz')
-        #     atoms.write(self.get_workdir() / image_file)
-        #     sim_input['args']['image']['image_file'] = image_file
-        #     del sim_input['args']['image']['atoms']
-
-        # # Write the associated input image
-        # if self.atoms is not None:
-        #     image_file = str('image_input.xyz')
-        #     self.atoms.write(self.get_workdir() / image_file)
-        #     sim_input['args']['image'] = {'image_file': image_file}
         image = self.sim_input.get('args', {}).get('image', False)
 
         if image:
@@ -338,12 +335,6 @@ class UnitJob(Job):
                 }
                 # print('image_file after', input_images_file)
 
-        # # If we passed an atoms object, delete it otherwise
-        # # the yamls can't store atoms objects
-        # atoms = sim_input['args'].get('image', {}).get('atoms', False)
-        # if atoms:
-        #     del sim_input['args']['image']['atoms']
-        # print('input files', sim_input)
         write_yaml(workdir / 'sim_input.yaml', self.sim_input)
         write_yaml(workdir / 'calc_input.yaml', self.calc_input)
         write_yaml(workdir / 'env_input.yaml', self.env_input)
@@ -351,6 +342,7 @@ class UnitJob(Job):
 
         if use_slurm and not interactive:
             self._gen_slurm_script()
+        return None
 
     def submit(
         self, dependency: Union[List,None] = None
@@ -363,12 +355,12 @@ class UnitJob(Job):
         _, status = self.get_status(display=True)
         if status in ('started', 'discard'):
             return None
-        # if status not in ('clean', 'discard'):
-        #     return None
 
-        if not self.sim_input.get('submit', True):
+        if not self.sim_input.get('submit', False):
             return None
-        # print('unitjob submit: overwritten files')
+
+        print('unitjob submit: overwritten files')
+        print(f'unitjob: submit: {self.sim_input.get("submit")}')
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
         mode_params = self.env.get('mode', {})
@@ -391,7 +383,6 @@ class UnitJob(Job):
             else:
                 command = ['sbatch', 'job.sh']
         elif use_slurm and interactive:
-            #TODO: Should eventually use salloc instead
             # print('unitjob submit: interactive slurm')
             command = self._gen_slurm_interactive_txt().split()
         else:
@@ -492,6 +483,9 @@ class DistributedJob(Job):
         Submits the jobs. If submitting lots of batch jobs, we 
         recommend using DistributedJob.submit_array
         '''
+        # It is possible to do an implementation where we limit
+        # the number of simultaneous jobs like an array using job
+        # dependencies but that can be implemented later
         job_ids = []
         for unitjob in self.unitjobs:
             job_id = unitjob.submit()
@@ -501,7 +495,8 @@ class DistributedJob(Job):
     def submit_array(
         self,
         array_max=None,
-        dependency: Union[List[str],None] = None
+        dependency: Union[List[str],None] = None,
+        **kwargs,
     ) -> Union[None,List[str]]:
         '''
         Submits a job array if all the jobs have the same env and use slurm

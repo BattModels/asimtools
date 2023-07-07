@@ -3,6 +3,7 @@
 Describe the script briefly here. If this is the script that runs multiple steps,
 describe it here. SPhinx will automatically generate docs when we get to that
 
+Cite the papers where the method/script was first introduced here as well
 Author: mkphuthi@github.com
 '''
 

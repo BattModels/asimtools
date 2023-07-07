@@ -60,7 +60,7 @@ def main(args=None) -> None:
     )
     job.gen_input_files()
     job.go_to_workdir()
-    job.start()
+    # job.start()
     try:
         job.submit()
     except:

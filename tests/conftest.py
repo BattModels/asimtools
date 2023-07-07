@@ -5,59 +5,67 @@ Global fixtures used in all tests defined here
 import pytest
 
 @pytest.fixture
-def slurm_batch_calc_input():
-    ''' Calc input that uses no calculator in a batch job '''
+def batch_env_input():
+    """Batch job env_input"""
+    env_input = {
+        'batch': {
+            'mode': {
+                'use_slurm': True,
+                'interactive': False,
+            },
+            'slurm': {
+                'flags': ['-n 1', '-J test', '--mem=1G']
+            }
+        }
+    }
+    return env_input
+
+@pytest.fixture
+def salloc_env_input():
+    """Interactive slurm job env_input"""
+    env_input = {
+        'salloc': {
+            'mode': {
+                'use_slurm': True,
+                'interactive': True,
+            },
+            'slurm': {
+                'flags': ['-n 1', '-J test', '--mem=1G']
+            }
+        }
+    }
+    return env_input
+
+@pytest.fixture
+def inline_env_input():
+    """Inline job env_input"""
+    env_input = {
+        'batch': {
+            'mode': {
+                'use_slurm': False,
+                'interactive': True,
+            },
+        }
+    }
+    return env_input
+
+@pytest.fixture
+def lj_argon_calc_input():
+    """ Calc input that uses LennardJones in a batch job"""
     calc_input = {
-        'job': {
-            'use_slurm': True,
-            'interactive': False,
+        'lj': {
+            'name': 'LennardJones',
+            'module': 'ase.calculators.lj',
+            'args': {
+                'sigma': 3.54,
+                'epsilon': 0.00802236,
+            },
         },
-        'slurm': {
-            'flags': ['-n 2', '--gres=gpu:1']
-        }
     }
     return calc_input
 
 @pytest.fixture
-def lj_slurm_batch_calc_input():
-    ''' Calc input that uses LennardJones in a batch job '''
-    calc_input = {
-        'name': 'LennardJones',
-        'job': {
-            'use_slurm': True,
-            'interactive': False,
-        },
-        'slurm': {
-            'flags': ['-n 2', '--gres=gpu:1']
-        }
-    }
-    return calc_input
-
-@pytest.fixture
-def interactive_calc_input():
-    ''' Calc input that uses no calculator in the terminal '''
-    calc_input = {
-        'job': {
-            'use_slurm': False,
-            'interactive': True,
-        }
-    }
-    return calc_input
-
-@pytest.fixture
-def lj_interactive_calc_input():
-    ''' Calc input that uses LennardJones in the terminal '''
-    calc_input = {
-        'name': 'LennardJones',
-        'job': {
-            'use_slurm': False,
-            'interactive': True,
-        }
-    }
-    return calc_input
-
-@pytest.fixture
-def singlepoint_sim_input():
+def singlepoint_argon_sim_input():
     ''' Sim input for singlepoint calculation '''
     sim_input = {
         'script': 'singlepoint',
@@ -66,7 +74,8 @@ def singlepoint_sim_input():
             'name': 'Ar',
             'crystalstructure': 'fcc',
             'a': 5.4,
-        }
+        },
+        'properties': ['energy', 'force', 'stress'],
     }
     return sim_input
 
@@ -76,7 +85,10 @@ def do_nothing_sim_input():
     Sim imput for a script that just completes without doing anything
     '''
     sim_input = {
-        'script': './data/do_nothing_script.py',
+        'script': './data/do_nothing.py',
         'prefix': 'test_',
+        'args': {
+            'duration': 5,
+        },
     }
     return sim_input
