@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 '''
-Run a script
+Creates the input files for the specified job in the given workdir
+then executes asim-run in the specified env_id,
 
 Author: mkphuthi@github.com
 '''

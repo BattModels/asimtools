@@ -791,6 +791,33 @@ def load_job_from_directory(workdir: str):
     return job
 
 
+# def load_jobs_from_directory(
+#     workdir: str = None,
+#     workdirs: list = None,
+#     pattern: str = None,
+# ) -> List[UnitJob]:
+#     ''' Loads all jobs from a given directory/directories '''
+
+#     assert [workdir, workdirs, pattern].count(None) == 2, \
+#         'Provide exactly one of workdir, workdirs or pattern'
+
+#     job_list = []
+#     if pattern is not None:
+#         job_list += load_jobs_from_directory(glob(pattern))
+#     elif workdirs is not None:
+#         for wd in workdirs:
+#             job_list += load_jobs_from_directory(wd)
+#     else:
+#         calc_input = read_yaml(
+#             os.path.join(workdir, 'calc_input.yaml')
+#         )
+#         sim_input = read_yaml(
+#             os.path.join(workdir, 'sim_input.yaml')
+#         )
+#         job_list += [UnitJob(calc_input, sim_input)]
+
+#     return job_list
+
 def load_jobs_from_directory(
     workdir: str = None,
     workdirs: list = None,
@@ -808,13 +835,10 @@ def load_jobs_from_directory(
         for wd in workdirs:
             job_list += load_jobs_from_directory(wd)
     else:
-        calc_input = read_yaml(
-            os.path.join(workdir, 'calc_input.yaml')
-        )
         sim_input = read_yaml(
             os.path.join(workdir, 'sim_input.yaml')
         )
-        job_list += [UnitJob(calc_input, sim_input)]
+        job_list += [UnitJob(sim_input)]
 
     return job_list
 
