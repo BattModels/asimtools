@@ -13,10 +13,10 @@ def distributed(
     subscripts: Dict,
     env_input: Optional[Dict] = None,
     calc_input: Optional[Dict] = None,
+    array_max: Optional[int] = None,
 ) -> Dict:
     '''
-    Submits multiple scripts simultaneously and handles
-    file management based on standard
+    Submits multiple scripts simultaneously
     '''
 
     djob = DistributedJob(
@@ -24,7 +24,7 @@ def distributed(
         env_input=env_input,
         calc_input=calc_input
     )
-    job_ids = djob.submit()
+    job_ids = djob.submit(array_max=array_max)
 
     results = {'job_ids': job_ids}
     return results

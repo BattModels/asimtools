@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages, find_namespace_packages
+from setuptools import setup, find_packages
 # from pathlib import Path
 # see https://packaging.python.org/guides/single-sourcing-package-version/
 # version_dict = {}
@@ -22,6 +22,7 @@ setup(
         "console_scripts": [
             "asim-run = asimtools.scripts.asim_run:main",
             "asim-execute = asimtools.scripts.asim_execute:main",
+            "asim-check = asimtools.scripts.asim_check:main",
         ]
     },
     install_requires=[

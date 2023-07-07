@@ -9,7 +9,6 @@ from asimtools.utils import (
     write_yaml,
     get_atoms,
     get_images,
-    parse_command_line
 )
 import ase.build
 
@@ -30,25 +29,6 @@ STRUCT_DIR = Path(os.path.join(
 def test_join_names(test_input, expected):
     ''' Test join_names '''
     assert join_names(test_input) == expected
-
-def test_parse_command_line(
-    tmp_path,
-    lj_interactive_calc_input,
-    singlepoint_sim_input
-):
-    ''' Tests commandline argument parsing '''
-    calc_input_file = str(tmp_path / 'calc_input.yaml')
-    sim_input_file = str(tmp_path / 'sim_input.yaml')
-    write_yaml(calc_input_file, lj_interactive_calc_input)
-    write_yaml(sim_input_file, singlepoint_sim_input)
-
-    calc_config_parse, sim_config_parse = parse_command_line(
-        [calc_input_file, sim_input_file]
-    )
-
-    ## some checks
-    assert lj_interactive_calc_input == calc_config_parse
-    assert singlepoint_sim_input == sim_config_parse
 
 @pytest.mark.parametrize("test_input, expected",[
     ({'name': 'Ar'},

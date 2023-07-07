@@ -201,6 +201,7 @@ def get_calc_input():
                 except Exception:
                     print('WARNING: No calc_input yaml found')
     else:
+        print('calcdfasdfasdf', calc_input_file)
         calc_input = read_yaml(calc_input_file)
         return calc_input
     return {}

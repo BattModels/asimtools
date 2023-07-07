@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 '''
-Execute a workflow given the sim_input.yaml and optinally,
+Execute a workflow given the sim_input.yaml and optionally,
 a calc_input.yaml and/or env_input.yaml. The called script will be run
 in the specified workdir and env_id
+
+Author: mkphuthi@github.com
 '''
 
 import sys
@@ -62,7 +64,7 @@ def main(args=None) -> None:
     )
     job.gen_input_files()
     job.go_to_workdir()
-    job.start()
+    # job.start()
     try:
         job.submit()
     except:

@@ -14,7 +14,6 @@ from asimtools.utils import get_atoms, join_names
 def atom_relax(
     calc_id: str,
     image: Dict,
-    prefix: str = '',
     optimizer: str = 'GPMin', #GPMin is fastest according to ASE docs
     properties: Tuple[str] = ('energy', 'forces'),
     fmax: float = 0.02,
@@ -39,7 +38,7 @@ def atom_relax(
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)
 
-    traj_file = join_names([prefix, 'atom_relax.traj'])
+    traj_file = 'atom_relax.traj'
     dyn = getattr(ase.optimize, optimizer)(atoms)
     traj = Trajectory(
         traj_file,
@@ -54,7 +53,7 @@ def atom_relax(
         print('Failed to optimize atoms')
         raise
 
-    image_file = join_names([prefix, 'image_output.xyz'])
+    image_file = 'image_output.xyz'
     atoms.write(image_file, format='extxyz')
 
     energy = float(atoms.get_potential_energy())

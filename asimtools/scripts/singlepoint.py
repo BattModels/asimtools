@@ -10,13 +10,11 @@ from asimtools.calculators import load_calc
 # from asimtools.job import uses_calc
 from asimtools.utils import (
     get_atoms,
-    join_names,
 )
 
 def singlepoint(
     calc_id: str,
     image: Dict,
-    prefix: str = '',
     properties: Tuple[str] = ('energy', 'forces'),
 ) -> Dict:
     '''
@@ -47,7 +45,7 @@ def singlepoint(
             print('Failed to calculate stress')
             raise
 
-    image_file = join_names([prefix, 'image_output.xyz'])
+    image_file = 'image_output.xyz'
     atoms.write(image_file, format='extxyz')
 
     results = {
