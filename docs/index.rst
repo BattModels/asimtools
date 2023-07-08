@@ -12,6 +12,7 @@ Welcome to asimtools's documentation!
 
    README <include_readme>
    API Docs <modules>
+   Contributing <include_contributing>
    
 
 
