@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Relaxes the given tomic structure using ASE's built-in structure
+Relaxes the given atomic structure using ASE's built-in structure
 optimizers
 '''
 

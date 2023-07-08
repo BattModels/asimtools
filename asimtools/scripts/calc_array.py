@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Apply the sim script using multiple calculators
+Apply the same script using multiple calculators
 
 Author: mkphuthi@github.com
 
@@ -18,10 +18,18 @@ def calc_array(
     env_input: Optional[Dict] = None,
     ids: Sequence = None,
 ) -> Dict:
-    ''' 
-    Submits same sim script using multiple calculators and if necessary, 
-    in different envs
-    '''
+    """Apply the same script using different calculators and if necessary
+    different environments
+
+    :param calc_ids: Iterable with calc_ids, defaults to None
+    :type calc_ids: Sequence, optional
+    :param calc_input: Dictionary of calculator inputs
+    :type calc_input: Dictionary, optional
+    :param ids: Iterable with custom ids for each calc, defaults to None
+    :type ids: Sequence, optional
+    :return: Dictionary of results
+    :rtype: Dict
+    """
     array_sim_input = {}
 
     # Allow user to customize subdirectory names if needed

@@ -20,7 +20,28 @@ def image_array(
     env_ids: Sequence[str] = None,
     array_max: Optional[int] = None,
 ) -> Dict:
-    ''' Submits same script on multiple images '''
+    """Submit the same script on multiple images and if specified, use
+    different env_ids
+
+    :param images: Image config, see :func:`asimtools.utils.get_atoms`
+    :type images: Dict
+    :param subscript_input: sim_input of script to be run
+    :type subscript_input: Dict
+    :param calc_input: calc_input to override global file, defaults to None
+    :type calc_input: Optional[Dict], optional
+    :param env_input: env_input to override global file, defaults to None
+    :type env_input: Optional[Dict], optional
+    :param ids: Custom ids for each image, defaults to None
+    :type ids: Sequence[str], optional
+    :param env_ids: Sequence of envs for each image, must be the same length \
+        as the total number of images, defaults to None
+    :type env_ids: Sequence[str], optional
+    :param array_max: Maximum jobs to run simultanteously in job array, \
+        defaults to None
+    :type array_max: Optional[int], optional
+    :return: Dictionary of results
+    :rtype: Dict
+    """
     images = get_images(**images)
     array_sim_input = {}
 

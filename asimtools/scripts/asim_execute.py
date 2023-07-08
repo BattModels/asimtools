@@ -53,9 +53,9 @@ def parse_command_line(args) -> Tuple[Dict, Dict]:
 
 
 def main(args=None) -> None:
-    ''' Execute a workflow given the sim_input.yaml and optinally,
+    """Execute a workflow given the sim_input.yaml and optinally,
     a calc_input.yaml and/or env_input.yaml. The called script will be run
-    in the specified workdir and env_id '''
+    in the specified workdir and env_id """
     sim_input, env_input, calc_input = parse_command_line(args)
     job = UnitJob(
         sim_input=sim_input,
@@ -64,7 +64,6 @@ def main(args=None) -> None:
     )
     job.gen_input_files()
     job.go_to_workdir()
-    # job.start()
     try:
         job.submit()
     except:

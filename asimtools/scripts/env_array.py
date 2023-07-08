@@ -17,7 +17,22 @@ def env_array(
     env_input: Optional[Dict] = None,
     ids: Sequence = None,
 ) -> Dict:
-    ''' Submits same script on multiple images '''
+    """Run the same script using multiple env_ids
+
+    :param subscript_input: sim_input for the script to be run
+    :type subscript_input: Dict
+    :param env_ids: Sequence of env_ids to iterate over
+    :type env_ids: Sequence[str]
+    :param calc_input: calc_input to override global file, defaults to None
+    :type calc_input: Optional[Dict], optional
+    :param env_input: env_input defaults to overide global file, defaults to\
+        None
+    :type env_input: Optional[Dict], optional
+    :param ids: Sequence of custom ids for each env_id, defaults to None
+    :type ids: Sequence, optional
+    :return: Dictionary of results
+    :rtype: Dict
+    """
     array_sim_input = {}
 
     # Allow user to customize subdirectory names if needed

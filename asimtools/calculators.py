@@ -1,18 +1,25 @@
 '''
 Tools for loading and returning ASE calculator objects for use in simulations
 '''
-
 import importlib
+from typing import Dict, Optional
 from asimtools.utils import get_calc_input
 # pylint: disable=import-outside-toplevel
 # pylint: disable=import-error
 
-# def load_generic(calc_params):
-#     ''' Loads a generic ASE calculator which follows the standard format '''
-#     from ase.calculators.eam import EAM
 
-def load_calc(calc_id=None, calc_input=None):
-    ''' Finds the correct loader and load the calc '''
+def load_calc(calc_id: str = None, calc_input: Optional[Dict] = None):
+    """Loads a calculator using given calc_id or calc_input
+
+    :param calc_id: ID/key to use to load calculator from the supplied/global\
+        calc_input file, defaults to None
+    :type calc_id: str, optional
+    :param calc_input: calc_input dictionary for a single calculator\
+        , defaults to None
+    :type calc_input: Optional[Dict], optional
+    :return: ASE calculator instance
+    :rtype: :class:`ase.calculators.calculators.Calculator`
+    """
     if calc_id is not None:
         if calc_input is None:
             calc_input = get_calc_input()
@@ -28,7 +35,7 @@ def load_calc(calc_id=None, calc_input=None):
             raise
     name = calc_params.get('name', None)
     if 'module' in calc_params:
-        loader = _load_ase_calc
+        loader = load_ase_calc
     else:
         try:
             loader = external_calcs[name]
@@ -44,8 +51,14 @@ def load_calc(calc_id=None, calc_input=None):
     return calc
 
 
-def _load_nequip(calc_params):
-    ''' Loads a NequIP or Allegro Calculator '''
+def load_nequip(calc_params):
+    """Load NequIP or Allegro calculator
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: NequIP ase calculator
+    :rtype: :class:`nequip.ase.nequip_calculator.NequIPCalculator`
+    """
     from nequip.ase.nequip_calculator import NequIPCalculator
 
     try:
@@ -56,8 +69,15 @@ def _load_nequip(calc_params):
 
     return calc
 
-def _load_dp(calc_params):
-    ''' Loads a DP Calculator '''
+
+def load_dp(calc_params):
+    """Load Deep Potential Calculator
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: DP calculator
+    :rtype: :class:`deepmd.calculator.DP`
+    """
     from deepmd.calculator import DP
 
     try:
@@ -69,62 +89,7 @@ def _load_dp(calc_params):
     return calc
 
 
-def _load_quantumespresso(calc_params):
-    ''' Loads QE calculator and catches common errors'''
-    from ase.calculators.espresso import Espresso
-
-    # Perform tests on input
-    necessary_params = ['input_data', 'pseudopotentials', 'command']
-    print(calc_params)
-    for param in necessary_params:
-        assert param in calc_params, f'{param} parameter missing for calc'
-
-    input_data = calc_params.get('input_data', False)
-    assert input_data, 'Provide input_data for QE'
-    necessary_input_data = ['ecutwfc']
-    for data in necessary_input_data:
-        assert data in calc_params['input_data'], \
-            f'{param} parameter missing for QE'
-
-    input_data['calculation'] = input_data.get('calculation', 100)
-    if input_data['calculation'] != 'scf':
-        cell_dynamics = input_data.get('cell_dynamics')
-        ion_dynamics = input_data.get('ion_dynamics', False)
-        assert cell_dynamics or ion_dynamics, \
-            f'{input_data["calculation"]} calculation might need dynamics'
-
-    kspacing = calc_params.get('kspacing', None)
-    kpts = calc_params.get('kpts', None)
-    assert (not (kpts is None and kspacing is None)) or \
-        (not ((kpts is not None) and (kspacing is not None))), \
-        'Provide exactly one of kpts or kspacing'
-
-    calc = Espresso(
-        pseudopotentials=calc_params['pseudopotentials'],
-        tstress=True,
-        tprnfor=True,
-        kpts=kpts,
-        kspacing=kspacing,
-        input_data=calc_params['input_data'],
-        command=calc_params['command']
-    )
-
-    return calc
-
-
-def _load_lj(calc_params):
-    ''' Loads a Lennard Jones Calculator '''
-    from ase.calculators.lj import LennardJones
-
-    try:
-        calc = LennardJones(**calc_params)
-    except Exception:
-        print(f"Failed to load calculator with parameters:\n {calc_params}")
-        raise
-
-    return calc
-
-def _load_ase_calc(calc_params):
+def load_ase_calc(calc_params):
     ''' Load any builtin ASE calculator '''
     module_name = calc_params.get('module', '')
     try:
@@ -147,8 +112,7 @@ def _load_ase_calc(calc_params):
     return calc
 
 external_calcs = {
-    'NequIP': _load_nequip,
-    'Allegro': _load_nequip,
-    # 'QuantumEspresso': _load_quantumespresso,
-    'DeepPotential': _load_dp,
+    'NequIP': load_nequip,
+    'Allegro': load_nequip,
+    'DeepPotential': load_dp,
 }

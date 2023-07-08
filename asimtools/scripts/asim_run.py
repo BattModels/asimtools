@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Execute a workflow given the sim_input.yaml and optionally,
+Execute a script given the sim_input.yaml and optionally,
 a calc_input.yaml. The called script will be run directly in the current
 directory and environment
 '''

@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 '''
-recursively check progress of jobs starting from a specified sim_input
-and pring out the result
-
-Author: mkphuthi@github.com
+Recursively check progress of jobs starting from a specified sim_input.yaml
+and pring out the progress
 '''
 import sys
 from pathlib import Path
