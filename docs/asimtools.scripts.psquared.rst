@@ -3,14 +3,6 @@ asimtools.scripts.psquared package
 
 
 
-asimtools.scripts.psquared.depye module
----------------------------------------
-
-.. automodule:: asimtools.scripts.psquared.depye
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 asimtools.scripts.psquared.enthalpy\_vs\_pressure module
 --------------------------------------------------------
 
