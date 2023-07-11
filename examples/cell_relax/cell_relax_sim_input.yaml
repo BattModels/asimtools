@@ -1,0 +1,13 @@
+script: cell_relax
+env_id: inline
+workdir: 'results'
+overwrite: true
+args:
+  calc_id: lj
+  image:
+    name: Ar
+    builder: bulk
+    crystalstructure: 'fcc'
+    a: 5.2
+  smax: 0.005
+

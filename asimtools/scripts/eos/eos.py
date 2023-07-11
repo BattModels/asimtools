@@ -7,10 +7,11 @@ from asimtools.job import ChainedJob
 def eos(
     image: dict,
     singlepoint_env_id: str,
-    singlepoint_calc_id: str,
+    calc_id: str,
     preprocess_env_id: str,
     nimages: int = 5,
     scale_range: Tuple[float] = (0.95, 1.05),
+    postprocess: bool = True,
 ) -> Dict:
     ''' EOS calculation '''
 
@@ -33,7 +34,7 @@ def eos(
                     'script': 'singlepoint',
                     'env_id': singlepoint_env_id,
                     'args': {
-                        'calc_id': singlepoint_calc_id,
+                        'calc_id': calc_id,
                         'properties': ['energy'],
                     }
                 }
@@ -42,10 +43,9 @@ def eos(
         'step-2': {
             'script': 'eos.postprocess',
             'env_id': preprocess_env_id,
-            'submit': False, #Fails if previous step is in a slurm queue
+            'submit': postprocess, #Fails if previous step is in a slurm queue
             'args': {
                 'images': {'pattern': '../step-1/id-*/image_output.xyz'},
-                'scale_range': scale_range,
             }
         }
     }

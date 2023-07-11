@@ -10,18 +10,25 @@ from asimtools.calculators import load_calc
 # from asimtools.job import uses_calc
 from asimtools.utils import (
     get_atoms,
-    join_names,
 )
 
 def singlepoint(
     calc_id: str,
     image: Dict,
-    prefix: str = '',
     properties: Tuple[str] = ('energy', 'forces'),
 ) -> Dict:
-    '''
-    Calculates the single point energy, forces and stresses where possible
-    '''
+    """Evaluates the properties of a single image, currently implemented
+    properties are energy, forces and stress
+
+    :param calc_id: ID of calculator provided in calc_input or global file
+    :type calc_id: str
+    :param image: Image config, see :func:`asimtools.utils.get_atoms`
+    :type image: Dict
+    :param properties: properties to evaluate, defaults to ('energy', 'forces')
+    :type properties: Tuple[str], optional
+    :return: Dictionary of results
+    :rtype: Dict
+    """
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)
@@ -47,7 +54,7 @@ def singlepoint(
             print('Failed to calculate stress')
             raise
 
-    image_file = join_names([prefix, 'image_output.xyz'])
+    image_file = 'image_output.xyz'
     atoms.write(image_file, format='extxyz')
 
     results = {

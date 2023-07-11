@@ -158,6 +158,8 @@ of conduct, and the process for submitting pull requests to us.
 
   - **Keith Phuthi**
     [mkphuthi](https://github.com/mkphuthi)
+  - **Emil Annevelink**
+    [emilannevelink](https://github.com/emilannevelink)
 
 See also the list of
 [contributors](https://github.com/BattModels/asimtools.git/contributors)

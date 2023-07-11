@@ -13,18 +13,35 @@ def distributed(
     subscripts: Dict,
     env_input: Optional[Dict] = None,
     calc_input: Optional[Dict] = None,
+    array_max: Optional[int] = None,
 ) -> Dict:
-    '''
-    Submits multiple scripts simultaneously and handles
-    file management based on standard
-    '''
+    """Distributes a set of jobs based on inpout parameter. The scnarios are
+    as follows:
+    #. use_slurm: False, interactive: True -> Runs one after the other.
+    #. use_slurm: True, interactive: False, same env_id -> Launches a job \
+    # array.
+    #. use_slurm: False, interactive: False, different env_ids -> Launches \
+    # multiple jobs.
 
+
+    :param subscripts: Dictionary of scripts, each key is an ID and each \
+        value is a sim_input file
+    :type subscripts: Dict
+    :param env_input: env_input that overrides global file, defaults to None
+    :type env_input: Optional[Dict], optional
+    :param calc_input: calc_input that overrides global file, defaults to None
+    :type calc_input: Optional[Dict], optional
+    :param array_max: Maximum number of jobs to run in array, defaults to None
+    :type array_max: Optional[int], optional
+    :return: Dictionary of results
+    :rtype: Dict
+    """
     djob = DistributedJob(
         sim_input=subscripts,
         env_input=env_input,
         calc_input=calc_input
     )
-    job_ids = djob.submit()
+    job_ids = djob.submit(array_max=array_max)
 
     results = {'job_ids': job_ids}
     return results

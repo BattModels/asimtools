@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 '''
-Run a script
+Execute a workflow given the sim_input.yaml and optionally,
+a calc_input.yaml and/or env_input.yaml. The called script will be run
+in the specified workdir and env_id
 
 Author: mkphuthi@github.com
 '''
@@ -51,7 +53,9 @@ def parse_command_line(args) -> Tuple[Dict, Dict]:
 
 
 def main(args=None) -> None:
-    ''' Main '''
+    """Execute a workflow given the sim_input.yaml and optinally,
+    a calc_input.yaml and/or env_input.yaml. The called script will be run
+    in the specified workdir and env_id """
     sim_input, env_input, calc_input = parse_command_line(args)
     job = UnitJob(
         sim_input=sim_input,
@@ -60,13 +64,11 @@ def main(args=None) -> None:
     )
     job.gen_input_files()
     job.go_to_workdir()
-    job.start()
     try:
         job.submit()
     except:
         job.fail()
         raise
-    # job.update_output({'job_ids': job_ids})
     job.leave_workdir()
 
 

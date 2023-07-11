@@ -12,18 +12,24 @@ setup(
     description="Atomic Simulation Tools",
     author="Keith Phuthi and Emil Annevelink",
     python_requires=">=3.9",
-    packages=find_packages(include=["asimtools", "asimtools.*"]),
+    packages=find_packages(include=[
+        "asimtools",
+        "asimtools.*",
+        "asimtools.scripts.*.*",
+    ]),
     entry_points={
         # make the scripts available as command line scripts
         "console_scripts": [
             "asim-run = asimtools.scripts.asim_run:main",
             "asim-execute = asimtools.scripts.asim_execute:main",
+            "asim-check = asimtools.scripts.asim_check:main",
         ]
     },
     install_requires=[
         "pandas",
         "pyyaml",
         "pymatgen",
+        "ase",
     ],
     zip_safe=True,
 )

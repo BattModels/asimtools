@@ -36,7 +36,6 @@ def psquared_diagram(
     plogspace: Tuple[float,float,float] = (-5,-2,10),
     ulim: Tuple[float,float] = (-1.1,0.2),
     nUs: int = 200,
-    **kwargs
 ) -> Tuple[None,Dict]:
     '''
     Generating P2 phase diagrams given the Gibbs energy versus pressure. Note
@@ -59,6 +58,7 @@ def psquared_diagram(
         gp_data = np.genfromtxt(gp_csv, delimiter=',')
         pvals = gp_data[:,0]
         gvals = gp_data[:,1]
+        print(formula, 'range:', np.min(gp_data[:,0]), np.max(gp_data[:,0]))
         # Make interpolation function for each comp
         gp_func = interpolate.interp1d(pvals, gvals, kind='cubic')
         gp_func_dict[formula] = gp_func
@@ -68,8 +68,9 @@ def psquared_diagram(
     gp_func = interpolate.interp1d(
         href_data[:,0]*GPa, href_data[:,1], kind='cubic'
     )
+    print('hprange:', np.min(href_data[:,0]*GPa), np.max(href_data[:,0]*GPa))
     gp_func_dict['H2'] = gp_func
-    
+
     # # Get the key for the pure element that isn't hydrogen
     # elems = [key for key in gp_func_dict if 'H' not in key]
     # assert len(elems) == 1, 'Provide only 1 pure element reference'
@@ -86,7 +87,12 @@ def psquared_diagram(
         # GH = gp_func_dict['Hs']
         G_entries = []
         for formula in formulas:
-            GMHn = gp_func_dict[formula](pressure)
+            print(formula)
+            try:
+                GMHn = gp_func_dict[formula](pressure)
+            except:
+                print('Error:', formula, pressure)
+                raise
             entry = PDEntry(formula, GMHn)
             G_entries.append(entry)
         pd_formulas = []
@@ -146,7 +152,7 @@ def psquared_diagram(
     np.savetxt('p2_diagram.csv', p2_grid, delimiter=',')
     write_csv_from_dict('formulas.txt', {'formulas': formulas})
     plot_phd(ps / GPa, np.linspace(*ulim, nUs), p2_grid, grid_formulas, fname='p2_diagram.png')
-    return None, {}
+    return {}
 
 def convhull_pourbaix(
     formulas,

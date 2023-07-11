@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 '''
-Run a script
-
-Author: mkphuthi@github.com
+Execute a script given the sim_input.yaml and optionally,
+a calc_input.yaml. The called script will be run directly in the current
+directory and environment
 '''
 
 import importlib
@@ -15,7 +15,7 @@ from asimtools.utils import read_yaml
 from asimtools.job import load_job_from_directory
 
 
-def parse_command_line(args) -> Tuple[Dict, Dict]:
+def parse_command_line(args) -> Tuple[Dict, str]:
     ''' Parse command line input '''
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -42,10 +42,10 @@ def parse_command_line(args) -> Tuple[Dict, Dict]:
 def main(args=None) -> None:
     ''' Main '''
     sim_input, calc_input_file = parse_command_line(args)
+    old_calc_input_var = os.getenv("ASIMTOOLS_CALC_INPUT", None)
     if calc_input_file is not None:
         assert Path(calc_input_file).exists(), 'Specify valid calc input file'
         os.environ["ASIMTOOLS_CALC_INPUT"] = calc_input_file
-        print('WARNING: ASIMTOOLS_CALC_INPUT variable changed')
     script = sim_input['script']
     module_name = script.split('/')[-1].split('.py')[0]
     func_name = module_name.split('.')[-1]
@@ -66,26 +66,36 @@ def main(args=None) -> None:
     sim_func = getattr(sim_module, func_name)
 
     print(f'asim-run: running {func_name}')
+    job = load_job_from_directory('.')
+    job.start()
     try:
         results = sim_func(**sim_input['args'])
-        success = True
     except:
         print(f'ERROR: Failed to run {func_name}')
+        if old_calc_input_var is not None:
+            os.environ["ASIMTOOLS_CALC_INPUT"] = old_calc_input_var
+        else:
+            if os.getenv("ASIMTOOLS_CALC_INPUT", False):
+                del os.environ["ASIMTOOLS_CALC_INPUT"]
+        job.fail()
         raise
 
-    job = load_job_from_directory('.')
-    if success:
-        # Get job IDs from internally run scripts if any
-        job_ids = results.get('job_ids', False)
-        # Otherwise get job_ids from wherever this script is running
-        if not job_ids:
-            job_ids = os.getenv('SLURM_JOB_ID')
-            results['job_ids'] = job_ids
-        job.update_output(results)
-        job.complete()
+    # Restore the previous calc_input in case other srcipts depend on it
+    # This is pretty messy right now, could probably be better
+    if old_calc_input_var is not None:
+        os.environ["ASIMTOOLS_CALC_INPUT"] = old_calc_input_var
     else:
-        job.fail()
+        if os.getenv("ASIMTOOLS_CALC_INPUT", False):
+            del os.environ["ASIMTOOLS_CALC_INPUT"]
 
+    # Get job IDs from internally run scripts if any
+    job_ids = results.get('job_ids', False)
+    # Otherwise get job_ids from wherever this script is running
+    if not job_ids:
+        job_ids = os.getenv('SLURM_JOB_ID')
+        results['job_ids'] = job_ids
+    job.update_output(results)
+    job.complete()
 
 if __name__ == "__main__":
     main(sys.argv[1:])

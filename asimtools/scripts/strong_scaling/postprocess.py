@@ -1,64 +1,122 @@
 '''.Xauthority'''
 
-from typing import Dict, Tuple
+from typing import Dict
+from datetime import datetime
+from glob import glob
+from pathlib import Path
 import numpy as np
-import matplotlib.pyplot as plt
-from ase.eos import EquationOfState
-from ase.io import read
-from ase. units import GPa
-# from asimtools.job import load_output_images, load_input_images
+from matplotlib import (
+    pyplot as plt,
+    ticker as mticker
+)
 from asimtools.utils import (
     write_csv_from_dict,
-    get_images,
+    read_yaml
 )
 
 def postprocess(
-    images: Dict = None,
-) -> Tuple[None,Dict]:
-    ''' Not implemented yet '''
-    raise NotImplentedError
-    # images = get_images(**images)
-    # volumes = np.array([at.get_volume() for at in images])
-    # energies = np.array([at.get_potential_energy() for at in images])
-    # write_csv_from_dict(
-    #     'eos_output.csv',
-    #     {'volumes': volumes, 'energies': energies}
-    # )
-    # eos_fit = EquationOfState(volumes, energies)
-    # print('here')
-    # try:
-    #     v0, e0, B = eos_fit.fit()
-    # except ValueError:
-    #     print('ERROR: Could not fit EOS, check structures')
-    #     v0, e0, B = None, None, None
+    outdir_pattern: str,
+    outfile: str = 'output.yaml',
+    job_script_file: str = 'job.sh',
+    log_x: bool = True,
+    log_y: bool = True,
+) -> Dict:
+    ''' Postprocess scaling data '''
 
-    # fig, ax = plt.subplots()
-    # if v0 is not None:
-    #     B_GPa = B / GPa # eV/Ang^3 to GPa
-    #     eos_fit.plot(ax=ax)
+    outdirs = glob(outdir_pattern)
+    outdirs = [Path(outdir) for outdir in outdirs]
+    dt_seconds = []
+    ntasks = []
+    nnodes = []
+    for outdir in outdirs:
+        outf = outdir / outfile
+        job_script = outdir / job_script_file
 
-    #     # Get equilibrium lattice scaling by interpolation
-    #     xs = [atoms.info['scale'] for atoms in images]
-    #     vs = []
-    #     atoms = read('../step-0/input_image.xyz')
-    #     for x in xs:
-    #         samp_atoms = atoms.copy()
-    #         samp_atoms.cell = samp_atoms.cell*x
-    #         vs.append(samp_atoms.get_volume())
-    #     x0 = np.interp(v0, vs, xs)
+        with open(job_script, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
 
-    #     results = {
-    #         'equilibrium_volume': float(v0),
-    #         'equilibrium_energy': float(e0),
-    #         'equilibrium_scale': float(x0),
-    #         'bulk_modulus': float(B_GPa),
-    #         'bulk_modulus_unit': 'GPa',
-    #     }
-    # else:
-    #     ax.plot(volumes, energies)
-    #     results = {}
-    # ax.set_xlabel(r'Volume ($\AA$)')
-    # ax.set_ylabel(r'Energy (eV)')
-    # plt.savefig('eos.png')
-    # plt.close(fig)
-    # return results
+        for line in lines:
+            if '-n ' in line:
+                ntasks.append(int(line.split(' ')[-1]))
+            if '-N ' in line:
+                nnodes.append(int(line.split(' ')[-1]))
+
+        output = read_yaml(outf)
+
+        start = datetime.strptime(output['start_time'], '%Y-%m-%d %H:%M:%S.%f')
+        end = datetime.strptime(output['end_time'], '%Y-%m-%d %H:%M:%S.%f')
+        deltat = end - start
+        dt_seconds.append(deltat.seconds)
+
+    # Make sure ntasks are sorted from lowest to highest
+    zipped = zip(ntasks, nnodes, dt_seconds)
+    zipped_array = np.array(sorted(zipped, key = lambda x: x[0]))
+
+    ntasks = zipped_array[:,0]
+    nnodes = zipped_array[:,1]
+    dt_seconds = zipped_array[:,2]
+    speedup = dt_seconds[0] / dt_seconds
+
+    write_csv_from_dict('scaling.csv', {
+        'ntasks': ntasks,
+        'nnodes': nnodes,
+        'dt_seconds': dt_seconds,
+        'speedup': speedup,
+    })
+
+    expected_speedup = ntasks / ntasks[0]
+    fig, ax = plt.subplots()
+    ax.plot(ntasks, speedup, 'k-*', label='scaling')
+    ax.plot(
+        ntasks,
+        expected_speedup,
+        'r--',
+        label=f'Ideal, $\Delta t_0$(s)={dt_seconds[0]:.0f}s'
+    )
+    ax.set_xlabel('ntasks')
+    ax.set_ylabel('Speedup')
+    if log_x:
+        ax.set_xscale('log', base=2)
+    if log_y:
+        ax.set_yscale('log', base=2)
+    ax.set_xticks(ntasks)
+    ax.set_xticklabels([str(ntask) for ntask in ntasks])
+    ax.set_yticks(expected_speedup)
+    ax.set_yticklabels([str(s) for s in expected_speedup])
+    ax.xaxis.set_minor_formatter(mticker.ScalarFormatter())
+    ax.yaxis.set_minor_formatter(mticker.ScalarFormatter())
+    ax.legend()
+
+    plt.savefig('speedup_vs_tasks.png')
+    plt.close(fig)
+
+    expected_speedup = nnodes / nnodes[0]
+    fig, ax = plt.subplots()
+    ax.plot(nnodes, speedup, 'k-*', label='scaling')
+    ax.plot(
+        nnodes,
+        expected_speedup,
+        'r--',
+        label=f'Ideal, $\Delta t_0$(s)={dt_seconds[0]:.0f}s'
+    )
+    ax.set_xlabel('nnodes')
+    ax.set_ylabel('Speedup')
+    if log_x:
+        ax.set_xscale('log', base=2)
+    if log_y:
+        ax.set_yscale('log', base=2)
+    ax.set_xticks(nnodes)
+    ax.set_xticklabels([str(nnode) for nnode in nnodes])
+    ax.set_yticks(expected_speedup)
+    ax.set_yticklabels([str(s) for s in expected_speedup])
+    ax.xaxis.set_minor_formatter(mticker.ScalarFormatter())
+    ax.yaxis.set_minor_formatter(mticker.ScalarFormatter())
+    ax.legend()
+    plt.savefig('speedup_vs_nodes.png')
+    plt.close(fig)
+
+    results = {
+        'files': {'scaling': 'scaling.csv'}
+    }
+
+    return results
