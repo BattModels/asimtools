@@ -2,12 +2,15 @@
 Utilities and helper functions for reading and writing data using set
 standards
 '''
-from typing import TypeVar, Iterable, Tuple, Union, List, Dict, Sequence
+from typing import (
+    TypeVar, Iterable, Tuple, Union, List, Dict, Sequence, Optional
+)
 from glob import glob
 import os
 import subprocess
 from pathlib import Path
 import yaml
+import numpy as np
 import pandas as pd
 from ase.io import read
 import ase.db
@@ -38,10 +41,25 @@ def write_yaml(yaml_path: str, yaml_Dict: Dict) -> None:
     with open(yaml_path, 'w', encoding='utf-8') as f:
         yaml.dump(yaml_Dict, f)
 
-def write_csv_from_dict(fname: str, data: Dict, columns: Iterable = None) -> pd.DataFrame:
+def get_axis_lims(x: Sequence, y: Sequence, padding: float=0.1):
+    """Get an estimate of good limits for a plot axis"""
+    data_min = np.min([x, y])
+    data_max = np.max([x, y])
+    diff = data_max - data_min
+    lims = [data_min - padding * diff, data_max + padding * diff]
+    return lims
+
+def write_csv_from_dict(
+    fname: str,
+    data: Dict,
+    columns: Optional[Sequence] = None,
+    header: Optional[str] = None,
+    **kwargs
+) -> pd.DataFrame:
     """Write a tabulated csv to a file from a dictionary. The keys will
     become the columns and the values will be the columns, All columns used 
-    must have the same length.
+    must have the same length. kwargs are passed to 
+    :func:`pandas.Dataframe.to_csv()`
 
     :param fname: File name to be return to
     :type fname: str
@@ -56,7 +74,10 @@ def write_csv_from_dict(fname: str, data: Dict, columns: Iterable = None) -> pd.
         columns = list(data.keys())
 
     csv_data = pd.DataFrame(data, columns=columns)
-    csv_data.to_csv(fname, index=False)
+    with open(fname, 'w', encoding='utf-8') as f:
+        f.write('#' + header + '\n')
+
+    csv_data.to_csv(fname, index=False, header=True, mode='a')
     return csv_data
 
 def strip_symbols(substr: str) -> str:
@@ -172,6 +193,7 @@ def parse_slice(value: str) -> slice:
 def get_images(
     image_file: str = None,
     pattern: str = None,
+    patterns: List[str] = None,
     images: Iterable[Atoms] = None,
     index: Union[str, int] = ':',
     **kwargs
