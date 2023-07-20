@@ -16,7 +16,7 @@ from asimtools.utils import (
 Calculator = TypeVar('Calculator')
 def calc_parity_data(
     subset: List,
-    calc: Calculator,
+    calc_id: str,
     properties: List = ('energy', 'forces', 'stress'),
     force_prob: float = 1.0,
 ) -> Dict:
@@ -36,6 +36,7 @@ def calc_parity_data(
         property
     :rtype: Dict
     """
+
     res = {prop: [] for prop in properties}
     ervals = []
     epvals = []
@@ -43,7 +44,8 @@ def calc_parity_data(
     fpvals = []
     srvals = []
     spvals = []
-    for atoms in subset:
+    for i, atoms in enumerate(subset):
+        calc = load_calc(calc_id)
         n_atoms = len(atoms)
         if 'energy' in properties:
             prop = 'energy'
@@ -75,6 +77,9 @@ def calc_parity_data(
                 [spvals, np.array(calc.get_stress(atoms)).flatten()]
             )
             res[prop] = {'ref': srvals, 'pred': spvals}
+
+        if i % 20 == 0:
+            print(f'Progress {i}/{len(subset)}')
 
     res['energy'] = {'ref': ervals, 'pred': epvals}
     res['forces'] = {'ref': frvals, 'pred': fpvals}
@@ -146,8 +151,8 @@ def parity(
     :rtype: Dict
     """
 
-    data = get_images(images)[index]
-    calc = load_calc(calc_id)
+    index = parse_slice(index)
+    data = get_images(**images)[index]
     assert len(data) > nprocs, \
         f'Too little samples ({len(data)})  for {nprocs}'
 
@@ -159,14 +164,12 @@ def parity(
         'stress': f'{unit}/$\AA^3$',
     }
 
-    index = parse_slice(index)
-
     subsets = _split_data(data, nprocs)
     reses = []
     with Pool(nprocs) as pool:
         reses = pool.map(partial(
             calc_parity_data,
-            calc=calc,
+            calc_id=calc_id,
             properties=properties,
             force_prob=force_prob,
             ),

@@ -40,7 +40,7 @@ def load_calc(calc_id: str = None, calc_input: Optional[Dict] = None):
         try:
             loader = external_calcs[name]
         except KeyError:
-            print(f'Provide ASE module for calc or \
+            print(f'Provide ASE module for calc or use\
                 one of {external_calcs.keys()}')
             raise
 
@@ -60,9 +60,9 @@ def load_nequip(calc_params):
     :rtype: :class:`nequip.ase.nequip_calculator.NequIPCalculator`
     """
     from nequip.ase.nequip_calculator import NequIPCalculator
-
+    print(calc_params)
     try:
-        calc = NequIPCalculator.from_deployed_model(**calc_params)
+        calc = NequIPCalculator.from_deployed_model(**calc_params['args'])
     except Exception:
         print(f"Failed to load NequIP with parameters:\n {calc_params}")
         raise
@@ -81,7 +81,7 @@ def load_dp(calc_params):
     from deepmd.calculator import DP
 
     try:
-        calc = DP(**calc_params)
+        calc = DP(**calc_params['args'])
     except Exception:
         print(f"Failed to load DP with parameters:\n {calc_params}")
         raise
