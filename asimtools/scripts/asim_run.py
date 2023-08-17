@@ -75,7 +75,7 @@ def main(args=None) -> None:
         if old_calc_input_var is not None:
             os.environ["ASIMTOOLS_CALC_INPUT"] = old_calc_input_var
         else:
-            if os.getenv("ASIMTOOLS_CALC_INPUT", False):
+            if os.getenv("ASIMTOOLS_CALC_INPUT", None) is not None:
                 del os.environ["ASIMTOOLS_CALC_INPUT"]
         job.fail()
         raise
@@ -85,7 +85,7 @@ def main(args=None) -> None:
     if old_calc_input_var is not None:
         os.environ["ASIMTOOLS_CALC_INPUT"] = old_calc_input_var
     else:
-        if os.getenv("ASIMTOOLS_CALC_INPUT", False):
+        if os.getenv("ASIMTOOLS_CALC_INPUT", None) is not None:
             del os.environ["ASIMTOOLS_CALC_INPUT"]
 
     # Get job IDs from internally run scripts if any

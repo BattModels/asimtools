@@ -4,11 +4,15 @@ Tools for loading and returning ASE calculator objects for use in simulations
 import importlib
 from typing import Dict, Optional
 from asimtools.utils import get_calc_input
+import subprocess
 # pylint: disable=import-outside-toplevel
 # pylint: disable=import-error
 
 
-def load_calc(calc_id: str = None, calc_input: Optional[Dict] = None):
+def load_calc(
+    calc_id: str = None,
+    calc_input: Optional[Dict] = None
+):
     """Loads a calculator using given calc_id or calc_input
 
     :param calc_id: ID/key to use to load calculator from the supplied/global\
@@ -34,6 +38,11 @@ def load_calc(calc_id: str = None, calc_input: Optional[Dict] = None):
             print('No calc_input found')
             raise
     name = calc_params.get('name', None)
+    precommands = calc_params.get('precommands', [])
+    for precommand in precommands:
+        subprocess.run(
+            precommand.split(), check=True, capture_output=False,
+        )
     if 'module' in calc_params:
         loader = load_ase_calc
     else:
@@ -60,7 +69,9 @@ def load_nequip(calc_params):
     :rtype: :class:`nequip.ase.nequip_calculator.NequIPCalculator`
     """
     from nequip.ase.nequip_calculator import NequIPCalculator
-    print(calc_params)
+    if calc_params.get('float64', False):
+        import torch
+        torch.set_default_dtype(torch.float64)
     try:
         calc = NequIPCalculator.from_deployed_model(**calc_params['args'])
     except Exception:

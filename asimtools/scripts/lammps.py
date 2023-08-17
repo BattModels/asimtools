@@ -11,21 +11,28 @@ from asimtools.utils import (
     join_names,
 )
 
-# pylint: disable=too-many-arguments
-# pylint: disable=too-many-locals
-# pylint: disable=dangerous-default-value
-
 def lammps(
     template: str,
     image: Dict = None,
     prefix: str = '',
-    atom_style: str = 'full',
-    variables: Dict = {},
+    atom_style: str = 'atomic',
+    variables: Dict = None,
     lmp_cmd: str = 'lmp',
 ) -> Dict:
     ''' 
     Runs a lammps simulation based on a template lammps input script
     '''
+    if variables is None:
+        variables = {}
+
+    # Make sure the provided script follows standard for reading
+    # in arbitrary image provided by asimtools
+    if image is not None:
+        atoms = get_atoms(**image)
+        atoms.write(
+            'image_input.lmpdat', format='lammps-data', atom_style=atom_style
+        )
+        variables['IMAGE_FILE'] = 'image_input.lmpdat'
 
     lmp_txt = ''
     for variable, value in variables.items():
@@ -38,16 +45,11 @@ def lammps(
     for line in lines:
         lmp_txt += line
 
-    # Make sure the provided script follows standard for reading
-    # in arbitrary image provided by asimtools
     if image is not None:
-        assert 'read_data ${image_file}' in lmp_txt, \
-            'Make sure "read_data ${image_file}" command is used (with correct atom style) \
-            in lammps input script if you specify image keyword'
-        atoms = get_atoms(**image)
-        atoms.write(
-            'image_input.lmpdat', format='lammps-data', atom_style=atom_style
-        )
+        assert 'read_data ' in lmp_txt, \
+            'Make sure "read_data image_input.lmpdat" command is used \
+                (with correct atom style) appropriately in lammps input \
+                script if you specify image keyword'
 
     lmp_inp_file = join_names([prefix, 'input.lammps'])
     with open(lmp_inp_file, 'w', encoding='utf-8') as f:
@@ -74,7 +76,6 @@ def lammps(
     results = {'files': {
         'log': 'log.lammps',
         'thermo': 'log.lammps',
-        # 'dump': 'dump'
     }}
 
     return results

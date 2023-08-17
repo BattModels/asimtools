@@ -356,7 +356,7 @@ class UnitJob(Job):
         if status in ('started', 'discard'):
             return None
 
-        if not self.sim_input.get('submit', False):
+        if not self.sim_input.get('submit', True):
             return None
 
         print('unitjob submit: overwritten files')
@@ -417,7 +417,7 @@ class UnitJob(Job):
 
         os.chdir(cur_dir)
         # print('unitjob submit: finished job')
-        if use_slurm and not interactive:
+        if use_slurm and not interactive and run_job:
             # print('completed_process:', completed_process.stdout)
             job_ids = [int(completed_process.stdout.split(' ')[-1])]
             # print('unitjob submit: job_ids:', job_ids)
@@ -656,8 +656,9 @@ class ChainedJob(Job):
     ) -> None:
         super().__init__(sim_input, env_input, calc_input)
 
-        assert np.all([key.startswith('step-') for key in sim_input]),\
-            'Keys should take the form "step-{step_id}" from step_id=0'
+        for key in sim_input:
+            assert key.startswith('step-'), \
+                f'Keys take the form "step-[step_id]" from id=0 not "{key}"'
 
         # workdir naming should follow pattern. Might loosen this
         # eventually
