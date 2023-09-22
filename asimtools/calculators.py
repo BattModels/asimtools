@@ -4,10 +4,9 @@ Tools for loading and returning ASE calculator objects for use in simulations
 import importlib
 from typing import Dict, Optional
 from asimtools.utils import get_calc_input
-import subprocess
+
 # pylint: disable=import-outside-toplevel
 # pylint: disable=import-error
-
 
 def load_calc(
     calc_id: str = None,
@@ -38,11 +37,7 @@ def load_calc(
             print('No calc_input found')
             raise
     name = calc_params.get('name', None)
-    precommands = calc_params.get('precommands', [])
-    for precommand in precommands:
-        subprocess.run(
-            precommand.split(), check=True, capture_output=False,
-        )
+
     if 'module' in calc_params:
         loader = load_ase_calc
     else:

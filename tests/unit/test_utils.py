@@ -6,9 +6,9 @@ import os
 import pytest
 from asimtools.utils import (
     join_names,
-    write_yaml,
     get_atoms,
     get_images,
+    change_dict_value,
 )
 import ase.build
 
@@ -69,3 +69,17 @@ def test_get_images(test_input, expected):
     ''' Test getting iterable of atoms from different inputs '''
     print(get_images(**test_input), expected, '*********')
     assert get_images(**test_input) == expected
+
+@pytest.mark.parametrize("test_input, expected",[
+    (['l1', 'l2', 'l3'], {'l1': {'l2': {'l3': 'new_value'}}}),
+    (['l1', 'l2'], {'l1': {'l2': 'new_value'}}),
+    (['l1'], {'l1': 'new_value'}),
+])
+def test_change_dict_value(test_input, expected):
+    ''' Test getting iterable of atoms from different inputs '''
+    d = {'l1': {'l2': {'l3': 'l3_value'}}}
+    new_d = change_dict_value(
+        d, 'new_value', test_input, return_copy=True
+    )
+    assert new_d == expected
+    assert new_d != d

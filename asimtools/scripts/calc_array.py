@@ -6,15 +6,19 @@ Author: mkphuthi@github.com
 
 '''
 
-from typing import Dict, Sequence, Optional
+from typing import Dict, Sequence, Optional, Union
 from copy import deepcopy
 from asimtools.job import DistributedJob
+from asimtools.utils import get_calc_input, change_dict_value
 
 def calc_array(
-    calc_ids: Sequence[str],
     subscript_input: Dict,
-    env_ids: Optional[Sequence[str]] = None,
-    calc_input: Optional[Dict] = None, #This doesn't work yet
+    calc_ids: Sequence[str] = None,
+    template_calc_id: Optional[str] = None,
+    key_sequence: Optional[Sequence[str]] = None,
+    array_values: Optional[Sequence] = None,
+    env_ids: Optional[Union[Sequence[str],str]] = None,
+    calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
     ids: Sequence = None,
 ) -> Dict:
@@ -30,18 +34,42 @@ def calc_array(
     :return: Dictionary of results
     :rtype: Dict
     """
-    array_sim_input = {}
+    using_array_values = key_sequence is not None\
+        and template_calc_id is not None\
+        and array_values is not None
+    assert calc_ids is not None or using_array_values, \
+        'Specify either a sequence of calc_ids or all of key_sequence, \
+        template_calc_id and array_values to iterate over'
 
-    # Allow user to customize subdirectory names if needed
-    if ids is None:
-        ids = [calc_id for calc_id in calc_ids]
-    else:
-        assert len(ids) == len(calc_ids), \
-            'Num. of calc_ids must match num. of ids'
+    if using_array_values:
+        if calc_input is None:
+            calc_input = get_calc_input()
+        calc_params = calc_input[template_calc_id]
+        new_calc_input = {}
+        if ids is None:
+            ids = [f'{key_sequence[-1]}-{val}' for val in array_values]
+        for i, val in enumerate(array_values):
+            new_calc_params = change_dict_value(
+                d=calc_params,
+                new_value=val,
+                key_sequence=key_sequence,
+                return_copy=True,
+            )
+            new_calc_input[ids[i]] = new_calc_params
+        calc_input = new_calc_input
+        calc_ids = ids
+    elif calc_ids is not None:
+        if ids is None:
+            ids = calc_ids
+
+    assert len(ids) == len(calc_ids), \
+        'Num. of calc_ids or array_values must match num. of ids'
 
     if env_ids is not None:
-        assert len(env_ids) == len(calc_ids), \
-            'Num. of calc_ids must match num. of env_ids'
+        assert len(env_ids) == len(calc_ids) or isinstance(env_ids, str), \
+            'Provide one env_id or as many as there are calc_ids/array_values'
+
+    array_sim_input = {}
 
     # Make individual sim_inputs for each calc
     for i, calc_id in enumerate(calc_ids):
@@ -50,7 +78,10 @@ def calc_array(
         array_sim_input[f'{ids[i]}'] = new_subscript_input
 
         if env_ids is not None:
-            new_subscript_input['env_id'] = env_ids[i]
+            if isinstance(env_ids, str):
+                new_subscript_input['env_id'] = env_ids
+            else:
+                new_subscript_input['env_id'] = env_ids[i]
 
     # Create a distributed job object
     djob = DistributedJob(array_sim_input, env_input, calc_input)

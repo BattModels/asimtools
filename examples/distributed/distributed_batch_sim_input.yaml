@@ -5,8 +5,7 @@ args:
   subscripts:
     id-00: &id01
       script: singlepoint
-      env_id: inline
-      config_id: inline
+      env_id: batch
       args:
         calc_id: lj
         image:

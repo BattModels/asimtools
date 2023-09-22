@@ -49,3 +49,30 @@ def test_asim_run(inputs, tmp_path, request):
     # Check job completion
     output = read_yaml('output.yaml')
     assert output.get('status', False) == 'complete'
+
+@pytest.mark.parametrize("inputs",[
+    ['do_nothing_sim_input', None],
+])
+def test_asim_run_commands(inputs, tmp_path, request):
+    ''' 
+    Test asim_run ability to launch and complete a script using LJ and running
+    commands before and after running the function
+    '''
+    os.chdir(tmp_path)
+    sim_input = request.getfixturevalue(inputs[0])
+    sim_input['precommands'] = ['touch precommand_test']
+    sim_input['postcommands'] = ['touch postcommand_test']
+    sim_input_file = 'sim_input.yaml'
+    write_yaml(sim_input_file, sim_input)
+    args = [sim_input_file]
+
+    if inputs[1] is not None:
+        calc_input_file = 'calc_input.yaml'
+        calc_input = request.getfixturevalue(inputs[1])
+        write_yaml(calc_input_file, calc_input)
+        args += ['-c', calc_input_file]
+
+    asim_run(args)
+
+    assert Path('precommand_test').exists()
+    assert Path('postcommand_test').exists()

@@ -10,5 +10,5 @@ args:
   nimages: 5
   scale_range: [0.95, 1.05]
   singlepoint_env_id: batch
-  singlepoint_calc_id: qe_li
+  calc_id: qe_li
   preprocess_env_id: batch

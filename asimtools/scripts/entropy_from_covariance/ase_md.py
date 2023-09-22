@@ -8,8 +8,9 @@ Cite the papers where the method/script was first introduced here as well
 Author: mkphuthi@github.com
 '''
 
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
 import numpy as np
+import matplotlib.pyplot as plt
 from ase.io.trajectory import Trajectory
 from ase.units import GPa, fs
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
@@ -18,7 +19,7 @@ from ase.md.npt import NPT
 from asimtools.calculators import load_calc
 from asimtools.utils import (
     get_atoms,
-    # get_images,
+    get_images,
 )
 
 def langevin_nvt(
@@ -46,11 +47,11 @@ def npt(
         atoms,
         temp,
         nsteps,
+        timestep,
         externalstress=0,
         traj_file=None,
         ttime=25*fs,
         pfactor=(75*fs)**2 * 14*GPa,  #ptime=75*fs
-        timestep=1*fs,
     ):
     """Does Nose-Hoover dynamics
 
@@ -96,17 +97,51 @@ def npt(
     traj = Trajectory(traj_file, 'r')
     return atoms, traj
 
+def plot_thermo(
+    images: Dict,
+    props: Sequence = ['epot', 'temp', 'ekin', 'etot', 'press'],
+    prefix: str = 'ase_md',
+):
+    atoms = get_images(**images)
+    prop_dict = {prop: [] for prop in props}
+
+    for a, atoms in enumerate(images):
+        epot = atoms.get_potential_energy()
+        ekin = atoms.get_kinetic_energy()
+        etot = epot+ekin
+        T = atoms.get_temperature()
+        prop_dict['epot'].append(epot)
+        prop_dict['ekin'].append(ekin)
+        prop_dict['etot'].append(etot)
+        prop_dict['temp'].append(T)
+        if 'press' in props:
+            pressure = np.mean(atoms.get_stress(include_ideal_gas=True)[:3])
+            prop_dict['press'].append(pressure)
+
+    stride = images.get('index', ':')
+
+    steps = np.arange(len(prop_dict['epots'])) * stride
+    for _, prop in enumerate(props):
+        _, ax = plt.subplots()
+        ax.plot(steps, prop_dict[prop])
+        ax.set_xlabel('Step')
+        ax.set_ylabel(prop)
+        plt.savefig(f'{prefix}_{prop}.png')
+
+    plt.close(fig='all')
+
 def ase_md(
     calc_id: str,
     image: Dict,
+    timestep: float,
     dynamics: str = 'npt',
     temp: float = 300.0,
-    timestep: float = 1*fs,
     friction: float = 1e-2,
     ttime: float = 25*fs,
     pfactor: float = None, #(75*fs)**2 * 14*GPa, #14 is bulk modulus of material i.e. Li
     nsteps: int = 100,
     externalstress: float = 0,
+    plot: bool = True,
 ) -> Dict:
     '''
     Script does xyz specifically
@@ -117,7 +152,7 @@ def ase_md(
     atoms.set_calculator(calc)
 
     if dynamics == 'langevin':
-        atoms, traj = langevin_nvt(
+        atoms, _ = langevin_nvt(
             atoms,
             temp,
             nsteps,
@@ -126,7 +161,7 @@ def ase_md(
             friction=friction,
         )
     elif dynamics == 'npt':
-        atoms, traj = npt(
+        atoms, _ = npt(
             atoms,
             temp,
             nsteps,
@@ -136,6 +171,9 @@ def ase_md(
             externalstress=externalstress,
             ttime=ttime,
         )
+
+    if plot:
+        plot_thermo({'input_file': 'output.traj'})
 
     results = {}
     return results

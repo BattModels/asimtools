@@ -10,6 +10,7 @@ import sys
 import os
 from pathlib import Path
 import argparse
+import subprocess
 from typing import Dict, Tuple
 from asimtools.utils import read_yaml
 from asimtools.job import load_job_from_directory
@@ -47,6 +48,24 @@ def main(args=None) -> None:
         assert Path(calc_input_file).exists(), 'Specify valid calc input file'
         os.environ["ASIMTOOLS_CALC_INPUT"] = calc_input_file
     script = sim_input['script']
+    precommands = sim_input.get('precommands', [])
+
+    for precommand in precommands:
+        command = precommand.split()
+        completed_process = subprocess.run(command, check=True)
+        completed_process = subprocess.run(
+            command, check=False, capture_output=True, text=True,
+        )
+
+        if completed_process.returncode != 0:
+            print(completed_process.stderr)
+            err_txt = f'ERROR: sim_input precommand "{" ".join(command)}" '
+            err_txt += 'failed as above. Make sure precommand can be '
+            err_txt += "executed by python's subprocess.run() routine"
+            print(err_txt)
+
+            completed_process.check_returncode()
+
     module_name = script.split('/')[-1].split('.py')[0]
     func_name = module_name.split('.')[-1]
     spec = importlib.util.find_spec('.'+module_name,'asimtools.scripts')
@@ -96,6 +115,11 @@ def main(args=None) -> None:
         results['job_ids'] = job_ids
     job.update_output(results)
     job.complete()
+
+    postcommands = sim_input.get('postcommands', [])
+    for postcommand in postcommands:
+        command = postcommand.split()
+        completed_process = subprocess.run(command, check=True)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

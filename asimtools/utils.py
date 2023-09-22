@@ -5,6 +5,7 @@ standards
 from typing import (
     TypeVar, Iterable, Tuple, Union, List, Dict, Sequence, Optional
 )
+from copy import deepcopy
 from glob import glob
 import os
 import subprocess
@@ -53,7 +54,7 @@ def write_csv_from_dict(
     fname: str,
     data: Dict,
     columns: Optional[Sequence] = None,
-    header: Optional[str] = None,
+    header: str = '',
     **kwargs
 ) -> pd.DataFrame:
     """Write a tabulated csv to a file from a dictionary. The keys will
@@ -343,3 +344,39 @@ def check_if_slurm_job_is_running(slurm_job_id: Union[str,int]):
     else:
         return False
     
+def change_dict_value(
+    d: Dict,
+    new_value,
+    key_sequence: Sequence,
+    return_copy: bool  = True
+) -> Dict:
+    """Changes a value in the specified dictionary given by following the 
+    key sequence
+
+    :param d: dictionary to be changed
+    :type d: Dict
+    :param new_value: The new value that will replace the old one
+    :type new_value: _type_
+    :param key_sequence: List of keys in the order in which they access the 
+    dictionary key
+    :type key_sequence: Sequence
+    :param return_copy: Whether to return a copy only or to modify the 
+    dictionary in-place as well, defaults to True
+    :type return_copy: bool, optional
+    :return: The changed dictionary
+    :rtype: Dict
+    """
+    if return_copy:
+        d = deepcopy(d)
+    if len(key_sequence) == 1:
+        d[key_sequence[0]] = new_value
+        return d
+    else:
+        new_d = change_dict_value(
+            d[key_sequence[0]],
+            new_value,
+            key_sequence[1:],
+            return_copy=return_copy
+        )
+        d[key_sequence[0]] = new_d
+        return d

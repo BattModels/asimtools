@@ -108,3 +108,61 @@ def test_submit(
             assert new_start_time != old_start_time
         else:
             assert new_start_time == old_start_time
+
+def test_slurm_script(tmp_path):  
+    wdir = tmp_path / 'results'
+    sim_input = {
+        'script': 'do_nothing',
+        'env_id': 'test_batch',
+        'workdir': wdir,
+        'args': {'calc_id': 'test_calc_id'},
+    }
+    env_input = {
+        'test_batch': {
+            'mode': {
+                'use_slurm': True,
+                'interactive': False,
+            },
+            'slurm': {
+                'flags': ['-N 1 #test flag'],
+                'precommands': ['test_env_precommand1', 'test_env_precommand2'],
+                'postcommands': ['test_env_postcommand1', 'test_env_postcommand2'],
+            },
+        },
+    }
+
+    calc_input = {
+        'test_calc_id': {
+            'precommands': ['test_calc_precommand1', 'test_calc_precommand2'],
+            'postcommands': ['test_calc_postcommand1', 'test_calc_postcommand2'],
+            'run_prefix': 'touch test_run_prefix; ',
+            'run_suffix': '; touch test_run_suffix',
+        },
+    }
+
+    unitjob = create_unitjob(sim_input, env_input, wdir, calc_input=calc_input)
+    unitjob.gen_input_files()
+
+    with open(wdir / 'job.sh', 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    jscript_txt = ' '.join(lines)
+
+    assert '#SBATCH -N 1' in jscript_txt
+    assert 'test_env_precommand1' in jscript_txt
+    assert 'test_env_precommand2' in jscript_txt
+    assert 'test_env_postcommand1' in jscript_txt
+    assert 'test_env_postcommand2' in jscript_txt
+    assert 'test_calc_precommand1' in jscript_txt
+    assert 'test_calc_precommand2' in jscript_txt
+    assert 'test_calc_postcommand1' in jscript_txt
+    assert 'test_calc_postcommand2' in jscript_txt
+    assert 'test_run_prefix' in jscript_txt
+    assert 'test_run_suffix' in jscript_txt
+
+    for line in lines:
+        if 'test_run_prefix' in line:
+            assert 'asim-run' in line
+            assert line.index('test_run_prefix') < line.index('asim-run')
+        if 'test_run_suffix' in line:
+            assert 'asim-run' in line
+            assert line.index('test_run_suffix') > line.index('asim-run')

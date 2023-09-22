@@ -10,6 +10,7 @@ import subprocess
 import numpy as np
 from ase import Atoms
 from ase.io import write
+from ase.geometry.geometry import wrap_positions
 from asimtools.utils import (
     get_atoms,
     get_images,
@@ -47,25 +48,38 @@ def read_xdat_xyz(xyz_path: str):
 
 def write_xdat_xyz(atoms: Atoms, fname: str = 'xyz.ideal'):
     txt = ''
-    print(atoms)
-    atoms.center()
+    # atoms.center(about=0)
+    # print('pos1:', atoms.positions)
     cell = atoms.get_cell()
     for row in cell:
-        txt += f'    {row[0]:.16f} {row[1]:.16f} {row[2]:.16f}\n'
+        txt += f'    {row[0]:.16f}\t{row[1]:.16f}\t{row[2]:.16f}\n'
 
     txt += f'{len(atoms)} atoms from POSCAR\n'
     symbols_count = {symbol: 1 for symbol in atoms.symbols}
-    for i, coord in enumerate(atoms.get_scaled_positions(wrap=True)):
+    normalized_cell = (cell.transpose() / np.linalg.norm(cell, axis=1)).transpose()
+    # print('normalized_cell:', normalized_cell)
+    coords = atoms.get_scaled_positions(wrap=False)
+    # print('coords:', coords)
+    wrapped_coords = wrap_positions(
+        coords,
+        normalized_cell,
+        pbc=True,
+        center=(0.0, 0.0, 0.0),
+        pretty_translation=False,
+        eps=1e-7,
+    )
+    # print('wrapped:', wrapped_coords)
+    for i, coord in enumerate(wrapped_coords):
         symbol = atoms[i].symbol
         number = atoms[i].number
-        print(coord)
-        txt += f'{coord[0]:.10f} {coord[0]:.10f} {coord[0]:.10f} '
+        # print(coord)
+        txt += f'{coord[0]:.10f} {coord[1]:.10f} {coord[2]:.10f} '
         txt += f'{number} {i+1} {symbols_count[symbol]}\n'
         symbols_count[symbol] += 1
 
+    # print(txt)
     with open(fname, 'w', encoding='utf-8') as f:
         f.write(txt)
-
 
 def write_Mass(atoms: Atoms):
     txt = f'{len(set(atoms.symbols))}\n'
@@ -101,10 +115,10 @@ def write_symmetry_ops(atoms: Atoms):
         return None
 
 def gen_xdat_inputs(
-    temperature: float,
-    unit_cell_image: Dict,
+    unit_cell_image: Optional[Dict] = None,
     ideal_image: Optional[Dict] = None,
     md_images: Optional[Dict] = None,
+    temperature: Optional[float] = None,
 ) -> Dict:
     '''
     Script does xyz specifically
@@ -131,10 +145,10 @@ def gen_xdat_inputs(
     return {}
 
 def run_xdat(
-    temperature: float,
-    unit_cell_image: Dict,
+    unit_cell_image: Optional[Dict] = None,
     ideal_image: Optional[Dict] = None,
     md_images: Optional[Dict] = None,
+    temperature: Optional[float] = None,
     xyz_ideal: str = 'xyz.ideal',
     xdatcar: str = 'XDATCAR',
     sym_file: str = 'symmetry_operation.dat',
@@ -144,7 +158,7 @@ def run_xdat(
     Runs the entropy calculation using xdat package
     '''
 
-    gen_xdat_inputs(temperature, unit_cell_image, ideal_image, md_images)
+    gen_xdat_inputs(unit_cell_image, ideal_image, md_images, temperature)
 
     assert Path(xyz_ideal).exists(), 'Provide existing xyz file'
     assert Path(xdatcar).exists(), 'Provide existing xdatcar file'

@@ -79,6 +79,19 @@ def load_job_tree(
     }
     return job_dict
 
+def get_status_and_color(job):
+    ''' Helper to get printing colors '''
+    status = job.get_status()[1]
+    if status == 'complete':
+        color = Fore.GREEN
+    elif status == 'failed':
+        color = Fore.RED
+    elif status == 'started':
+        color = Fore.BLUE
+    else:
+        color = Fore.WHITE
+    return status, color
+
 def print_job_tree(job_tree: Dict, indent_str='', level=0) -> None:
     """Prints the job tree given the job_tree dictionary
 
@@ -91,11 +104,7 @@ def print_job_tree(job_tree: Dict, indent_str='', level=0) -> None:
     subjobs = job_tree['subjobs']
     if subjobs is not None:
         workdir = job_tree['workdir']
-        status = job_tree['job'].get_status()[1]
-        if status == 'complete':
-            color = Fore.GREEN
-        elif status == 'failed':
-            color = Fore.RED
+        status, color = get_status_and_color(job_tree['job'])
         script = job_tree['job'].sim_input['script']
         print(color + f'{indent_str}{workdir}, script: {script},' + \
             f'status: {status}' + reset)
@@ -112,18 +121,10 @@ def print_job_tree(job_tree: Dict, indent_str='', level=0) -> None:
     else:
         subjob_dir = job_tree['workdir']
         subjob = job_tree['job']
-        status = subjob.get_status()[1]
-        status = job_tree['job'].get_status()[1]
-        if status == 'complete':
-            color = Fore.GREEN
-        elif status == 'failed':
-            color = Fore.RED
-        else:
-            color = Fore.WHITE
         script = subjob.sim_input['script']
-        # indent_str = ' ' * indent
+        status, color = get_status_and_color(subjob)
         print(color + f'{indent_str}{subjob_dir}, script: {script}, '+\
-            f'status: {status}' + reset)
+        f'status: {status}' + reset)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

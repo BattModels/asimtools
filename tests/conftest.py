@@ -92,3 +92,122 @@ def do_nothing_sim_input():
         },
     }
     return sim_input
+
+@pytest.fixture
+def do_nothing_distributed_sim_input():
+    ''' 
+    Sim imput for a script that just completes without doing anything
+    '''
+    subscript_input = {
+        'script': 'singlepoint',
+        'env_id': 'inline',
+        'args': {
+            'calc_id': 'lj',
+            'image': {
+                'name': 'Ar',
+            },
+            'properties': ['energy', 'forces'],
+        }
+    }
+    sim_input = {
+        'script': 'distributed',
+        'env_id': 'inline',
+        'args': {
+            'subscripts': {
+                'id-00': subscript_input,
+                'id-01': subscript_input,
+                'id-02': subscript_input,
+                'id-03': subscript_input,
+                'id-04': subscript_input,
+                'id-05': subscript_input,
+                'id-06': subscript_input,
+                'id-07': subscript_input,
+                'id-08': subscript_input,
+                'id-09': subscript_input,
+                'id-10': subscript_input,
+                'id-11': subscript_input,
+                'id-12': subscript_input,
+            }
+        }
+    }
+
+    return sim_input
+
+@pytest.fixture
+def do_nothing_distributed_custom_name_sim_input():
+    ''' 
+    Sim imput for a script that just completes without doing anything
+    '''
+    subscript_input = {
+        'script': 'singlepoint',
+        'env_id': 'inline',
+        'args': {
+            'calc_id': 'lj',
+            'image': {
+                'name': 'Ar',
+            },
+            'properties': ['energy', 'forces'],
+        }
+    }
+    sim_input = {
+        'script': 'distributed',
+        'env_id': 'inline',
+        'args': {
+            'subscripts': {
+                'first': subscript_input,
+                'second': subscript_input,
+                'third': subscript_input,'id-03': subscript_input,
+                'id-04': subscript_input,
+                'id-05': subscript_input,
+                'id-06': subscript_input,
+                'id-07': subscript_input,
+                'id-08': subscript_input,
+                'id-09': subscript_input,
+                'id-10': subscript_input,
+                'id-11': subscript_input,
+                'id-12': subscript_input,
+            }
+        }
+    }
+
+    return sim_input
+
+@pytest.fixture
+def do_nothing_distributed_batch_sim_input():
+    ''' 
+    Sim imput for a script that just completes without doing anything
+    '''
+    subscript_input = {
+        'script': 'singlepoint',
+        'env_id': 'inline',
+        'args': {
+            'calc_id': 'lj',
+            'image': {
+                'name': 'Ar',
+            },
+            'properties': ['energy', 'forces'],
+        }
+    }
+    sim_input = {
+        'script': 'distributed',
+        'env_id': 'batch',
+        'args': {
+            'subscripts': {
+                'id-00': subscript_input,
+                'id-01': subscript_input,
+                'id-02': subscript_input,
+                'id-03': subscript_input,
+                'id-04': subscript_input,
+                'id-05': subscript_input,
+                'id-06': subscript_input,
+                'id-07': subscript_input,
+                'id-08': subscript_input,
+                'id-09': subscript_input,
+                'id-10': subscript_input,
+                'id-11': subscript_input,
+                'id-12': subscript_input,
+            }
+        }
+    }
+
+    return sim_input
