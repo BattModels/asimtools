@@ -11,6 +11,7 @@ Welcome to asimtools's documentation!
    :caption: Contents:
 
    README <include_readme>
+   asimplify
    API Docs <modules>
    Contributing <include_contributing>
    

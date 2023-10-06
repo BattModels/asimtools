@@ -30,6 +30,9 @@ setup(
         "pyyaml",
         "pymatgen",
         "ase",
+        "colorama",
+        "myst-parser",
+        "sphinx",
     ],
     zip_safe=True,
 )
