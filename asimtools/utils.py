@@ -8,6 +8,7 @@ from typing import (
 from copy import deepcopy
 from glob import glob
 import os
+import logging
 import subprocess
 from pathlib import Path
 import yaml
@@ -74,7 +75,7 @@ def write_csv_from_dict(
     if columns is None:
         columns = list(data.keys())
 
-    csv_data = pd.DataFrame(data, columns=columns)
+    csv_data = pd.DataFrame(data, columns=columns, **kwargs)
     with open(fname, 'w', encoding='utf-8') as f:
         f.write('#' + header + '\n')
 
@@ -387,3 +388,24 @@ def change_dict_value(
         )
         d[key_sequence[0]] = new_d
         return d
+
+def get_logger(
+    logfile='job.log',
+    fstr='%(asctime)s |%(module)s|%(funcName)s| %(levelname)s: %(message)s',
+    level='debug',
+):
+    ''' Get the logger '''
+
+    level_dict = {
+        'debug': logging.DEBUG,
+        'info': logging.INFO,
+        'warning': logging.WARNING,
+    }
+    assert level in level_dict, f'level must be one of {level_dict.keys()}'
+
+    logging.basicConfig(
+        filename=logfile,
+        level=level_dict[level],
+        format=fstr,
+    )
+    return logging.getLogger(__name__)

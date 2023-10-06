@@ -6,6 +6,7 @@ Author: mkphuthi@github.com
 '''
 
 from typing import Tuple, Dict
+import logging
 from asimtools.calculators import load_calc
 # from asimtools.job import uses_calc
 from asimtools.utils import (
@@ -36,22 +37,25 @@ def singlepoint(
     if 'energy' in properties:
         try:
             energy = atoms.get_potential_energy()
+            logging.debug('Calculated energy')
         except Exception:
-            print('Failed to calculate energy')
+            logging.error('Failed to calculate energy')
             raise
 
     if 'forces' in properties:
         try:
             atoms.get_forces()
+            logging.debug('Calculated forces')
         except Exception:
-            print('Failed to calculate forces')
+            logging.error('Failed to calculate forces')
             raise
 
     if 'stress' in properties:
         try:
             atoms.get_stress()
+            logging.debug('Calculated stress')
         except Exception:
-            print('Failed to calculate stress')
+            logging.error('Failed to calculate stress')
             raise
 
     image_file = 'image_output.xyz'
