@@ -9,7 +9,7 @@ import numpy as np
 import ase.optimize
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
-from asimtools.utils import get_atoms, join_names
+from asimtools.utils import get_atoms, get_logger
 
 def atom_relax(
     calc_id: str,
@@ -37,6 +37,7 @@ def atom_relax(
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)
+    logger = get_logger()
 
     traj_file = 'atom_relax.traj'
     dyn = getattr(ase.optimize, optimizer)(atoms)
@@ -50,7 +51,7 @@ def atom_relax(
     try:
         dyn.run(fmax=fmax)
     except Exception:
-        print('Failed to optimize atoms')
+        logger.error('Failed to relax atoms')
         raise
 
     image_file = 'image_output.xyz'

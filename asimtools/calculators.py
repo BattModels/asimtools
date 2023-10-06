@@ -2,6 +2,7 @@
 Tools for loading and returning ASE calculator objects for use in simulations
 '''
 import importlib
+import logging
 from typing import Dict, Optional
 from asimtools.utils import get_calc_input
 
@@ -26,16 +27,14 @@ def load_calc(
     if calc_id is not None:
         if calc_input is None:
             calc_input = get_calc_input()
-        print('calcs calc input:', calc_input)
         try:
             calc_params = calc_input[calc_id]
-        except KeyError:
-            print(f'Calculator with calc_id: {calc_id} not found in \
-                calc_input {calc_input}')
-            raise
-        except AttributeError:
-            print('No calc_input found')
-            raise
+        except KeyError as exc:
+            msg = f'Calculator with calc_id: {calc_id} not found in'
+            msg += f'calc_input {calc_input}'
+            raise KeyError(msg) from exc
+        except AttributeError as exc:
+            raise AttributeError('No calc_input found') from exc
     name = calc_params.get('name', None)
 
     if 'module' in calc_params:
@@ -43,15 +42,15 @@ def load_calc(
     else:
         try:
             loader = external_calcs[name]
-        except KeyError:
-            print(f'Provide ASE module for calc or use\
-                one of {external_calcs.keys()}')
-            raise
+        except KeyError as exc:
+            msg = 'Provide ASE module for calc or use'
+            msg += f' one of {external_calcs.keys()}'
+            raise KeyError(msg) from exc
 
     calc = loader(calc_params=calc_params)
     label = calc_params.get('label', name)
     calc.label = label
-
+    logging.debug('Loaded calculator %s', calc_id)
     return calc
 
 
@@ -69,9 +68,9 @@ def load_nequip(calc_params):
         torch.set_default_dtype(torch.float64)
     try:
         calc = NequIPCalculator.from_deployed_model(**calc_params['args'])
-    except Exception:
-        print(f"Failed to load NequIP with parameters:\n {calc_params}")
-        raise
+    except Exception as exc:
+        msg = f"Failed to load NequIP with parameters:\n {calc_params}"
+        raise RuntimeError(msg) from exc
 
     return calc
 

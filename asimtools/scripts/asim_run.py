@@ -12,7 +12,7 @@ from pathlib import Path
 import argparse
 import subprocess
 from typing import Dict, Tuple
-from asimtools.utils import read_yaml
+from asimtools.utils import read_yaml, get_logger
 from asimtools.job import load_job_from_directory
 
 
@@ -42,6 +42,8 @@ def parse_command_line(args) -> Tuple[Dict, str]:
 
 def main(args=None) -> None:
     ''' Main '''
+    logger = get_logger()
+    logger.debug('Entered asim_run')
     sim_input, calc_input_file = parse_command_line(args)
     old_calc_input_var = os.getenv("ASIMTOOLS_CALC_INPUT", None)
     if calc_input_file is not None:
@@ -58,11 +60,13 @@ def main(args=None) -> None:
         )
 
         if completed_process.returncode != 0:
-            print(completed_process.stderr)
+            logger.error('asim-run: Failed to run precommand %s', precommand)
+            # print(completed_process.stderr)
+            logger.error(completed_process.stderr)
             err_txt = f'ERROR: sim_input precommand "{" ".join(command)}" '
             err_txt += 'failed as above. Make sure precommand can be '
             err_txt += "executed by python's subprocess.run() routine"
-            print(err_txt)
+            logger.error(err_txt)
 
             completed_process.check_returncode()
 
@@ -84,13 +88,15 @@ def main(args=None) -> None:
 
     sim_func = getattr(sim_module, func_name)
 
-    print(f'asim-run: running {func_name}')
-    job = load_job_from_directory('.')
+    cwd = Path('.').resolve()
+    job = load_job_from_directory(cwd)
     job.start()
     try:
         results = sim_func(**sim_input['args'])
+        logger.info('Successfully ran script "%s" in "%s"', script, cwd)
     except:
-        print(f'ERROR: Failed to run {func_name}')
+        logger.info('Failed to run script "%s" in "%s"', script, cwd)
+        # Restore the CALC_INPUT environment variable
         if old_calc_input_var is not None:
             os.environ["ASIMTOOLS_CALC_INPUT"] = old_calc_input_var
         else:
@@ -120,6 +126,8 @@ def main(args=None) -> None:
     for postcommand in postcommands:
         command = postcommand.split()
         completed_process = subprocess.run(command, check=True)
+
+    logger.debug('Complete')
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -9,6 +9,7 @@ import subprocess
 import os
 from pathlib import Path
 from datetime import datetime
+import logging
 from glob import glob
 from typing import List, TypeVar, Dict, Tuple, Union
 from copy import deepcopy
@@ -22,6 +23,7 @@ from asimtools.utils import (
     get_images,
     get_env_input,
     get_calc_input,
+    get_logger,
     check_if_slurm_job_is_running,
 )
 
@@ -50,6 +52,15 @@ class Job():
         # Any subsequent input files should use the full path
         self.sim_input['workdir'] = str(self.workdir)
         self.launchdir = Path(os.getcwd())
+
+        # # See python logging docs
+        # logging.basicConfig(
+        #     filename=self.workdir / 'job.log',
+        #     level=logging.DEBUG,
+        #     format='%(asctime)s %(name)s %(levelname)s: %(message)s'
+        # )
+        # logger = logging.getLogger(__name__)
+        # self.logger = logger
 
     def mkworkdir(self) -> None:
         ''' Creates the work directory if it doesn't exist '''
@@ -171,6 +182,12 @@ class Job():
         output.update(output_update)
         write_yaml(self.get_output_yaml(), output)
 
+    def get_logger(self, logfilename='job.log', level='info'):
+        ''' Get the logger '''
+        assert self.workdir.exists(), 'Work directory does not exist yet'
+        logger = get_logger(logfile=self.workdir / logfilename, level=level)
+        return logger
+
 class UnitJob(Job):
     ''' 
     Unit job object with ability to submit a slurm/interactive job.
@@ -287,7 +304,7 @@ class UnitJob(Job):
             if complete and not overwrite:
                 txt = f'Skipped writing in {self.workdir}, files already '
                 txt += 'written. Set overwrite=True to overwrite'
-                print(txt)
+                self.get_logger().warning(txt)
                 return None
 
         # If the sim_input uses an image/images, we want to write it in 
@@ -335,18 +352,24 @@ class UnitJob(Job):
         Submit a job using slurm, interactively or in the terminal
         '''
         self.gen_input_files()
+
+        logger = self.get_logger()
+
         _, status = self.get_status(display=True)
         if status in ('discard'):
             txt = f'Current job status in "{self.workdir}" is "{status}", '
             txt += 'skipping submission, set "overwrite=True" to ignore'
-            print(txt)
+            logger.warning(txt)
             return None
 
         if not self.sim_input.get('submit', True):
-            print('Keyword submit=False, skipping submission')
+            logger.warning('Keyword submit=False, skipping submission in \
+                %s', self.workdir)
             return None
 
-        print(f'Submitting "{self.sim_input["script"]}" in "{self.workdir}"')
+        msg = f'Submitting "{self.sim_input["script"]}" in "{self.workdir}"'
+        logging.info(msg)
+        print(msg)
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
         mode_params = self.env.get('mode', {})
@@ -391,11 +414,8 @@ class UnitJob(Job):
                 output_file.write(completed_process.stdout)
 
             if completed_process.returncode != 0:
-                err_txt = f'ERROR: Failed to run {sim_input.get("script")} in '
-                err_txt += f'{self.workdir} with command:\n'
-                err_txt += f'{" ".join(command)}\n'
-                err_txt += f'See {self.workdir / "stderr.txt"} for details.'
-                print(err_txt)
+                err_msg = f'See {self.workdir / "stderr.txt"} for traceback.'
+                logger.error(err_msg)
                 with open('stderr.txt', 'w', encoding='utf-8') as err_file:
                     err_file.write(completed_process.stderr)
                 completed_process.check_returncode()
@@ -408,7 +428,9 @@ class UnitJob(Job):
             self.update_output({'job_ids': job_ids})
             return job_ids
 
-        print('Succesfully submitted job')
+        msg = f'Submitted "{self.sim_input["script"]}" in "{self.workdir}"'
+        logger.info(msg)
+        print(msg)
 
         return None
 
@@ -466,7 +488,10 @@ class DistributedJob(Job):
 
         self.unitjobs = unitjobs
 
-    def submit_jobs(self, **kwargs) -> Union[None,List[str]]:
+    def submit_jobs(
+        self,
+        **kwargs, # Necessary for compatibility with job.submit
+    ) -> Union[None,List[str]]:
         '''
         Submits the jobs. If submitting lots of batch jobs, we 
         recommend using DistributedJob.submit_array
@@ -484,12 +509,13 @@ class DistributedJob(Job):
         self,
         array_max=None,
         dependency: Union[List[str],None] = None,
-        **kwargs,
+        **kwargs, # Necessary for compatibility with job.submit
     ) -> Union[None,List[str]]:
         '''
         Submits a job array if all the jobs have the same env and use slurm
         '''
         self.gen_input_files()
+        logger = self.get_logger()
 
         njobs = len(self.unitjobs)
 
@@ -531,12 +557,19 @@ class DistributedJob(Job):
         with open('stdout.txt', 'w', encoding='utf-8') as output_file:
             output_file.write(completed_process.stdout)
 
+        # if completed_process.returncode != 0:
+        #     err_txt = 'ERROR: Failed to run array in '
+        #     err_txt += f'{self.workdir} with command:\n'
+        #     err_txt += f'{" ".join(command)}\n'
+        #     err_txt += f'See {self.workdir / "stderr.txt"} for details.'
+        #     print(err_txt)
+        #     with open('stderr.txt', 'w', encoding='utf-8') as err_file:
+        #         err_file.write(completed_process.stderr)
+        #     completed_process.check_returncode()
+
         if completed_process.returncode != 0:
-            err_txt = 'ERROR: Failed to run array in '
-            err_txt += f'{self.workdir} with command:\n'
-            err_txt += f'{" ".join(command)}\n'
-            err_txt += f'See {self.workdir / "stderr.txt"} for details.'
-            print(err_txt)
+            err_msg = f'See {self.workdir / "stderr.txt"} for traceback.'
+            logger.error(err_msg)
             with open('stderr.txt', 'w', encoding='utf-8') as err_file:
                 err_file.write(completed_process.stderr)
             completed_process.check_returncode()
@@ -649,7 +682,7 @@ class ChainedJob(Job):
 
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
-
+        logger = self.get_logger()
         step = 0 #self.get_current_step() TODO: This feature is not used yet
         are_interactive_jobs = [
             uj.env['mode'].get('interactive', False) \
@@ -689,7 +722,7 @@ class ChainedJob(Job):
                     else:
                         txt = f'Skipping step-{step+i} since '
                         txt += f'status is {status}'
-                        print(txt)
+                        logger.warning(txt)
 
             job_ids = dependency
 
@@ -706,13 +739,15 @@ class ChainedJob(Job):
 def load_job_from_directory(workdir: str):
     ''' Loads a job from a given directory '''
     workdir = Path(workdir)
+    assert workdir.exists(), f'Work director {workdir} does not exist'
+    logger = get_logger()
     sim_inputs = glob(str(workdir / 'sim_input.yaml'))
     if len(sim_inputs) != 1:
-        print(f'WARNING: Multiple or no sim_input files in {workdir}')
+        logger('Multiple or no sim_input.yaml files in %s', {workdir})
     try:
         sim_input = read_yaml(glob(str(workdir / 'sim_input.yaml'))[0])
     except:
-        print('sim_input.yaml not found')
+        logger('sim_input.yaml not found in %s', {workdir})
         raise
 
     env_inputs = glob(str(workdir / 'env_input.yaml'))
