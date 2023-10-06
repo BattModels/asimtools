@@ -9,6 +9,7 @@ from asimtools.utils import (
     get_atoms,
     get_images,
     change_dict_value,
+    parse_slice,
 )
 import ase.build
 
@@ -83,3 +84,17 @@ def test_change_dict_value(test_input, expected):
     )
     assert new_d == expected
     assert new_d != d
+
+@pytest.mark.parametrize("test_input, expected",[
+    (':', slice(None, None, None)),
+    ('1:', slice(1, None, None)),
+    (':4', slice(None, 4, None)),
+    ('1:5', slice(1, 5, None)),
+    ('::-1', slice(None, None, -1)),
+    ('3:67:4', slice(3, 67, 4)),
+])
+def test_parse_slice(test_input, expected):
+    ''' Test parsing a slice '''
+    
+    assert parse_slice(test_input) == expected
+

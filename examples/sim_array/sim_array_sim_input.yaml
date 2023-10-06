@@ -1,0 +1,16 @@
+script: sim_array
+overwrite: true
+workdir: results
+args:
+  key_sequence: ['args', 'image', 'a']
+  array_values: [3.50, 3.60, 3.70]
+  env_ids: 'batch'
+  template_sim_input:
+    script: singlepoint
+    overwrite: true
+    args:
+      calc_id: 'lj'
+      image:
+        builder: bulk
+        name: Cu
+        crystalstructure: 'fcc'

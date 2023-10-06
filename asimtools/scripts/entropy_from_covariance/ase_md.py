@@ -134,8 +134,8 @@ def ase_md(
     calc_id: str,
     image: Dict,
     timestep: float,
+    temp: float,
     dynamics: str = 'npt',
-    temp: float = 300.0,
     friction: float = 1e-2,
     ttime: float = 25*fs,
     pfactor: float = None, #(75*fs)**2 * 14*GPa, #14 is bulk modulus of material i.e. Li

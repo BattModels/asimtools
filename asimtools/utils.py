@@ -183,12 +183,13 @@ def parse_slice(value: str) -> slice:
     :return: slice object
     :rtype: slice
     """
-    if value:
-        parts = value.split(':')
-        if len(parts) == 1:
-            parts = [None, parts[0]]
-    else:
-        parts = []
+    indices = str(value).split(':')
+    parts = []
+    for index in indices:
+        if index == '':
+            parts.append(False)
+        else:
+            parts.append(index)
     return slice(*[int(p) if p else None for p in parts])
 
 def get_images(
@@ -226,28 +227,34 @@ def get_images(
     """
     assert (image_file is not None) or \
         (pattern is not None) or \
+        (patterns is not None) or \
         (images is not None), \
         "Please specify file, pattern or iterable"
 
-    index = parse_slice(str(index))
     if image_file is not None:
         images = read(image_file, index=index, **kwargs)
     elif pattern is not None:
         image_files = glob(pattern)
         assert len(image_files) > 0, \
             f'No images matching pattern "{pattern}" from "{os.getcwd()}"'
-        images = [
-            read(image_file, **kwargs) for image_file in image_files
-        ]
+
+        images = []
+        for image_file in image_files:
+            new_images = read(image_file, index=index, **kwargs)
+            # Output of read can either be list of atoms or Atoms, depending on index
+            if not isinstance(new_images, list):
+                new_images = [new_images]
+            images += new_images
+
     elif patterns is not None:
         images = []
         for pattern in patterns:
             image_files = glob(pattern)
             assert len(image_files) > 0, \
                 f'No images matching patterns "{pattern}" from "{os.getcwd()}"'
-            images += get_images(pattern=pattern, **kwargs)
+            images += get_images(pattern=pattern, index=index, **kwargs)
     elif images is not None:
-        images = images[index]
+        images = images[parse_slice(str(index))]
     else:
         images = []
 
@@ -288,7 +295,7 @@ def get_env_input() -> Dict:
                 try:
                     env_input = read_yaml(env_input_file)
                     return env_input
-                except Exception:
+                except FileNotFoundError:
                     print('WARNING: No env_input yaml found')
     else:
         env_input = read_yaml(env_input_file)
@@ -316,7 +323,7 @@ def get_calc_input():
                 try:
                     calc_input = read_yaml(calc_input_file)
                     return calc_input
-                except Exception:
+                except FileNotFoundError:
                     print('WARNING: No calc_input yaml found')
     else:
         calc_input = read_yaml(calc_input_file)

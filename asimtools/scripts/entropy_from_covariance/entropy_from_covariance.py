@@ -6,13 +6,15 @@ Author: mkphuthi@github.com
 '''
 from typing import Dict, Sequence
 from asimtools.job import UnitJob
-
+from copy import deepcopy
 
 def entropy_from_covariance(
     image: Dict,
     temps: Sequence,
     calc_env_id: str,
+    repeat: Sequence[int],
     process_env_id: str,
+    md_script: str,
     md_args: Dict,
     sampling_index: str = ':',
     system: str = 'mod',
@@ -22,7 +24,8 @@ def entropy_from_covariance(
     given temperatures
     '''
 
-    md_args['image'] = image
+    md_args['image'] = deepcopy(image)
+    md_args['image']['repeat'] = repeat
     sim_input = {
         'script': 'distributed',
         'env_id': process_env_id,
@@ -32,9 +35,12 @@ def entropy_from_covariance(
             'subscripts': {},
         }
     }
-
+    print('image', image)
     for temp in temps:
-        md_args['temp'] = temp
+        if md_script == 'lammps':
+            md_args['variables']['TEMP'] = temp
+        else:
+            md_args['temp'] = temp
         temp_input = {
             'script': 'chained',
             'env_id': process_env_id,
@@ -43,11 +49,11 @@ def entropy_from_covariance(
             'args': {
                 'steps': {
                     'step-0': {
-                        'script': 'entropy_from_covariance.ase_md',
+                        'script': md_script,
                         'env_id': calc_env_id,
                         'submit': True,
                         'overwrite': True,
-                        'args': md_args,
+                        'args': deepcopy(md_args),
                     },
                     'step-1': {
                         'script': 'entropy_from_covariance.run_xdat',
@@ -57,8 +63,7 @@ def entropy_from_covariance(
                         'args': {
                             'unit_cell_image': image,
                             'ideal_image': {
-                                'image_file': '../step-0/output.traj',
-                                'index': 0,
+                                'image_file': '../step-0/input_image.xyz',
                             },
                             'md_images': {
                                 'image_file': '../step-0/output.traj',

@@ -29,7 +29,7 @@ def postprocess(
         {'volumes': volumes, 'energies': energies}
     )
     eos_fit = EquationOfState(volumes, energies)
-    print('here')
+
     try:
         v0, e0, B = eos_fit.fit()
     except ValueError:

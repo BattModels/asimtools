@@ -5,6 +5,7 @@ Runs a user defined lammps script or template
 Author: mkphuthi@github.com
 '''
 from typing import Dict
+from pathlib import Path
 import subprocess
 from asimtools.utils import (
     get_atoms,
@@ -30,7 +31,10 @@ def lammps(
     if image is not None:
         atoms = get_atoms(**image)
         atoms.write(
-            'image_input.lmpdat', format='lammps-data', atom_style=atom_style
+            'image_input.lmpdat',
+            format='lammps-data',
+            atom_style=atom_style,
+            masses=True,
         )
         variables['IMAGE_FILE'] = 'image_input.lmpdat'
 
@@ -39,6 +43,7 @@ def lammps(
         lmp_txt += f'variable {variable} equal {value}\n'
 
     lmp_txt += '\n'
+    template = Path(template).resolve()
     with open(template, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 

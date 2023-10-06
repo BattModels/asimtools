@@ -144,6 +144,34 @@ def gen_xdat_inputs(
 
     return {}
 
+def read_xdat_stdout(fname: str):
+    with open(fname, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    for line in lines:
+        if line.startswith('NPAIR'):
+            npair = int(line.split('=')[-1])
+        elif line.startswith('Lambda'):
+            lambda_val = float(line.split('=')[-1])
+        elif line.startswith('T='):
+            vals = line.split()
+            temperature = float(vals[0].split('=')[-1])
+            ln_det = float(vals[1].split('=')[-1])
+            s_classical = float(vals[2].split('=')[-1])
+            s_quantum = float(vals[3].split('=')[-1])
+
+    results = {
+        'npair': npair,
+        'lambda': lambda_val,
+        'temperature': temperature,
+        'ln_det': ln_det,
+        's_classical': s_classical,
+        's_quantum': s_quantum,
+    }
+
+    return results
+
+
 def run_xdat(
     unit_cell_image: Optional[Dict] = None,
     ideal_image: Optional[Dict] = None,
@@ -181,7 +209,8 @@ def run_xdat(
             command, check=False, capture_output=True, text=True,
         )
 
-    with open('xdat_stdout.txt', 'w', encoding='utf-8') as f:
+    xdat_stdout_file = 'xdat_stdout.txt'
+    with open(xdat_stdout_file, 'w', encoding='utf-8') as f:
         f.write(completed_process.stdout)
 
     if completed_process.returncode != 0:
@@ -193,27 +222,6 @@ def run_xdat(
         completed_process.check_returncode()
         return None
 
-    lines = completed_process.stdout.split('\n')
-
-    for line in lines:
-        if line.startswith('NPAIR'):
-            npair = int(line.split('=')[-1])
-        elif line.startswith('Lambda'):
-            lambda_val = float(line.split('=')[-1])
-        elif line.startswith('T='):
-            vals = line.split()
-            temperature = float(vals[0].split('=')[-1])
-            ln_det = float(vals[1].split('=')[-1])
-            s_classical = float(vals[2].split('=')[-1])
-            s_quantum = float(vals[3].split('=')[-1])
-
-    results = {
-        'npair': npair,
-        'lambda': lambda_val,
-        'temperature': temperature,
-        'ln_det': ln_det,
-        's_classical': s_classical,
-        's_quantum': s_quantum,
-    }
+    results = read_xdat_stdout(xdat_stdout_file)
 
     return results
