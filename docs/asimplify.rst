@@ -242,7 +242,34 @@ sim_input.yaml:
         array_values: ['Al', 'Ni', 'Cu', 'Pd', 'Ag', 'Pt', 'Au']
         env_ids: 'batch'
         template_sim_input:
-            script: ase_eos
+            script: /path/to/ase_eos.py
+            args:
+                calc_id: emt
+                image:
+                    builder: bulk
+                    crystalstructure: 'fcc'
+
+To make the script easier to access without having to use the full path, you
+can set the environment variable
+
+.. code-block:: console
+
+    export ASIMTOOLS_SCRIPT_DIR=/path/to/my/script/dir/
+
+You can then move the ``ase_eos.py`` script into a directory called ``ase_eos``
+and place it in the script directory. This allows you to refer to scripts
+prepended with the script dir as below
+
+.. code-block:: yaml
+
+    script: sim_array
+    workdir: results
+    args:
+        key_sequence: ['args', 'image', 'name']
+        array_values: ['Al', 'Ni', 'Cu', 'Pd', 'Ag', 'Pt', 'Au']
+        env_ids: 'batch'
+        template_sim_input:
+            script: ase_eos/ase_eos.py
             args:
                 calc_id: emt
                 image:
