@@ -1,4 +1,4 @@
-script: /home/mphuthi/tests/asimtools/examples/ase_eos/ase_eos.py
+script: ase_eo.py
 env_id: inline
 workdir: results
 args:

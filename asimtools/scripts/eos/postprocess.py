@@ -16,11 +16,6 @@ def postprocess(
     images: Dict = None,
 ) -> Tuple[None,Dict]:
     ''' plot things '''
-    # Should we standardize to using pandas? Issue is that switching
-    # between np and pandas is probably not good
-
-    # Should change this to load_jobs_from_directory once we
-    # know everything else works
     images = get_images(**images)
     volumes = np.array([at.get_volume() for at in images])
     energies = np.array([at.get_potential_energy() for at in images])

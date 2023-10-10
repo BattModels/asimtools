@@ -85,20 +85,41 @@ def main(args=None) -> None:
             completed_process.check_returncode()
 
     module_name = script.split('/')[-1].split('.py')[0]
-    func_name = module_name.split('.')[-1]
-    spec = importlib.util.find_spec('.'+module_name,'asimtools.scripts')
+    func_name = module_name.split('.')[-1] # must match script name
 
+    # Check if the script is a core script
+    spec = importlib.util.find_spec('.'+module_name,'asimtools.scripts')
     if spec is not None:
         sim_module = importlib.import_module(
             '.'+module_name,'asimtools.scripts'
         )
+        logger.debug('Loaded core script %s', module_name)
     else:
-        spec = importlib.util.spec_from_file_location(
-            module_name, script
-        )
+        # Try and find a script from the set script directory
+        script_dir = os.environ.get('ASIMTOOLS_SCRIPT_DIR', False)
+        if script_dir:
+            # script = script.replace('.', '/')
+            script = Path(script_dir) / script
+            spec = importlib.util.spec_from_file_location(
+                    module_name, script
+                )
+            logger.debug('Loading script from script directory %s', script)
+        if spec is None:
+            spec = importlib.util.spec_from_file_location(
+                module_name, script
+            )
+            logger.debug('Loading script from full path %s', script)
+
         sim_module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = sim_module
-        spec.loader.exec_module(sim_module)
+        try:
+            spec.loader.exec_module(sim_module)
+        except Exception as exc:
+            err_txt = f'Failed to find script: {script}. Check your '
+            err_txt += 'ASIMTOOLS_SCRIPT_DIR environment variable or '
+            err_txt += 'provide the full path'
+            logger.error(err_txt)
+            raise FileNotFoundError(err_txt) from exc
 
     sim_func = getattr(sim_module, func_name)
 

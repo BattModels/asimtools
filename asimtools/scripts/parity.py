@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 '''
 Generates a parity plot and collects evaluation statistics comparing energy
-and/or forces and/or stress to existing values in the provided dataset
+and/or forces and/or stress to existing values in the provided dataset. This
+script can work in parallel based on the number of cores specified.
 
 Author: mkphuthi@github.com
 
@@ -120,7 +121,7 @@ def rmse(yhat: Sequence, y: Sequence) -> float:
     :type y: Sequence
     :return: RMSE
     :rtype: float
-    """    
+    """
     return np.sqrt(np.sum(np.square(yhat - y)) / len(y))
 
 def parity(
@@ -167,8 +168,8 @@ def parity(
     unit_factor = unit_factors[unit]
     units = {
         'energy': f'{unit}/atom',
-        'forces': f'{unit}/$\AA$',
-        'stress': f'{unit}/$\AA^3$',
+        'forces': f'{unit}'+r'/$\AA$',
+        'stress': f'{unit}'+r'/$\AA^3$',
     }
 
     subsets = _split_data(data, nprocs)

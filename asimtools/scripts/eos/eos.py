@@ -3,7 +3,6 @@
 from typing import Dict, Tuple
 from asimtools.job import ChainedJob
 
-# @branch
 def eos(
     image: dict,
     singlepoint_env_id: str,
@@ -49,14 +48,6 @@ def eos(
             }
         }
     }
-    # preprocess_step = UnitJob(sim_input={
-    #     'script': 'eos.preprocess',
-    #     'env_id': preprocess_env_id,
-    #     'args': {
-    #         'image': image,
-    #         'nimages': nimages,
-    #         'scale_range': scale_range,
-    # }})
 
     chain = ChainedJob(sim_input, env_input=None, calc_input=None)
     chain.submit()

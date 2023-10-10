@@ -428,4 +428,16 @@ issue:
   with a status of ``complete`` or ``discard``. Note that error files are not
   deleted so you will have to clear those manually
 
+Importing functions from scripts
+********************************
 
+Because scripts contain what are merely Python functions, you can always import
+them and use them in any other code for example, you can import 
+:func:`asimtools.scripts.singlepoint` and use it as below.
+
+.. code-block:: python
+  
+  from asimtools.scripts.singlepoint import singlepoint
+
+  results = singlepoint(image={'name': 'Ar'}, calc_id='lj')
+  print(results)
