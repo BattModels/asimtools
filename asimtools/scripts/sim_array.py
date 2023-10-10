@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 '''
-Apply the same script using multiple calculators
+Runs the same script, iterating over multiple values of a specified argument
+based on a sim_input template provided by the user
 
 Author: mkphuthi@github.com
 
@@ -19,7 +20,8 @@ def sim_array(
     env_input: Optional[Dict] = None,
     ids: Sequence = None,
 ) -> Dict:
-    """Runs the same script using multiple values based on a sim_input template provided by the user
+    """Runs the same script, iterating over multiple values of a specified
+    argument based on a sim_input template provided by the user
 
     :param template_sim_input: sim_input containing all the default parameters
     :type template_sim_input: Dict

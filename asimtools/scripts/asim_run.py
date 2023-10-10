@@ -32,9 +32,18 @@ def parse_command_line(args) -> Tuple[Dict, str]:
         type=str,
         help='calculator input yaml file'
     )
+    parser.add_argument(
+        '-d',
+        '--debug',
+        metavar='debug mode',
+        action='store true',
+        help='Set logging level'
+    )
     args = parser.parse_args(args)
 
     sim_input = read_yaml(args.sim_input_file)
+    if args.get('debug'):
+        sim_input['debug'] = True
     calc_input_file = args.calc
 
     return sim_input, calc_input_file
@@ -42,9 +51,15 @@ def parse_command_line(args) -> Tuple[Dict, str]:
 
 def main(args=None) -> None:
     ''' Main '''
-    logger = get_logger()
-    logger.debug('Entered asim_run')
     sim_input, calc_input_file = parse_command_line(args)
+
+    if sim_input.get('debug', False):
+        level = 'debug'
+    else:
+        level = 'warning'
+    logger = get_logger(level=level)
+    logger.debug('Entered asim_run')
+
     old_calc_input_var = os.getenv("ASIMTOOLS_CALC_INPUT", None)
     if calc_input_file is not None:
         assert Path(calc_input_file).exists(), 'Specify valid calc input file'

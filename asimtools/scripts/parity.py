@@ -1,5 +1,11 @@
-'''.Xauthority'''
+#!/usr/bin/env python
+'''
+Generates a parity plot and collects evaluation statistics comparing energy
+and/or forces and/or stress to existing values in the provided dataset
 
+Author: mkphuthi@github.com
+
+'''
 from typing import Dict, List, TypeVar, Sequence
 from functools import partial
 from multiprocessing import Pool
@@ -126,7 +132,8 @@ def parity(
     index: str = ':',
     properties: Sequence = ('energy', 'forces', 'stress'),
 ) -> Dict:
-    """Generates a parity plot and collects evaluation statistics
+    """Generates a parity plot and collects evaluation statistics comparing energy
+    and/or forces and/or stress to existing values in the provided dataset
 
     :param images: Image config, see :func:`asimtools.utils.get_atoms`
     :type images: Dict

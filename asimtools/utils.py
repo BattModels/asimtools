@@ -351,7 +351,7 @@ def check_if_slurm_job_is_running(slurm_job_id: Union[str,int]):
         return True
     else:
         return False
-    
+
 def change_dict_value(
     d: Dict,
     new_value,
@@ -365,11 +365,9 @@ def change_dict_value(
     :type d: Dict
     :param new_value: The new value that will replace the old one
     :type new_value: _type_
-    :param key_sequence: List of keys in the order in which they access the 
-    dictionary key
+    :param key_sequence: List of keys in the order in which they access the dictionary key
     :type key_sequence: Sequence
-    :param return_copy: Whether to return a copy only or to modify the 
-    dictionary in-place as well, defaults to True
+    :param return_copy: Whether to return a copy only or to modify the dictionary in-place as well, defaults to True
     :type return_copy: bool, optional
     :return: The changed dictionary
     :rtype: Dict

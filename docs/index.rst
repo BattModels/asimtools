@@ -11,7 +11,9 @@ Welcome to asimtools's documentation!
    :caption: Contents:
 
    README <include_readme>
-   asimplify
+   Running Scripts <usage>
+   Custom Scripts <asimplify>
+   Workflows <workflows>
    API Docs <modules>
    Contributing <include_contributing>
    
