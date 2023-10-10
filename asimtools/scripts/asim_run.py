@@ -35,14 +35,13 @@ def parse_command_line(args) -> Tuple[Dict, str]:
     parser.add_argument(
         '-d',
         '--debug',
-        metavar='debug mode',
-        action='store true',
+        action='store_true',
         help='Set logging level'
     )
     args = parser.parse_args(args)
 
     sim_input = read_yaml(args.sim_input_file)
-    if args.get('debug'):
+    if args.debug:
         sim_input['debug'] = True
     calc_input_file = args.calc
 
@@ -107,7 +106,7 @@ def main(args=None) -> None:
     job = load_job_from_directory(cwd)
     job.start()
     try:
-        results = sim_func(**sim_input['args'])
+        results = sim_func(**sim_input.get('args', {}))
         logger.info('Successfully ran script "%s" in "%s"', script, cwd)
     except:
         logger.info('Failed to run script "%s" in "%s"', script, cwd)

@@ -37,9 +37,18 @@ def parse_command_line(args) -> Tuple[Dict, Dict]:
         type=str,
         help='calculator input yaml file',
     )
+    parser.add_argument(
+        '-d',
+        '--debug',
+        action='store_true',
+        help='Set logging level'
+    )
     args = parser.parse_args(args)
-
     sim_input = read_yaml(args.sim_input_file)
+    # Do some cleanup of arguments
+    if args.debug:
+        sim_input['debug'] = True
+
     calc_input = args.calc
     env_input = args.env
     if env_input is not None:

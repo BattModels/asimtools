@@ -90,12 +90,12 @@ calculator using a simple change.
     from ase.build import bulk
     from ase.eos import calculate_eos
     from ase.db import connect
-    from asimtools.utils import get_calc
+    from asimtools.calculators import load_calc
 
     def ase_eos(
         calc_id,
     ):
-        calc = get_calc(calc_id)
+        calc = load_calc(calc_id)
         db = connect('bulk.db')
         for symb in ['Al', 'Ni', 'Cu', 'Pd', 'Ag', 'Pt', 'Au']:
             atoms = bulk(symb, 'fcc')
@@ -120,13 +120,13 @@ The final change we will make is to parallelize over structures as below
     from ase.build import bulk
     from ase.eos import calculate_eos
     from ase.db import connect
-    from asimtools.utils import get_calc
+    from asimtools.calculators import load_calc
 
     def ase_eos(
         image,
         calc_id,
     ):
-        calc = get_calc(calc_id)
+        calc = load_calc(calc_id)
         db = connect('bulk.db')
         atoms = get_atoms(**image)
         atoms.calc = calc
@@ -153,14 +153,16 @@ the repository will need clear syntax highlighting and documentation.
     import logging
     from ase.eos import calculate_eos
     from ase.db import connect
-    from asimtools.utils import get_calc
+    from asimtools.calculators import load_calc
+    from asimtools.utils import get_atoms
 
     def ase_eos(
         image: Dict,
         calc_id: str,
+        db_file: 'bulk.db'
     ) -> Dict:
-        calc = get_calc(calc_id)
-        db = connect('bulk.db')
+        calc = load_calc(calc_id)
+        db = connect(db_file)
         atoms = get_atoms(**image)
         atoms.calc = calc
         eos = calculate_eos(atoms)
@@ -170,8 +172,8 @@ the repository will need clear syntax highlighting and documentation.
         atoms.cell *= (v / atoms.get_volume())**(1 / 3)
         atoms.get_potential_energy()
         db.write(atoms, bm=B)
-        
-        results = {'v': v, 'e': e, 'B': B}
+
+        results = {'v': float(v), 'e': float(e), 'B': float(B)}
         return results
 
 To run this script on an arbitrary structure say Argon with say the

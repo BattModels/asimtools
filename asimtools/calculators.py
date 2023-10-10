@@ -67,7 +67,7 @@ def load_nequip(calc_params):
         import torch
         torch.set_default_dtype(torch.float64)
     try:
-        calc = NequIPCalculator.from_deployed_model(**calc_params['args'])
+        calc = NequIPCalculator.from_deployed_model(**calc_params.get('args', {}))
     except Exception as exc:
         msg = f"Failed to load NequIP with parameters:\n {calc_params}"
         raise RuntimeError(msg) from exc

@@ -236,8 +236,13 @@ class UnitJob(Job):
         calc_run_prefix = self.calc_params.get('run_prefix', '')
         calc_run_suffix = self.calc_params.get('run_suffix', '')
 
+        if self.sim_input.get('debug', False):
+            debug_flag = ' -d'
+        else:
+            debug_flag = ''
+
         txt = f'{env_run_prefix} {calc_run_prefix} '
-        txt += 'asim-run sim_input.yaml -c calc_input.yaml'
+        txt += 'asim-run sim_input.yaml -c calc_input.yaml' + debug_flag
         txt += f' {env_run_suffix} {calc_run_suffix} '
         return txt
 

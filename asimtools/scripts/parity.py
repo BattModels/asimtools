@@ -23,7 +23,7 @@ Calculator = TypeVar('Calculator')
 def calc_parity_data(
     subset: List,
     calc_id: str,
-    properties: List = ('energy', 'forces', 'stress'),
+    properties: Sequence = ('energy', 'forces', 'stress'),
     force_prob: float = 1.0,
 ) -> Dict:
     """Calculates parity data for each atoms instance in subset
