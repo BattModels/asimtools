@@ -1,14 +1,13 @@
 from setuptools import setup, find_packages
-# from pathlib import Path
-# see https://packaging.python.org/guides/single-sourcing-package-version/
-# version_dict = {}
-# with open(Path(__file__).parents[0] / "nequip/_version.py") as fp:
-#     exec(fp.read(), version_dict)
-# version = version_dict["__version__"]
-# del version_dict
+from pathlib import Path
+
+version_dict = {}
+with open(Path(__file__).parents[0] / 'asimtools/_version.py') as fp:
+    exec(fp.read(), version_dict)
 
 setup(
     name="asimtools",
+    version=version_dict["__version__"],
     description="Atomic Simulation Tools",
     author="Keith Phuthi and Emil Annevelink",
     python_requires=">=3.9",
