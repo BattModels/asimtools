@@ -7,8 +7,6 @@ asimtools.scripts package
    :maxdepth: 4
 
    asimtools.scripts.eos
-   asimtools.scripts.psquared
-   asimtools.scripts.strong_scaling
 
 
 
