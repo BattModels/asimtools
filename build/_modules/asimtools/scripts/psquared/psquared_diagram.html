@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>asimtools.scripts.psquared.psquared_diagram &mdash; asimtools 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../include_readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../asimplify.html">Custom Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../include_contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">asimtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">asimtools.scripts.psquared.psquared_diagram</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for asimtools.scripts.psquared.psquared_diagram</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;.Xauthority&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
+<span class="kn">from</span> <span class="nn">ase.units</span> <span class="kn">import</span> <span class="n">GPa</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">mpatches</span>
+<span class="kn">from</span> <span class="nn">pymatgen.analysis.phase_diagram</span> <span class="kn">import</span> <span class="n">PhaseDiagram</span><span class="p">,</span> <span class="n">PDEntry</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">PDPlotter</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core</span> <span class="kn">import</span> <span class="n">Composition</span>
+<span class="kn">from</span> <span class="nn">asimtools.utils</span> <span class="kn">import</span> <span class="n">write_csv_from_dict</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="plot_phd"><a class="viewcode-back" href="../../../../asimtools.scripts.psquared.html#asimtools.scripts.psquared.psquared_diagram.plot_phd">[docs]</a><span class="k">def</span> <span class="nf">plot_phd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">qhull_formulas</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;phase_diagram.png&#39;</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;Paired&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">qhull_formulas</span><span class="p">))</span> 
+    <span class="n">c</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolor</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">cmap</span><span class="p">(</span><span class="n">f</span><span class="p">))</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qhull_formulas</span><span class="p">))],</span>
+        <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">qhull_formula</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">qhull_formula</span> <span class="ow">in</span> <span class="n">qhull_formulas</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">log</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
+
+<span class="c1"># @branch</span>
+<div class="viewcode-block" id="psquared_diagram"><a class="viewcode-back" href="../../../../asimtools.scripts.psquared.html#asimtools.scripts.psquared.psquared_diagram.psquared_diagram">[docs]</a><span class="k">def</span> <span class="nf">psquared_diagram</span><span class="p">(</span>
+    <span class="n">gp_files_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">pH</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">H_ref_csv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">Temp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
+    <span class="n">plogspace</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span><span class="nb">float</span><span class="p">,</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+    <span class="n">ulim</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">),</span>
+    <span class="n">nUs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generating P2 phase diagrams given the Gibbs energy versus pressure. Note</span>
+<span class="sd">    that this works with either formation energies or without since if you give</span>
+<span class="sd">    formation energies the references will be zero</span>
+
+<span class="sd">    This assumes that the Gibbs free energies provided are the minimum gibbs</span>
+<span class="sd">    for all polymorphs of that composition</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c1"># For comp in comps directory:</span>
+    <span class="n">gp_csvs</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">gp_files_pattern</span><span class="p">)</span>
+    <span class="n">gp_func_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">gp_csv</span> <span class="ow">in</span> <span class="n">gp_csvs</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">gp_csv</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">formula</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># To match pymatgen format</span>
+            <span class="n">formula</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span><span class="o">.</span><span class="n">formula</span>
+
+        <span class="n">gp_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">gp_csv</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="n">pvals</span> <span class="o">=</span> <span class="n">gp_data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">gvals</span> <span class="o">=</span> <span class="n">gp_data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="s1">&#39;range:&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">gp_data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">gp_data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="c1"># Make interpolation function for each comp</span>
+        <span class="n">gp_func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">pvals</span><span class="p">,</span> <span class="n">gvals</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
+        <span class="n">gp_func_dict</span><span class="p">[</span><span class="n">formula</span><span class="p">]</span> <span class="o">=</span> <span class="n">gp_func</span>
+
+    <span class="c1"># Get H reference data, assuming it is given per atom here</span>
+    <span class="n">href_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">H_ref_csv</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+    <span class="n">gp_func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span>
+        <span class="n">href_data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">GPa</span><span class="p">,</span> <span class="n">href_data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;hprange:&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">href_data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">GPa</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">href_data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">GPa</span><span class="p">))</span>
+    <span class="n">gp_func_dict</span><span class="p">[</span><span class="s1">&#39;H2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gp_func</span>
+
+    <span class="c1"># # Get the key for the pure element that isn&#39;t hydrogen</span>
+    <span class="c1"># elems = [key for key in gp_func_dict if &#39;H&#39; not in key]</span>
+    <span class="c1"># assert len(elems) == 1, &#39;Provide only 1 pure element reference&#39;</span>
+    <span class="c1"># M_key = elems[0]</span>
+    <span class="c1"># # Number of M atoms in data for ref</span>
+    <span class="c1"># refnM = Composition(M_key).num_atoms</span>
+
+    <span class="n">ps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">*</span><span class="n">plogspace</span><span class="p">)</span> <span class="o">*</span> <span class="n">GPa</span>
+    <span class="n">formulas</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">gp_func_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="n">p2_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">ps</span><span class="p">),</span> <span class="n">nUs</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">pp</span><span class="p">,</span> <span class="n">pressure</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ps</span><span class="p">):</span>
+        <span class="c1"># GM = gp_func_dict[M_key]</span>
+        <span class="c1"># GH = gp_func_dict[&#39;Hs&#39;]</span>
+        <span class="n">G_entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">formula</span> <span class="ow">in</span> <span class="n">formulas</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">GMHn</span> <span class="o">=</span> <span class="n">gp_func_dict</span><span class="p">[</span><span class="n">formula</span><span class="p">](</span><span class="n">pressure</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error:&#39;</span><span class="p">,</span> <span class="n">formula</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)</span>
+                <span class="k">raise</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">PDEntry</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">GMHn</span><span class="p">)</span>
+            <span class="n">G_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="n">pd_formulas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">Gf_energies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">phase_diagram</span> <span class="o">=</span> <span class="n">PhaseDiagram</span><span class="p">(</span><span class="n">G_entries</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">G_entries</span><span class="p">:</span>
+            <span class="n">pd_formulas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">formula</span><span class="p">)</span>
+            <span class="n">Gf</span> <span class="o">=</span> <span class="n">phase_diagram</span><span class="o">.</span><span class="n">get_form_energy</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+            <span class="n">Gf_energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Gf</span><span class="p">)</span>
+
+            <span class="c1"># Try using Gf/formula unit</span>
+            <span class="c1"># formula, factor = entry.composition.get_integer_formula_and_factor()</span>
+            <span class="c1"># pd_formulas.append(formula)</span>
+            <span class="c1"># Gf_energies.append(phase_diagram.get_form_energy(entry) / factor)</span>
+
+        <span class="c1"># For now use Pinwen&#39;s method of setting GH=1e5</span>
+        <span class="n">H_ind</span> <span class="o">=</span> <span class="n">pd_formulas</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;H2&#39;</span><span class="p">)</span>
+        <span class="n">pd_formulas</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">H_ind</span><span class="p">)</span>
+        <span class="n">Gf_energies</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">H_ind</span><span class="p">)</span>
+        <span class="c1"># import pdb; pdb.set_trace()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;p: </span><span class="si">{</span><span class="n">pressure</span><span class="o">/</span><span class="n">GPa</span><span class="si">}</span><span class="se">\n</span><span class="s1">formulas = </span><span class="si">{</span><span class="n">formulas</span><span class="si">}</span><span class="se">\n</span><span class="s1">formulas = </span><span class="si">{</span><span class="n">pd_formulas</span><span class="si">}</span><span class="se">\n</span><span class="s1">energies = </span><span class="si">{</span><span class="n">Gf_energies</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># pb_grid, grid_formulas = convhull_pourbaix(</span>
+        <span class="c1">#     {},</span>
+        <span class="c1">#     formulas=pd_formulas[:] + [&#39;H2&#39;],</span>
+        <span class="c1">#     energies=Gf_energies[:] + [1e5],</span>
+        <span class="c1">#     nUs=nUs,</span>
+        <span class="c1">#     npHs=2,</span>
+        <span class="c1">#     ulim=ulim,</span>
+        <span class="c1">#     # pHlim=[pH,pH+0.001], #No need for full diagram, just a slice</span>
+        <span class="c1">#     pHlim=[-2,14],</span>
+        <span class="c1">#     T=Temp,</span>
+        <span class="c1">#     plot=True,</span>
+        <span class="c1">#     # plot=False,</span>
+        <span class="c1">#     plot_fname=f&#39;pb/p{pressure:.2E}_pourbaix.png&#39;</span>
+        <span class="c1"># )</span>
+        <span class="n">pb_grid</span><span class="p">,</span> <span class="n">grid_formulas</span> <span class="o">=</span> <span class="n">Pourbaix_H_2</span><span class="p">(</span>
+            <span class="n">formula</span><span class="o">=</span><span class="n">pd_formulas</span><span class="p">[:],</span>
+            <span class="n">E</span><span class="o">=</span><span class="n">Gf_energies</span><span class="p">[:],</span>
+            <span class="n">nu</span><span class="o">=</span><span class="n">nUs</span><span class="p">,</span>
+            <span class="n">nph</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+            <span class="n">ulim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">),</span>
+            <span class="n">phlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">14</span><span class="p">),</span>
+            <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">plot_fname</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;pb/p</span><span class="si">{</span><span class="n">pressure</span><span class="si">:</span><span class="s1">.2E</span><span class="si">}</span><span class="s1">_pourbaix.png&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># pb_slice = pb_grid[:,0] # Get only the slice for the pH we want</span>
+        <span class="c1"># print(&#39;shape&#39;, pb_grid)</span>
+        <span class="c1"># print(grid_formulas)</span>
+        <span class="c1"># p2_grid[pp] = pb_slice</span>
+
+        <span class="n">ph_ind</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">pH</span><span class="o">-</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="mi">16</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">p2_grid</span><span class="p">[</span><span class="n">pp</span><span class="p">]</span> <span class="o">=</span> <span class="n">pb_grid</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">ph_ind</span><span class="p">]</span>
+        
+
+    <span class="n">p2_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">p2_grid</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s1">&#39;p2_diagram.csv&#39;</span><span class="p">,</span> <span class="n">p2_grid</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+    <span class="n">write_csv_from_dict</span><span class="p">(</span><span class="s1">&#39;formulas.txt&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;formulas&#39;</span><span class="p">:</span> <span class="n">formulas</span><span class="p">})</span>
+    <span class="n">plot_phd</span><span class="p">(</span><span class="n">ps</span> <span class="o">/</span> <span class="n">GPa</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">*</span><span class="n">ulim</span><span class="p">,</span> <span class="n">nUs</span><span class="p">),</span> <span class="n">p2_grid</span><span class="p">,</span> <span class="n">grid_formulas</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;p2_diagram.png&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="convhull_pourbaix"><a class="viewcode-back" href="../../../../asimtools.scripts.psquared.html#asimtools.scripts.psquared.psquared_diagram.convhull_pourbaix">[docs]</a><span class="k">def</span> <span class="nf">convhull_pourbaix</span><span class="p">(</span>
+    <span class="n">formulas</span><span class="p">,</span>
+    <span class="n">energies</span><span class="p">,</span>
+    <span class="n">nUs</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">npHs</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">ulim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">),</span>
+    <span class="n">pHlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">14</span><span class="p">),</span>
+    <span class="n">T</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">plot_fname</span><span class="o">=</span><span class="s1">&#39;pourbaix_diagram.png&#39;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">    Generate Pourbaix using structures with intercept method implemented</span>
+<span class="sd">    by Pinwen</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">energies</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">formulas</span><span class="p">),</span> <span class="s1">&#39;energies and formulae&#39;</span>
+    <span class="k">assert</span> <span class="s1">&#39;H&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">formulas</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;1st one should be pure without H&#39;</span>
+    <span class="c1"># assert len(set(formulas[-1])) == 1, f&#39;{set(formulas[-1])} Last one should be H&#39;</span>
+
+    <span class="n">Us</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">*</span><span class="n">ulim</span><span class="p">,</span> <span class="n">nUs</span><span class="p">)</span>
+    <span class="n">pHs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">*</span><span class="n">pHlim</span><span class="p">,</span> <span class="n">npHs</span><span class="p">)</span>
+
+    <span class="n">entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">PDEntry</span><span class="p">(</span><span class="n">formulas</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">formulas</span><span class="p">))]</span>
+    <span class="n">phd</span> <span class="o">=</span>  <span class="n">PhaseDiagram</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+    <span class="c1"># plot = PDPlotter(phd, backend=&#39;matplotlib&#39;)</span>
+    <span class="c1"># plot.get_plot()</span>
+    <span class="c1"># plt.savefig(f&#39;convhulls/hull{np.random.randint(1000)}.png&#39;)</span>
+    <span class="c1"># Get compositions on the hull and their hydrogen fractions</span>
+    <span class="n">stable_entries</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">phd</span><span class="o">.</span><span class="n">qhull_entries</span> <span class="k">if</span> \
+        <span class="n">phd</span><span class="o">.</span><span class="n">get_decomp_and_e_above_hull</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span><span class="n">allow_negative</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">qhull_es_per_atom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">entry</span><span class="o">.</span><span class="n">energy_per_atom</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">stable_entries</span><span class="p">])</span>
+    <span class="n">qhull_formulas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">stable_entries</span><span class="p">])</span>
+    <span class="c1"># print(qhull_formulas)</span>
+    <span class="c1"># print(qhull_es_per_atom)</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">get_atomic_fraction</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">stable_entries</span><span class="p">])</span>
+
+    <span class="c1"># Define elemental references and some useful constants</span>
+    <span class="c1"># M_energy = energies[0]</span>
+    <span class="c1"># H_energy = energies[-1]</span>
+    <span class="n">kB</span> <span class="o">=</span> <span class="mf">8.617333e-5</span> <span class="c1">#eV/K</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">kB</span> <span class="o">*</span> <span class="n">T</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># This is just a constant we simplify here</span>
+
+    <span class="c1"># Sort compositions by H fraction</span>
+    <span class="n">sort_ind</span> <span class="o">=</span> <span class="n">xs</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">xs</span><span class="p">[</span><span class="n">sort_ind</span><span class="p">]</span>
+    <span class="n">gfMHns</span> <span class="o">=</span> <span class="n">qhull_es_per_atom</span><span class="p">[</span><span class="n">sort_ind</span><span class="p">]</span>
+    <span class="n">qhull_formulas</span> <span class="o">=</span> <span class="n">qhull_formulas</span><span class="p">[</span><span class="n">sort_ind</span><span class="p">]</span>
+
+    <span class="c1"># Get the intercept at zero U and lnpH=0</span>
+    <span class="n">muMHn_intercepts</span> <span class="o">=</span> <span class="n">gfMHns</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">gfMHns</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">gfMHns</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">xs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])),</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">xs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Generate the phase grid by setting the phase with the highest</span>
+    <span class="c1"># hydrogen content as the most stable once the chemical potential</span>
+    <span class="c1"># of H has changed enough such that DeltaG for hydride is less than 0</span>
+    <span class="n">phase_grid</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">nUs</span><span class="p">,</span> <span class="n">npHs</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">uu</span><span class="p">,</span> <span class="n">U</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">Us</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">MHn_index</span><span class="p">,</span> <span class="n">muMHn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">muMHn_intercepts</span><span class="p">):</span>
+            <span class="n">max_stable_pH</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">U</span> <span class="o">+</span> <span class="n">muMHn</span><span class="p">)</span> <span class="o">/</span> <span class="n">gamma</span>
+
+            <span class="k">for</span> <span class="n">pp</span><span class="p">,</span> <span class="n">pH</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pHs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">pH</span> <span class="o">&lt;=</span> <span class="n">max_stable_pH</span><span class="p">:</span>
+                    <span class="n">phase_grid</span><span class="p">[</span><span class="n">uu</span><span class="p">,</span><span class="n">pp</span><span class="p">]</span> <span class="o">=</span> <span class="n">MHn_index</span>
+
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">plot_phd</span><span class="p">(</span><span class="n">pHs</span><span class="p">,</span> <span class="n">Us</span><span class="p">,</span> <span class="n">phase_grid</span><span class="p">,</span> <span class="n">qhull_formulas</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="n">plot_fname</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">phase_grid</span><span class="p">,</span> <span class="n">qhull_formulas</span></div>
+
+<div class="viewcode-block" id="Pourbaix_H_2"><a class="viewcode-back" href="../../../../asimtools.scripts.psquared.html#asimtools.scripts.psquared.psquared_diagram.Pourbaix_H_2">[docs]</a><span class="k">def</span> <span class="nf">Pourbaix_H_2</span><span class="p">(</span>
+    <span class="n">formula</span><span class="p">,</span>
+    <span class="n">E</span><span class="p">,</span>
+    <span class="n">nu</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">nph</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">ulim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">),</span>
+    <span class="n">phlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">14</span><span class="p">),</span>
+    <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">plot_fname</span><span class="o">=</span><span class="s1">&#39;pourbaix.png&#39;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="c1"># Unnecessary reloading of module</span>
+    <span class="kn">from</span> <span class="nn">pymatgen.analysis.phase_diagram</span> <span class="kn">import</span> <span class="n">PhaseDiagram</span>
+    
+    <span class="c1"># Unnecessary relabelling of variable</span>
+    <span class="n">comp</span><span class="o">=</span><span class="n">formula</span>
+    
+    <span class="c1"># Unnecessary relabeling of variable</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">E</span>
+
+    <span class="c1"># GEt numuber of atoms for each entry</span>
+    <span class="n">nat</span><span class="o">=</span><span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">num_atoms</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comp</span><span class="p">]</span>
+
+    <span class="c1"># Individual entry to PD, Set H energy high so that all hydrides show up in phase diagram</span>
+    <span class="n">entry</span><span class="o">=</span><span class="p">[</span><span class="n">PDEntry</span><span class="p">(</span><span class="n">comp</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))]</span><span class="o">+</span><span class="p">[</span><span class="n">PDEntry</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span><span class="mf">1e5</span><span class="p">)]</span>
+    
+    <span class="c1"># Energy above convex hull for each entry</span>
+    <span class="n">stability</span><span class="o">=</span><span class="p">[</span><span class="n">PhaseDiagram</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span><span class="o">.</span><span class="n">get_decomp_and_e_above_hull</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">allow_negative</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+    <span class="n">phd</span> <span class="o">=</span>  <span class="n">PhaseDiagram</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+    <span class="c1"># plot = PDPlotter(phd, backend=&#39;matplotlib&#39;)</span>
+    <span class="c1"># plot.get_plot()</span>
+    <span class="c1"># plt.savefig(f&#39;convhulls/hull{np.random.randint(1000)}.png&#39;)</span>
+    
+    <span class="c1"># Compositions on the convex hull</span>
+    <span class="n">comp_convex</span><span class="o">=</span><span class="p">[</span><span class="n">comp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">comp</span><span class="p">))</span> <span class="k">if</span> <span class="n">stability</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># energies per atom on the convex hull. Shouldn&#39;t this be per formula unit?</span>
+    <span class="n">y_convex</span><span class="o">=</span><span class="p">[</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">nat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="k">if</span> <span class="n">stability</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Fraction of hydrogen</span>
+    <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">fractional_composition</span><span class="o">.</span><span class="n">formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">comp</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+    <span class="c1"># Hydrogen fractions on convex hull</span>
+    <span class="n">x_convex</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">if</span> <span class="n">stability</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># What is mutr? mutr is the chemical potential change below which(as it gets more negative) the compound at i+1 is no longer on the convex hull</span>
+    <span class="n">mutr</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">comp_convex</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">comp_convex</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">mutr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">y_convex</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">x_convex</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">y_convex</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">y_convex</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">x_convex</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">x_convex</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># print(y_convex, mutr)</span>
+    <span class="c1"># T=300 K, U=-0.0596*pH-mutr</span>
+    <span class="n">phmin</span><span class="o">=</span><span class="n">phlim</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="n">phmax</span><span class="o">=</span><span class="n">phlim</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span><span class="n">umin</span><span class="o">=</span><span class="n">ulim</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="n">umax</span><span class="o">=</span><span class="n">ulim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">a</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nu</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">nph</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nu</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">u</span><span class="o">=</span><span class="n">umin</span><span class="o">+</span><span class="n">i</span><span class="o">/</span><span class="n">nu</span><span class="o">*</span><span class="p">(</span><span class="n">umax</span><span class="o">-</span><span class="n">umin</span><span class="p">)</span> <span class="c1"># Equivalent to np.linspace(umin, umax, nu)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mutr</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># This essentially finds the ranges of pH for which the particular compound</span>
+            <span class="c1"># is stable</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># This is the metal end of the hull therefore we have maximum alkalinity</span>
+                <span class="n">ph1</span><span class="o">=</span><span class="n">phmax</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Compare the chemical potential minus applied electric potential, if </span>
+                <span class="n">ph1</span><span class="o">=</span><span class="nb">min</span><span class="p">((</span><span class="o">-</span><span class="n">u</span><span class="o">-</span><span class="n">mutr</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mf">0.0596</span><span class="p">,</span><span class="n">phmax</span><span class="p">)</span>
+            <span class="c1"># print(j, ph1, mutr, u)</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">mutr</span><span class="p">):</span>
+                <span class="c1"># This is the hydrogen end of the hull therefore we have max acidity</span>
+                <span class="n">ph2</span><span class="o">=</span><span class="n">phmin</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ph2</span><span class="o">=</span><span class="nb">max</span><span class="p">((</span><span class="o">-</span><span class="n">u</span><span class="o">-</span><span class="n">mutr</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">/</span><span class="mf">0.0596</span><span class="p">,</span><span class="n">phmin</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">ph2</span><span class="o">-</span><span class="n">phmin</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">phmax</span><span class="o">-</span><span class="n">phmin</span><span class="p">)</span><span class="o">*</span><span class="n">nph</span><span class="p">)),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">ph1</span><span class="o">-</span><span class="n">phmin</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">phmax</span><span class="o">-</span><span class="n">phmin</span><span class="p">)</span><span class="o">*</span><span class="n">nph</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span>
+            <span class="p">):</span>
+                <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="n">j</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">phs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">*</span><span class="n">phlim</span><span class="p">,</span> <span class="n">nph</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">us</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">*</span><span class="n">ulim</span><span class="p">,</span> <span class="n">nu</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">plot_phd</span><span class="p">(</span><span class="n">phs</span><span class="p">,</span> <span class="n">us</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">comp_convex</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="n">plot_fname</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">,</span><span class="n">comp_convex</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi, Emil Annevelink.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

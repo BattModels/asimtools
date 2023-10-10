@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>asimtools.scripts package &mdash; asimtools 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asimtools.scripts.eos package" href="asimtools.scripts.eos.html" />
+    <link rel="prev" title="asimtools package" href="asimtools.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="include_readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asimplify.html">Custom Scripts</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Docs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asimtools.html">asimtools package</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">asimtools.scripts package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.scripts.eos.html">asimtools.scripts.eos package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.scripts.psquared.html">asimtools.scripts.psquared package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.scripts.strong_scaling.html">asimtools.scripts.strong_scaling package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.asim_execute">asimtools.scripts.asim_execute module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.asim_run">asimtools.scripts.asim_run module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.atom_relax">asimtools.scripts.atom_relax module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.calc_array">asimtools.scripts.calc_array module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.cell_relax">asimtools.scripts.cell_relax module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.chained">asimtools.scripts.chained module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.distributed">asimtools.scripts.distributed module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.env_array">asimtools.scripts.env_array module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.image_array">asimtools.scripts.image_array module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.lammps">asimtools.scripts.lammps module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.singlepoint">asimtools.scripts.singlepoint module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts.template">asimtools.scripts.template module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-asimtools.scripts">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools.calculators">asimtools.calculators module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools.job">asimtools.job module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools.utils">asimtools.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="include_contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asimtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">asimtools</a></li>
+          <li class="breadcrumb-item"><a href="asimtools.html">asimtools package</a></li>
+      <li class="breadcrumb-item active">asimtools.scripts package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/asimtools.scripts.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="asimtools-scripts-package">
+<h1>asimtools.scripts package<a class="headerlink" href="#asimtools-scripts-package" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="asimtools.scripts.eos.html">asimtools.scripts.eos package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.scripts.eos.html#module-asimtools.scripts.eos.eos">asimtools.scripts.eos.eos module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.eos.html#asimtools.scripts.eos.eos.eos"><code class="docutils literal notranslate"><span class="pre">eos()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.scripts.eos.html#module-asimtools.scripts.eos.postprocess">asimtools.scripts.eos.postprocess module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.eos.html#asimtools.scripts.eos.postprocess.postprocess"><code class="docutils literal notranslate"><span class="pre">postprocess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.scripts.eos.html#module-asimtools.scripts.eos.preprocess">asimtools.scripts.eos.preprocess module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.eos.html#asimtools.scripts.eos.preprocess.preprocess"><code class="docutils literal notranslate"><span class="pre">preprocess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.scripts.eos.html#module-asimtools.scripts.eos">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="asimtools.scripts.psquared.html">asimtools.scripts.psquared package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.scripts.psquared.html#module-asimtools.scripts.psquared.enthalpy_vs_pressure">asimtools.scripts.psquared.enthalpy_vs_pressure module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.psquared.html#asimtools.scripts.psquared.enthalpy_vs_pressure.enthalpy_vs_pressure"><code class="docutils literal notranslate"><span class="pre">enthalpy_vs_pressure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.psquared.html#asimtools.scripts.psquared.enthalpy_vs_pressure.vinet_pv_eos"><code class="docutils literal notranslate"><span class="pre">vinet_pv_eos()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.scripts.psquared.html#module-asimtools.scripts.psquared.psquared_diagram">asimtools.scripts.psquared.psquared_diagram module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.psquared.html#asimtools.scripts.psquared.psquared_diagram.Pourbaix_H_2"><code class="docutils literal notranslate"><span class="pre">Pourbaix_H_2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.psquared.html#asimtools.scripts.psquared.psquared_diagram.convhull_pourbaix"><code class="docutils literal notranslate"><span class="pre">convhull_pourbaix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.psquared.html#asimtools.scripts.psquared.psquared_diagram.plot_phd"><code class="docutils literal notranslate"><span class="pre">plot_phd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.psquared.html#asimtools.scripts.psquared.psquared_diagram.psquared_diagram"><code class="docutils literal notranslate"><span class="pre">psquared_diagram()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.scripts.psquared.html#module-asimtools.scripts.psquared">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="asimtools.scripts.strong_scaling.html">asimtools.scripts.strong_scaling package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.scripts.strong_scaling.html#module-asimtools.scripts.strong_scaling.postprocess">asimtools.scripts.strong_scaling.postprocess module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.strong_scaling.html#asimtools.scripts.strong_scaling.postprocess.postprocess"><code class="docutils literal notranslate"><span class="pre">postprocess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.scripts.strong_scaling.html#module-asimtools.scripts.strong_scaling.strong_scaling">asimtools.scripts.strong_scaling.strong_scaling module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.strong_scaling.html#asimtools.scripts.strong_scaling.strong_scaling.strong_scaling"><code class="docutils literal notranslate"><span class="pre">strong_scaling()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.scripts.strong_scaling.html#module-asimtools.scripts.strong_scaling.submit_jobs">asimtools.scripts.strong_scaling.submit_jobs module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.scripts.strong_scaling.html#asimtools.scripts.strong_scaling.submit_jobs.strong_scaling"><code class="docutils literal notranslate"><span class="pre">strong_scaling()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.scripts.strong_scaling.html#module-asimtools.scripts.strong_scaling">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="module-asimtools.scripts.asim_execute">
+<span id="asimtools-scripts-asim-execute-module"></span><h2>asimtools.scripts.asim_execute module<a class="headerlink" href="#module-asimtools.scripts.asim_execute" title="Permalink to this heading"></a></h2>
+<p>Execute a workflow given the sim_input.yaml and optionally,
+a calc_input.yaml and/or env_input.yaml. The called script will be run
+in the specified workdir and env_id</p>
+<p>Author: <a class="reference external" href="mailto:mkphuthi&#37;&#52;&#48;github&#46;com">mkphuthi<span>&#64;</span>github<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.asim_execute.main">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.asim_execute.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/asim_execute.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.asim_execute.main" title="Permalink to this definition"></a></dt>
+<dd><p>Execute a workflow given the sim_input.yaml and optinally,
+a calc_input.yaml and/or env_input.yaml. The called script will be run
+in the specified workdir and env_id</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.asim_execute.parse_command_line">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.asim_execute.</span></span><span class="sig-name descname"><span class="pre">parse_command_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.12)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/asimtools/scripts/asim_execute.html#parse_command_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.asim_execute.parse_command_line" title="Permalink to this definition"></a></dt>
+<dd><p>Parse command line input</p>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts.asim_run">
+<span id="asimtools-scripts-asim-run-module"></span><h2>asimtools.scripts.asim_run module<a class="headerlink" href="#module-asimtools.scripts.asim_run" title="Permalink to this heading"></a></h2>
+<p>Execute a script given the sim_input.yaml and optionally,
+a calc_input.yaml. The called script will be run directly in the current
+directory and environment</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.asim_run.main">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.asim_run.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/asim_run.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.asim_run.main" title="Permalink to this definition"></a></dt>
+<dd><p>Main</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.asim_run.parse_command_line">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.asim_run.</span></span><span class="sig-name descname"><span class="pre">parse_command_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.12)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/asimtools/scripts/asim_run.html#parse_command_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.asim_run.parse_command_line" title="Permalink to this definition"></a></dt>
+<dd><p>Parse command line input</p>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts.atom_relax">
+<span id="asimtools-scripts-atom-relax-module"></span><h2>asimtools.scripts.atom_relax module<a class="headerlink" href="#module-asimtools.scripts.atom_relax" title="Permalink to this heading"></a></h2>
+<p>Relaxes the given atomic structure using ASE’s built-in structure
+optimizers</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.atom_relax.atom_relax">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.atom_relax.</span></span><span class="sig-name descname"><span class="pre">atom_relax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'GPMin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.12)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('energy',</span> <span class="pre">'forces')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/atom_relax.html#atom_relax"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.atom_relax.atom_relax" title="Permalink to this definition"></a></dt>
+<dd><p>Relaxes the given tomic structure using ASE’s built-in structure
+optimizers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>calc_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Calculator ID</p></li>
+<li><p><strong>image</strong> (<em>Dict</em>) – image configuration</p></li>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – Prefix of output files, defaults to ‘’</p></li>
+<li><p><strong>optimizer</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – ASE Optimizer class, defaults to ‘GPMin’</p></li>
+<li><p><strong>fmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – Force convergence threshold in optimizer, defaults to 0.02</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of results</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts.calc_array">
+<span id="asimtools-scripts-calc-array-module"></span><h2>asimtools.scripts.calc_array module<a class="headerlink" href="#module-asimtools.scripts.calc_array" title="Permalink to this heading"></a></h2>
+<p>Apply the same script using multiple calculators</p>
+<p>Author: <a class="reference external" href="mailto:mkphuthi&#37;&#52;&#48;github&#46;com">mkphuthi<span>&#64;</span>github<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.calc_array.calc_array">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.calc_array.</span></span><span class="sig-name descname"><span class="pre">calc_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subscript_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_calc_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><span class="pre">Sequence</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><span class="pre">Sequence</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/calc_array.html#calc_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.calc_array.calc_array" title="Permalink to this definition"></a></dt>
+<dd><p>Apply the same script using different calculators and if necessary
+different environments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>calc_ids</strong> (<em>Sequence</em><em>, </em><em>optional</em>) – Iterable with calc_ids, defaults to None</p></li>
+<li><p><strong>calc_input</strong> (<em>Dictionary</em><em>, </em><em>optional</em>) – Dictionary of calculator inputs</p></li>
+<li><p><strong>ids</strong> (<em>Sequence</em><em>, </em><em>optional</em>) – Iterable with custom ids for each calc, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of results</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts.cell_relax">
+<span id="asimtools-scripts-cell-relax-module"></span><h2>asimtools.scripts.cell_relax module<a class="headerlink" href="#module-asimtools.scripts.cell_relax" title="Permalink to this heading"></a></h2>
+<p>Relaxes structure using ASE</p>
+<p>Author: <a class="reference external" href="mailto:mkphuthi&#37;&#52;&#48;github&#46;com">mkphuthi<span>&#64;</span>github<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.cell_relax.cell_relax">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.cell_relax.</span></span><span class="sig-name descname"><span class="pre">cell_relax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'BFGS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><span class="pre">Sequence</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/cell_relax.html#cell_relax"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.cell_relax.cell_relax" title="Permalink to this definition"></a></dt>
+<dd><p>Relax cell using ASE Optimizer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>calc_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Key for calculator provided in calc_input</p></li>
+<li><p><strong>image</strong> (<em>Dict</em>) – Image parameters, see :func: asimtools.utils.get_atoms</p></li>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – Prefix to output files, defaults to ‘’</p></li>
+<li><p><strong>optimizer</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – Optimizer class to use from ase.optimize, defaults to ‘BFGS’</p></li>
+<li><p><strong>smax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum stress in eV/$AA^3$, defaults to 0.002</p></li>
+<li><p><strong>mask</strong> (<em>Optional</em><em>[</em><em>Sequence</em><em>]</em><em>, </em><em>optional</em>) – Mask to constrain cell deformation while relaxing, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of results including, final energy, stress and output files</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts.chained">
+<span id="asimtools-scripts-chained-module"></span><h2>asimtools.scripts.chained module<a class="headerlink" href="#module-asimtools.scripts.chained" title="Permalink to this heading"></a></h2>
+<p>Submits a chain of scripts in the order specified by steps
+in input</p>
+<p>Author: <a class="reference external" href="mailto:mkphuthi&#37;&#52;&#48;github&#46;com">mkphuthi<span>&#64;</span>github<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.chained.chained">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.chained.</span></span><span class="sig-name descname"><span class="pre">chained</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/chained.html#chained"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.chained.chained" title="Permalink to this definition"></a></dt>
+<dd><p>Run a workflow using the provided sim_input.yaml one after the other,
+The jobs will run one after the other, if slurm is used, job dependencies
+will be used. Note that if one of the subscripts internally launches another
+script e.g. image_array, calc_array etc, slurm job dependencies will not
+work as expected. In those cases, we recommend running the steps one by one
+or interactively</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>steps</strong> (<em>Dict</em>) – Dictionary where each key is an ID and the value is a         standard sim_input</p></li>
+<li><p><strong>env_input</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>]</em><em>, </em><em>optional</em>) – env_input that overrides global file, defaults to None</p></li>
+<li><p><strong>calc_input</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>]</em><em>, </em><em>optional</em>) – calc_input that overrides global file, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of results</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts.distributed">
+<span id="asimtools-scripts-distributed-module"></span><h2>asimtools.scripts.distributed module<a class="headerlink" href="#module-asimtools.scripts.distributed" title="Permalink to this heading"></a></h2>
+<p>Distributes a number of simulations at the same time if possible</p>
+<p>Author: <a class="reference external" href="mailto:mkphuthi&#37;&#52;&#48;github&#46;com">mkphuthi<span>&#64;</span>github<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.distributed.distributed">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.distributed.</span></span><span class="sig-name descname"><span class="pre">distributed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subscripts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/distributed.html#distributed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.distributed.distributed" title="Permalink to this definition"></a></dt>
+<dd><p>Distributes a set of jobs based on inpout parameter. The scnarios are
+as follows:
+#. use_slurm: False, interactive: True -&gt; Runs one after the other.
+#. use_slurm: True, interactive: False, same env_id -&gt; Launches a job     # array.
+#. use_slurm: False, interactive: False, different env_ids -&gt; Launches     # multiple jobs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subscripts</strong> (<em>Dict</em>) – Dictionary of scripts, each key is an ID and each         value is a sim_input file</p></li>
+<li><p><strong>env_input</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>]</em><em>, </em><em>optional</em>) – env_input that overrides global file, defaults to None</p></li>
+<li><p><strong>calc_input</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>]</em><em>, </em><em>optional</em>) – calc_input that overrides global file, defaults to None</p></li>
+<li><p><strong>array_max</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em><em>, </em><em>optional</em>) – Maximum number of jobs to run in array, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of results</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts.env_array">
+<span id="asimtools-scripts-env-array-module"></span><h2>asimtools.scripts.env_array module<a class="headerlink" href="#module-asimtools.scripts.env_array" title="Permalink to this heading"></a></h2>
+<p>Apply the same script using different envs</p>
+<p>Author: <a class="reference external" href="mailto:mkphuthi&#37;&#52;&#48;github&#46;com">mkphuthi<span>&#64;</span>github<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.env_array.env_array">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.env_array.</span></span><span class="sig-name descname"><span class="pre">env_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subscript_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><span class="pre">Sequence</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/env_array.html#env_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.env_array.env_array" title="Permalink to this definition"></a></dt>
+<dd><p>Run the same script using multiple env_ids</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subscript_input</strong> (<em>Dict</em>) – sim_input for the script to be run</p></li>
+<li><p><strong>env_ids</strong> (<em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em>) – Sequence of env_ids to iterate over</p></li>
+<li><p><strong>calc_input</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>]</em><em>, </em><em>optional</em>) – calc_input to override global file, defaults to None</p></li>
+<li><p><strong>env_input</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>]</em><em>, </em><em>optional</em>) – env_input defaults to overide global file, defaults to        None</p></li>
+<li><p><strong>ids</strong> (<em>Sequence</em><em>, </em><em>optional</em>) – Sequence of custom ids for each env_id, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of results</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts.image_array">
+<span id="asimtools-scripts-image-array-module"></span><h2>asimtools.scripts.image_array module<a class="headerlink" href="#module-asimtools.scripts.image_array" title="Permalink to this heading"></a></h2>
+<p>Apply the same script on multiple images</p>
+<p>Author: <a class="reference external" href="mailto:mkphuthi&#37;&#52;&#48;github&#46;com">mkphuthi<span>&#64;</span>github<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.image_array.image_array">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.image_array.</span></span><span class="sig-name descname"><span class="pre">image_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscript_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/image_array.html#image_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.image_array.image_array" title="Permalink to this definition"></a></dt>
+<dd><p>Submit the same script on multiple images and if specified, use
+different env_ids</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images</strong> (<em>Dict</em>) – Image config, see <a class="reference internal" href="asimtools.html#asimtools.utils.get_atoms" title="asimtools.utils.get_atoms"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.utils.get_atoms()</span></code></a></p></li>
+<li><p><strong>subscript_input</strong> (<em>Dict</em>) – sim_input of script to be run</p></li>
+<li><p><strong>calc_input</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>]</em><em>, </em><em>optional</em>) – calc_input to override global file, defaults to None</p></li>
+<li><p><strong>env_input</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>]</em><em>, </em><em>optional</em>) – env_input to override global file, defaults to None</p></li>
+<li><p><strong>ids</strong> (<em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – Custom ids for each image, defaults to None</p></li>
+<li><p><strong>env_ids</strong> (<em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – Sequence of envs for each image, must be the same length         as the total number of images, defaults to None</p></li>
+<li><p><strong>array_max</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em><em>, </em><em>optional</em>) – Maximum jobs to run simultanteously in job array,         defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of results</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts.lammps">
+<span id="asimtools-scripts-lammps-module"></span><h2>asimtools.scripts.lammps module<a class="headerlink" href="#module-asimtools.scripts.lammps" title="Permalink to this heading"></a></h2>
+<p>Runs a user defined lammps script or template</p>
+<p>Author: <a class="reference external" href="mailto:mkphuthi&#37;&#52;&#48;github&#46;com">mkphuthi<span>&#64;</span>github<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.lammps.lammps">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.lammps.</span></span><span class="sig-name descname"><span class="pre">lammps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'atomic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmp_cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lmp'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/lammps.html#lammps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.lammps.lammps" title="Permalink to this definition"></a></dt>
+<dd><p>Runs a lammps simulation based on a template lammps input script</p>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts.singlepoint">
+<span id="asimtools-scripts-singlepoint-module"></span><h2>asimtools.scripts.singlepoint module<a class="headerlink" href="#module-asimtools.scripts.singlepoint" title="Permalink to this heading"></a></h2>
+<p>Calculates single point energy</p>
+<p>Author: <a class="reference external" href="mailto:mkphuthi&#37;&#52;&#48;github&#46;com">mkphuthi<span>&#64;</span>github<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.singlepoint.singlepoint">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.singlepoint.</span></span><span class="sig-name descname"><span class="pre">singlepoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.12)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('energy',</span> <span class="pre">'forces')</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/singlepoint.html#singlepoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.singlepoint.singlepoint" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluates the properties of a single image, currently implemented
+properties are energy, forces and stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>calc_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – ID of calculator provided in calc_input or global file</p></li>
+<li><p><strong>image</strong> (<em>Dict</em>) – Image config, see <a class="reference internal" href="asimtools.html#asimtools.utils.get_atoms" title="asimtools.utils.get_atoms"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.utils.get_atoms()</span></code></a></p></li>
+<li><p><strong>properties</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – properties to evaluate, defaults to (‘energy’, ‘forces’)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of results</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts.template">
+<span id="asimtools-scripts-template-module"></span><h2>asimtools.scripts.template module<a class="headerlink" href="#module-asimtools.scripts.template" title="Permalink to this heading"></a></h2>
+<p>Describe the script briefly here. If this is a script that runs multiple steps,
+describe it here using reStructuredText to generate autodocs</p>
+<p>Cite the papers where the method/script was first introduced here as well</p>
+<p>Author: <a class="reference external" href="mailto:mkphuthi&#37;&#52;&#48;github&#46;com">mkphuthi<span>&#64;</span>github<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.scripts.template.template">
+<span class="sig-prename descclassname"><span class="pre">asimtools.scripts.template.</span></span><span class="sig-name descname"><span class="pre">template</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/scripts/template.html#template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.scripts.template.template" title="Permalink to this definition"></a></dt>
+<dd><p>Script does xyz specifically</p>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.scripts">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asimtools.scripts" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="asimtools.html" class="btn btn-neutral float-left" title="asimtools package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="asimtools.scripts.eos.html" class="btn btn-neutral float-right" title="asimtools.scripts.eos package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi, Emil Annevelink.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
