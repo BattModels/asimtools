@@ -1,22 +1,45 @@
 # Atomic SIMulation Tools
 
-This package is for optimizing and standardizing production runs for atomistic simulations. By using in-built or user-defined scripts,
-users can run their own simulation recipes and scale them on slurm based clusters. The core idea is to separate the dependence of the
-atomistic potential/calculator and the simulations steps thereby allowing the same simulation to be run with multiple calculators and
-the same calculator to be used for multiple simulations. Input and output files must follow a strict format so that consistent 
-analysis pipelines can be used across users
+This package is a lightweight workflow and simulation manager for reproducible
+atomistic simulations that can be transferred across environments, calculators
+and structures. By using in-built or user-defined scripts and utilities, users
+can run/build their own simulation recipes and automagically scale them on
+slurm based clusters. The core idea is to separate the dependence of the
+atomistic potential/calculator and the simulations steps thereby allowing the
+same simulation to be run with multiple calculators and the same calculator to
+be used for multiple simulations. Input and output files must follow a strict
+format so that consistent analysis pipelines can be used across users
 
 ## Developer philosophy
-The main goal of asimtools is to push all the complexity of workflow management, best-practices, file management etc. into the backend such that the everyday user only has to handle input files for existing workflows and script files for workflows they want to implement. The following are the guiding principles for how asimtools should work:
+The goal of asimtools is to push all the complexity of workflow
+management, best-practices, file management etc. into the backend such that the
+everyday user only has to handle input files for existing workflows and script
+files for workflows they want to implement. The following are the guiding
+principles for how asimtools should work:
 
 - Scripts should resemble boilerplate ASE code as much as possible.
 - Scripts should not explicitly depend on a calculator
 - Scripts should not explicitly depend on the context in which they run
-- It should be easy to debug individual scripts/parts in large workflows. In addition, it should always be possible to debug/resubmit jobs without using asimtools.
-- input file structure and format should be staandard across all scripts. In addition all input parameters should match how they would like without asimtools i.e. do not provide an API! This means extensive use of importlib.
+- It should be easy to debug individual scripts/parts in large workflows. In
+  addition, it should always be possible to debug/resubmit jobs without using
+  asimtools.
+- input file structure and format should be standard across all scripts. In
+  addition all input parameters should match how they would like without
+  asimtools i.e. do not provide an API! This means extensive use of importlib.
 - output file structure should be predictable across all scripts
 - Job progress tracking must be incorporated
-- Best practices should be built-in e.g. if multiple jobs of the same context are submitted simulataneously, it must be a job array
+- Best practices should be built-in e.g. if multiple jobs of the same slurm
+  context are submitted simulataneously, it must be a job array
+
+## Philosophy on User Experience
+The philosophy is to build "simulations" using building blocks of scripts.
+These scripts can be as complicated/efficient as you make them using any
+external packages you want and can be optimized with time but can still be run
+within the framework. This allows a test friendly way to transition from say a
+tutorial on the ASE/pymatgen website to an asimtools script. So while
+complicated wrappers are discouraged, they would still work as long as the
+script works. The benefit out of the box is that you can make your script
+independent of calculator or input structures and submit them easily.
 
 ## Getting Started
 
@@ -37,32 +60,26 @@ pip install -e .
 ```
 
 This installs the base package in developer mode so that you do not have to
-reinstall every time you make changes.
+reinstall if you make changes to the core package.
 
-Individual calculators may need external packages for loading those calculators. It is up to the user to make sure those are installed.
+Individual calculators may need external packages for loading those
+calculators. Similarly some scripts e.g. `lammps.py` might also need external packages to be used. It is up to the user to make sure those are installed.
 
-You sill also need to setup some environment variables, these variables point
+You will also need to setup some environment variables, these variables point
 to a `env_input.yaml` and `calc_input.yaml` with your favorite configs since
 these are commonly shared among simulations. You can also directly specify them
-when running `asim-execute` but this might be buggy (See `asim-execute -h`). 
-Examples of these files can be found in the `singlepoint` example.
+when running `asim-execute` (See `asim-execute -h`). 
+Examples of these files can be found in the examples.
 
 Add the following to your `.bashrc`
 ```
-export ASIMTOOLS_ENV_INPUT=/path/to/my/env_input.yaml
-export ASIMTOOLS_CALC_INPUT=/path/to/my/calc_input.yaml
+export ASIMTOOLS_ENV_INPUT=/path/to/my/global/env_input.yaml
+export ASIMTOOLS_CALC_INPUT=/path/to/my/global/calc_input.yaml
+export ASIMTOOLS_SCRIPT_DIR=/path/to/my/script/dir
 ```
-
-### Custom scripts
-To enable users to write their own scripts without touching the source code,
-you can also specify a ASIMTOOLS_SCRIPT_PATH where ASIMTools will look for 
-scripts in addition to the core scripts. This is not implemented and tested yet
-but the idea is to have a `.asimtools` dotfile where all these environment 
-variables will be defined
-
-## Examples
-Below are a few examples on how to run already implemented scripts.
-
+<!-- ## Examples -->
+<!-- Below are a few examples on how to run already implemented scripts. -->
+<!-- 
 The first thing to understand is the difference between `asim-execute sim_input.yaml` and 
 `asim-run sim_input.yaml`. The latter runs the chosen script in whatever location 
 and environment it happens to be launched from i.e. equivalent to 
@@ -70,21 +87,11 @@ and environment it happens to be launched from i.e. equivalent to
 that runs the script e.g. it will go to the work directory and launch a slurm job 
 from there containing `asim-run sim_input.yaml`.  `asim-execute` is essentially 
 "environment-aware" and runs the script in the environment specified by `env_id`
-whereas `asim-run` does not use `env_id` at all.
+whereas `asim-run` does not use `env_id` at all. -->
 
-The philosophy is to build "simulations" using building blocks of scripts. 
-These scripts can be as complicated/efficient using any external packages 
-you want and can be optimized with time but can still be run within the 
-framework. This allows a test friendly way to transition from say a tutorial
-on the ASE/pymatgen website to an asimtools script. So while 
-complicated wrappers are discouraged, they would still work as long as the 
-script works. The benefit out of the box is that you can make your script 
-independent of calculator or input structures and submit them easily.
+<!-- A template is provided for writing a new script called `template.py`
 
-A template is provided for writing a new script called `template.py`
-
-We provide a standard set of building block scripts for simulations/workflows that tend
-to form components of large simulations. Let us consider some examples. 
+We provide a standard set of building block scripts for simulations/workflows that tend to form components of large simulations. Let us consider some examples. 
 To see details of their arguments (`args`), see their docstrings (which don't exist yet :( )
 
 1. The simplest are "unit" scripts which do not internally call other scripts 
@@ -127,7 +134,7 @@ the results from the array. It is possible to
 - running a `chained.py` on a `sim_input.yaml` with the correct format that runs scripts that are already defined
 - to write a script such that it directly manipulates Job objects. This is the most flexible and robust but ofcourse most complicated
 *Exercise: Run the eos calculation without writing any new scripts, simply using the scripts in the core (image_array) and eos subfolder (preprocessing and postprocessing).* 
-The key is being able to to point to the correct files for each step before the calculation is run.
+The key is being able to to point to the correct files for each step before the calculation is run. -->
 
 ## Running the tests
 
@@ -167,8 +174,8 @@ who participated in this project.
 
 ## License
 
-This project is licensed under the ABC License
+This project is licensed under the MIT License
 
-## Acknowledgments
+<!-- ## Acknowledgments
 
-  - Hat tip to anyone whose code is used
+  - Hat tip to anyone whose code is used -->
