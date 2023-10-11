@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>asimtools.utils &mdash; asimtools 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../include_readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Running Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../asimplify.html">Custom Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workflows.html">Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../include_contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">asimtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">asimtools.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for asimtools.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Utilities and helper functions for reading and writing data using set</span>
+<span class="sd">standards</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">ase.io</span> <span class="kn">import</span> <span class="n">read</span>
+<span class="kn">import</span> <span class="nn">ase.db</span>
+<span class="kn">import</span> <span class="nn">ase.build</span>
+
+<span class="n">Atoms</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Atoms&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="read_yaml"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.read_yaml">[docs]</a><span class="k">def</span> <span class="nf">read_yaml</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a yaml file</span>
+
+<span class="sd">    :param yaml_path: Path to yaml file</span>
+<span class="sd">    :type yaml_path: str</span>
+<span class="sd">    :return: Dictionary</span>
+<span class="sd">    :rtype: Dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="write_yaml"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.write_yaml">[docs]</a><span class="k">def</span> <span class="nf">write_yaml</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">yaml_Dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a dictionary to a yaml file</span>
+
+<span class="sd">    :param yaml_path: Path to write yaml to</span>
+<span class="sd">    :type yaml_path: str</span>
+<span class="sd">    :param yaml_Dict: Dictionary to write</span>
+<span class="sd">    :type yaml_Dict: Dict</span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">yaml_Dict</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_axis_lims"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.get_axis_lims">[docs]</a><span class="k">def</span> <span class="nf">get_axis_lims</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">padding</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get an estimate of good limits for a plot axis&quot;&quot;&quot;</span>
+    <span class="n">data_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+    <span class="n">data_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">data_max</span> <span class="o">-</span> <span class="n">data_min</span>
+    <span class="n">lims</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_min</span> <span class="o">-</span> <span class="n">padding</span> <span class="o">*</span> <span class="n">diff</span><span class="p">,</span> <span class="n">data_max</span> <span class="o">+</span> <span class="n">padding</span> <span class="o">*</span> <span class="n">diff</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">lims</span></div>
+
+<div class="viewcode-block" id="write_csv_from_dict"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.write_csv_from_dict">[docs]</a><span class="k">def</span> <span class="nf">write_csv_from_dict</span><span class="p">(</span>
+    <span class="n">fname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">header</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a tabulated csv to a file from a dictionary. The keys will</span>
+<span class="sd">    become the columns and the values will be the columns, All columns used </span>
+<span class="sd">    must have the same length. kwargs are passed to </span>
+<span class="sd">    :func:`pandas.Dataframe.to_csv()`</span>
+
+<span class="sd">    :param fname: File name to be return to</span>
+<span class="sd">    :type fname: str</span>
+<span class="sd">    :param data: Dictionary to write</span>
+<span class="sd">    :type data: Dict</span>
+<span class="sd">    :param columns: Keys to use as columns of csv, defaults to None</span>
+<span class="sd">    :type columns: Iterable, optional</span>
+<span class="sd">    :return: Pandas dataframe of results</span>
+<span class="sd">    :rtype: pd.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="n">csv_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="n">header</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">csv_data</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">csv_data</span></div>
+
+<div class="viewcode-block" id="strip_symbols"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.strip_symbols">[docs]</a><span class="k">def</span> <span class="nf">strip_symbols</span><span class="p">(</span><span class="n">substr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to format filenames using standard</span>
+
+<span class="sd">    :param substr: substring</span>
+<span class="sd">    :type substr: str</span>
+<span class="sd">    :return: stripped string</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bad_symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">substr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">substr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bad_symbols</span> <span class="ow">or</span> <span class="n">substr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bad_symbols</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">bad_symbol</span> <span class="ow">in</span> <span class="n">bad_symbols</span><span class="p">:</span>
+            <span class="n">substr</span> <span class="o">=</span> <span class="n">substr</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">bad_symbol</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">strip_symbols</span><span class="p">(</span><span class="n">substr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">substr</span></div>
+
+<div class="viewcode-block" id="join_names"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.join_names">[docs]</a><span class="k">def</span> <span class="nf">join_names</span><span class="p">(</span><span class="n">substrs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Join multiple strings using a hyphen neatly</span>
+
+<span class="sd">    :param substrs: Sequence of strings to merge</span>
+<span class="sd">    :type substrs: Sequence[str]</span>
+<span class="sd">    :return: Joined strings</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">new_substrs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">substr</span> <span class="ow">in</span> <span class="n">substrs</span><span class="p">:</span>
+        <span class="n">new_substrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">strip_symbols</span><span class="p">(</span><span class="n">substr</span><span class="p">))</span>
+
+    <span class="n">final_substrs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">substr</span> <span class="ow">in</span> <span class="n">new_substrs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">substr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">final_substrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">substr</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">final_substrs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">name</span></div>
+
+<div class="viewcode-block" id="get_atoms"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.get_atoms">[docs]</a><span class="k">def</span> <span class="nf">get_atoms</span><span class="p">(</span>
+    <span class="n">image_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">builder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;bulk&#39;</span><span class="p">,</span>
+    <span class="n">atoms</span><span class="p">:</span> <span class="n">Atoms</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">repeat</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rattle_stdev</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Atoms</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an atoms object based on specified config. This is the </span>
+<span class="sd">    recommended way to load atoms objects. There are three options to specify:</span>
+<span class="sd">    #. image_file.</span>
+<span class="sd">    #. builder, kwargs.</span>
+<span class="sd">    #. atoms.</span>
+
+<span class="sd">    :param image_file: Path to an ASE-readable image file, defaults to None</span>
+<span class="sd">    :type image_file: str, optional</span>
+<span class="sd">    :param builder: Builder to use from :mod:`ase.build`, defaults to &#39;bulk&#39;. \</span>
+<span class="sd">        Any extra keyword arguments specified are passed to the build</span>
+<span class="sd">    :type builder: str, optional</span>
+<span class="sd">    :param atoms: :class:`ase.Atoms` object, defaults to None</span>
+<span class="sd">    :type atoms: Atoms, optional</span>
+<span class="sd">    :param repeat: Number of times to repeat input to create supercell, \</span>
+<span class="sd">        defaults to None</span>
+<span class="sd">    :type repeat: Tuple[int, int, int], optional</span>
+<span class="sd">    :param rattle_stdev: stdev to be provided to :meth:`ase.Atoms.rattle`, \</span>
+<span class="sd">        defaults to None</span>
+<span class="sd">    :type rattle_stdev: float, optional</span>
+<span class="sd">    :return: One :class:`ase.Atoms` instance</span>
+<span class="sd">    :rtype: Atoms</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> \
+        <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> \
+        <span class="n">atoms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+        <span class="s2">&quot;Specify atoms, image_file or use ase.build tools&quot;</span>
+
+    <span class="k">if</span> <span class="n">image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">atoms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">builder_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ase</span><span class="o">.</span><span class="n">build</span><span class="p">,</span> <span class="n">builder</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">atoms</span> <span class="o">=</span> <span class="n">builder_func</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Make sure you choose a valid builder and appropriate</span><span class="se">\</span>
+<span class="s1">                arguments matching the functions in ase.build. </span><span class="se">\n\</span>
+<span class="s1">                See https://wiki.fysik.dtu.dk/ase/ase/build/build.html&#39;</span><span class="p">)</span>
+            <span class="k">raise</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">atoms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Specify an input structure&#39;</span>
+
+    <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">rattle_stdev</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">rattle</span><span class="p">(</span><span class="n">stdev</span><span class="o">=</span><span class="n">rattle_stdev</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">atoms</span></div>
+
+<div class="viewcode-block" id="parse_slice"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.parse_slice">[docs]</a><span class="k">def</span> <span class="nf">parse_slice</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">slice</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parses a :func:`slice` from string, like `start:stop:step`.</span>
+
+<span class="sd">    :param value: Slice string</span>
+<span class="sd">    :type value: str</span>
+<span class="sd">    :return: slice object</span>
+<span class="sd">    :rtype: slice</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">slice</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="get_images"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.get_images">[docs]</a><span class="k">def</span> <span class="nf">get_images</span><span class="p">(</span>
+    <span class="n">image_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">patterns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">images</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Atoms</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">index</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Atoms</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a list of atoms objects based on the input arguments. Options \</span>
+<span class="sd">        to specify are:</span>
+<span class="sd">        #. image_file</span>
+<span class="sd">        #. pattern</span>
+<span class="sd">        #. images</span>
+
+<span class="sd">    :param image_file: Path to ASE-readable file with one or more images, \</span>
+<span class="sd">        defaults to None</span>
+<span class="sd">    :type image_file: str, optional</span>
+<span class="sd">    :param pattern: String pattern of paths from which to search for images, \</span>
+<span class="sd">        defaults to None. This only gets one image from each file as in \</span>
+<span class="sd">        :func:`ase.io.read` without specifying an index</span>
+<span class="sd">    :type pattern: str, optional</span>
+<span class="sd">    :param patterns: Sequence of string patterns/paths from which to search \</span>
+<span class="sd">        for images, defaults to None. This only gets one image from each file \</span>
+<span class="sd">        as in :func:`ase.io.read` without specifying an index</span>
+<span class="sd">    :type pattern: str, optional</span>
+<span class="sd">    :param images: A list of atoms objects, defaults to None</span>
+<span class="sd">    :type images: Iterable[Atoms], optional</span>
+<span class="sd">    :param index: Index to specify when using :func:`ase.io.read`, \</span>
+<span class="sd">        defaults to &#39;:&#39;</span>
+<span class="sd">    :type index: Union[str, int], optional</span>
+<span class="sd">    :return: List of :class:`ase.Atoms`</span>
+<span class="sd">    :rtype: List[Atoms]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> \
+        <span class="p">(</span><span class="n">pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> \
+        <span class="p">(</span><span class="n">patterns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> \
+        <span class="p">(</span><span class="n">images</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">),</span> \
+        <span class="s2">&quot;Please specify file, pattern or iterable&quot;</span>
+
+    <span class="k">if</span> <span class="n">image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">image_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> \
+            <span class="sa">f</span><span class="s1">&#39;No images matching pattern &quot;</span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s1">&quot; from &quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+
+        <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">image_file</span> <span class="ow">in</span> <span class="n">image_files</span><span class="p">:</span>
+            <span class="n">new_images</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># Output of read can either be list of atoms or Atoms, depending on index</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_images</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">new_images</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_images</span><span class="p">]</span>
+            <span class="n">images</span> <span class="o">+=</span> <span class="n">new_images</span>
+
+    <span class="k">elif</span> <span class="n">patterns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">patterns</span><span class="p">:</span>
+            <span class="n">image_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> \
+                <span class="sa">f</span><span class="s1">&#39;No images matching patterns &quot;</span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s1">&quot; from &quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+            <span class="n">images</span> <span class="o">+=</span> <span class="n">get_images</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="n">pattern</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">images</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">parse_slice</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;No images found&#39;</span>
+
+    <span class="k">return</span> <span class="n">images</span></div>
+
+<div class="viewcode-block" id="new_db"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.new_db">[docs]</a><span class="k">def</span> <span class="nf">new_db</span><span class="p">(</span><span class="n">dbname</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a new ASE database overwriting an old one</span>
+
+<span class="sd">    :param dbname: Name for the new database</span>
+<span class="sd">    :type dbname: str</span>
+<span class="sd">    :return: Connection to database</span>
+<span class="sd">    :rtype: :mod:`ase.db` connection</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dbname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ase</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbname</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_env_input"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.get_env_input">[docs]</a><span class="k">def</span> <span class="nf">get_env_input</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the global env_input from the environment variable, then tries</span>
+<span class="sd">    then ``.asimtools`` dotfile</span>
+
+<span class="sd">    :return: env_input dictionary or empty dictionary if not found</span>
+<span class="sd">    :rtype: Dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">env_input_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;ASIMTOOLS_ENV_INPUT&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">env_input_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dotfile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;~/.asimtools&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dotfile</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dotfile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ENV_INPUT_FILE&#39;</span><span class="p">):</span>
+                    <span class="n">env_input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">))</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">env_input_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">env_input</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">env_input_file</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">env_input</span>
+                <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: No env_input yaml found&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">env_input</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">env_input_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">env_input</span>
+    <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="get_calc_input"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.get_calc_input">[docs]</a><span class="k">def</span> <span class="nf">get_calc_input</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the global calc_input from the environment variable, then tries</span>
+<span class="sd">    then ``.asimtools`` dotfile</span>
+
+<span class="sd">    :return: calc_input dictionary or empty dictionary if not found</span>
+<span class="sd">    :rtype: Dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">calc_input_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;ASIMTOOLS_CALC_INPUT&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">calc_input_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dotfile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;~/.asimtools&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dotfile</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dotfile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;CALC_INPUT_FILE&#39;</span><span class="p">):</span>
+                    <span class="n">calc_input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">))</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">calc_input_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">calc_input</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">calc_input_file</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">calc_input</span>
+                <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: No calc_input yaml found&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">calc_input</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">calc_input_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">calc_input</span>
+    <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="check_if_slurm_job_is_running"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.check_if_slurm_job_is_running">[docs]</a><span class="k">def</span> <span class="nf">check_if_slurm_job_is_running</span><span class="p">(</span><span class="n">slurm_job_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks if the slurm job with specifying job_id is running</span>
+
+<span class="sd">    :param slurm_job_id: Job ID as str or int</span>
+<span class="sd">    :type slurm_job_id: Union[str,int]</span>
+<span class="sd">    :return: Whether job is running or not</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">slurm_job_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">slurm_job_id</span><span class="p">)</span>
+    <span class="n">completed_process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="p">[</span><span class="s1">&#39;squeue&#39;</span><span class="p">,</span> <span class="s1">&#39;--job&#39;</span><span class="p">,</span> <span class="n">slurm_job_id</span><span class="p">],</span> 
+        <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">stdout</span> <span class="o">=</span> <span class="n">completed_process</span><span class="o">.</span><span class="n">stdout</span>
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="n">slurm_job_id</span><span class="p">)</span> <span class="ow">in</span> <span class="n">stdout</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="change_dict_value"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.change_dict_value">[docs]</a><span class="k">def</span> <span class="nf">change_dict_value</span><span class="p">(</span>
+    <span class="n">d</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">new_value</span><span class="p">,</span>
+    <span class="n">key_sequence</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
+    <span class="n">return_copy</span><span class="p">:</span> <span class="nb">bool</span>  <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Changes a value in the specified dictionary given by following the </span>
+<span class="sd">    key sequence</span>
+
+<span class="sd">    :param d: dictionary to be changed</span>
+<span class="sd">    :type d: Dict</span>
+<span class="sd">    :param new_value: The new value that will replace the old one</span>
+<span class="sd">    :type new_value: _type_</span>
+<span class="sd">    :param key_sequence: List of keys in the order in which they access the dictionary key</span>
+<span class="sd">    :type key_sequence: Sequence</span>
+<span class="sd">    :param return_copy: Whether to return a copy only or to modify the dictionary in-place as well, defaults to True</span>
+<span class="sd">    :type return_copy: bool, optional</span>
+<span class="sd">    :return: The changed dictionary</span>
+<span class="sd">    :rtype: Dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">return_copy</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">d</span><span class="p">[</span><span class="n">key_sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">new_value</span>
+        <span class="k">return</span> <span class="n">d</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">new_d</span> <span class="o">=</span> <span class="n">change_dict_value</span><span class="p">(</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">key_sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+            <span class="n">new_value</span><span class="p">,</span>
+            <span class="n">key_sequence</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+            <span class="n">return_copy</span><span class="o">=</span><span class="n">return_copy</span>
+        <span class="p">)</span>
+        <span class="n">d</span><span class="p">[</span><span class="n">key_sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">new_d</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="get_logger"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.get_logger">[docs]</a><span class="k">def</span> <span class="nf">get_logger</span><span class="p">(</span>
+    <span class="n">logfile</span><span class="o">=</span><span class="s1">&#39;job.log&#39;</span><span class="p">,</span>
+    <span class="n">fstr</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> |</span><span class="si">%(module)s</span><span class="s1">|</span><span class="si">%(funcName)s</span><span class="s1">| </span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Get the logger &#39;&#39;&#39;</span>
+
+    <span class="n">level_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;debug&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+        <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+        <span class="s1">&#39;warning&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">assert</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">level_dict</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;level must be one of </span><span class="si">{</span><span class="n">level_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+        <span class="n">filename</span><span class="o">=</span><span class="n">logfile</span><span class="p">,</span>
+        <span class="n">level</span><span class="o">=</span><span class="n">level_dict</span><span class="p">[</span><span class="n">level</span><span class="p">],</span>
+        <span class="nb">format</span><span class="o">=</span><span class="n">fstr</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi, Emil Annevelink.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
