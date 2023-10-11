@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developing Custom Scripts &mdash; asimtools 0.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Using built-in workflow tools" href="workflows.html" />
+    <link rel="prev" title="Running an existing script" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="include_readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Running Scripts</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Custom Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflows.html">Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="include_contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asimtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Developing Custom Scripts</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/asimplify.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="developing-custom-scripts">
+<h1>Developing Custom Scripts<a class="headerlink" href="#developing-custom-scripts" title="Permalink to this heading"></a></h1>
+<p>This section will guide you through taking your own in-house simulation and
+integrating it in to asimtools. The process is designed to be as
+straight-forward as reasonably possible.</p>
+<p>As an example, we will ASIMplify the calculation of adsorption_energies as
+shown in ASE. To understand the code, visit the ASE <cite>tutorials page &lt;https://wiki.fysik.dtu.dk/ase/tutorials/db/db.html&gt;</cite>. Ultimately, the
+ASIMplified code will work with any element and , any calculator and any
+environment and be fully parallelized job submission in just a few steps!</p>
+<p><strong>Use toy example</strong> To make things easier, it is best to first replace the
+expensive parts of your workflow with toy examples e.g. use an empirical
+calculator like EAM instead of DFT, use a smaller/simpler structure, loop
+over fewer cases etc.</p>
+<p>The ASE example already uses a simple EMT calculator and structure which is
+provided here for reference:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ase.build</span> <span class="kn">import</span> <span class="n">bulk</span>
+<span class="kn">from</span> <span class="nn">ase.calculators.emt</span> <span class="kn">import</span> <span class="n">EMT</span>
+<span class="kn">from</span> <span class="nn">ase.eos</span> <span class="kn">import</span> <span class="n">calculate_eos</span>
+<span class="kn">from</span> <span class="nn">ase.db</span> <span class="kn">import</span> <span class="n">connect</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s1">&#39;bulk.db&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">symb</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Al&#39;</span><span class="p">,</span> <span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="s1">&#39;Cu&#39;</span><span class="p">,</span> <span class="s1">&#39;Pd&#39;</span><span class="p">,</span> <span class="s1">&#39;Ag&#39;</span><span class="p">,</span> <span class="s1">&#39;Pt&#39;</span><span class="p">,</span> <span class="s1">&#39;Au&#39;</span><span class="p">]:</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">bulk</span><span class="p">(</span><span class="n">symb</span><span class="p">,</span> <span class="s1">&#39;fcc&#39;</span><span class="p">)</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">calc</span> <span class="o">=</span> <span class="n">EMT</span><span class="p">()</span>
+    <span class="n">eos</span> <span class="o">=</span> <span class="n">calculate_eos</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">v</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="n">eos</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>  <span class="c1"># find minimum</span>
+    <span class="c1"># Do one more calculation at the minimu and write to database:</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">cell</span> <span class="o">*=</span> <span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_volume</span><span class="p">())</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">bm</span><span class="o">=</span><span class="n">B</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Wrap in a function</strong> The workhorse of ASIMTools is the function, any code
+wrapped in a function that returns a dictionary can be run within the
+ASIMTools framework. The easiest thing to do would be to take the code and
+copy and paste it in a function which is defined inside a script with the
+same name</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ase.build</span> <span class="kn">import</span> <span class="n">bulk</span>
+<span class="kn">from</span> <span class="nn">ase.calculators.emt</span> <span class="kn">import</span> <span class="n">EMT</span>
+<span class="kn">from</span> <span class="nn">ase.eos</span> <span class="kn">import</span> <span class="n">calculate_eos</span>
+<span class="kn">from</span> <span class="nn">ase.db</span> <span class="kn">import</span> <span class="n">connect</span>
+
+<span class="k">def</span> <span class="nf">ase_eos</span><span class="p">():</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s1">&#39;bulk.db&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">symb</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Al&#39;</span><span class="p">,</span> <span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="s1">&#39;Cu&#39;</span><span class="p">,</span> <span class="s1">&#39;Pd&#39;</span><span class="p">,</span> <span class="s1">&#39;Ag&#39;</span><span class="p">,</span> <span class="s1">&#39;Pt&#39;</span><span class="p">,</span> <span class="s1">&#39;Au&#39;</span><span class="p">]:</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">bulk</span><span class="p">(</span><span class="n">symb</span><span class="p">,</span> <span class="s1">&#39;fcc&#39;</span><span class="p">)</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">calc</span> <span class="o">=</span> <span class="n">EMT</span><span class="p">()</span>
+        <span class="n">eos</span> <span class="o">=</span> <span class="n">calculate_eos</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="n">v</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="n">eos</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>  <span class="c1"># find minimum</span>
+        <span class="c1"># Do one more calculation at the minimu and write to database:</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">cell</span> <span class="o">*=</span> <span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_volume</span><span class="p">())</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">()</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">bm</span><span class="o">=</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{}</span>
+</pre></div>
+</div>
+<p>Immediately as it is, this script can be run in ASIMTools. You can run it with
+the following sim_input.yaml</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ase_eos.py</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inline</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span>
+</pre></div>
+</div>
+<p>then call</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">asim-execute sim_input.yaml</span>
+</pre></div>
+</div>
+<p>Only a little bit more complicated than calling <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">ase_eos.py</span></code>
+This script however still depends on specific structures and a specific
+calculator. Let’s do the easy thing first, let’s make the script work with any
+calculator using a simple change.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ase.build</span> <span class="kn">import</span> <span class="n">bulk</span>
+<span class="kn">from</span> <span class="nn">ase.eos</span> <span class="kn">import</span> <span class="n">calculate_eos</span>
+<span class="kn">from</span> <span class="nn">ase.db</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="kn">from</span> <span class="nn">asimtools.calculators</span> <span class="kn">import</span> <span class="n">load_calc</span>
+
+<span class="k">def</span> <span class="nf">ase_eos</span><span class="p">(</span>
+    <span class="n">calc_id</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">calc</span> <span class="o">=</span> <span class="n">load_calc</span><span class="p">(</span><span class="n">calc_id</span><span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s1">&#39;bulk.db&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">symb</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Al&#39;</span><span class="p">,</span> <span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="s1">&#39;Cu&#39;</span><span class="p">,</span> <span class="s1">&#39;Pd&#39;</span><span class="p">,</span> <span class="s1">&#39;Ag&#39;</span><span class="p">,</span> <span class="s1">&#39;Pt&#39;</span><span class="p">,</span> <span class="s1">&#39;Au&#39;</span><span class="p">]:</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">bulk</span><span class="p">(</span><span class="n">symb</span><span class="p">,</span> <span class="s1">&#39;fcc&#39;</span><span class="p">)</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">calc</span> <span class="o">=</span> <span class="n">calc</span>
+        <span class="n">eos</span> <span class="o">=</span> <span class="n">calculate_eos</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="n">v</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="n">eos</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>  <span class="c1"># find minimum</span>
+        <span class="c1"># Do one more calculation at the minimu and write to database:</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">cell</span> <span class="o">*=</span> <span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_volume</span><span class="p">())</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">()</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">bm</span><span class="o">=</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{}</span>
+</pre></div>
+</div>
+<p>Just like that we can now run the script with any correctly configure
+calculator for the all the structures! We can even now run <code class="docutils literal notranslate"><span class="pre">calc_array</span></code> to
+iterate getting the results using different calculators.</p>
+<p>The final change we will make is to parallelize over structures as below</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ase.build</span> <span class="kn">import</span> <span class="n">bulk</span>
+<span class="kn">from</span> <span class="nn">ase.eos</span> <span class="kn">import</span> <span class="n">calculate_eos</span>
+<span class="kn">from</span> <span class="nn">ase.db</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="kn">from</span> <span class="nn">asimtools.calculators</span> <span class="kn">import</span> <span class="n">load_calc</span>
+
+<span class="k">def</span> <span class="nf">ase_eos</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">,</span>
+    <span class="n">calc_id</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">calc</span> <span class="o">=</span> <span class="n">load_calc</span><span class="p">(</span><span class="n">calc_id</span><span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s1">&#39;bulk.db&#39;</span><span class="p">)</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">get_atoms</span><span class="p">(</span><span class="o">**</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">calc</span> <span class="o">=</span> <span class="n">calc</span>
+    <span class="n">eos</span> <span class="o">=</span> <span class="n">calculate_eos</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">v</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="n">eos</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>  <span class="c1"># find minimum</span>
+    <span class="c1"># Do one more calculation at the minimu and write to database:</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">cell</span> <span class="o">*=</span> <span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_volume</span><span class="p">())</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">bm</span><span class="o">=</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{}</span>
+</pre></div>
+</div>
+<p>Easy-peasy. We now have a script that works with arbitrary environment,
+arbitrary calculator and arbitrary input structure (Of course the simulation
+will fail if we give a bad structure for example)</p>
+<p>We can do some final cleanup of the script so that it sends outputs to
+<code class="docutils literal notranslate"><span class="pre">output.yaml</span></code> and logs some checkpoints. Additionally, any scripts added to
+the repository will need clear syntax highlighting and documentation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">ase.eos</span> <span class="kn">import</span> <span class="n">calculate_eos</span>
+<span class="kn">from</span> <span class="nn">ase.db</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="kn">from</span> <span class="nn">asimtools.calculators</span> <span class="kn">import</span> <span class="n">load_calc</span>
+<span class="kn">from</span> <span class="nn">asimtools.utils</span> <span class="kn">import</span> <span class="n">get_atoms</span>
+
+<span class="k">def</span> <span class="nf">ase_eos</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">calc_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">db_file</span><span class="p">:</span> <span class="s1">&#39;bulk.db&#39;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="n">calc</span> <span class="o">=</span> <span class="n">load_calc</span><span class="p">(</span><span class="n">calc_id</span><span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="n">db_file</span><span class="p">)</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">get_atoms</span><span class="p">(</span><span class="o">**</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">calc</span> <span class="o">=</span> <span class="n">calc</span>
+    <span class="n">eos</span> <span class="o">=</span> <span class="n">calculate_eos</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">v</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="n">eos</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>  <span class="c1"># find minimum</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Successfully fit EOS&#39;</span><span class="p">)</span>
+    <span class="c1"># Do one more calculation at the minimu and write to database:</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">cell</span> <span class="o">*=</span> <span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_volume</span><span class="p">())</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">bm</span><span class="o">=</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="s1">&#39;e&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">B</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">results</span>
+</pre></div>
+</div>
+<p>To run this script on an arbitrary structure say Argon with say the
+LennardJones calculator, in a slurm job we can now use the following input
+files.</p>
+<p>sim_input.yaml:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ase_eos.py</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ar</span>
+<span class="w">    </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gpaw</span>
+</pre></div>
+</div>
+<p>calc_input.yaml:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">lj</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LennardJones</span>
+<span class="w">    </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase.calculators.lj</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">sigma</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.54</span>
+<span class="w">        </span><span class="nt">epsilon</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.00802236</span>
+<span class="nt">emt</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EMT</span>
+<span class="w">    </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase.calculators.emt</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+</pre></div>
+</div>
+<p>env_input.yaml:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">batch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">use_slurm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">interactive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">slurm</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">flags</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-n 2</span>
+<span class="w">        </span><span class="nt">precommands</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source ~/.bashrc</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda activate asimtools</span>
+<span class="nt">inline</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">use_slurm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">        </span><span class="nt">interactive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+<p>Going back to the original problem, we wanted to run the simulation of mulitple
+different elements with the EMT calculator. To achieve that in parallel, we can
+nest the <code class="docutils literal notranslate"><span class="pre">ase_eos</span></code> script in a <a class="reference internal" href="asimtools.scripts.html#asimtools.scripts.sim_array.sim_array" title="asimtools.scripts.sim_array.sim_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.scripts.sim_array.sim_array()</span></code></a> script as follows</p>
+<p>sim_input.yaml:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sim_array</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;args&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;image&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">array_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;Al&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ni&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Cu&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pd&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ag&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pt&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Au&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">env_ids</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;batch&#39;</span>
+<span class="w">    </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ase_eos.py</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emt</span>
+<span class="w">            </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span>
+<span class="w">                </span><span class="nt">crystalstructure</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;fcc&#39;</span>
+</pre></div>
+</div>
+<p>To make the script easier to access without having to use the full path, you
+can set the environment variable</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">export ASIMTOOLS_SCRIPT_DIR=/path/to/my/script/dir/</span>
+</pre></div>
+</div>
+<p>You can then move the <code class="docutils literal notranslate"><span class="pre">ase_eos.py</span></code> script into a directory called <code class="docutils literal notranslate"><span class="pre">ase_eos</span></code>
+and place it in the script directory. This allows you to refer to scripts
+prepended with the script dir as below</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sim_array</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;args&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;image&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">array_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;Al&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ni&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Cu&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pd&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ag&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pt&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Au&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">env_ids</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;batch&#39;</span>
+<span class="w">    </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase_eos/ase_eos.py</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emt</span>
+<span class="w">            </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span>
+<span class="w">                </span><span class="nt">crystalstructure</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;fcc&#39;</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Running an existing script" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="workflows.html" class="btn btn-neutral float-right" title="Using built-in workflow tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi, Emil Annevelink.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

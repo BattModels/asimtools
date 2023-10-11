@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>asimtools.calculators &mdash; asimtools 0.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../include_readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Running Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../asimplify.html">Custom Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workflows.html">Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../include_contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">asimtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">asimtools.calculators</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for asimtools.calculators</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Tools for loading and returning ASE calculator objects for use in simulations</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">asimtools.utils</span> <span class="kn">import</span> <span class="n">get_calc_input</span>
+
+<span class="c1"># pylint: disable=import-outside-toplevel</span>
+<span class="c1"># pylint: disable=import-error</span>
+
+<div class="viewcode-block" id="load_calc"><a class="viewcode-back" href="../../asimtools.html#asimtools.calculators.load_calc">[docs]</a><span class="k">def</span> <span class="nf">load_calc</span><span class="p">(</span>
+    <span class="n">calc_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">calc_input</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads a calculator using given calc_id or calc_input</span>
+
+<span class="sd">    :param calc_id: ID/key to use to load calculator from the supplied/global\</span>
+<span class="sd">        calc_input file, defaults to None</span>
+<span class="sd">    :type calc_id: str, optional</span>
+<span class="sd">    :param calc_input: calc_input dictionary for a single calculator\</span>
+<span class="sd">        , defaults to None</span>
+<span class="sd">    :type calc_input: Optional[Dict], optional</span>
+<span class="sd">    :return: ASE calculator instance</span>
+<span class="sd">    :rtype: :class:`ase.calculators.calculators.Calculator`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">calc_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">calc_input</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">calc_input</span> <span class="o">=</span> <span class="n">get_calc_input</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">calc_params</span> <span class="o">=</span> <span class="n">calc_input</span><span class="p">[</span><span class="n">calc_id</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Calculator with calc_id: </span><span class="si">{</span><span class="n">calc_id</span><span class="si">}</span><span class="s1"> not found in&#39;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;calc_input </span><span class="si">{</span><span class="n">calc_input</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;No calc_input found&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">calc_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;module&#39;</span> <span class="ow">in</span> <span class="n">calc_params</span><span class="p">:</span>
+        <span class="n">loader</span> <span class="o">=</span> <span class="n">load_ase_calc</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">loader</span> <span class="o">=</span> <span class="n">external_calcs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Provide ASE module for calc or use&#39;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; one of </span><span class="si">{</span><span class="n">external_calcs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+
+    <span class="n">calc</span> <span class="o">=</span> <span class="n">loader</span><span class="p">(</span><span class="n">calc_params</span><span class="o">=</span><span class="n">calc_params</span><span class="p">)</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">calc_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">calc</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Loaded calculator </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">calc_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">calc</span></div>
+
+
+<div class="viewcode-block" id="load_nequip"><a class="viewcode-back" href="../../asimtools.html#asimtools.calculators.load_nequip">[docs]</a><span class="k">def</span> <span class="nf">load_nequip</span><span class="p">(</span><span class="n">calc_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load NequIP or Allegro calculator</span>
+
+<span class="sd">    :param calc_params: args to pass to loader</span>
+<span class="sd">    :type calc_params: Dict</span>
+<span class="sd">    :return: NequIP ase calculator</span>
+<span class="sd">    :rtype: :class:`nequip.ase.nequip_calculator.NequIPCalculator`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">nequip.ase.nequip_calculator</span> <span class="kn">import</span> <span class="n">NequIPCalculator</span>
+    <span class="k">if</span> <span class="n">calc_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">torch</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">set_default_dtype</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">calc</span> <span class="o">=</span> <span class="n">NequIPCalculator</span><span class="o">.</span><span class="n">from_deployed_model</span><span class="p">(</span><span class="o">**</span><span class="n">calc_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to load NequIP with parameters:</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">calc_params</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+
+    <span class="k">return</span> <span class="n">calc</span></div>
+
+
+<div class="viewcode-block" id="load_dp"><a class="viewcode-back" href="../../asimtools.html#asimtools.calculators.load_dp">[docs]</a><span class="k">def</span> <span class="nf">load_dp</span><span class="p">(</span><span class="n">calc_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load Deep Potential Calculator</span>
+
+<span class="sd">    :param calc_params: args to pass to loader</span>
+<span class="sd">    :type calc_params: Dict</span>
+<span class="sd">    :return: DP calculator</span>
+<span class="sd">    :rtype: :class:`deepmd.calculator.DP`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">deepmd.calculator</span> <span class="kn">import</span> <span class="n">DP</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">calc</span> <span class="o">=</span> <span class="n">DP</span><span class="p">(</span><span class="o">**</span><span class="n">calc_params</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load DP with parameters:</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">calc_params</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+
+    <span class="k">return</span> <span class="n">calc</span></div>
+
+
+<div class="viewcode-block" id="load_ase_calc"><a class="viewcode-back" href="../../asimtools.html#asimtools.calculators.load_ase_calc">[docs]</a><span class="k">def</span> <span class="nf">load_ase_calc</span><span class="p">(</span><span class="n">calc_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Load any builtin ASE calculator &#39;&#39;&#39;</span>
+    <span class="n">module_name</span> <span class="o">=</span> <span class="n">calc_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;module&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Check calc module&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">calc_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">calc_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Check calc name&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="n">calc_args</span> <span class="o">=</span> <span class="n">calc_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">calc</span> <span class="o">=</span> <span class="n">calc_class</span><span class="p">(</span><span class="o">**</span><span class="n">calc_args</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Check calc args&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="k">return</span> <span class="n">calc</span></div>
+
+<span class="n">external_calcs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;NequIP&#39;</span><span class="p">:</span> <span class="n">load_nequip</span><span class="p">,</span>
+    <span class="s1">&#39;Allegro&#39;</span><span class="p">:</span> <span class="n">load_nequip</span><span class="p">,</span>
+    <span class="s1">&#39;DeepPotential&#39;</span><span class="p">:</span> <span class="n">load_dp</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi, Emil Annevelink.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
