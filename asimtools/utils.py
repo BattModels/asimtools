@@ -407,3 +407,18 @@ def get_logger(
         format=fstr,
     )
     return logging.getLogger(__name__)
+
+
+def get_str_btn(s, s1, s2):
+    ''' Return substring between the first instance of s1 and the first
+    instance of s2 after s1 in s. None corresponds to beginning or end of
+    string for s1 and s2 respectively '''
+    if s1 is not None:
+        i1 = s.index(s1) + len(s1)
+    else:
+        i1 = 0
+    if s2 is not None:
+        i2 = s[i1:].index(s2) + i1
+    else:
+        i2 = len(s)
+    return s[i1:i2]

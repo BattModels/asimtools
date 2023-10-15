@@ -110,14 +110,20 @@ def main(args=None) -> None:
             )
             logger.debug('Loading script from full path %s', script)
 
-        sim_module = importlib.util.module_from_spec(spec)
+        try:
+            sim_module = importlib.util.module_from_spec(spec)
+        except Exception as exc:
+            err_msg = f'Failed to load module for script: "{script}"'
+            logger.error(err_msg)
+            raise AttributeError(err_msg) from exc
+
         sys.modules[module_name] = sim_module
         try:
             spec.loader.exec_module(sim_module)
         except Exception as exc:
-            err_txt = f'Failed to find script: {script}. Check your '
-            err_txt += 'ASIMTOOLS_SCRIPT_DIR environment variable or '
-            err_txt += 'provide the full path'
+            err_txt = f'Failed to load script: {script}. Check your '
+            err_txt += 'ASIMTOOLS_SCRIPT_DIR environment variable, '
+            err_txt += 'provide the full path and ensure the script works.'
             logger.error(err_txt)
             raise FileNotFoundError(err_txt) from exc
 

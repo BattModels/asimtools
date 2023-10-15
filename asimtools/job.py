@@ -374,7 +374,7 @@ class UnitJob(Job):
 
         msg = f'Submitting "{self.sim_input["script"]}" in "{self.workdir}"'
         logging.info(msg)
-        print(msg)
+        print(msg) # For printing to console, maybe can be cleaner
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
         mode_params = self.env.get('mode', {})
@@ -522,13 +522,20 @@ class DistributedJob(Job):
         self.gen_input_files()
         logger = self.get_logger()
 
-        njobs = len(self.unitjobs)
+        unitjobs = [] # Track jobs that are supposed to be submitted
+        for unitjob in self.unitjobs:
+            if unitjob.sim_input.get('submit', True):
+                unitjobs.append(unitjob)
+
+        njobs = len(unitjobs)
+        if njobs == 0:
+            return None
 
         # For limiting number of jobs launched in array
         if array_max is not None:
             arr_max_str = f'%{array_max}'
         else:
-            arr_max = self.unitjobs[0].env['mode'].get('array_max', False)
+            arr_max = unitjobs[0].env['mode'].get('array_max', False)
             if arr_max:
                 arr_max_str = f'%{arr_max}'
             else:
@@ -561,16 +568,6 @@ class DistributedJob(Job):
 
         with open('stdout.txt', 'w', encoding='utf-8') as output_file:
             output_file.write(completed_process.stdout)
-
-        # if completed_process.returncode != 0:
-        #     err_txt = 'ERROR: Failed to run array in '
-        #     err_txt += f'{self.workdir} with command:\n'
-        #     err_txt += f'{" ".join(command)}\n'
-        #     err_txt += f'See {self.workdir / "stderr.txt"} for details.'
-        #     print(err_txt)
-        #     with open('stderr.txt', 'w', encoding='utf-8') as err_file:
-        #         err_file.write(completed_process.stderr)
-        #     completed_process.check_returncode()
 
         if completed_process.returncode != 0:
             err_msg = f'See {self.workdir / "stderr.txt"} for traceback.'

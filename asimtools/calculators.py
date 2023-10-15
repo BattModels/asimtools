@@ -88,7 +88,7 @@ def load_dp(calc_params):
     try:
         calc = DP(**calc_params['args'])
     except Exception:
-        print(f"Failed to load DP with parameters:\n {calc_params}")
+        logging.error("Failed to load DP with parameters:\n %s", calc_params)
         raise
 
     return calc
@@ -100,24 +100,42 @@ def load_ase_calc(calc_params):
     try:
         module = importlib.import_module(module_name)
     except:
-        print("Check calc module")
+        logging.error("Check calc module and stderr")
         raise
     name = calc_params.get('name', None)
     try:
         calc_class = getattr(module, name)
     except:
-        print("Check calc name")
+        logging.error("Check calc name and stderr")
         raise
     calc_args = calc_params.get('args', {})
     try:
         calc = calc_class(**calc_args)
     except:
-        print("Check calc args")
+        logging.error("Check calc args and stderr")
         raise
     return calc
+
+# def load_espresso(calc_params):
+#     '''
+#     Load the Espresso calculator as in newer versions of ASE. This is
+#     implemented for forards compatibility
+#     '''
+#     from ase.calculators.espresso import Espresso, EspressoProfile
+#     calc_args = calc_params.get('args', {})
+#     if 'command' in calc_args:
+#         command_list = calc_args['command'].split()
+#         profile = EspressoProfile(argv=command_list)
+#         calc_args.pop('command')
+#     else:
+#         profile = EspressoProfile(argv=['pw.x'])
+
+#     calc = Espresso(**calc_args, profile=profile)
+#     return calc
 
 external_calcs = {
     'NequIP': load_nequip,
     'Allegro': load_nequip,
     'DeepPotential': load_dp,
+    # 'Espresso': load_espresso,
 }
