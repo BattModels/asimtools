@@ -25,7 +25,7 @@ def preprocess(
     for scale in scales:
         new_cell = atoms.get_cell() * scale
         new_atoms = atoms.copy()
-        new_atoms.set_cell(new_cell)
+        new_atoms.set_cell(new_cell, scale_atoms=True)
         new_atoms.info['scale'] = f'{scale:.2f}'
         scaled_images.append(new_atoms)
 

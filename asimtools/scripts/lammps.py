@@ -7,6 +7,7 @@ Author: mkphuthi@github.com
 from typing import Dict
 from pathlib import Path
 import subprocess
+import logging
 from asimtools.utils import (
     get_atoms,
     join_names,
@@ -72,11 +73,11 @@ def lammps(
     if completed_process.returncode != 0:
         err_txt = f'Failed to run {lmp_inp_file}\n'
         err_txt += 'See lmp.stderr.txt for details.'
-        print(err_txt)
+        logging.error(err_txt)
         with open('lmp_stderr.txt', 'w', encoding='utf-8') as f:
             f.write(completed_process.stderr)
         completed_process.check_returncode()
-        return None
+        return {}
 
     results = {'files': {
         'log': 'log.lammps',

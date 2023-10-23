@@ -8,7 +8,6 @@ Author: mkphuthi@github.com
 from typing import Tuple, Dict
 import logging
 from asimtools.calculators import load_calc
-# from asimtools.job import uses_calc
 from asimtools.utils import (
     get_atoms,
 )

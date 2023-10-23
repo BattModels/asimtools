@@ -15,6 +15,7 @@ import yaml
 import numpy as np
 import pandas as pd
 from ase.io import read
+from ase.parallel import paropen
 import ase.db
 import ase.build
 
@@ -28,7 +29,7 @@ def read_yaml(yaml_path: str) -> Dict:
     :return: Dictionary
     :rtype: Dict
     """
-    with open(yaml_path, 'r', encoding='utf-8') as f:
+    with paropen(yaml_path, 'r', encoding='utf-8') as f:
         output = yaml.safe_load(f)
     return output
 
@@ -40,7 +41,7 @@ def write_yaml(yaml_path: str, yaml_Dict: Dict) -> None:
     :param yaml_Dict: Dictionary to write
     :type yaml_Dict: Dict
     """ 
-    with open(yaml_path, 'w', encoding='utf-8') as f:
+    with paropen(yaml_path, 'w', encoding='utf-8') as f:
         yaml.dump(yaml_Dict, f)
 
 def get_axis_lims(x: Sequence, y: Sequence, padding: float=0.1):
@@ -76,7 +77,7 @@ def write_csv_from_dict(
         columns = list(data.keys())
 
     csv_data = pd.DataFrame(data, columns=columns, **kwargs)
-    with open(fname, 'w', encoding='utf-8') as f:
+    with paropen(fname, 'w', encoding='utf-8') as f:
         f.write('#' + header + '\n')
 
     csv_data.to_csv(fname, index=False, header=True, mode='a')
@@ -199,6 +200,7 @@ def get_images(
     patterns: List[str] = None,
     images: Iterable[Atoms] = None,
     index: Union[str, int] = ':',
+    skip_failed: bool = True,
     **kwargs
 ) -> List[Atoms]:
     """Return a list of atoms objects based on the input arguments. Options \
@@ -241,7 +243,11 @@ def get_images(
 
         images = []
         for image_file in image_files:
-            new_images = read(image_file, index=index, **kwargs)
+            try:
+                new_images = read(image_file, index=index, **kwargs)
+            except Exception as exc:
+                if not skip_failed:
+                    raise IOError(f"Failed to read {image_file}") from exc
             # Output of read can either be list of atoms or Atoms, depending on index
             if not isinstance(new_images, list):
                 new_images = [new_images]
@@ -286,7 +292,7 @@ def get_env_input() -> Dict:
     if env_input_file is None:
         dotfile = Path('~/.asimtools')
         if dotfile.exists():
-            with open(dotfile, 'r', encoding='utf-8') as f:
+            with paropen(dotfile, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
             for line in lines:
                 if line.startswith('ENV_INPUT_FILE'):
@@ -314,7 +320,7 @@ def get_calc_input():
     if calc_input_file is None:
         dotfile = Path('~/.asimtools')
         if dotfile.exists():
-            with open(dotfile, 'r', encoding='utf-8') as f:
+            with paropen(dotfile, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
             for line in lines:
                 if line.startswith('CALC_INPUT_FILE'):

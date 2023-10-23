@@ -8,17 +8,21 @@ Author: mkphuthi@github.com
 '''
 
 from typing import Dict, Sequence, Optional, Union
+from glob import glob
 from asimtools.job import DistributedJob
 from asimtools.utils import change_dict_value
+from asimtools.utils import get_str_btn
 
 def sim_array(
     template_sim_input: Dict,
     key_sequence: Optional[Sequence[str]] = None,
     array_values: Optional[Sequence] = None,
+    file_pattern: Optional[str] = None,
     env_ids: Optional[Union[Sequence[str],str]] = None,
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
     ids: Sequence = None,
+    str_btn_params: Optional[Dict] = None,
 ) -> Dict:
     """Runs the same script, iterating over multiple values of a specified
     argument based on a sim_input template provided by the user
@@ -40,8 +44,20 @@ def sim_array(
     :return: Results
     :rtype: Dict
     """
+
+    assert array_values is None or file_pattern is None, \
+        'Provide only one of array_values or file_pattern'
+
+    if file_pattern is not None:
+        array_values = glob(file_pattern)
+
+    assert len(array_values) > 0, 'No array values or files found'
+
     if ids is None:
-        ids = [f'{key_sequence[-1]}-{val}' for val in array_values]
+        if str_btn_params is not None:
+            ids = [get_str_btn(s, **str_btn_params) for s in array_values]
+        else:
+            ids = [f'{key_sequence[-1]}-{val}' for val in array_values]
 
     assert len(ids) == len(array_values), \
         'Num. of array_values must match num. of ids'
