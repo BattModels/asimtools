@@ -1,5 +1,5 @@
 script: singlepoint
-env_id: inline
+env_id: batch
 workdir: 'results'
 overwrite: true
 args:

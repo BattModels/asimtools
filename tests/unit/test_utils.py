@@ -59,6 +59,8 @@ def test_get_atoms(test_input, expected):
 @pytest.mark.parametrize("test_input, expected",[
     ({'image_file': str(STRUCT_DIR / 'images.xyz')},
      [ase.build.bulk('Ar'), ase.build.bulk('Cu'), ase.build.bulk('Fe')]),
+    ({'image_file': str(STRUCT_DIR / 'Li1.xyz')},
+     [ase.build.bulk('Li').repeat((1,1,1))]),
     ({'pattern': str(STRUCT_DIR / 'Li*.xyz')},
      [ase.build.bulk('Li').repeat((1,1,1)),
       ase.build.bulk('Li').repeat((2,2,2)),

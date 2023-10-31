@@ -16,3 +16,4 @@ gpaw:
   precommands:
     - source ~/.bashrc
     - conda activate py-gpaw
+    - alias python="gpaw python"

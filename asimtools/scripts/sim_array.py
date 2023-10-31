@@ -21,8 +21,8 @@ def sim_array(
     env_ids: Optional[Union[Sequence[str],str]] = None,
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
-    ids: Sequence = None,
-    str_btn_params: Optional[Dict] = None,
+    ids: Optional[Union[Sequence,str]] = 'values',
+    str_btn_args: Optional[Dict] = None,
 ) -> Dict:
     """Runs the same script, iterating over multiple values of a specified
     argument based on a sim_input template provided by the user
@@ -48,16 +48,19 @@ def sim_array(
     assert array_values is None or file_pattern is None, \
         'Provide only one of array_values or file_pattern'
 
+    print('fpattern', file_pattern)
     if file_pattern is not None:
         array_values = glob(file_pattern)
 
     assert len(array_values) > 0, 'No array values or files found'
 
-    if ids is None:
-        if str_btn_params is not None:
-            ids = [get_str_btn(s, **str_btn_params) for s in array_values]
-        else:
-            ids = [f'{key_sequence[-1]}-{val}' for val in array_values]
+    if ids == 'str_btn':
+        assert str_btn_args is not None, 'Provide str_btn_args for ids'
+        ids = [get_str_btn(s, *str_btn_args) for s in array_values]
+    elif ids == 'values':
+        ids = [f'{key_sequence[-1]}-{val}' for val in array_values]
+    elif ids is None:
+        ids = [str(i) for i in range(len(array_values))]
 
     assert len(ids) == len(array_values), \
         'Num. of array_values must match num. of ids'
@@ -86,6 +89,7 @@ def sim_array(
 
     # Create a distributed job object
     djob = DistributedJob(sim_inputs, env_input, calc_input)
+    print('dist workdir', djob.workdir)
     job_ids = djob.submit()
 
     results = {'job_ids': job_ids}

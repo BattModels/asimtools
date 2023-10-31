@@ -6,6 +6,7 @@ batch:
     flags:
       - -n 2
       - -p idle
+      - --gres:gpu=0
     precommands:
       - source ~/.bashrc
       - conda activate asimtools

@@ -29,8 +29,11 @@ def read_yaml(yaml_path: str) -> Dict:
     :return: Dictionary
     :rtype: Dict
     """
-    with paropen(yaml_path, 'r', encoding='utf-8') as f:
+    with open(yaml_path, 'r', encoding='utf-8') as f:
         output = yaml.safe_load(f)
+
+    if output is None:
+        return {}
     return output
 
 def write_yaml(yaml_path: str, yaml_Dict: Dict) -> None:
@@ -41,6 +44,7 @@ def write_yaml(yaml_path: str, yaml_Dict: Dict) -> None:
     :param yaml_Dict: Dictionary to write
     :type yaml_Dict: Dict
     """ 
+    # Use paropen so that only the master process is updating outputs
     with paropen(yaml_path, 'w', encoding='utf-8') as f:
         yaml.dump(yaml_Dict, f)
 
@@ -77,7 +81,7 @@ def write_csv_from_dict(
         columns = list(data.keys())
 
     csv_data = pd.DataFrame(data, columns=columns, **kwargs)
-    with paropen(fname, 'w', encoding='utf-8') as f:
+    with open(fname, 'w', encoding='utf-8') as f:
         f.write('#' + header + '\n')
 
     csv_data.to_csv(fname, index=False, header=True, mode='a')
@@ -236,6 +240,8 @@ def get_images(
 
     if image_file is not None:
         images = read(image_file, index=index, **kwargs)
+        if not isinstance(images, list):
+                images = [images]
     elif pattern is not None:
         image_files = glob(pattern)
         assert len(image_files) > 0, \
@@ -292,7 +298,7 @@ def get_env_input() -> Dict:
     if env_input_file is None:
         dotfile = Path('~/.asimtools')
         if dotfile.exists():
-            with paropen(dotfile, 'r', encoding='utf-8') as f:
+            with open(dotfile, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
             for line in lines:
                 if line.startswith('ENV_INPUT_FILE'):
@@ -320,7 +326,7 @@ def get_calc_input():
     if calc_input_file is None:
         dotfile = Path('~/.asimtools')
         if dotfile.exists():
-            with paropen(dotfile, 'r', encoding='utf-8') as f:
+            with open(dotfile, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
             for line in lines:
                 if line.startswith('CALC_INPUT_FILE'):

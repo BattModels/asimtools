@@ -7,6 +7,7 @@ Author: mkphuthi@github.com
 
 import subprocess
 import os
+import pkgutil
 from pathlib import Path
 from datetime import datetime
 import logging
@@ -14,6 +15,7 @@ from glob import glob
 from typing import List, TypeVar, Dict, Tuple, Union
 from copy import deepcopy
 import ase.io
+from ase.parallel import paropen
 import numpy as np
 from asimtools.utils import (
     read_yaml,
@@ -49,18 +51,12 @@ class Job():
         self.workdir = Path(
             sim_input.get('workdir', '.')
         ).resolve()
-        # Any subsequent input files should use the full path
-        self.sim_input['workdir'] = str(self.workdir)
-        self.launchdir = Path(os.getcwd())
 
-        # # See python logging docs
-        # logging.basicConfig(
-        #     filename=self.workdir / 'job.log',
-        #     level=logging.DEBUG,
-        #     format='%(asctime)s %(name)s %(levelname)s: %(message)s'
-        # )
-        # logger = logging.getLogger(__name__)
-        # self.logger = logger
+        # Any subsequent input files should use the full path
+        self.sim_input['workdir'] = str(self.workdir) 
+        self.launchdir = Path(os.getcwd())
+        if self.sim_input.get('src_dir', False):
+            self.sim_input['src_dir'] = self.launchdir
 
     def mkworkdir(self) -> None:
         ''' Creates the work directory if it doesn't exist '''
@@ -241,8 +237,17 @@ class UnitJob(Job):
         else:
             debug_flag = ''
 
+        # GPAW requires python script to be called with gpaw python
+        # For now this is a work around but perhaps there exists a cleaner way
+        if self.calc_params.get('name', '') == 'GPAW':
+            asloader = pkgutil.get_loader('asimtools.scripts.asim_run')
+            asfile = asloader.get_filename()
+            alias = f'gpaw python {asfile}'
+        else:
+            alias = 'asim-run'
+
         txt = f'{env_run_prefix} {calc_run_prefix} '
-        txt += 'asim-run sim_input.yaml -c calc_input.yaml' + debug_flag
+        txt += f'{alias} sim_input.yaml --calc=calc_input.yaml' + debug_flag
         txt += f' {env_run_suffix} {calc_run_suffix} '
         return txt
 
@@ -281,7 +286,7 @@ class UnitJob(Job):
         '''
         slurm_params = self.env.get('slurm', False)
 
-        txt = 'salloc --unbuffered ' # unbuffered to avoid IO lag
+        txt = 'srun --unbuffered ' # unbuffered to avoid IO lag
         txt += ' '.join(slurm_params.get('flags'))
         txt += self.gen_run_command()
 
@@ -310,6 +315,7 @@ class UnitJob(Job):
                 txt = f'Skipped writing in {self.workdir}, files already '
                 txt += 'written. Set overwrite=True to overwrite'
                 self.get_logger().warning(txt)
+                print(txt)
                 return None
 
         # If the sim_input uses an image/images, we want to write it in 
@@ -392,7 +398,8 @@ class UnitJob(Job):
                     else:
                         dependstr += f':{dep}' if dep is not None else ''
 
-                command = ['sbatch', '-d', f'afterok:{dependstr}', 'job.sh']
+                command = ['sbatch', '-d', f'afterok:{dependstr}']
+                command += ['--kill-on-invalid-dep=yes', 'job.sh']
             else:
                 command = ['sbatch', 'job.sh']
 
@@ -415,13 +422,13 @@ class UnitJob(Job):
                 command, check=False, capture_output=True, text=True,
             )
 
-            with open('stdout.txt', 'w', encoding='utf-8') as output_file:
+            with paropen('stdout.txt', 'w', encoding='utf-8') as output_file:
                 output_file.write(completed_process.stdout)
 
             if completed_process.returncode != 0:
                 err_msg = f'See {self.workdir / "stderr.txt"} for traceback.'
                 logger.error(err_msg)
-                with open('stderr.txt', 'w', encoding='utf-8') as err_file:
+                with paropen('stderr.txt', 'w', encoding='utf-8') as err_file:
                     err_file.write(completed_process.stderr)
                 completed_process.check_returncode()
 
@@ -566,13 +573,13 @@ class DistributedJob(Job):
             command, check=False, capture_output=True, text=True,
         )
 
-        with open('stdout.txt', 'w', encoding='utf-8') as output_file:
+        with paropen('stdout.txt', 'w', encoding='utf-8') as output_file:
             output_file.write(completed_process.stdout)
 
         if completed_process.returncode != 0:
             err_msg = f'See {self.workdir / "stderr.txt"} for traceback.'
             logger.error(err_msg)
-            with open('stderr.txt', 'w', encoding='utf-8') as err_file:
+            with paropen('stderr.txt', 'w', encoding='utf-8') as err_file:
                 err_file.write(completed_process.stderr)
             completed_process.check_returncode()
 

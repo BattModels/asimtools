@@ -12,6 +12,7 @@ from pathlib import Path
 import argparse
 import subprocess
 from typing import Dict, Tuple
+# from ase.parallel import world
 from asimtools.utils import read_yaml, get_logger
 from asimtools.job import load_job_from_directory
 
@@ -75,7 +76,6 @@ def main(args=None) -> None:
 
         if completed_process.returncode != 0:
             logger.error('asim-run: Failed to run precommand %s', precommand)
-            # print(completed_process.stderr)
             logger.error(completed_process.stderr)
             err_txt = f'ERROR: sim_input precommand "{" ".join(command)}" '
             err_txt += 'failed as above. Make sure precommand can be '
@@ -130,8 +130,10 @@ def main(args=None) -> None:
     sim_func = getattr(sim_module, func_name)
 
     cwd = Path('.').resolve()
+    # if world.rank == 0:
     job = load_job_from_directory(cwd)
     job.start()
+
     try:
         results = sim_func(**sim_input.get('args', {}))
         logger.info('Successfully ran script "%s" in "%s"', script, cwd)
@@ -143,6 +145,7 @@ def main(args=None) -> None:
         else:
             if os.getenv("ASIMTOOLS_CALC_INPUT", None) is not None:
                 del os.environ["ASIMTOOLS_CALC_INPUT"]
+        # if world.rank == 0:
         job.fail()
         raise
 
@@ -160,6 +163,8 @@ def main(args=None) -> None:
     if not job_ids:
         job_ids = os.getenv('SLURM_JOB_ID')
         results['job_ids'] = job_ids
+
+    # if world.rank == 0:
     job.update_output(results)
     job.complete()
 
