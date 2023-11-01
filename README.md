@@ -10,6 +10,9 @@ same simulation to be run with multiple calculators and the same calculator to
 be used for multiple simulations. Input and output files must follow a strict
 format so that consistent analysis pipelines can be used across users
 
+## Documentation
+Documentation is under construction [here]([https://github.com/mkphuthi](https://battmodels.github.io/asimtools/)) 
+
 ## Developer philosophy
 The goal of asimtools is to push all the complexity of workflow
 management, best-practices, file management etc. into the backend such that the
