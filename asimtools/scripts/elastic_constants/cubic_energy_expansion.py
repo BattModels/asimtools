@@ -85,8 +85,6 @@ def cubic_energy_expansion(
     image: Dict,
     deltas: Sequence[float] = (-0.01,-0.0075,-0.005,0.00,0.005,0.0075,0.01),
     ase_eos_args: Optional[Dict] = None,
-    relax_cell: bool = True,
-    cell_relax_args: Optional[Dict] = None,
 ) -> Dict:
     '''
     Calculates B, C11, C12 and C44 elastic constants of a structure with cubic
