@@ -1,0 +1,18 @@
+script: symmetric_cell_relax
+workdir: yh
+env_id: n16
+args:
+  calc_id: yh
+  image:
+    image_file: input_image.xyz
+  optimizer: BFGS
+  fixsymmetry_args:
+    symprec: 0.01
+    adjust_positions: true
+    adjust_cell: true
+  expcellfilter_args:
+    mask: null
+    hydrostatic_strain: false
+    constant_volume: false
+    scalar_pressure: 0.05
+
