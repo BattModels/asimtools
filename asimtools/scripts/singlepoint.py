@@ -5,7 +5,7 @@ Calculates single point energy
 Author: mkphuthi@github.com
 '''
 
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Optional
 import logging
 from asimtools.calculators import load_calc
 from asimtools.utils import (
@@ -16,6 +16,7 @@ def singlepoint(
     calc_id: str,
     image: Dict,
     properties: Tuple[str] = ('energy', 'forces'),
+    prefix: Optional[str] = None,
 ) -> Dict:
     """Evaluates the properties of a single image, currently implemented
     properties are energy, forces and stress
@@ -32,6 +33,11 @@ def singlepoint(
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)
+
+    if prefix is not None:
+        prefix = prefix + '_'
+    else:
+        prefix = ''
 
     if 'energy' in properties:
         try:
@@ -57,7 +63,7 @@ def singlepoint(
             logging.error('Failed to calculate stress')
             raise
 
-    image_file = 'image_output.xyz'
+    image_file = prefix + 'image_output.xyz'
     atoms.write(image_file, format='extxyz')
 
     results = {

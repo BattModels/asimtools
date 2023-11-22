@@ -4,7 +4,7 @@ Relaxes the given atomic structure using ASE's built-in structure
 optimizers
 '''
 
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
 import numpy as np
 import ase.optimize
 from ase.io.trajectory import Trajectory
@@ -17,6 +17,7 @@ def atom_relax(
     optimizer: str = 'GPMin', #GPMin is fastest according to ASE docs
     properties: Tuple[str] = ('energy', 'forces'),
     fmax: float = 0.02,
+    prefix: Optional[str] = None,
 ) -> Dict:
     """Relaxes the given tomic structure using ASE's built-in structure
     optimizers
@@ -39,7 +40,12 @@ def atom_relax(
     atoms.set_calculator(calc)
     logger = get_logger()
 
-    traj_file = 'atom_relax.traj'
+    if prefix is not None:
+        prefix = prefix + '_'
+    else:
+        prefix = ''
+
+    traj_file = prefix + 'atom_relax.traj'
     dyn = getattr(ase.optimize, optimizer)(atoms)
     traj = Trajectory(
         traj_file,
@@ -54,7 +60,7 @@ def atom_relax(
         logger.error('Failed to relax atoms')
         raise
 
-    image_file = 'image_output.xyz'
+    image_file = prefix + 'image_output.xyz'
     atoms.write(image_file, format='extxyz')
 
     energy = float(atoms.get_potential_energy())

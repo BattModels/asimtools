@@ -19,10 +19,10 @@ from asimtools.utils import get_atoms, join_names
 def cell_relax(
     calc_id: str,
     image: Dict,
-    prefix: str = '',
     optimizer: str = 'BFGS',
-    smax: float = 0.002,
+    fmax: float = 0.002,
     mask: Optional[Sequence] = None,
+    prefix: Optional[str] = None,
 ) -> Dict:
     """Relax cell using ASE Optimizer
 
@@ -34,8 +34,8 @@ def cell_relax(
     :type prefix: str, optional
     :param optimizer: Optimizer class to use from ase.optimize, defaults to 'BFGS'
     :type optimizer: str, optional
-    :param smax: Maximum stress in eV/$\AA^3$, defaults to 0.002
-    :type smax: float, optional
+    :param fmax: Maximum stress in eV/$\AA^3$, defaults to 0.002
+    :type fmax: float, optional
     :param mask: Mask to constrain cell deformation while relaxing, defaults to None
     :type mask: Optional[Sequence], optional
     :return: Dictionary of results including, final energy, stress and output files
@@ -44,6 +44,11 @@ def cell_relax(
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)
+
+    if prefix is not None:
+        prefix = prefix + '_'
+    else:
+        prefix = ''
 
     traj_file = join_names([prefix, 'cell_relax.traj'])
     sf = StrainFilter(atoms, mask=mask)
@@ -56,7 +61,7 @@ def cell_relax(
     )
     dyn.attach(traj)
     try:
-        dyn.run(fmax=smax)
+        dyn.run(fmax=fmax)
     except Exception:
         print('Failed to optimize atoms')
         raise
@@ -65,11 +70,11 @@ def cell_relax(
     atoms.write(image_file, format='extxyz')
 
     energy = float(atoms.get_potential_energy())
-    final_smax = float(atoms.get_stress().max())
+    final_fmax = float(atoms.get_stress().max())
 
     results = {
         'energy': energy,
-        'final_smax': final_smax,
+        'final_fmax': final_fmax,
         'files':{
             'image': image_file,
             'traj': traj_file,

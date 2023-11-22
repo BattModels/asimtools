@@ -204,7 +204,7 @@ def get_images(
     patterns: List[str] = None,
     images: Iterable[Atoms] = None,
     index: Union[str, int] = ':',
-    skip_failed: bool = True,
+    skip_failed: bool = False,
     **kwargs
 ) -> List[Atoms]:
     """Return a list of atoms objects based on the input arguments. Options \
@@ -239,6 +239,7 @@ def get_images(
         "Please specify file, pattern or iterable"
 
     if image_file is not None:
+        image_file = Path(image_file).resolve()
         images = read(image_file, index=index, **kwargs)
         if not isinstance(images, list):
                 images = [images]
@@ -249,11 +250,21 @@ def get_images(
 
         images = []
         for image_file in image_files:
+            image_file = Path(image_file).resolve()
             try:
-                new_images = read(image_file, index=index, **kwargs)
+                new_images = read(
+                    image_file,
+                    index=index,
+                    **kwargs
+                )
             except Exception as exc:
                 if not skip_failed:
-                    raise IOError(f"Failed to read {image_file}") from exc
+                    raise IOError(
+                        f"Failed to read {image_file} from {os.getcwd()}"
+                    ) from exc
+                else:
+                    new_images = []
+
             # Output of read can either be list of atoms or Atoms, depending on index
             if not isinstance(new_images, list):
                 new_images = [new_images]

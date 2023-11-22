@@ -15,6 +15,7 @@ import numpy as np
 from pymatgen.core.surface import generate_all_slabs
 from pymatgen.io.ase import AseAtomsAdaptor as AAA
 from asimtools.calculators import load_calc
+from asimtools.scripts.atom_relax import atom_relax
 from asimtools.utils import (
     get_atoms,
 )
@@ -40,6 +41,7 @@ def surface_energies(
     image: Dict,
     calc_id: str,
     millers: Union[str,Sequence] = 'all',
+    atom_relax_args: Optional[Dict] = None,
     generate_all_slabs_args: Optional[Dict] = None,
 ) -> Dict:
     '''
@@ -50,6 +52,9 @@ def surface_energies(
     calc = load_calc(calc_id)
     bulk = get_atoms(**image)
     bulk.set_calculator(calc)
+
+    if atom_relax_args is None:
+        atom_relax_args = {}
 
     default_pymatgen_kwargs = {
         'max_index': 3,
@@ -82,6 +87,18 @@ def surface_energies(
             logging.info('Calculating for %s', miller)
             atoms = AAA.get_atoms(big_slab)
             atoms.write(f'{miller}.xyz')
+
+            relax_results = atom_relax(
+                calc_id=calc_id,
+                image={'atoms': atoms},
+                optimizer=atom_relax_args.get('optimizer', 'BFGS'),
+                properties=('energy','forces'),
+                fmax=atom_relax_args.get('fmax', 0.02),
+                prefix=f'{miller}_relaxed'
+            )
+            atoms = get_atoms(
+                image_file = relax_results.get('files', {}).get('image')
+            )
 
             assert np.allclose(atoms.pbc, (True, True, True)), \
                 f'Check pbcs for {miller}: {atoms.pbc}'

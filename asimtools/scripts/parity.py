@@ -199,7 +199,7 @@ def parity(
         )
 
         rmse_val = rmse(res[prop]['ref'], res[prop]['pred'])
-        results[f'{prop}_rmse'] = rmse_val
+        results[f'{prop}_rmse'] = float(rmse_val)
 
         _, ax = plt.subplots()
         lims = np.array(get_axis_lims(res[prop]['ref'], res[prop]['pred']))
