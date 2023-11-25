@@ -31,54 +31,41 @@ bibliography: paper.bib
 
 # Summary
 
-The forces on stars, galaxies, and dark matter under external gravitational
-fields lead to the dynamical evolution of structures in the universe. The orbits
-of these bodies are therefore key to understanding the formation, history, and
-future state of galaxies. The field of "galactic dynamics," which aims to model
-the gravitating components of galaxies to study their structure and evolution,
-is now well-established, commonly taught, and frequently used in astronomy.
-Aside from toy problems and demonstrations, the majority of problems require
-efficient numerical tools, many of which require the same base code (e.g., for
-performing numerical orbit integration).
+Atomic simulations are a key component of modern day materials science in both academia and industry. However, simulation protocols and workflows used by researchers are typically difficult to transfer to systems using different inputs, packages and environments. This leads to poor reproducability and inefficient transfer of code from one researcher to the next. In addition, there exists a zoo of tools and packages for atomic simulation with more being developed every day. There is however no unifying framework that can encompass all these tools without significant software development or using bulky workflow managers.
 
 # Statement of need
 
-`Gala` is an Astropy-affiliated Python package for galactic dynamics. Python
-enables wrapping low-level languages (e.g., C) for speed without losing
-flexibility or ease-of-use in the user-interface. The API for `Gala` was
-designed to provide a class-based and user-friendly interface to fast (C or
-Cython-optimized) implementations of common operations such as gravitational
-potential and force evaluation, orbit integration, dynamical transformations,
-and chaos indicators for nonlinear dynamics. `Gala` also relies heavily on and
-interfaces well with the implementations of physical units and astronomical
-coordinate systems in the `Astropy` package [@astropy] (`astropy.units` and
-`astropy.coordinates`).
+Atomic SIMulation Tools (`ASIMTools`) is a lightweight workflow and simulation manager for reproducible atomistic simulations that can be transferred across environments, calculators and structures implemented in Python. By using in-built or user-defined scripts and utilities, users can run/build their own simulation recipes and automatically scale them on slurm based clusters or locally on their console. The core idea is to separate the dependence of the atomistic potential/calculator, the simulation environment and the simulation protocol thereby allowing the same simulation to be run with different calculators, structures or on different computers with just a change of parameter.Input and output yaml files follow a standard format based providing a simple interface that also acts as a record of the parameters used in a simulation without having to edit python scripts.
 
-`Gala` was designed to be used by both astronomical researchers and by
-students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications [@Pearson:2017] and has also been
-used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material [@Binney:2008]. The combination of speed,
-design, and support for Astropy functionality in `Gala` will enable exciting
-scientific explorations of forthcoming data releases from the *Gaia* mission
-[@gaia] by students and experts alike.
+`ASIMTools` is for users interested in performing atomistic calculations on
+UNIX-like operating systems and/or on slurm based High Performance Computing
+clusters. By defining simulation protocols as functions in "scripts",
+simulation protocols can be easily added to the library of provided scripts and
+iterated on. This will allow the community to develop a robust set of shareable
+simulation protocols. The flexibility of ASIMTools allows integration of any
+kind of simulation tools such as pymatgen, LAMMPS etc. with examples provided.
+With the scripts defined, users only need to provide a set of inputs in the form of yaml files that define the parameters used for each simulation and are therefore a record. 
+
+# State of the Field
+There exist a number of popular workflow tools for atomistic simulations such as Aiida `[@author:2001]`, Fireworks `[@author:2001]` and many more. These tools provide frameworks for constructing complex workflows with different underlying principles. Some managers enforce strict rules that ensure that data obeys FAIR principles and emphasize data provenance and reproducibility. These methods however tend to be fairly large packages with steep learning curves. ASIMTools provides a simple interface as a starting point that can transform any code into ASIMTools compatible code by simply wrapping it in a function that returns a Python dictionary. Any such code can work in ASIMTools and with a few extra steps, the protocol can be made to support an arbitrary calculator and input structure.
+
+In some workflow managters, such as Atomic Simulation Recipes `[@author:2001]`. Once workflows are built, it can often be difficult to quickly change and iterate over key parameters such as the choice of atomistic calculator or structure as they are intrinsically built into the code. This is particularly challening in an age where machine learning models are becoming more popular. Workflows involving machine learning interaction potentials tend to require the ability to repeat the same calculations on different examples, using different calculators on different hardware iteratively. This is where the value of ASIMTools lies in contrast to more established workflows. ASIMTools is not designed to replace the more powerful workflow managers but rather to supplement them. This is achieved by providing unified inputs that can be easily integrated into, for example, Aiida as Python functions/scripts while also being a stand-alone lightweight workflow manager.
+
+# Example
+We present two examples of simulation protocols, more can be found in the
+ASIMTools documentation.
+
+## Calculating the energy and forces of an atomic configuration
+Most atomic simulations invlolve evaluations of energies, forces, dipoles etc. of an atomic configuration. In Figure. \autoref{fig:singlepoint} we show how the `singlepoint` script, provided in 
+ASIMTools can be used and the input files needed to run the script with arbitrary input structure, calculator or environment.
+
+![Schematic showing the connection between the modular input yaml files. The sim_input.yaml is the main imput file which specifies the environment, calculator (if used) and script to be run.\label{fig:singlepoint}](figures/singlepoint.pdf){ width=100% }
 
 # Mathematics
 
 Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
 
 Double dollars make self-standing equations:
-
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
-
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
-\end{equation}
-and refer to \autoref{eq:fourier} from text.
 
 # Citations
 
@@ -94,19 +81,18 @@ For a quick reference, the following citation commands can be used:
 - `[@author:2001]` -> "(Author et al., 2001)"
 - `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
 
-# Figures
+# Author Contribution Statement
+
+Conceptualization by Keith Phuthi. Coding and development by Keith Phuthi and Emil Annevelink. Paper writing by Keith Phuthi and Emil Annevelink. Project management by all.
+<!-- # Figures
 
 Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
-
-Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
+![Schematic showing the connection between the modular input yaml files. The sim_input.yaml is the main imput file which specifies the environment, calculator (if used) and script to be run.\label{fig:singlepoint}](figures/singlepoint.pdf){ width=100% }
+and referenced from text using \autoref{fig:example}. -->
 
 # Acknowledgements
 
-We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong
-Oh, and support from Kathryn Johnston during the genesis of this project.
+We acknowledge contributions Victor Azumah, Kian Pu, Ziqi Wang and Hancheng Zhao.
 
 # References
 Example paper.bib file:
