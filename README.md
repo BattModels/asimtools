@@ -10,6 +10,8 @@ same simulation to be run with multiple calculators and the same calculator to
 be used for multiple simulations. Input and output files must follow a strict
 format so that consistent analysis pipelines can be used across users
 
+** ASIMTools is going through some breaking changes for version 0.1.0, please use with caution **
+
 ## Documentation
 Documentation is under construction [here](https://battmodels.github.io/asimtools/)
 
