@@ -9,7 +9,9 @@ author: mkphuthi@github.com
 from typing import Dict, Optional
 import logging
 import matplotlib.pyplot as plt
+import pandas as pd
 from ase.eos import calculate_eos
+from ase.io import read
 from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms
 
@@ -36,7 +38,9 @@ def ase_cubic_eos_optimization(
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
     atoms.calc = calc
-    eos = calculate_eos(atoms, trajectory='eos.traj', eps=eps, npoints=npoints)
+    v_init = atoms.get_volume()
+    traj_file = 'eos.traj'
+    eos = calculate_eos(atoms, trajectory=traj_file, eps=eps, npoints=npoints)
     eos.eos_string = eos_string
     v0, e0, B = eos.fit()  # find minimum
     logging.info('Successfully fit EOS')
@@ -53,5 +57,25 @@ def ase_cubic_eos_optimization(
         eos.plot()
         plt.savefig('eos.png')
 
-    results = {'v0': float(v0), 'e0': float(e0), 'B': float(B)}
+    traj = read(traj_file, index=':')
+
+    eos_dict = {
+        'energies': [],
+        'volumes': [],
+        'volume_scale_factors': [],
+    }
+    for struct in traj:
+        eos_dict['energies'].append(struct.get_potential_energy())
+        eos_dict['volumes'].append(struct.get_volume())
+        eos_dict['volume_scale_factors'].append(struct.get_volume() / v_init)
+
+    eos_df = pd.DataFrame(eos_dict)
+    eos_df.to_csv('eos.csv')
+
+    results = {
+        'v0': float(v0),
+        'e0': float(e0),
+        'B': float(B),
+        'x0': float(v0 / v_init)
+    }
     return results

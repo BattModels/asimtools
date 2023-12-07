@@ -20,6 +20,7 @@ def lammps(
     atom_style: str = 'atomic',
     variables: Dict = None,
     lmp_cmd: str = 'lmp',
+    masses: bool = True,
 ) -> Dict:
     ''' 
     Runs a lammps simulation based on a template lammps input script
@@ -31,11 +32,18 @@ def lammps(
     # in arbitrary image provided by asimtools
     if image is not None:
         atoms = get_atoms(**image)
-        atoms.write(
+        if masses:
+            atoms.write(
+                'image_input.lmpdat',
+                format='lammps-data',
+                atom_style=atom_style,
+                masses=masses,
+            )
+        else:
+            atoms.write(
             'image_input.lmpdat',
             format='lammps-data',
             atom_style=atom_style,
-            masses=True,
         )
         variables['IMAGE_FILE'] = 'image_input.lmpdat'
 
