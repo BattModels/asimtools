@@ -48,10 +48,9 @@ def sim_array(
     assert array_values is None or file_pattern is None, \
         'Provide only one of array_values or file_pattern'
 
-    print('fpattern', file_pattern)
     if file_pattern is not None:
         array_values = glob(file_pattern)
-
+    print(array_values)
     assert len(array_values) > 0, 'No array values or files found'
 
     if ids == 'str_btn':
