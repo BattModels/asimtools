@@ -20,11 +20,11 @@ STRUCT_DIR = Path(os.path.join(
 ))
 
 @pytest.mark.parametrize("test_input, expected",[
-    (['a', 'b'],'a_b'),
-    (['a', 'b', 'c'],'a_b_c'),
-    (['_a', 'b.c'],'a_b.c'),
-    (['a', '-b.--'],'a_b'),
-    ([' ', '-b', 'c '],'b_c'),
+    (['a', 'b'],'a__b_'),
+    (['a', 'b', 'c'],'a__b__c_'),
+    (['_a', 'b.c'],'a__b.c_'),
+    (['a', '-b.--'],'a__b_'),
+    ([' ', '-b', 'c '],'b__c_'),
     (['', 'b'],'b'),
 ])
 def test_join_names(test_input, expected):

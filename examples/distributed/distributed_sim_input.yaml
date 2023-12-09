@@ -1,27 +1,17 @@
 script: distributed
-env_id: inline
-workdir: results
+workdir: 'results'
 args:
   subscripts:
-    id-00: &id01
+    id-0000: &id01
       script: singlepoint
       env_id: inline
       config_id: inline
       args:
-        calc_id: lj
+        calc_id: lj_Ar
         image:
           name: Ar
         properties: ['energy', 'forces']
-    id-01: *id01
-    id-02: *id01
-    id-03: *id01
-    id-04: *id01
-    id-05: *id01
-    id-06: *id01
-    id-07: *id01
-    id-08: *id01
-    id-09: *id01
-    id-10: *id01
-    id-11: *id01
-    id-12: *id01
+    id-0001: *id01
+    id-0002: *id01
+    id-0003: *id01
 

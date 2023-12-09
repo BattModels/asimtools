@@ -48,12 +48,12 @@ class Job():
         self.env_input = deepcopy(env_input)
         self.calc_input = deepcopy(calc_input)
         self.sim_input = deepcopy(sim_input)
-        self.workdir = Path(
-            sim_input.get('workdir', '.')
-        ).resolve()
+        self.workdir = Path(sim_input.get('workdir', '.')).resolve()
 
-        # Any subsequent input files should use the full path
-        self.sim_input['workdir'] = str(self.workdir) 
+        # sim_input will be in workdir from now on so set workdir as a relative
+        # path, but in this class, always use self.workdir not
+        # which is the full path to avoid confusion sim_input['workdir']
+        self.sim_input['workdir'] = './' #str(self.workdir) 
         self.launchdir = Path(os.getcwd())
         if self.sim_input.get('src_dir', False):
             self.sim_input['src_dir'] = self.launchdir
@@ -119,8 +119,7 @@ class Job():
 
     def get_output_yaml(self) -> Dict:
         ''' Get current output file '''
-        prefix = ''
-        out_fname = join_names([prefix, 'output.yaml'])
+        out_fname = 'output.yaml'
         output_yaml = self.workdir / out_fname
         return output_yaml
 
@@ -149,7 +148,7 @@ class Job():
         self.env_input.update(new_params)
 
     def set_workdir(self, workdir) -> None:
-        ''' Set working directory '''
+        ''' Set working directory both in sim_input and instance '''
         workdir = Path(workdir)
         self.sim_input['workdir'] = str(workdir.resolve())
         self.workdir = workdir
@@ -292,9 +291,16 @@ class UnitJob(Job):
 
         return txt
 
-    def gen_input_files(self) -> None:
+    def gen_input_files(
+        self,
+        write_calc_input: bool = True,
+        write_env_input: bool = False,
+    ) -> None:
         ''' Write input files to working directory '''
         workdir = self.workdir
+
+        # This is the sim_input that will be written to disk so it will have
+        # slightly different paths and the image(s) will be image_files
         sim_input = deepcopy(self.sim_input)
         # The sim_input file will already be in the work directory
         sim_input['workdir'] = '.'
@@ -310,10 +316,11 @@ class UnitJob(Job):
         if not workdir.exists():
             workdir.mkdir()
         elif output_file.exists() and sim_input_file.exists():
-            complete = read_yaml(output_file).get('start_time', False)
+            complete = read_yaml(output_file).get('end_time', False)
             if complete and not overwrite:
-                txt = f'Skipped writing in {self.workdir}, files already '
-                txt += 'written. Set overwrite=True to overwrite'
+                txt = f'Skipped writing in {self.workdir}, files/directory '
+                txt += 'already exist. Set overwrite=True to overwrite files '
+                txt += 'or delete directory first (recommended)'
                 self.get_logger().warning(txt)
                 print(txt)
                 return None
@@ -326,30 +333,40 @@ class UnitJob(Job):
 
         if image:
             atoms = get_atoms(**image)
-            input_image_file = self.workdir.resolve() / 'input_image.xyz'
-            atoms.write(input_image_file, format='extxyz')
-            self.sim_input['args']['image'] = {
+            input_image_file = 'input_image.xyz' # Relative to workdir
+            # input_image_file = self.workdir.resolve() / 'input_image.xyz'
+            atoms.write(
+                self.workdir / input_image_file,
+                format='extxyz'
+            )
+            sim_input['args']['image'] = {
                 'image_file': str(input_image_file),
             }
 
         images = self.sim_input.get('args', {}).get('images', False)
         if images:
-            if images.get('images', False):
+            if images.get('images', False) or images.get('image_file', False):
                 images = get_images(**images)
-                input_images_file = self.workdir / 'input_images.xyz'
-                ase.io.write(input_images_file, images, format='extxyz')
-                self.sim_input['args']['images'] = {
+                input_images_file = 'input_images.xyz' # Relative to workdir
+                ase.io.write(
+                    self.workdir / input_images_file,
+                    images,
+                    format='extxyz'
+                )
+                sim_input['args']['images'] = {
                     'image_file': str(input_images_file),
                 }
-            elif images.get('image_file', False):
-                input_images_file = Path(images['image_file']).resolve()
-                self.sim_input['args']['images'] = {
-                    'image_file': str(input_images_file),
-                }
+            # elif images.get('image_file', False):
+            #     input_images_file = Path(images['image_file']).resolve()
+            #     sim_input['args']['images'] = {
+            #         'image_file': str(input_images_file),
+            #     }
 
-        write_yaml(workdir / 'sim_input.yaml', self.sim_input)
-        write_yaml(workdir / 'calc_input.yaml', self.calc_input)
-        write_yaml(workdir / 'env_input.yaml', self.env_input)
+        write_yaml(workdir / 'sim_input.yaml', sim_input)
+        if write_calc_input:
+            write_yaml(workdir / 'calc_input.yaml', self.calc_input)
+        if write_env_input:
+            write_yaml(workdir / 'env_input.yaml', self.env_input)
         write_yaml(self.get_output_yaml(), {'status': 'clean'})
 
         if use_slurm and not interactive:
@@ -357,7 +374,8 @@ class UnitJob(Job):
         return None
 
     def submit(
-        self, dependency: Union[List,None] = None
+        self,
+        dependency: Union[List,None] = None,
     ) -> Union[None,List[str]]:
         '''
         Submit a job using slurm, interactively or in the terminal
@@ -458,7 +476,12 @@ class DistributedJob(Job):
         # Set a standard for all subdirectories to start
         # with "id-{sim_id}" followed by user labels
         new_sim_input = {}
-        num_digits =len(str(len(sim_input)))
+        njobs = len(sim_input)
+        num_digits = 4
+        assert njobs < 1000, \
+            f'ASIMTools id_nums are limited to {num_digits} digits, found \
+            {njobs} jobs! Having that many jobs is not very storage efficient.'
+
         sim_id_changed = False
         for i, (sim_id, subsim_input) in enumerate(sim_input.items()):
             assert 'script' in subsim_input, 'Check sim_input format,\
@@ -469,10 +492,14 @@ class DistributedJob(Job):
             prefix = 'id-'+f'{i}'.rjust(num_digits, '0')
             if not sim_id.startswith(prefix):
                 sim_id_changed = True
-                new_sim_id = join_names([prefix,sim_id])
-                new_sim_input[new_sim_id] = deepcopy(sim_input[sim_id])
 
         if sim_id_changed:
+            for i, (sim_id, subsim_input) in enumerate(sim_input.items()):
+                prefix = 'id-'+f'{i}'.rjust(num_digits, '0')
+                new_sim_id = join_names([prefix,sim_id])
+                new_subsim_input = deepcopy(sim_input[sim_id])
+                new_subsim_input['distributed_id'] = i
+                new_sim_input[new_sim_id] = new_subsim_input
             sim_input = new_sim_input
         unitjobs = []
         for sim_id, subsim_input in sim_input.items():

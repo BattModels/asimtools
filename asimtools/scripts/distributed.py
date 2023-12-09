@@ -23,7 +23,6 @@ def distributed(
     #. use_slurm: False, interactive: False, different env_ids -> Launches \
     # multiple jobs.
 
-
     :param subscripts: Dictionary of scripts, each key is an ID and each \
         value is a sim_input file
     :type subscripts: Dict

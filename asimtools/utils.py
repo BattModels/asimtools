@@ -121,7 +121,7 @@ def join_names(substrs: Sequence[str]) -> str:
     for substr in new_substrs:
         if len(substr) > 0:
             final_substrs.append(substr)
-    name = '_'.join(final_substrs)
+    name = '__'.join(final_substrs) + '_'
     return name
 
 def get_atoms(
