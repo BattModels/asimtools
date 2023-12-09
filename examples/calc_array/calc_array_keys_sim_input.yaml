@@ -1,4 +1,4 @@
-script: calc_array
+asimmodule: workflows.calc_array
 overwrite: true
 workdir: results_keys
 args:
@@ -6,8 +6,8 @@ args:
   key_sequence: ['args', 'sigma']
   array_values: [2.30, 2.40, 2.50]
   env_ids: 'inline'
-  subscript_input:
-    script: eos.eos
+  subasimmodule_input:
+    asimmodule: eos.eos
     overwrite: true
     args:
       image:

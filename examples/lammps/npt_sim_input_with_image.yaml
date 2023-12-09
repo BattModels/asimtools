@@ -1,4 +1,4 @@
-script: lammps
+asimmodule: lammps.lammps
 env_id: inline
 workdir: 'results'
 overwrite: true

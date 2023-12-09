@@ -1,4 +1,4 @@
-script: atom_relax
+asimmodule: geometry_optimization.atom_relax
 env_id: srun
 workdir: 'results'
 overwrite: true

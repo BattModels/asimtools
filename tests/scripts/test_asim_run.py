@@ -1,5 +1,5 @@
 """
-Tests for running scripts using asim_run.py
+Tests for running asimmodules using asim_run.py
 """
 import os
 from pathlib import Path
@@ -30,7 +30,7 @@ def test_parse_command_line(sim_input, calc_input, tmp_path):
 ])
 def test_asim_run(inputs, tmp_path, request):
     ''' 
-    Test asim_run ability to launch and complete a script using LJ
+    Test asim_run ability to launch and complete a asimmodule using LJ
     '''
     os.chdir(tmp_path)
     sim_input = request.getfixturevalue(inputs[0])
@@ -55,7 +55,7 @@ def test_asim_run(inputs, tmp_path, request):
 ])
 def test_asim_run_commands(inputs, tmp_path, request):
     ''' 
-    Test asim_run ability to launch and complete a script using LJ and running
+    Test asim_run ability to launch and complete a asimmodule using LJ and running
     commands before and after running the function
     '''
     os.chdir(tmp_path)

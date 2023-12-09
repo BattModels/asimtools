@@ -1,28 +1,28 @@
-asimtools.scripts.eos package
+asimtools.asimmodules.eos package
 =============================
 
 
 
-asimtools.scripts.eos.eos module
+asimtools.asimmodules.eos.eos module
 --------------------------------
 
-.. automodule:: asimtools.scripts.eos.eos
+.. automodule:: asimtools.asimmodules.eos.eos
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.eos.postprocess module
+asimtools.asimmodules.eos.postprocess module
 ----------------------------------------
 
-.. automodule:: asimtools.scripts.eos.postprocess
+.. automodule:: asimtools.asimmodules.eos.postprocess
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.eos.preprocess module
+asimtools.asimmodules.eos.preprocess module
 ---------------------------------------
 
-.. automodule:: asimtools.scripts.eos.preprocess
+.. automodule:: asimtools.asimmodules.eos.preprocess
    :members:
    :undoc-members:
    :show-inheritance:
@@ -30,7 +30,7 @@ asimtools.scripts.eos.preprocess module
 Module contents
 ---------------
 
-.. automodule:: asimtools.scripts.eos
+.. automodule:: asimtools.asimmodules.eos
    :members:
    :undoc-members:
    :show-inheritance:

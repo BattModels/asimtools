@@ -1,4 +1,4 @@
-script: symmetric_cell_relax
+asimmodule: geometry_optimization.symmetric_cell_relax
 workdir: yh
 env_id: n16
 args:

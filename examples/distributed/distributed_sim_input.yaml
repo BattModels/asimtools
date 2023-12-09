@@ -1,9 +1,9 @@
-script: distributed
+asimmodule: workflows.distributed
 workdir: 'results'
 args:
-  subscripts:
+  subasimmodules:
     id-0000: &id01
-      script: singlepoint
+      asimmodule: singlepoint
       env_id: inline
       config_id: inline
       args:
@@ -14,4 +14,3 @@ args:
     id-0001: *id01
     id-0002: *id01
     id-0003: *id01
-

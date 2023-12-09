@@ -1,10 +1,10 @@
-script: calc_array
+asimmodule: workflows.calc_array
 overwrite: true
 workdir: results
 args:
   calc_ids: ['emt', 'lj']
-  subscript_input:
-    script: eos.eos
+  subasimmodule_input:
+    asimmodule: eos.eos
     overwrite: true
     args:
       image:

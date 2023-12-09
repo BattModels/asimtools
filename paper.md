@@ -35,31 +35,31 @@ Atomic simulations are a key component of modern day materials science in both a
 
 # Statement of need
 
-Atomic SIMulation Tools (`ASIMTools`) is a lightweight workflow and simulation manager for reproducible atomistic simulations that can be transferred across environments, calculators and structures implemented in Python. By using in-built or user-defined scripts and utilities, users can run/build their own simulation recipes and automatically scale them on slurm based clusters or locally on their console. The core idea is to separate the dependence of the atomistic potential/calculator, the simulation environment and the simulation protocol thereby allowing the same simulation to be run with different calculators, structures or on different computers with just a change of parameter.Input and output yaml files follow a standard format based providing a simple interface that also acts as a record of the parameters used in a simulation without having to edit python scripts.
+Atomic SIMulation Tools (`ASIMTools`) is a lightweight workflow and simulation manager for reproducible atomistic simulations that can be transferred across environments, calculators and structures implemented in Python. By using in-built or user-defined asimmodules and utilities, users can run/build their own simulation recipes and automatically scale them on slurm based clusters or locally on their console. The core idea is to separate the dependence of the atomistic potential/calculator, the simulation environment and the simulation protocol thereby allowing the same simulation to be run with different calculators, structures or on different computers with just a change of parameter.Input and output yaml files follow a standard format based providing a simple interface that also acts as a record of the parameters used in a simulation without having to edit python asimmodules.
 
 `ASIMTools` is for users interested in performing atomistic calculations on
 UNIX-like operating systems and/or on slurm based High Performance Computing
-clusters. By defining simulation protocols as functions in "scripts",
-simulation protocols can be easily added to the library of provided scripts and
+clusters. By defining simulation protocols as functions in "asimmodules",
+simulation protocols can be easily added to the library of provided asimmodules and
 iterated on. This will allow the community to develop a robust set of shareable
 simulation protocols. The flexibility of ASIMTools allows integration of any
 kind of simulation tools such as pymatgen, LAMMPS etc. with examples provided.
-With the scripts defined, users only need to provide a set of inputs in the form of yaml files that define the parameters used for each simulation and are therefore a record. 
+With the asimmodules defined, users only need to provide a set of inputs in the form of yaml files that define the parameters used for each simulation and are therefore a record. 
 
 # State of the Field
 There exist a number of popular workflow tools for atomistic simulations such as Aiida `[@author:2001]`, Fireworks `[@author:2001]` and many more. These tools provide frameworks for constructing complex workflows with different underlying principles. Some managers enforce strict rules that ensure that data obeys FAIR principles and emphasize data provenance and reproducibility. These methods however tend to be fairly large packages with steep learning curves. ASIMTools provides a simple interface as a starting point that can transform any code into ASIMTools compatible code by simply wrapping it in a function that returns a Python dictionary. Any such code can work in ASIMTools and with a few extra steps, the protocol can be made to support an arbitrary calculator and input structure.
 
-In some workflow managters, such as Atomic Simulation Recipes `[@author:2001]`. Once workflows are built, it can often be difficult to quickly change and iterate over key parameters such as the choice of atomistic calculator or structure as they are intrinsically built into the code. This is particularly challening in an age where machine learning models are becoming more popular. Workflows involving machine learning interaction potentials tend to require the ability to repeat the same calculations on different examples, using different calculators on different hardware iteratively. This is where the value of ASIMTools lies in contrast to more established workflows. ASIMTools is not designed to replace the more powerful workflow managers but rather to supplement them. This is achieved by providing unified inputs that can be easily integrated into, for example, Aiida as Python functions/scripts while also being a stand-alone lightweight workflow manager.
+In some workflow managters, such as Atomic Simulation Recipes `[@author:2001]`. Once workflows are built, it can often be difficult to quickly change and iterate over key parameters such as the choice of atomistic calculator or structure as they are intrinsically built into the code. This is particularly challening in an age where machine learning models are becoming more popular. Workflows involving machine learning interaction potentials tend to require the ability to repeat the same calculations on different examples, using different calculators on different hardware iteratively. This is where the value of ASIMTools lies in contrast to more established workflows. ASIMTools is not designed to replace the more powerful workflow managers but rather to supplement them. This is achieved by providing unified inputs that can be easily integrated into, for example, Aiida as Python functions/asimmodules while also being a stand-alone lightweight workflow manager.
 
 # Example
 We present two examples of simulation protocols, more can be found in the
 ASIMTools documentation.
 
 ## Calculating the energy and forces of an atomic configuration
-Most atomic simulations invlolve evaluations of energies, forces, dipoles etc. of an atomic configuration. In Figure. \autoref{fig:singlepoint} we show how the `singlepoint` script, provided in 
-ASIMTools can be used and the input files needed to run the script with arbitrary input structure, calculator or environment.
+Most atomic simulations invlolve evaluations of energies, forces, dipoles etc. of an atomic configuration. In Figure. \autoref{fig:singlepoint} we show how the `singlepoint` asimmodule, provided in 
+ASIMTools can be used and the input files needed to run the asimmodule with arbitrary input structure, calculator or environment.
 
-![Schematic showing the connection between the modular input yaml files. The sim_input.yaml is the main imput file which specifies the environment, calculator (if used) and script to be run.\label{fig:singlepoint}](figures/singlepoint.pdf){ width=100% }
+![Schematic showing the connection between the modular input yaml files. The sim_input.yaml is the main imput file which specifies the environment, calculator (if used) and asimmodule to be run.\label{fig:singlepoint}](figures/singlepoint.pdf){ width=100% }
 
 # Mathematics
 
@@ -87,7 +87,7 @@ Conceptualization by Keith Phuthi. Coding and development by Keith Phuthi and Em
 <!-- # Figures
 
 Figures can be included like this:
-![Schematic showing the connection between the modular input yaml files. The sim_input.yaml is the main imput file which specifies the environment, calculator (if used) and script to be run.\label{fig:singlepoint}](figures/singlepoint.pdf){ width=100% }
+![Schematic showing the connection between the modular input yaml files. The sim_input.yaml is the main imput file which specifies the environment, calculator (if used) and asimmodule to be run.\label{fig:singlepoint}](figures/singlepoint.pdf){ width=100% }
 and referenced from text using \autoref{fig:example}. -->
 
 # Acknowledgements

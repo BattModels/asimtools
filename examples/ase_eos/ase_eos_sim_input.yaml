@@ -1,4 +1,4 @@
-script: ase_eo.py
+asimmodule: ../ase_eos.py
 env_id: inline
 workdir: results
 args:

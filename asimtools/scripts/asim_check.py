@@ -105,8 +105,8 @@ def print_job_tree(job_tree: Dict, indent_str='', level=0) -> None:
     if subjobs is not None:
         workdir = job_tree['workdir']
         status, color = get_status_and_color(job_tree['job'])
-        script = job_tree['job'].sim_input['script']
-        print(color + f'{indent_str}{workdir}, script: {script},' + \
+        asimmodule = job_tree['job'].sim_input['asimmodule']
+        print(color + f'{indent_str}{workdir}, asimmodule: {asimmodule},' + \
             f'status: {status}' + reset)
         if level > 0:
             indent_str = '| ' + ' ' * level
@@ -121,9 +121,9 @@ def print_job_tree(job_tree: Dict, indent_str='', level=0) -> None:
     else:
         subjob_dir = job_tree['workdir']
         subjob = job_tree['job']
-        script = subjob.sim_input['script']
+        asimmodule = subjob.sim_input['asimmodule']
         status, color = get_status_and_color(subjob)
-        print(color + f'{indent_str}{subjob_dir}, script: {script}, '+\
+        print(color + f'{indent_str}{subjob_dir}, asimmodule: {asimmodule}, '+\
         f'status: {status}' + reset)
 
 if __name__ == "__main__":

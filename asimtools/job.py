@@ -207,7 +207,7 @@ class UnitJob(Job):
                 }
             }
 
-        # Check if the script being called uses a calc_id to
+        # Check if the asimmodule being called uses a calc_id to
         # get precommands, postcommands, run_prefixes and run_suffixes
         self.calc_id = self.sim_input.get('args', {}).get('calc_id', None)
         if self.calc_id is not None:
@@ -219,8 +219,8 @@ class UnitJob(Job):
         '''
         Generates the command to run the job, independent of slurm
         '''
-        script = self.sim_input.get('script', False)
-        assert script, 'Specify a script in sim_input'
+        asimmodule = self.sim_input.get('asimmodule', False)
+        assert asimmodule, 'Specify a asimmodule in sim_input'
 
         mode_params = self.env.get('mode', {
             'use_slurm': False, 'interactive': True
@@ -236,10 +236,10 @@ class UnitJob(Job):
         else:
             debug_flag = ''
 
-        # GPAW requires python script to be called with gpaw python
+        # GPAW requires python asimmodule to be called with gpaw python
         # For now this is a work around but perhaps there exists a cleaner way
         if self.calc_params.get('name', '') == 'GPAW':
-            asloader = pkgutil.get_loader('asimtools.scripts.asim_run')
+            asloader = pkgutil.get_loader('asimtools.asimmodules.asim_run')
             asfile = asloader.get_filename()
             alias = f'gpaw python {asfile}'
         else:
@@ -396,7 +396,7 @@ class UnitJob(Job):
                 %s', self.workdir)
             return None
 
-        msg = f'Submitting "{self.sim_input["script"]}" in "{self.workdir}"'
+        msg = f'Submitting "{self.sim_input["asimmodule"]}" in "{self.workdir}"'
         logging.info(msg)
         print(msg) # For printing to console, maybe can be cleaner
         cur_dir = Path('.').resolve()
@@ -458,7 +458,7 @@ class UnitJob(Job):
             self.update_output({'job_ids': job_ids})
             return job_ids
 
-        msg = f'Submitted "{self.sim_input["script"]}" in "{self.workdir}"'
+        msg = f'Submitted "{self.sim_input["asimmodule"]}" in "{self.workdir}"'
         logger.info(msg)
         print(msg)
 
@@ -484,8 +484,8 @@ class DistributedJob(Job):
 
         sim_id_changed = False
         for i, (sim_id, subsim_input) in enumerate(sim_input.items()):
-            assert 'script' in subsim_input, 'Check sim_input format,\
-                must have script and each job with a unique key'
+            assert 'asimmodule' in subsim_input, 'Check sim_input format,\
+                must have asimmodule and each job with a unique key'
 
             # We set a fixed number of digits so that the slurm array ID
             # matches the directory name for easy resubmission of arrays
@@ -503,8 +503,8 @@ class DistributedJob(Job):
             sim_input = new_sim_input
         unitjobs = []
         for sim_id, subsim_input in sim_input.items():
-            assert 'script' in subsim_input, 'Check sim_input format,\
-                must have script and each job with a unique key'
+            assert 'asimmodule' in subsim_input, 'Check sim_input format,\
+                must have asimmodule and each job with a unique key'
 
             subsim_input['workdir'] = sim_id
             unitjob = UnitJob(subsim_input, env_input, calc_input)
@@ -679,7 +679,7 @@ class DistributedJob(Job):
 class ChainedJob(Job):
     '''
     Jobs made of smaller sequential unitjobs. Note that this only works
-    well with unit jobs. If one of the UnitJobs calls scripts, internally,
+    well with unit jobs. If one of the UnitJobs calls asimmodules, internally,
     slurm will fail to build the correct dependencies but the files will be
     generated appropriately, you can submit them manually
     '''
@@ -748,7 +748,7 @@ class ChainedJob(Job):
                     if not cur_step_complete:
                         unitjob.env['slurm']['flags'].append(f'-J step-{step+i}')
                         # Get latest job_id if previous step output was updated with new IDs
-                        # This should allow scripts that run scripts to use correct dependencies
+                        # This should allow asimmodules that run asimmodules to use correct dependencies
                         # print(f'Job id for step-{i} is {dependency}')
                         # if i > 0:
                         #     dependency = self.unitjobs[i-1].get_output().get('job_ids', dependency)

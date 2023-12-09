@@ -1,6 +1,6 @@
 '''
 Calculate the equation of state, fit it and extract the equilibrium 
-volume, energy and bulk modulus. This script is based on the example provided 
+volume, energy and bulk modulus. This asimmodule is based on the example provided 
 on the ASE website: https://wiki.fysik.dtu.dk/ase/tutorials/db/db.html
 
 author: mkphuthi@github.com

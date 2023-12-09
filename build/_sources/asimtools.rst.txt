@@ -6,7 +6,7 @@ asimtools package
 .. toctree::
    :maxdepth: 4
 
-   asimtools.scripts
+   asimtools.asimmodules
 
 
 

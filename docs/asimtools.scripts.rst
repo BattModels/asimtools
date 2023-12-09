@@ -1,4 +1,4 @@
-asimtools.scripts package
+asimtools.asimmodules package
 =========================
 
 
@@ -6,134 +6,134 @@ asimtools.scripts package
 .. toctree::
    :maxdepth: 4
 
-   asimtools.scripts.eos
+   asimtools.asimmodules.eos
 
 
 
-asimtools.scripts.asim\_check module
+asimtools.asimmodules.asim\_check module
 ------------------------------------
 
-.. automodule:: asimtools.scripts.asim_check
+.. automodule:: asimtools.asimmodules.asim_check
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.asim\_execute module
+asimtools.asimmodules.asim\_execute module
 --------------------------------------
 
-.. automodule:: asimtools.scripts.asim_execute
+.. automodule:: asimtools.asimmodules.asim_execute
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.asim\_run module
+asimtools.asimmodules.asim\_run module
 ----------------------------------
 
-.. automodule:: asimtools.scripts.asim_run
+.. automodule:: asimtools.asimmodules.asim_run
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.atom\_relax module
+asimtools.asimmodules.atom\_relax module
 ------------------------------------
 
-.. automodule:: asimtools.scripts.atom_relax
+.. automodule:: asimtools.asimmodules.atom_relax
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.calc\_array module
+asimtools.asimmodules.calc\_array module
 ------------------------------------
 
-.. automodule:: asimtools.scripts.calc_array
+.. automodule:: asimtools.asimmodules.calc_array
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.cell\_relax module
+asimtools.asimmodules.cell\_relax module
 ------------------------------------
 
-.. automodule:: asimtools.scripts.cell_relax
+.. automodule:: asimtools.asimmodules.cell_relax
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.chained module
+asimtools.asimmodules.chained module
 --------------------------------
 
-.. automodule:: asimtools.scripts.chained
+.. automodule:: asimtools.asimmodules.chained
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.distributed module
+asimtools.asimmodules.distributed module
 ------------------------------------
 
-.. automodule:: asimtools.scripts.distributed
+.. automodule:: asimtools.asimmodules.distributed
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.do\_nothing module
+asimtools.asimmodules.do\_nothing module
 ------------------------------------
 
-.. automodule:: asimtools.scripts.do_nothing
+.. automodule:: asimtools.asimmodules.do_nothing
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.env\_array module
+asimtools.asimmodules.env\_array module
 -----------------------------------
 
-.. automodule:: asimtools.scripts.env_array
+.. automodule:: asimtools.asimmodules.env_array
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.image\_array module
+asimtools.asimmodules.image\_array module
 -------------------------------------
 
-.. automodule:: asimtools.scripts.image_array
+.. automodule:: asimtools.asimmodules.image_array
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.lammps module
+asimtools.asimmodules.lammps module
 -------------------------------
 
-.. automodule:: asimtools.scripts.lammps
+.. automodule:: asimtools.asimmodules.lammps
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.parity module
+asimtools.asimmodules.parity module
 -------------------------------
 
-.. automodule:: asimtools.scripts.parity
+.. automodule:: asimtools.asimmodules.parity
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.sim\_array module
+asimtools.asimmodules.sim\_array module
 -----------------------------------
 
-.. automodule:: asimtools.scripts.sim_array
+.. automodule:: asimtools.asimmodules.sim_array
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.singlepoint module
+asimtools.asimmodules.singlepoint module
 ------------------------------------
 
-.. automodule:: asimtools.scripts.singlepoint
+.. automodule:: asimtools.asimmodules.singlepoint
    :members:
    :undoc-members:
    :show-inheritance:
 
-asimtools.scripts.template module
+asimtools.asimmodules.template module
 ---------------------------------
 
-.. automodule:: asimtools.scripts.template
+.. automodule:: asimtools.asimmodules.template
    :members:
    :undoc-members:
    :show-inheritance:
@@ -141,7 +141,7 @@ asimtools.scripts.template module
 Module contents
 ---------------
 
-.. automodule:: asimtools.scripts
+.. automodule:: asimtools.asimmodules
    :members:
    :undoc-members:
    :show-inheritance:

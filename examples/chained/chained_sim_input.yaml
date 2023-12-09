@@ -1,31 +1,31 @@
-script: chained
+asimmodule: workflows.chained
 config_id: inline
 args:
   workdir: results
   steps:
     step-0:
-      script: singlepoint
+      asimmodule: singlepoint
       config_id: batch
       args:
         image:
           name: 'Ar'
         properties: ['energy', 'forces']
     step-1:
-      script: singlepoint
+      asimmodule: singlepoint
       config_id: batch
       args:
         image:
           name: 'Ar'
         properties: ['energy', 'forces']
     step-2:
-      script: singlepoint
+      asimmodule: singlepoint
       config_id: batch
       args:
         image:
           name: 'Ar'
         properties: ['energy', 'forces']
     step-3:
-      script: singlepoint
+      asimmodule: singlepoint
       config_id: batch
       args:
         image:

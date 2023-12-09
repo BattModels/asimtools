@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
 Execute a workflow given the sim_input.yaml and optionally,
-a calc_input.yaml and/or env_input.yaml. The called script will be run
+a calc_input.yaml and/or env_input.yaml. The called asimmodule will be run
 in the specified workdir and env_id
 
 Author: mkphuthi@github.com
@@ -62,7 +62,7 @@ def parse_command_line(args) -> Tuple[Dict, Dict]:
 
 def main(args=None) -> None:
     """Execute a workflow given the sim_input.yaml and optinally,
-    a calc_input.yaml and/or env_input.yaml. The called script will be run
+    a calc_input.yaml and/or env_input.yaml. The called asimmodule will be run
     in the specified workdir and env_id """
     sim_input, env_input, calc_input = parse_command_line(args)
 

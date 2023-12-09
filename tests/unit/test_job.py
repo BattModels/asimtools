@@ -122,10 +122,10 @@ def test_submit(
         else:
             assert new_start_time == old_start_time
 
-def test_slurm_script(tmp_path):  
+def test_slurm_asimmodule(tmp_path):  
     wdir = tmp_path / 'results'
     sim_input = {
-        'script': 'do_nothing',
+        'asimmodule': 'do_nothing',
         'env_id': 'test_batch',
         'workdir': wdir,
         'args': {'calc_id': 'test_calc_id'},
@@ -158,19 +158,19 @@ def test_slurm_script(tmp_path):
 
     with open(wdir / 'job.sh', 'r', encoding='utf-8') as f:
         lines = f.readlines()
-    jscript_txt = ' '.join(lines)
+    jasimmodule_txt = ' '.join(lines)
 
-    assert '#SBATCH -N 1' in jscript_txt
-    assert 'test_env_precommand1' in jscript_txt
-    assert 'test_env_precommand2' in jscript_txt
-    assert 'test_env_postcommand1' in jscript_txt
-    assert 'test_env_postcommand2' in jscript_txt
-    assert 'test_calc_precommand1' in jscript_txt
-    assert 'test_calc_precommand2' in jscript_txt
-    assert 'test_calc_postcommand1' in jscript_txt
-    assert 'test_calc_postcommand2' in jscript_txt
-    assert 'test_run_prefix' in jscript_txt
-    assert 'test_run_suffix' in jscript_txt
+    assert '#SBATCH -N 1' in jasimmodule_txt
+    assert 'test_env_precommand1' in jasimmodule_txt
+    assert 'test_env_precommand2' in jasimmodule_txt
+    assert 'test_env_postcommand1' in jasimmodule_txt
+    assert 'test_env_postcommand2' in jasimmodule_txt
+    assert 'test_calc_precommand1' in jasimmodule_txt
+    assert 'test_calc_precommand2' in jasimmodule_txt
+    assert 'test_calc_postcommand1' in jasimmodule_txt
+    assert 'test_calc_postcommand2' in jasimmodule_txt
+    assert 'test_run_prefix' in jasimmodule_txt
+    assert 'test_run_suffix' in jasimmodule_txt
 
     for line in lines:
         if 'test_run_prefix' in line:

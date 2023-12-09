@@ -1,10 +1,10 @@
-script: distributed
+asimmodule: workflows.distributed
 env_id: inline
 workdir: results
 args:
-  subscripts:
+  subasimmodules:
     id-00: &id01
-      script: singlepoint
+      asimmodule: singlepoint
       env_id: batch
       args:
         calc_id: lj

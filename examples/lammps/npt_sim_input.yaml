@@ -1,4 +1,4 @@
-script: lammps
+asimmodule: lammps.lammps
 env_id: inline
 workdir: 'results'
 overwrite: true
@@ -7,11 +7,6 @@ args:
   lmp_cmd: 'lmp'
   # template needs full path right now
   template: /home/mphuthi/tests/asimtools/examples/lammps/lj_npt_template.lammps
-  # image:
-  #   name: Ar
-  #   builder: bulk
-  #   crystalstructure: 'fcc'
-  #   a: 5.3
   variables:  
     NSTEPS : 100
     THERMO_FREQ:  10

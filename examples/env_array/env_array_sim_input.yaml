@@ -1,9 +1,9 @@
-script: env_array
+asimmodule: workflows.env_array
 overwrite: true
 workdir: results
 args:
-  subscript_input:
-    script: singlepoint
+  subasimmodule_input:
+    asimmodule: singlepoint
     calc_id: qe_li
     overwrite: true
     args:

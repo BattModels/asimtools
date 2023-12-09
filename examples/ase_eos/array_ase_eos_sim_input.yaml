@@ -1,11 +1,11 @@
-script: sim_array
+asimmodule: workflows.sim_array
 workdir: results
 args:
   key_sequence: ['args', 'image', 'name']
   array_values: ['Al', 'Ni', 'Cu', 'Pd', 'Ag', 'Pt', 'Au']
   env_ids: 'batch'
   template_sim_input:
-    script: /home/mphuthi/tests/asimtools/examples/ase_eos/ase_eos.py
+    asimmodule: geometry_optimization.ase_cubic_eos_optimization.py
     args:
       calc_id: emt
       image:

@@ -1,4 +1,4 @@
-script: singlepoint
+asimmodule: singlepoint
 env_id: batch
 workdir: 'results'
 overwrite: true

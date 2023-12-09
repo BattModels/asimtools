@@ -1,4 +1,4 @@
-script: cell_relax
+asimmodule: geometry_optimization.cell_relax
 env_id: inline
 workdir: 'results'
 overwrite: true
