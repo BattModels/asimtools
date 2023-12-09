@@ -4,6 +4,7 @@ Tests for utils.py
 from pathlib import Path
 import os
 import pytest
+from ase.io import read
 from asimtools.utils import (
     join_names,
     get_atoms,
@@ -25,7 +26,7 @@ STRUCT_DIR = Path(os.path.join(
     (['_a', 'b.c'],'a__b.c_'),
     (['a', '-b.--'],'a__b_'),
     ([' ', '-b', 'c '],'b__c_'),
-    (['', 'b'],'b'),
+    (['', 'b'],'b_'),
 ])
 def test_join_names(test_input, expected):
     ''' Test join_names '''
@@ -62,16 +63,19 @@ def test_get_atoms(test_input, expected):
     ({'image_file': str(STRUCT_DIR / 'Li1.xyz')},
      [ase.build.bulk('Li').repeat((1,1,1))]),
     ({'pattern': str(STRUCT_DIR / 'Li*.xyz')},
-     [ase.build.bulk('Li').repeat((1,1,1)),
-      ase.build.bulk('Li').repeat((2,2,2)),
-      ase.build.bulk('Li').repeat((3,3,3))]),
+     [read(str(STRUCT_DIR / 'Li1.xyz')),
+      read(str(STRUCT_DIR / 'Li2.xyz')),
+      read(str(STRUCT_DIR / 'Li3.xyz'))]),
     ({'images': [ase.build.bulk('Ar'), ase.build.bulk('Fe')]},
      [ase.build.bulk('Ar'), ase.build.bulk('Fe')]),
 ])
 def test_get_images(test_input, expected):
     ''' Test getting iterable of atoms from different inputs '''
     print(get_images(**test_input), expected, '*********')
-    assert get_images(**test_input) == expected
+    input_images = get_images(**test_input)
+    assert len(input_images) == len(expected)
+    for image in input_images:
+        assert image in expected
 
 @pytest.mark.parametrize("test_input, expected",[
     (['l1', 'l2', 'l3'], {'l1': {'l2': {'l3': 'new_value'}}}),

@@ -4,8 +4,10 @@ Test Job class
 #pylint: disable=missing-function-docstring
 #pylint: disable=redefined-outer-name
 
+from pathlib import Path
 import pytest
 from asimtools.job import UnitJob
+from asimtools.utils import read_yaml
 
 def create_unitjob(sim_input, env_input, workdir, calc_input=None):
     """Helper for making a generic UnitJob object"""
@@ -23,21 +25,32 @@ def create_unitjob(sim_input, env_input, workdir, calc_input=None):
     return unitjob
 
 @pytest.mark.parametrize("env_input",[
-    "inline_env_input", "batch_env_input", "salloc_env_input"
+    "inline_env_input",
+    "batch_env_input",
+    "salloc_env_input",
 ])
-@pytest.mark.parametrize("sim_input",["do_nothing_sim_input"])
+@pytest.mark.parametrize("sim_input",[
+    "do_nothing_sim_input", "singlepoint_argon_sim_input"
+])
 def test_gen_input_files(env_input, sim_input, tmp_path, request):
     env_input = request.getfixturevalue(env_input)
     sim_input = request.getfixturevalue(sim_input)
     wdir = tmp_path / 'wdir'
     unitjob = create_unitjob(sim_input, env_input, wdir)
-    unitjob.gen_input_files()
+    unitjob.gen_input_files(write_env_input=True, write_calc_input=True)
 
     assert wdir.exists()
     assert (wdir / 'sim_input.yaml').exists()
     assert (wdir / 'calc_input.yaml').exists()
     assert (wdir / 'env_input.yaml').exists()
     assert (wdir / 'output.yaml').exists()
+    assert Path(read_yaml(wdir / 'sim_input.yaml')['workdir']) == Path('./')
+
+    # Test that we always write the input atomic structures
+    if "image" in sim_input.get('args', {}).get('image', []):
+        assert (wdir / 'input_image.xyz').exists()
+    if "images" in sim_input.get('args', {}).get('images', []):
+        assert (wdir / 'input_images.xyz').exists()
 
 @pytest.mark.parametrize("env_input",[
     "inline_env_input", "batch_env_input", "salloc_env_input"
