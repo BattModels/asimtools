@@ -1,9 +1,8 @@
 asimmodule: singlepoint
+workdir: batch_results
 env_id: batch
-workdir: 'results'
-overwrite: true
 args:
-  calc_id: gpaw
+  calc_id: lj_Ar
   image:
     name: Ar
     builder: bulk

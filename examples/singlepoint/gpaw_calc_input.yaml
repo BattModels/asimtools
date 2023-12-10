@@ -1,4 +1,4 @@
-lj: 
+lj_Ar: 
   name: LennardJones
   module: ase.calculators.lj
   args:
@@ -15,5 +15,4 @@ gpaw:
   run_prefix: srun --mpi=pmix
   precommands:
     - source ~/.bashrc
-    - conda activate py-gpaw
-    - alias python="gpaw python"
+    - conda activate py-gpaw # You probably want to do something like this!

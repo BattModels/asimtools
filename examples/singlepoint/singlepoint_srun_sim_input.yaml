@@ -1,5 +1,6 @@
 asimmodule: singlepoint
-workdir: inline_results
+workdir: srun_results
+env_id: srun
 args:
   calc_id: lj_Ar
   image:

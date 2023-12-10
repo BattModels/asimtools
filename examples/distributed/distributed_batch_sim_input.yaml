@@ -7,7 +7,7 @@ args:
       asimmodule: singlepoint
       env_id: batch
       args:
-        calc_id: lj
+        calc_id: lj_Ar
         image:
           name: Ar
         properties: ['energy', 'forces']

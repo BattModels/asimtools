@@ -48,9 +48,9 @@ def test_gen_input_files(env_input, sim_input, tmp_path, request):
 
     # Test that we always write the input atomic structures
     if "image" in sim_input.get('args', {}).get('image', []):
-        assert (wdir / 'input_image.xyz').exists()
+        assert (wdir / 'image_input.xyz').exists()
     if "images" in sim_input.get('args', {}).get('images', []):
-        assert (wdir / 'input_images.xyz').exists()
+        assert (wdir / 'images_input.xyz').exists()
 
 @pytest.mark.parametrize("env_input",[
     "inline_env_input", "batch_env_input", "salloc_env_input"

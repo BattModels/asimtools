@@ -1,14 +1,18 @@
-# Cu empirical potentials
-
 emt: 
   name: EMT
   module: ase.calculators.emt
   args:
     fixed_cutoff: True
-lj:
+lj_Cu:
   name: LennardJones
   module: ase.calculators.lj
   args:
     sigma: 2.338
     epsilon: 0.409
+lj_Ar: 
+  name: LennardJones
+  module: ase.calculators.lj
+  args:
+    sigma: 3.54
+    epsilon: 0.00802236
 

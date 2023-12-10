@@ -242,7 +242,7 @@ def get_images(
         image_file = Path(image_file).resolve()
         images = read(image_file, index=index, **kwargs)
         if not isinstance(images, list):
-                images = [images]
+            images = [images]
     elif pattern is not None:
         image_files = glob(pattern)
         assert len(image_files) > 0, \

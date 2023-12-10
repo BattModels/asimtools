@@ -14,6 +14,7 @@ import logging
 from glob import glob
 from typing import List, TypeVar, Dict, Tuple, Union
 from copy import deepcopy
+from colorama import Fore
 import ase.io
 from ase.parallel import paropen
 import numpy as np
@@ -30,6 +31,9 @@ from asimtools.utils import (
 )
 
 Atoms = TypeVar('Atoms')
+
+START_MESSAGE = '+' * 15 + ' ASIMTOOLS START' + '+' * 15 + '\n'
+STOP_MESSAGE = '+' * 15 + ' ASIMTOOLS STOP' + '+' * 15 + '\n'
 
 class Job():
     ''' Abstract class for the job object '''
@@ -51,9 +55,9 @@ class Job():
         self.workdir = Path(sim_input.get('workdir', '.')).resolve()
 
         # sim_input will be in workdir from now on so set workdir as a relative
-        # path, but in this class, always use self.workdir not
-        # which is the full path to avoid confusion sim_input['workdir']
-        self.sim_input['workdir'] = './' #str(self.workdir) 
+        # path, but in this class/subclasses, always use self.workdir
+        # which is the full path to avoid confusion
+        self.sim_input['workdir'] = './' 
         self.launchdir = Path(os.getcwd())
         if self.sim_input.get('src_dir', False):
             self.sim_input['src_dir'] = self.launchdir
@@ -168,7 +172,7 @@ class Job():
             status = output.get('status', 'clean')
             complete = status == 'complete'
         if display:
-            print(f'Current status in "{self.workdir}" is "{status}"')
+            print(f'Status: {status}')
         return complete, status
 
     def update_output(self, output_update: Dict) -> None:
@@ -320,12 +324,12 @@ class UnitJob(Job):
             if complete and not overwrite:
                 txt = f'Skipped writing in {self.workdir}, files/directory '
                 txt += 'already exist. Set overwrite=True to overwrite files '
-                txt += 'or delete directory first (recommended)'
+                txt += 'or delete results directory first (recommended)'
                 self.get_logger().warning(txt)
-                print(txt)
+                print(Fore.RED + 'WARNING: ' + txt + Fore.WHITE)
                 return None
 
-        # If the sim_input uses an image/images, we want to write it in 
+        # If the sim_input uses an image/images, we want to write it in
         # the workdir and point to it using a filename. This is so that
         # there is a record of the input image for debugging and the input
         # method is consistent with complex workflows
@@ -333,8 +337,8 @@ class UnitJob(Job):
 
         if image:
             atoms = get_atoms(**image)
-            input_image_file = 'input_image.xyz' # Relative to workdir
-            # input_image_file = self.workdir.resolve() / 'input_image.xyz'
+            input_image_file = 'image_input.xyz' # Relative to workdir
+            # input_image_file = self.workdir.resolve() / 'image_input.xyz'
             atoms.write(
                 self.workdir / input_image_file,
                 format='extxyz'
@@ -347,7 +351,7 @@ class UnitJob(Job):
         if images:
             if images.get('images', False) or images.get('image_file', False):
                 images = get_images(**images)
-                input_images_file = 'input_images.xyz' # Relative to workdir
+                input_images_file = 'images_input.xyz' # Relative to workdir
                 ase.io.write(
                     self.workdir / input_images_file,
                     images,
@@ -380,15 +384,26 @@ class UnitJob(Job):
         '''
         Submit a job using slurm, interactively or in the terminal
         '''
+
+        msg = START_MESSAGE
+        msg += f'asimmodule: {self.sim_input["asimmodule"]}\n'
+        msg += f'Work directory: {self.workdir}'
+        logmsg = f'Submitting "{self.sim_input["asimmodule"]}" in "{self.workdir}"'
+        logging.info(logmsg)
+        print(msg) # For printing to console
+
         self.gen_input_files()
 
         logger = self.get_logger()
 
         _, status = self.get_status(display=True)
-        if status in ('discard'):
+        if status in ('discard', 'complete'):
             txt = f'Current job status in "{self.workdir}" is "{status}", '
             txt += 'skipping submission, set "overwrite=True" to ignore'
             logger.warning(txt)
+            if status in ('complete'):
+                print('Job already completed, not submitting again')
+                print(STOP_MESSAGE)
             return None
 
         if not self.sim_input.get('submit', True):
@@ -396,9 +411,6 @@ class UnitJob(Job):
                 %s', self.workdir)
             return None
 
-        msg = f'Submitting "{self.sim_input["asimmodule"]}" in "{self.workdir}"'
-        logging.info(msg)
-        print(msg) # For printing to console, maybe can be cleaner
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
         mode_params = self.env.get('mode', {})
@@ -458,8 +470,10 @@ class UnitJob(Job):
             self.update_output({'job_ids': job_ids})
             return job_ids
 
-        msg = f'Submitted "{self.sim_input["asimmodule"]}" in "{self.workdir}"'
-        logger.info(msg)
+        logmsg = f'Submitted "{self.sim_input["asimmodule"]}" in "{self.workdir}"'
+        msg = 'Successfully submitted\n'
+        msg += STOP_MESSAGE
+        logger.info(logmsg)
         print(msg)
 
         return None
