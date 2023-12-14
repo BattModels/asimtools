@@ -121,7 +121,7 @@ def join_names(substrs: Sequence[str]) -> str:
     for substr in new_substrs:
         if len(substr) > 0:
             final_substrs.append(substr)
-    name = '__'.join(final_substrs) + '_'
+    name = '__'.join(final_substrs) + '__'
     return name
 
 def get_atoms(
@@ -160,6 +160,8 @@ def get_atoms(
         "Specify atoms, image_file or use ase.build tools"
 
     if image_file is not None:
+        assert Path(image_file).exists(), \
+            f'The image_file {image_file} does not exist from {os.getcwd()}'
         atoms = read(image_file, **kwargs)
     elif atoms is None:
         builder_func = getattr(ase.build, builder)
@@ -275,14 +277,20 @@ def get_images(
         for pattern in patterns:
             image_files = glob(pattern)
             assert len(image_files) > 0, \
-                f'No images matching patterns "{pattern}" from "{os.getcwd()}"'
-            images += get_images(pattern=pattern, index=index, **kwargs)
+                f'Don\'t include pattern "{pattern}" if no files match'
+            images += get_images(
+                pattern=pattern,
+                index=index,
+                skip_failed=skip_failed,
+                **kwargs
+            )
     elif images is not None:
         images = images[parse_slice(str(index))]
     else:
         images = []
 
-    assert len(images) > 0, 'No images found'
+    if not skip_failed:
+        assert len(images) > 0, 'No images found'
 
     return images
 
@@ -410,6 +418,31 @@ def change_dict_value(
         d[key_sequence[0]] = new_d
         return d
 
+def change_dict_values(
+    d: Dict,
+    new_values: Sequence,
+    key_sequences: Sequence,
+    return_copy: bool = True
+) -> Dict:
+    """Changes values in the specified dictionary given by following the 
+    key sequences. Key-value pairs are set in the given order
+
+    :param d: dictionary to be changed
+    :type d: Dict
+    :param new_values: The new values that will replace the old one
+    :type new_values: Sequence
+    :param key_sequence: List of list of keys in the order in which they access the dictionary key
+    :type key_sequence: Sequence
+    :param return_copy: Whether to return a copy only or to modify the dictionary in-place as well, defaults to True
+    :type return_copy: bool, optional
+    :return: The changed dictionary
+    :rtype: Dict
+    """
+    for key_sequence, new_value in zip(key_sequences, new_values):
+        d = change_dict_value(d, new_value, key_sequence, return_copy)
+
+    return d
+
 def get_logger(
     logfile='job.log',
     fstr='%(asctime)s |%(module)s|%(funcName)s| %(levelname)s: %(message)s',
@@ -432,16 +465,41 @@ def get_logger(
     return logging.getLogger(__name__)
 
 
-def get_str_btn(s, s1, s2):
+def get_str_btn(
+    s: str,
+    s1: str,
+    s2: str,
+    start: int = 0,
+    end: int = 0
+):
     ''' Return substring between the first instance of s1 and the first
     instance of s2 after s1 in s. None corresponds to beginning or end of
     string for s1 and s2 respectively '''
+
     if s1 is not None:
-        i1 = s.index(s1) + len(s1)
+        i1 = s.index(s1, start) + len(s1)
     else:
         i1 = 0
     if s2 is not None:
-        i2 = s[i1:].index(s2) + i1
+        i2 = s[i1:].index(s2, end) + i1
     else:
         i2 = len(s)
     return s[i1:i2]
+
+def find_nth(haystack: str, needle: str, n: int) -> int:
+    ''' Return index of nth occurence of substrin in string '''
+    start = haystack.find(needle)
+    while start >= 0 and n > 1:
+        start = haystack.find(needle, start+len(needle))
+        n -= 1
+    return start
+
+def get_nth_label(
+    s: str,
+    n: int = 1,
+):
+    ''' Return nth label in a string potentially containin multiple labels,
+    indexing starts from 0 '''
+    start = find_nth(s, '__', n=(n*2+1))
+    print('start', start)
+    return get_str_btn(s, '__', '__', start=start)

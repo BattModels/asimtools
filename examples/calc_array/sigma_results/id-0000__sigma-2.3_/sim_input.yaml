@@ -1,0 +1,7 @@
+args:
+  calc_id: sigma-2.3
+  image:
+    image_file: image_input.xyz
+asimmodule: singlepoint
+distributed_id: 0
+workdir: .

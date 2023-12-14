@@ -2,7 +2,7 @@ asimmodule: workflows.sim_array
 workdir: crystalstructure_results
 args:
   key_sequence: ['args', 'image']
-  ids: [fcc, bcc] # Check what happens in this cas if you don't specify ids
+  labels: [fcc, bcc] # Check what happens in this cas if you don't specify ids
   array_values:
   - builder: bulk
     name: Cu

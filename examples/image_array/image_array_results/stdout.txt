@@ -1,0 +1,21 @@
++++++++++++++++ ASIMTOOLS START+++++++++++++++
+asimmodule: singlepoint
+Work directory: /Users/mphuthi/Documents/scrap/dev/asimtools/examples/image_array/image_array_results/id-0000__0__
+Status: clean
+Successfully submitted
++++++++++++++++ ASIMTOOLS STOP+++++++++++++++
+
++++++++++++++++ ASIMTOOLS START+++++++++++++++
+asimmodule: singlepoint
+Work directory: /Users/mphuthi/Documents/scrap/dev/asimtools/examples/image_array/image_array_results/id-0001__1__
+Status: clean
+Successfully submitted
++++++++++++++++ ASIMTOOLS STOP+++++++++++++++
+
++++++++++++++++ ASIMTOOLS START+++++++++++++++
+asimmodule: singlepoint
+Work directory: /Users/mphuthi/Documents/scrap/dev/asimtools/examples/image_array/image_array_results/id-0002__2__
+Status: clean
+Successfully submitted
++++++++++++++++ ASIMTOOLS STOP+++++++++++++++
+

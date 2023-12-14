@@ -1,0 +1,9 @@
+args:
+  calc_id: lj_Cu
+  fmax: 0.03
+  image:
+    image_file: image_input.xyz
+asimmodule: geometry_optimization.atom_relax
+distributed_id: 1
+env_id: inline
+workdir: .

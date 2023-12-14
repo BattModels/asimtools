@@ -1,0 +1,7 @@
+args:
+  calc_id: lj_Ar
+  image:
+    image_file: image_input.xyz
+  optimizer: BFGS
+asimmodule: geometry_optimization.atom_relax
+workdir: .

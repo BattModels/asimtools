@@ -1,17 +1,12 @@
 asimmodule: workflows.image_array
-overwrite: true
-workdir: results
-env_id: batch
+workdir: image_array_results
 args:
   images:
-    pattern: /home/mphuthi/tests/asimtools/examples/image_array/structures/Ar*.cif
-  ids: [2.5, 3.0, 3.5]
-  array_max: 3
+    pattern: ../structures/Ar*.cif
+  array_max: 2
   subasimmodule_input:
     asimmodule: singlepoint
-    env_id: batch
-    overwrite: true
     args:
-      calc_id: lj
+      calc_id: lj_Ar
       properties: ['energy', 'forces']
 

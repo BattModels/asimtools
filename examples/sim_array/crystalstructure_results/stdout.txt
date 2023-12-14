@@ -1,0 +1,15 @@
+dist workdir /Users/mphuthi/Documents/scrap/dev/asimtools/examples/sim_array/crystalstructure_results
++++++++++++++++ ASIMTOOLS START+++++++++++++++
+asimmodule: singlepoint
+Work directory: /Users/mphuthi/Documents/scrap/dev/asimtools/examples/sim_array/crystalstructure_results/id-0000__fcc__
+Status: clean
+Successfully submitted
++++++++++++++++ ASIMTOOLS STOP+++++++++++++++
+
++++++++++++++++ ASIMTOOLS START+++++++++++++++
+asimmodule: singlepoint
+Work directory: /Users/mphuthi/Documents/scrap/dev/asimtools/examples/sim_array/crystalstructure_results/id-0001__bcc__
+Status: clean
+Successfully submitted
++++++++++++++++ ASIMTOOLS STOP+++++++++++++++
+

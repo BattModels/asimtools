@@ -1,0 +1,18 @@
+asimmodule: geometry_optimization.optimize
+workdir: optimize_results
+args:
+  calc_id: lj_Ar
+  image:
+    name: Ar
+    crystalstructure: fcc
+    a: 4.8
+    cubic: true
+    rattle_stdev: 0.02
+  optimizer: BFGS
+  optimizer_args: {}
+  fmax: 0.001
+  expcellfilter_args:
+    mask: null
+    hydrostatic_strain: false
+    constant_volume: false
+    scalar_pressure: 0.0

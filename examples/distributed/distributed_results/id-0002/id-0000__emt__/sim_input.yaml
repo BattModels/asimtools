@@ -1,0 +1,12 @@
+args:
+  ase_cubic_eos_args:
+    eos_string: sj
+    eps: 0.04
+    npoints: 5
+  calc_id: emt
+  image:
+    image_file: image_input.xyz
+asimmodule: elastic_constants.cubic_energy_expansion
+distributed_id: 0
+env_id: inline
+workdir: .

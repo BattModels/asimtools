@@ -1,10 +1,12 @@
 asimmodule: geometry_optimization.symmetric_cell_relax
-workdir: yh
-env_id: n16
+workdir: symmetric_cell_relax_results
 args:
-  calc_id: yh
+  calc_id: lj_Ar
   image:
-    image_file: input_image.xyz
+    name: Ar
+    crystalstructure: sc
+    a: 3
+    cubic: true
   optimizer: BFGS
   fixsymmetry_args:
     symprec: 0.01
@@ -15,4 +17,3 @@ args:
     hydrostatic_strain: false
     constant_volume: false
     scalar_pressure: 0.05
-

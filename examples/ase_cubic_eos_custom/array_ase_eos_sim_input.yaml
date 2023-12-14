@@ -1,0 +1,15 @@
+asimmodule: workflows.sim_array
+workdir: array_results
+args:
+  key_sequence: ['args', 'image', 'name']
+  array_values: ['Al', 'Ni', 'Cu', 'Pd', 'Ag', 'Pt', 'Au']
+  template_sim_input:
+    asimmodule: ../../ase_eos.py
+    args:
+      calc_id: emt
+      image:
+        builder: bulk
+        crystalstructure: fcc
+        cubic: true
+      db_file: bulk.db
+

@@ -1,0 +1,21 @@
+bulk_energy_per_atom: -0.005681511358545777
+end_time: 09:19:36, 12/14/23
+job_ids: null
+start_time: 09:19:29, 12/14/23
+status: complete
+surface_energies:
+  '100':
+    area: 6.516050000000001
+    natoms: 10
+    slab_energy: 0.8527348401609203
+    surf_energy: 0.06979304592094734
+  '110':
+    area: 9.215086283101206
+    natoms: 12
+    slab_energy: 1.327500724106697
+    surf_energy: 0.07572793230209182
+  '111':
+    area: 5.6430648323295935
+    natoms: 9
+    slab_energy: 0.6716532753405069
+    surf_energy: 0.06404204975871551

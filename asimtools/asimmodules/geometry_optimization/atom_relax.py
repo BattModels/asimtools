@@ -49,7 +49,7 @@ def atom_relax(
     dyn = getattr(ase.optimize, optimizer)(atoms)
     traj = Trajectory(
         traj_file,
-        'w',
+        'a',
         atoms,
         properties=properties
     )

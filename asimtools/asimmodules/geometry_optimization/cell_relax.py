@@ -50,12 +50,12 @@ def cell_relax(
     else:
         prefix = ''
 
-    traj_file = join_names([prefix, 'cell_relax.traj'])
+    traj_file = join_names([prefix, 'cell_relax.traj'])[:-2] # Don't include __
     sf = StrainFilter(atoms, mask=mask)
     dyn = getattr(ase.optimize, optimizer)(sf)
     traj = Trajectory(
         traj_file,
-        'w',
+        'a',
         atoms,
         properties=['energy', 'forces', 'stress'],
     )
@@ -66,7 +66,7 @@ def cell_relax(
         print('Failed to optimize atoms')
         raise
 
-    image_file = join_names([prefix, 'image_output.xyz'])
+    image_file = join_names([prefix, 'image_output.xyz'])[:-2]
     atoms.write(image_file, format='extxyz')
 
     energy = float(atoms.get_potential_energy())

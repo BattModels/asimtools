@@ -15,7 +15,7 @@ import numpy as np
 from pymatgen.core.surface import generate_all_slabs
 from pymatgen.io.ase import AseAtomsAdaptor as AAA
 from asimtools.calculators import load_calc
-from asimtools.asimmodules.atom_relax import atom_relax
+from asimtools.asimmodules.geometry_optimization.atom_relax import atom_relax
 from asimtools.utils import (
     get_atoms,
 )
@@ -35,7 +35,7 @@ def get_surface_energy(slab, calc, bulk_e_per_atom):
         surf_en = (slab_en - nslab * bulk_e_per_atom) / (2 * area)
     else:
         surf_en = None
-    return surf_en, slab, converged
+    return converged, surf_en, slab_en, area
 
 def surface_energies(
     image: Dict,
@@ -93,7 +93,7 @@ def surface_energies(
                 image={'atoms': atoms},
                 optimizer=atom_relax_args.get('optimizer', 'BFGS'),
                 properties=('energy','forces'),
-                fmax=atom_relax_args.get('fmax', 0.02),
+                fmax=atom_relax_args.get('fmax', 0.01),
                 prefix=f'{miller}_relaxed'
             )
             atoms = get_atoms(
@@ -109,15 +109,20 @@ def surface_energies(
                 f'Multiple terminations for {miller}'
 
             slab_dict[miller] = {}
-            surf_en, slab_atoms, converged = get_surface_energy(
+            converged, surf_en, slab_en, area = get_surface_energy(
                 atoms, load_calc(calc_id), bulk_e_per_atom
             )
 
             if converged:
                 slab_dict[miller]['surf_energy'] = float(surf_en)
                 slab_dict[miller]['natoms'] = len(atoms)
-                slab_atoms.write(f'{miller}.xyz')
+                slab_dict[miller]['slab_energy'] = float(slab_en)
+                slab_dict[miller]['area'] = float(area)
+                atoms.write(f'{miller}.xyz')
 
-    results = slab_dict
+    results = {
+        'surface_energies': slab_dict,
+        'bulk_energy_per_atom': bulk_e_per_atom,
+    }
 
     return results # Always return a dictionary! Use {} if necessary

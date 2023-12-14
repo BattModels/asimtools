@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/mphuthi/miniconda3/envs/ase/bin/asim-run", line 33, in <module>
+    sys.exit(load_entry_point('asimtools', 'console_scripts', 'asim-run')())
+  File "/Users/mphuthi/Documents/scrap/dev/asimtools/asimtools/scripts/asim_run.py", line 138, in main
+    results = sim_func(**sim_input.get('args', {}))
+  File "/Users/mphuthi/Documents/scrap/dev/asimtools/asimtools/asimmodules/geometry_optimization/atom_relax.py", line 49, in atom_relax
+    dyn = getattr(ase.optimize, optimizer)(atoms)
+AttributeError: module 'ase.optimize' has no attribute 'BFG'

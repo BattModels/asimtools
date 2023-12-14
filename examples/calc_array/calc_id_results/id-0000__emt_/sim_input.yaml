@@ -1,0 +1,9 @@
+args:
+  calc_id: emt
+  fmax: 0.03
+  image:
+    image_file: image_input.xyz
+asimmodule: geometry_optimization.atom_relax
+distributed_id: 0
+env_id: inline
+workdir: .

@@ -56,7 +56,7 @@ def symmetric_cell_relax(
     traj_file = 'cell_relax.traj'
     traj = Trajectory(
         traj_file,
-        'w',
+        'a',
         atoms,
         properties=['energy', 'forces', 'stress'],
     )

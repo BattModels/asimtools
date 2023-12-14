@@ -21,7 +21,7 @@ def sim_array(
     env_ids: Optional[Union[Sequence[str],str]] = None,
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
-    ids: Optional[Union[Sequence,str]] = 'values',
+    labels: Optional[Union[Sequence,str]] = 'values',
     str_btn_args: Optional[Dict] = None,
 ) -> Dict:
     """Runs the same asimmodule, iterating over multiple values of a specified
@@ -39,8 +39,8 @@ def sim_array(
     :type calc_input: Optional[Dict], optional
     :param env_input: env_input to use, defaults to None
     :type env_input: Optional[Dict], optional
-    :param ids: Custom ids to use for each simulation, defaults to None
-    :type ids: Sequence, optional
+    :param labels: Custom labels to use for each simulation, defaults to None
+    :type labels: Sequence, optional
     :return: Results
     :rtype: Dict
     """
@@ -50,26 +50,26 @@ def sim_array(
 
     if file_pattern is not None:
         array_values = glob(file_pattern)
-    print(array_values)
+
     assert len(array_values) > 0, 'No array values or files found'
 
-    if ids == 'str_btn':
-        assert str_btn_args is not None, 'Provide str_btn_args for ids'
-        ids = [get_str_btn(s, *str_btn_args) for s in array_values]
-    elif ids == 'values':
-        ids = [f'{key_sequence[-1]}-{val}' for val in array_values]
-    elif ids is None:
-        ids = [str(i) for i in range(len(array_values))]
+    if labels == 'str_btn':
+        assert str_btn_args is not None, 'Provide str_btn_args for labels'
+        labels = [get_str_btn(s, *str_btn_args) for s in array_values]
+    elif labels == 'values':
+        labels = [f'{key_sequence[-1]}-{val}' for val in array_values]
+    elif labels is None:
+        labels = [str(i) for i in range(len(array_values))]
 
-    assert len(ids) == len(array_values), \
-        'Num. of array_values must match num. of ids'
+    assert len(labels) == len(array_values), \
+        'Num. of array_values must match num. of labels'
 
     if env_ids is None:
         pass
     elif isinstance(env_ids, str):
-        env_ids = [env_ids for i in range(len(ids))]
+        env_ids = [env_ids for i in range(len(labels))]
     else:
-        assert len(env_ids) == len(ids) or isinstance(env_ids, str), \
+        assert len(env_ids) == len(labels) or isinstance(env_ids, str), \
             'Provide one env_id or as many as there are array_values'
 
     # Create sim_inputs for each array value and to create input for
@@ -84,7 +84,7 @@ def sim_array(
         )
         if env_ids is not None:
             new_sim_input['env_id'] = env_ids[i]
-        sim_inputs[ids[i]] = new_sim_input
+        sim_inputs[labels[i]] = new_sim_input
 
     # Create a distributed job object
     djob = DistributedJob(sim_inputs, env_input, calc_input)

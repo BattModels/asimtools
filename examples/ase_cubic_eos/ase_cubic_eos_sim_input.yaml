@@ -1,0 +1,13 @@
+asimmodule: geometry_optimization.ase_cubic_eos_optimization
+workdir: eos_results
+args:
+  calc_id: emt
+  image:
+    name: Cu
+    a: 3.59
+    cubic: true
+  npoints: 5
+  eps: 0.02
+  plot: true
+  eos_string: vinet
+

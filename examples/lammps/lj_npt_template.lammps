@@ -4,8 +4,9 @@ atom_style      atomic
 
 neighbor        1.0 bin
 
-lattice fcc 5.26
-region  box block 0 10 0 10 0 10
+# We explicitly epecify the initial structure and box  in the template
+lattice         fcc 5.26
+region          box block 0 10 0 10 0 10
 create_box      1 box
 create_atoms    1 box
 
@@ -16,7 +17,6 @@ pair_coeff * * 0.00802236 3.54
 
 thermo_style    custom step temp pe ke etotal press vol lx ly lz xy xz yz
 thermo          ${THERMO_FREQ}
-# dump            1 all custom ${DUMP_FREQ} traj/dump.lammpstrj id type x y z
 
 fix             1 all npt temp ${TEMP} ${TEMP} ${TAU_T} iso ${PRES} ${PRES} ${TAU_P}
 

@@ -1,26 +1,39 @@
 asimmodule: workflows.distributed
-env_id: inline
-workdir: results
+workdir: distributed_results
 args:
+  array_max: 2 # You can limit how many slurm jobs are run at the same time here (only for job arrays)
   subasimmodules:
-    id-00: &id01
+    id-0000:
       asimmodule: singlepoint
+      env_id: batch #If all env_ids are slurm batch jobs using the same configuration, we automatically use arrays
+      args:
+        calc_id: lj_Ar
+        image:
+          name: Ar
+    id-0001:
+      # Doesn't have to be same asimmodule
+      asimmodule: geometry_optimization.atom_relax
       env_id: batch
       args:
         calc_id: lj_Ar
         image:
           name: Ar
-        properties: ['energy', 'forces']
-    id-01: *id01
-    id-02: *id01
-    id-03: *id01
-    id-04: *id01
-    id-05: *id01
-    id-06: *id01
-    id-07: *id01
-    id-08: *id01
-    id-09: *id01
-    id-10: *id01
-    id-11: *id01
-    id-12: *id01
-
+    id-0002:
+      # This is just the calc_array example copied and pasted!
+      asimmodule: workflows.calc_array
+      env_id: batch
+      args:
+        calc_ids: [emt, lj_Cu]
+        env_ids: [inline, inline] # Must correspond to calc_id if list is given
+        subasimmodule_input:
+          asimmodule: elastic_constants.cubic_energy_expansion
+          args:
+            calc_id: emt
+            image:
+              name: Cu
+              a: 3.6
+              cubic: true
+            ase_cubic_eos_args: # The minimum for every calculator should be in the e-v range
+              npoints: 5
+              eps: 0.04
+              eos_string: sj

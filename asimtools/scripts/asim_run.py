@@ -96,7 +96,7 @@ def main(args=None) -> None:
         logger.debug('Loaded core asimmodule %s', module_name)
     else:
         # Try and find a asimmodule from the set asimmodule directory
-        asimmodule_dir = os.environ.get('ASIMTOOLS_SCRIPT_DIR', False)
+        asimmodule_dir = os.environ.get('ASIMTOOLS_ASIMMODULE_DIR', False)
         if asimmodule_dir:
             # asimmodule = asimmodule.replace('.', '/')
             asimmodule = Path(asimmodule_dir) / asimmodule

@@ -1,0 +1,8 @@
+args:
+  calc_id: lj_Cu
+  image:
+    image_file: image_input.xyz
+asimmodule: singlepoint
+distributed_id: 0
+env_id: inline
+workdir: .

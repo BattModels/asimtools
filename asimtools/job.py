@@ -37,7 +37,6 @@ STOP_MESSAGE = '+' * 15 + ' ASIMTOOLS STOP' + '+' * 15 + '\n'
 
 class Job():
     ''' Abstract class for the job object '''
-
     # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
@@ -263,7 +262,21 @@ class UnitJob(Job):
         calc_params = self.calc_params
 
         txt = '#!/usr/bin/sh\n'
-        for flag in slurm_params.get('flags'):
+        flags = slurm_params.get('flags')
+        if isinstance(flags, dict):
+            flag_list = []
+            for k, v in flags.items():
+                assert k.startswith('-'), \
+                    'Slurm flags must start with "-" or "--"'
+                if k.startswith('--'):
+                    delim = '='
+                else:
+                    delim = ' '
+
+                flag_list.append(delim.join([k, v]))
+        
+        flags = flag_list                
+        for flag in flags:
             txt += f'#SBATCH {flag}\n'
         txt += '\n'
         for command in slurm_params.get('precommands', []):
@@ -360,11 +373,6 @@ class UnitJob(Job):
                 sim_input['args']['images'] = {
                     'image_file': str(input_images_file),
                 }
-            # elif images.get('image_file', False):
-            #     input_images_file = Path(images['image_file']).resolve()
-            #     sim_input['args']['images'] = {
-            #         'image_file': str(input_images_file),
-            #     }
 
         write_yaml(workdir / 'sim_input.yaml', sim_input)
         if write_calc_input:

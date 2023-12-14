@@ -17,10 +17,9 @@ from asimtools.calculators import load_calc
 from asimtools.utils import (
     get_atoms,
 )
-from asimtools.asimmodules.ase_cubic_eos_optimization import (
+from asimtools.asimmodules.geometry_optimization.ase_cubic_eos_optimization import (
     ase_cubic_eos_optimization as eos
 )
-from asimtools.asimmodules.cell_relax import cell_relax
 
 def get_strained_atoms(atoms, strain: str, delta: float):
     """Returns a unit cell with atoms strained according to some useful types
@@ -84,7 +83,7 @@ def cubic_energy_expansion(
     calc_id: str,
     image: Dict,
     deltas: Sequence[float] = (-0.01,-0.0075,-0.005,0.00,0.005,0.0075,0.01),
-    ase_eos_args: Optional[Dict] = None,
+    ase_cubic_eos_args: Optional[Dict] = None,
 ) -> Dict:
     '''
     Calculates B, C11, C12 and C44 elastic constants of a structure with cubic
@@ -98,8 +97,8 @@ def cubic_energy_expansion(
     # Start by getting the Bulk modulus and optimized cell from the EOS
     logging.info('Calculating EOS')
     eos_kwargs = {'image': image, 'calc_id': calc_id}
-    if ase_eos_args is not None:
-        eos_kwargs.update(ase_eos_args)
+    if ase_cubic_eos_args is not None:
+        eos_kwargs.update(ase_cubic_eos_args)
     eos_results = eos(**eos_kwargs)
     B = eos_results['B']
     atoms = get_atoms(image_file='eos_image_output.xyz')
@@ -135,7 +134,7 @@ def cubic_energy_expansion(
         c11min12_atoms.write(f's{delta:.4f}_c11min12.xyz')
 
     def f(x, a, b, c):
-        ''' Fitting function for Free energy expansion to second order'''
+        ''' Fitting function for free energy expansion to second order'''
         return a*x**2 + b*x + c
 
     logging.info('Fitting for C44')
@@ -152,13 +151,15 @@ def cubic_energy_expansion(
     anis = 2 * C44 / (C11 - C12)
 
     results = {
-        'B': float(B / GPa),
-        'C11minC12': float(C11minC12 / GPa),
-        'C11': float(C11 / GPa),
-        'C12': float(C12 / GPa),
-        'C44': float(C44 / GPa),
-        'Anisotropy': float(anis),
-        'vol': float(atoms.get_volume()),
+        'constants': {
+            'B': float(B / GPa),
+            'C11minC12': float(C11minC12 / GPa),
+            'C11': float(C11 / GPa),
+            'C12': float(C12 / GPa),
+            'C44': float(C44 / GPa),
+            'Anisotropy': float(anis),
+            'vol': float(atoms.get_volume()),
+        },
     }
 
     return results # Always return a dictionary! Use {} if necessary

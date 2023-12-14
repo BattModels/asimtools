@@ -1,0 +1,9 @@
+end_time: 19:55:53, 12/12/23
+energy: -0.05881063236758873
+files:
+  image: image_output.xyz
+  traj: atom_relax.traj
+final_fmax: 3.201175717020595e-17
+job_ids: null
+start_time: 19:55:53, 12/12/23
+status: complete

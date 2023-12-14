@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/Users/mphuthi/miniconda3/envs/ase/bin/asim-run", line 33, in <module>
+    sys.exit(load_entry_point('asimtools', 'console_scripts', 'asim-run')())
+  File "/Users/mphuthi/Documents/scrap/dev/asimtools/asimtools/scripts/asim_run.py", line 138, in main
+    results = sim_func(**sim_input.get('args', {}))
+  File "/Users/mphuthi/Documents/scrap/dev/asimtools/asimtools/asimmodules/workflows/distributed.py", line 43, in distributed
+    job_ids = djob.submit(array_max=array_max)
+  File "/Users/mphuthi/Documents/scrap/dev/asimtools/asimtools/job.py", line 687, in submit
+    job_ids = self.submit_jobs(**kwargs)
+  File "/Users/mphuthi/Documents/scrap/dev/asimtools/asimtools/job.py", line 556, in submit_jobs
+    job_id = unitjob.submit()
+  File "/Users/mphuthi/Documents/scrap/dev/asimtools/asimtools/job.py", line 462, in submit
+    completed_process.check_returncode()
+  File "/Users/mphuthi/miniconda3/envs/ase/lib/python3.9/subprocess.py", line 460, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+subprocess.CalledProcessError: Command '['asim-run', 'sim_input.yaml', '--calc=calc_input.yaml']' returned non-zero exit status 1.

@@ -16,7 +16,7 @@ def image_array(
     subasimmodule_input: Dict,
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
-    ids: Sequence[str] = None,
+    labels: Sequence[str] = None,
     env_ids: Sequence[str] = None,
     array_max: Optional[int] = None,
 ) -> Dict:
@@ -31,8 +31,8 @@ def image_array(
     :type calc_input: Optional[Dict], optional
     :param env_input: env_input to override global file, defaults to None
     :type env_input: Optional[Dict], optional
-    :param ids: Custom ids for each image, defaults to None
-    :type ids: Sequence[str], optional
+    :param labels: Custom labels for each image, defaults to None
+    :type labels: Sequence[str], optional
     :param env_ids: Sequence of envs for each image, must be the same length \
         as the total number of images, defaults to None
     :type env_ids: Sequence[str], optional
@@ -46,11 +46,11 @@ def image_array(
     array_sim_input = {}
 
     # Allow user to customize subdirectory names if needed
-    if ids is None:
-        ids = [str(i) for i in range(len(images))]
+    if labels is None:
+        labels = [str(i) for i in range(len(images))]
     else:
-        assert len(ids) == len(images), \
-            'Num. of images must match num. of ids'
+        assert len(labels) == len(images), \
+            'Num. of images must match num. of labels'
 
     if env_ids is not None:
         assert len(env_ids) == len(images), \
@@ -62,7 +62,7 @@ def image_array(
         new_subasimmodule_input['args']['image'] = {
             'atoms': image
         }
-        array_sim_input[f'{ids[i]}'] = new_subasimmodule_input
+        array_sim_input[f'{labels[i]}'] = new_subasimmodule_input
 
         if env_ids is not None:
             new_subasimmodule_input['env_id'] = env_ids[i]

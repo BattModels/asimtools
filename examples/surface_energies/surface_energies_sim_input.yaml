@@ -1,0 +1,15 @@
+asimmodule: surface_energies.surface_energies
+workdir: surface_energies_results
+args:
+  calc_id: emt
+  image:
+    name: Cu
+    cubic: true # This is really important! You must use the conventional cell!
+  millers: ['100', '110', '111']
+  generate_all_slabs_args:
+    max_index: 2
+    min_slab_size: 15
+    min_vacuum_size: 10
+  atom_relax_args:
+    optimizer: BFGS
+    fmax: 0.01

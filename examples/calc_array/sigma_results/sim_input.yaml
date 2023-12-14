@@ -1,0 +1,16 @@
+args:
+  array_values:
+  - 2.3
+  - 2.33
+  - 2.36
+  key_sequence:
+  - args
+  - sigma
+  subasimmodule_input:
+    args:
+      image:
+        name: Cu
+    asimmodule: singlepoint
+  template_calc_id: lj_Cu
+asimmodule: workflows.calc_array
+workdir: .

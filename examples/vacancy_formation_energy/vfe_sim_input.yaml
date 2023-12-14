@@ -1,0 +1,12 @@
+asimmodule: vacancy_formation_energy.vacancy_formation_energy
+workdir: vfe_results
+args:
+  calc_id: emt
+  image: # Does not need to be relaxed, will use energy minimum volume from eos
+    name: Cu
+    a: 3.59
+    cubic: true
+  atom_relax_args:
+    fmax: 0.01
+  repeat: [5,5,5]
+vacancy_index: 1

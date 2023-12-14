@@ -1,13 +1,11 @@
-asimmodule: geometry_optimization.cell_relax
-env_id: inline
-workdir: 'results'
-overwrite: true
+asimmodule: geometry_optimization.cell_relax # The symmetry might change!
+workdir: cell_relax_results
 args:
-  calc_id: lj
+  calc_id: lj_Ar
   image:
     name: Ar
     builder: bulk
-    crystalstructure: 'fcc'
+    crystalstructure: fcc
     a: 5.2
-  smax: 0.005
+  fmax: 0.005  # See ASE docs StrainFilter for best choices for setting this
 

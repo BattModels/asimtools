@@ -1,9 +1,0 @@
-asimmodule: ../ase_eos.py
-env_id: inline
-workdir: results
-args:
-  calc_id: emt
-  image:
-    name: Cu
-  db_file: /home/mphuthi/tests/asimtools/examples/ase_eos/results/bulk.db
-

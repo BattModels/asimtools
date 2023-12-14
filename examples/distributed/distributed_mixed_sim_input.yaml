@@ -1,0 +1,37 @@
+asimmodule: workflows.distributed
+workdir: distributed_results
+args:
+  subasimmodules:
+    id-0000:
+      asimmodule: singlepoint
+      env_id: inline # No array since one of them is not a slurm batch job
+      args:
+        calc_id: lj_Ar
+        image:
+          name: Ar
+    id-0001:
+      # Doesn't have to be same asimmodule
+      asimmodule: geometry_optimization.atom_relax
+      env_id: batch
+      args:
+        calc_id: lj_Ar
+        image:
+          name: Ar
+    id-0002:
+      # This is just the calc_array example copied and pasted!
+      asimmodule: workflows.calc_array
+      env_id: batch
+      args:
+        calc_ids: [emt, lj_Cu]
+        env_ids: [inline, inline] # Must correspond to calc_id if list is given
+        subasimmodule_input:
+          asimmodule: elastic_constants.cubic_energy_expansion
+          args:
+            calc_id: emt
+            image:
+              name: Cu
+              a: 3.6
+            ase_cubic_eos_args: # The minimum for every calculator should be in the e-v range
+              npoints: 5
+              eps: 0.04
+              eos_string: sj

@@ -1,0 +1,17 @@
+args:
+  atom_relax_args:
+    fmax: 0.01
+    optimizer: BFGS
+  calc_id: emt
+  generate_all_slabs_args:
+    max_index: 2
+    min_slab_size: 15
+    min_vacuum_size: 10
+  image:
+    image_file: image_input.xyz
+  millers:
+  - '100'
+  - '110'
+  - '111'
+asimmodule: surface_energies.surface_energies
+workdir: .

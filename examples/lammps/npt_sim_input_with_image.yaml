@@ -1,11 +1,9 @@
 asimmodule: lammps.lammps
-env_id: inline
-workdir: 'results'
-overwrite: true
-submit: true
+workdir: npt_results
 args:
-  lmp_cmd: 'lmp'
-  # template needs full path right now
+  lmp_cmd: lmp
+  # path relative to workdir, full path usually works best, you can put them
+  # in a directory and version control!
   template: /home/mphuthi/dev/asimtools/examples/lammps/lj_npt_template_with_image.lammps
   image:
     name: Ar
