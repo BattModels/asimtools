@@ -60,10 +60,10 @@ def vacancy_formation_energy(
     vac_form_e = vacant_e - (len(vacant) / len(bulk) * bulk_e)
 
     res_dict = {}
-    res_dict['bulk_e'] = bulk_e
-    res_dict['vacant_e'] = vacant_e
+    res_dict['bulk_e'] = float(bulk_e)
+    res_dict['vacant_e'] = float(vacant_e)
     res_dict['bulk_n'] = len(bulk)
-    res_dict['vfe'] = vac_form_e
+    res_dict['vfe'] = float(vac_form_e)
 
     results = {'vfe': res_dict}
     return results

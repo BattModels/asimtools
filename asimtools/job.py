@@ -358,6 +358,7 @@ class UnitJob(Job):
             )
             sim_input['args']['image'] = {
                 'image_file': str(input_image_file),
+                # 'image_file': str((self.workdir / input_image_file).resolve())
             }
 
         images = self.sim_input.get('args', {}).get('images', False)
