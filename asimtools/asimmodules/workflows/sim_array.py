@@ -88,7 +88,6 @@ def sim_array(
 
     # Create a distributed job object
     djob = DistributedJob(sim_inputs, env_input, calc_input)
-    print('dist workdir', djob.workdir)
     job_ids = djob.submit()
 
     results = {'job_ids': job_ids}
