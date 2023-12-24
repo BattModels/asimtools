@@ -117,12 +117,12 @@ def surface_energies(
                 slab_dict[miller]['surf_energy'] = float(surf_en)
                 slab_dict[miller]['natoms'] = len(atoms)
                 slab_dict[miller]['slab_energy'] = float(slab_en)
+                slab_dict['bulk_energy_per_atom'] = float(bulk_e_per_atom)
                 slab_dict[miller]['area'] = float(area)
                 atoms.write(f'{miller}.xyz')
 
     results = {
         'surface_energies': slab_dict,
-        'bulk_energy_per_atom': bulk_e_per_atom,
     }
 
     return results # Always return a dictionary! Use {} if necessary

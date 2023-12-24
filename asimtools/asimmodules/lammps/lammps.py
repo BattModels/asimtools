@@ -63,7 +63,7 @@ def lammps(
         assert 'read_data ' in lmp_txt, \
             'Make sure "read_data image_input.lmpdat" command is used \
                 (with correct atom style) appropriately in lammps input \
-                asimmodule if you specify image keyword'
+                file if you specify image keyword'
 
     lmp_inp_file = join_names([prefix, 'input.lammps'])
     with open(lmp_inp_file, 'w', encoding='utf-8') as f:
