@@ -274,8 +274,9 @@ class UnitJob(Job):
                     delim = ' '
 
                 flag_list.append(delim.join([k, v]))
-        
-        flags = flag_list                
+
+            flags = flag_list
+
         for flag in flags:
             txt += f'#SBATCH {flag}\n'
         txt += '\n'
