@@ -71,6 +71,8 @@ def test_get_atoms(test_input, expected):
      [ase.build.bulk('Ar'), ase.build.bulk('Cu')]),
     ({'image_file': str(STRUCT_DIR / 'Li1.xyz')},
      [ase.build.bulk('Li').repeat((1,1,1))]),
+    ({'pattern': str(STRUCT_DIR / 'Li1*.xyz')},
+     [read(str(STRUCT_DIR / 'Li1.xyz'))]),
     ({'pattern': str(STRUCT_DIR / 'Li*.xyz')},
      [read(str(STRUCT_DIR / 'Li1.xyz')),
       read(str(STRUCT_DIR / 'Li2.xyz')),
@@ -97,7 +99,8 @@ def test_get_atoms(test_input, expected):
 ])
 def test_get_images(test_input, expected):
     ''' Test getting iterable of atoms from different inputs '''
-    print(get_images(**test_input), expected, '*********')
+    print('++input:', get_images(**test_input))
+    print('++expected:', expected)
     input_images = get_images(**test_input)
     assert len(input_images) == len(expected)
     for image in input_images:

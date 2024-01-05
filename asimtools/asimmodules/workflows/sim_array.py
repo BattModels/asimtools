@@ -23,6 +23,8 @@ def sim_array(
     env_input: Optional[Dict] = None,
     labels: Optional[Union[Sequence,str]] = 'values',
     str_btn_args: Optional[Dict] = None,
+    secondary_key_sequences: Optional[Sequence] = None,
+    secondary_array_values: Optional[Sequence] = None,
 ) -> Dict:
     """Runs the same asimmodule, iterating over multiple values of a specified
     argument based on a sim_input template provided by the user
@@ -64,6 +66,13 @@ def sim_array(
     assert len(labels) == len(array_values), \
         'Num. of array_values must match num. of labels'
 
+    if secondary_array_values is not None:
+        for l in secondary_array_values:
+            assert len(l) == len(labels), \
+                f"Secondary values ({len(l)}) not same length as array values"\
+                f" ({len(labels)})"
+
+    print(secondary_key_sequences)
     if env_ids is None:
         pass
     elif isinstance(env_ids, str):
@@ -82,6 +91,16 @@ def sim_array(
             key_sequence=key_sequence,
             return_copy=True,
         )
+
+        for k, vs in zip(secondary_key_sequences, secondary_array_values):
+            print('kv', k, vs[i])
+            new_sim_input = change_dict_value(
+                d=new_sim_input,
+                new_value=vs[i],
+                key_sequence=k,
+                return_copy=False,
+            )
+
         if env_ids is not None:
             new_sim_input['env_id'] = env_ids[i]
         sim_inputs[labels[i]] = new_sim_input
