@@ -1,5 +1,5 @@
 asimmodule: workflows.image_array
-workdir: image_array_results
+workdir: image_array_batch_results
 args:
   images:
     pattern: ../structures/Ar*.cif

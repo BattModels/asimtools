@@ -1,8 +1,0 @@
-args:
-  calc_id: emt
-  db_file: bulk.db
-  image:
-    image_file: image_input.xyz
-asimmodule: ../../ase_eos.py
-distributed_id: 4
-workdir: .

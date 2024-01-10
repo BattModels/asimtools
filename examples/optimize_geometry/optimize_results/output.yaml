@@ -1,9 +1,0 @@
-end_time: 14:19:09, 12/13/23
-energy: -0.2547222834755177
-files:
-  image: image_output.xyz
-  traj: optimize.traj
-final_fmax: 5.053349967517845e-06
-job_ids: null
-start_time: 14:19:08, 12/13/23
-status: complete

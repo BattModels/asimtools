@@ -1,4 +1,0 @@
-emt:
-  args: {}
-  module: ase.calculators.emt
-  name: EMT
