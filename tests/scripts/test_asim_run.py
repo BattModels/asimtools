@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import pytest
 from asimtools.utils import write_yaml, read_yaml
+from asimtools.job import create_unitjob
 from asimtools.scripts.asim_run import main as asim_run
 from asimtools.scripts.asim_run import parse_command_line
 

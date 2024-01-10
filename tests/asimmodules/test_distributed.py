@@ -2,33 +2,32 @@
 Tests for running asimmodules using asim_run.py
 """
 import os
-import glob
+from glob import glob
 from pathlib import Path
 import pytest
 from asimtools.utils import write_yaml
-from asimtools.scripts.asim_execute import main as asim_execute
+from asimtools.job import create_unitjob
+from asimtools.job import load_job_from_directory
 
-# @pytest.mark.parametrize("inputs",[
-#     ['do_nothing_distributed_sim_input', None],
-# ])
-# def test_distributed(inputs, tmp_path, request):
-#     ''' 
-#     Test distributed ability to launch and complete distributed jobs
-#     '''
-#     os.chdir(tmp_path)
-#     sim_input = request.getfixturevalue(inputs[0])
-#     sim_input_file = 'sim_input.yaml'
-#     write_yaml(sim_input_file, sim_input)
-#     args = [sim_input_file]
+@pytest.mark.parametrize("calc_input",["lj_argon_calc_input"])
+@pytest.mark.parametrize("env_input",["inline_env_input"])
+@pytest.mark.parametrize("sim_input",["lj_distributed_sim_input"])
+def test_distributed(env_input, calc_input, sim_input, tmp_path, request):
+    env_input = request.getfixturevalue(env_input)
+    calc_input = request.getfixturevalue(calc_input)
+    sim_input = request.getfixturevalue(sim_input)
+    wdir = tmp_path / 'wdir'
+    unitjob = create_unitjob(sim_input, env_input, wdir, calc_input=calc_input)
+    unitjob.submit()
 
-#     if inputs[1] is not None:
-#         calc_input_file = 'calc_input.yaml'
-#         calc_input = request.getfixturevalue(inputs[1])
-#         write_yaml(calc_input_file, calc_input)
-#         args += ['-c', calc_input_file]
+    assert load_job_from_directory(wdir).get_status()[1] == 'complete'
+    dirs = glob(str(wdir / 'id*'))
+    assert len(dirs) == len(sim_input['args']['subasimmodules'])
 
-#     asim_execute(args)
-#     print(str(Path(tmp_path) / 'id-0000')+'*')
-#     print(glob.glob(str(Path(tmp_path))+'/*'))
+    for d in dirs:
+        assert str(d).rsplit('/', maxsplit=1)[-1].startswith('id-')
 
-#     assert len(glob.glob(str(Path(tmp_path) / 'id-0000')+'*')) == 1
+        uj = load_job_from_directory(d)
+        assert uj.get_status()[1] == 'complete'
+
+        assert uj.get_sim_input()['workdir'] == './'
