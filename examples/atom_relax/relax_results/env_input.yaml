@@ -1,4 +1,0 @@
-inline:
-  mode:
-    interactive: true
-    use_slurm: false

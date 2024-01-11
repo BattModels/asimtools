@@ -1,2 +1,0 @@
-       Step     Time          Energy         fmax
-GPMin:    0 19:22:17       -3.246324        0.0000

@@ -1,7 +1,0 @@
-args:
-  calc_id: lj_Ar
-  fmax: 0.006
-  image:
-    image_file: image_input.xyz
-asimmodule: geometry_optimization.cell_relax
-workdir: .
