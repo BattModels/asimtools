@@ -85,11 +85,20 @@ def cubic_energy_expansion(
     deltas: Sequence[float] = (-0.01,-0.0075,-0.005,0.00,0.005,0.0075,0.01),
     ase_cubic_eos_args: Optional[Dict] = None,
 ) -> Dict:
-    '''
-    Calculates B, C11, C12 and C44 elastic constants of a structure with cubic
-    symmetry
-    '''
+    """Calculates B (Bulk modulus), C11, C12 and C44 elastic constants of 
+    a structure with cubic symmetry
 
+    :param calc_id: calc_id specification
+    :type calc_id: str
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
+    :type image: Dict
+    :param deltas: strains to apply in each direction, defaults to (-0.01,-0.0075,-0.005,0.00,0.005,0.0075,0.01)
+    :type deltas: Sequence[float], optional
+    :param ase_cubic_eos_args: Argumenents to pass to :func:`asimtools.asimmodules.geometry_optimization.ase_cubic_eos_optimization`, defaults to None
+    :type ase_cubic_eos_args: Optional[Dict], optional
+    :return: Elastic constant results
+    :rtype: Dict
+    """
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)

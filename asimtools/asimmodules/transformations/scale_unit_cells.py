@@ -28,17 +28,21 @@ def scale_unit_cells(
 ) -> Dict:
     """Produce a set of images with unit cells scaled compared to the input
 
-    :param image: Image parameters
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param scales: Scaling values by which to scale cell, defaults to None
     :type scales: Optional[Sequence], optional
-    :param logspace: Parameters to pass to np.logspace for scaling values, defaults to None
+    :param logspace: Parameters to pass to np.logspace for scaling values,
+        defaults to None
     :type logspace: Optional[Sequence], optional
-    :param linspace: Parameters to pass to np.linspace for scaling values, defaults to None
+    :param linspace: Parameters to pass to np.linspace for scaling values,
+        defaults to None
     :type linspace: Optional[Sequence], optional
-    :param scale_by: Scale either "volume" or "a" which is lattice parameter, defaults to 'a'
+    :param scale_by: Scale either "volume" or "a" which is lattice parameter,
+        defaults to 'a'
     :type scale_by: str, optional
-    :raises ValueError: If more than one of scales, linspace, logspace are provided
+    :raises ValueError: If more than one of scales, linspace, logspace are
+        provided
     :return: Path to xyz file
     :rtype: Dict
     """

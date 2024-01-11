@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 '''
-Describe the asimmodule briefly here. If this is a asimmodule that runs multiple steps,
-describe it here using reStructuredText to generate autodocs
-
-Cite the papers where the method/asimmodule was first introduced here as well
+Calculates the monovacancy formation energy from a bulk structure
 
 Author: mkphuthi@github.com
 '''
@@ -23,6 +20,24 @@ def vacancy_formation_energy(
     atom_relax_args: Optional[Dict] = None,
     repeat: Optional[Sequence] = None
 ) -> Dict:
+    """Calculates the monovacancy formation energy from a bulk structure
+
+    :param calc_id: calc_id specification
+    :type calc_id: str
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
+    :type image: Dict
+    :param vacancy_index: Index of atom to remove, defaults to 0
+    :type vacancy_index: int, optional
+    :param atom_relax_args: Args to pass to
+        :func:`asimtools.asimmodules.geometry_optimization.atom_relax.atom_relax`,
+        defaults to None
+    :type atom_relax_args: Optional[Dict], optional
+    :param repeat: Repeat to apply to image to create supercell, defaults to
+        None
+    :type repeat: Optional[Sequence], optional
+    :return: Empty dictionary
+    :rtype: Dict
+    """    
 
     calc = load_calc(calc_id)
     bulk = get_atoms(**image).repeat(repeat)

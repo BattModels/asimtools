@@ -31,8 +31,8 @@ def calc_parity_data(
 
     :param subset: List of atoms instances
     :type subset: List
-    :param calc: ASE Cailculator instance
-    :type calc: Calculator
+    :param calc_id: calc_id specification
+    :type calc_id: str
     :param properties: Properties to evaluate, choose from "energy", \
         "forces" and "stress", defaults to ('energy', 'forces', 'stress')
     :type properties: List, optional

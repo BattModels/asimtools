@@ -21,6 +21,23 @@ def ase_phonons(
     kpts: Sequence[int] = (20, 20, 20),
     supercell: Sequence[int] = (5,5,5),
 ) -> Dict:
+    """Calculates phonon spectrum and DOS using ASE
+
+    :param calc_id: calc_id specification
+    :type calc_id: str
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
+    :type image: Dict
+    :param path: Path in BZ for plot
+    :type path: str
+    :param delta: delta in ASE phonons, defaults to 0.01
+    :type delta: float, optional
+    :param kpts: kpts in ASE phonons, defaults to (20, 20, 20)
+    :type kpts: Sequence[int], optional
+    :param supercell: repeat of image to use as supercell, defaults to (5,5,5)
+    :type supercell: Sequence[int], optional
+    :return: Empty dictionary
+    :rtype: Dict
+    """
     
     atoms = get_atoms(**image)
     calc = load_calc(calc_id)

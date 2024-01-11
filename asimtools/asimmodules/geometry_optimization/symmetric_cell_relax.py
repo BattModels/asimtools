@@ -23,9 +23,9 @@ def symmetric_cell_relax(
 ) -> Dict:
     """Relaxes cell (and atoms) using ase.constraints.ExpCellFilter while retaining symmetry
 
-    :param calc_id: calc_id in calc_input.yaml
+    :param calc_id: calc_id specification
     :type calc_id: str
-    :param image: image specification
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param optimizer: Any optimizer from ase.optimize, defaults to 'BFGS'
     :type optimizer: str, optional

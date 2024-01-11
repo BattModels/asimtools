@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 '''
-Relaxes structure using ASE while retaining symmetry. Requires ASE>=3.23
+Relaxes both atoms and cell coordinates simultaneously.
 
 Author: mkphuthi@github.com
 '''
 from typing import Dict, Optional
 import ase.optimize
 from ase.constraints import ExpCellFilter
-from ase.spacegroup.symmetrize import FixSymmetry
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms
@@ -22,9 +21,9 @@ def optimize(
 ) -> Dict:
     """Relaxes cell (and atoms) using ase.constraints.ExpCellFilter while retaining symmetry
 
-    :param calc_id: calc_id in calc_input.yaml
+    :param calc_id: calc_id specification
     :type calc_id: str
-    :param image: image specification
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param optimizer: Any optimizer from ase.optimize, defaults to 'BFGS'
     :type optimizer: str, optional

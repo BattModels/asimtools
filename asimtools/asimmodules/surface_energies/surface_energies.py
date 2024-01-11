@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 '''
-Describe the asimmodule briefly here. If this is a asimmodule that runs multiple steps,
-describe it here using reStructuredText to generate autodocs
-
-Cite the papers where the method/asimmodule was first introduced here as well
+Calculates surface energies of slabs defined by args specified for
+pymatgen.core.surface.generate_all_slabs()
 
 Author: mkphuthi@github.com
 '''
@@ -38,16 +36,32 @@ def get_surface_energy(slab, calc, bulk_e_per_atom):
     return converged, surf_en, slab_en, area
 
 def surface_energies(
-    image: Dict,
     calc_id: str,
+    image: Dict,
     millers: Union[str,Sequence] = 'all',
     atom_relax_args: Optional[Dict] = None,
     generate_all_slabs_args: Optional[Dict] = None,
 ) -> Dict:
-    '''
-    Calculates surface energies of slabs defined by args specified for
+    """Calculates surface energies of slabs defined by args specified for
     pymatgen.core.surface.generate_all_slabs()
-    '''
+
+    :param calc_id: calc_id specification
+    :type calc_id: str
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
+    :type image: Dict
+    :param millers: List of miller indices to consider in the form 'xyz',
+        defaults to 'all'
+    :type millers: Union[str,Sequence], optional
+    :param atom_relax_args: Args to pass to
+        :func:`asimtools.asimmodules.geometry_optimization.atom_relax.atom_relax`,
+        defaults to None
+    :type atom_relax_args: Optional[Dict], optional
+    :param generate_all_slabs_args: Args to pass to
+        :func:`pymatgen.core.surface.generate_all_slabs`, defaults to None
+    :type generate_all_slabs_args: Optional[Dict], optional
+    :return: _description_
+    :rtype: Dict
+    """
 
     calc = load_calc(calc_id)
     bulk = get_atoms(**image)

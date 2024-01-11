@@ -14,7 +14,7 @@ from asimtools.utils import get_atoms, get_logger
 def atom_relax(
     calc_id: str,
     image: Dict,
-    optimizer: str = 'GPMin', #GPMin is fastest according to ASE docs
+    optimizer: str = 'GPMin', #GPMin is fast in many cases according to ASE docs
     properties: Tuple[str] = ('energy', 'forces'),
     fmax: float = 0.02,
     prefix: Optional[str] = None,
@@ -22,9 +22,9 @@ def atom_relax(
     """Relaxes the given tomic structure using ASE's built-in structure
     optimizers
 
-    :param calc_id: Calculator ID
+    :param calc_id: calc_id specification
     :type calc_id: str
-    :param image: image configuration
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param prefix: Prefix of output files, defaults to ''
     :type prefix: str, optional

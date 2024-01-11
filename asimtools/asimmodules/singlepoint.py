@@ -21,9 +21,9 @@ def singlepoint(
     """Evaluates the properties of a single image, currently implemented
     properties are energy, forces and stress
 
-    :param calc_id: ID of calculator provided in calc_input or global file
+    :param calc_id: calc_id specification
     :type calc_id: str
-    :param image: Image config, see :func:`asimtools.utils.get_atoms`
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param properties: properties to evaluate, defaults to ('energy', 'forces')
     :type properties: Tuple[str], optional

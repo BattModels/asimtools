@@ -16,8 +16,8 @@ from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms
 
 def ase_cubic_eos_optimization(
-    image: Dict,
     calc_id: str,
+    image: Dict,
     npoints: Optional[int] = 5,
     eos_string: Optional[str] = 'sj',
     eps: Optional[float] = 0.04,
@@ -25,10 +25,10 @@ def ase_cubic_eos_optimization(
 ) -> Dict:
     """Generate the energy-volume equation of state (energy calculations not parallelized)
 
-    :param image: Image input
-    :type image: Dict
-    :param calc_id: calc_id
+    :param calc_id: calc_id specification
     :type calc_id: str
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
+    :type image: Dict
     :param npoints: Number of energy points to calculate, must be >5, defaults to 5
     :type npoints: Optional[int], optional
     :param eos_string: eos_string as specified for :func:`ase.eos.calculate_eos`, defaults to 'sj'

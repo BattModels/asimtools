@@ -26,9 +26,9 @@ def cell_relax(
 ) -> Dict:
     """Relax cell using ASE Optimizer
 
-    :param calc_id: Key for calculator provided in calc_input
+    :param calc_id: calc_id specification
     :type calc_id: str
-    :param image: Image parameters, see :func: asimtools.utils.get_atoms
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param prefix: Prefix to output files, defaults to ''
     :type prefix: str, optional

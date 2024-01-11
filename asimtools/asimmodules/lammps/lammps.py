@@ -4,7 +4,7 @@ Runs a user defined lammps script or template
 
 Author: mkphuthi@github.com
 '''
-from typing import Dict
+from typing import Dict, Optional
 from pathlib import Path
 import subprocess
 import logging
@@ -15,14 +15,34 @@ from asimtools.utils import (
 
 def lammps(
     template: str,
-    image: Dict = None,
+    image: Optional[Dict] = None,
     prefix: str = '',
     atom_style: str = 'atomic',
-    variables: Dict = None,
+    variables: Optional[Dict] = None,
     lmp_cmd: str = 'lmp',
     masses: bool = True,
 ) -> Dict:
-    ''' 
+    """Runs a lammps script based on a specified template, variables can be 
+    specified as arguments to be defined in the final LAMMPS input file if 
+    placeholders are put in the template
+
+    :param template: path to lammps input template file
+    :type template: str
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`, defaults to None
+    :type image: Dict, optional
+    :param prefix: Prefix to be added to input file, defaults to ''
+    :type prefix: str, optional
+    :param atom_style: LAMMPS style in which to write image to Lammps data input e.g. full, atomic etc., defaults to 'atomic'
+    :type atom_style: str, optional
+    :param variables: Dictionary of variables to be defined into the lammps input, defaults to None
+    :type variables: Dict, optional
+    :param lmp_cmd: Command with which to run LAMMPS, defaults to 'lmp'
+    :type lmp_cmd: str, optional
+    :param masses: Whether to specify atomic masses in LAMMPS data input, requires ASE>3.23.0, defaults to True
+    :type masses: bool, optional
+    :return: LAMMPS out file names
+    :rtype: Dict
+    """    ''' 
     Runs a lammps simulation based on a template lammps input script
     '''
     if variables is None:

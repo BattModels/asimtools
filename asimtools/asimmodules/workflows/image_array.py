@@ -23,7 +23,7 @@ def image_array(
     """Submit the same asimmodule on multiple images and if specified, use
     different env_ids
 
-    :param images: Image config, see :func:`asimtools.utils.get_atoms`
+    :param images: Images specification, see :func:`asimtools.utils.get_images`
     :type images: Dict
     :param subasimmodule_input: sim_input of asimmodule to be run
     :type subasimmodule_input: Dict
