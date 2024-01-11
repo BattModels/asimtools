@@ -92,7 +92,7 @@ and referenced from text using \autoref{fig:example}. -->
 
 # Acknowledgements
 
-We acknowledge contributions Victor Azumah, Kian Pu, Ziqi Wang and Hancheng Zhao.
+We acknowledge feedback from Kian Pu, Lance Kavalsky, Ziqi Wang and Hancheng Zhao.
 
 # References
 Example paper.bib file:
