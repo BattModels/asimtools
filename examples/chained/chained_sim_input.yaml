@@ -1,34 +1,29 @@
-script: chained
-config_id: inline
+asimmodule: workflows.chained
+workdir: chained_results
 args:
-  workdir: results
   steps:
     step-0:
-      script: singlepoint
-      config_id: batch
+      asimmodule: geometry_optimization.atom_relax
       args:
+        calc_id: lj_Ar
         image:
-          name: 'Ar'
-        properties: ['energy', 'forces']
+          name: Ar
+          crystalstructure: fcc
+          a: 4.0
+          repeat: [3,3,3]
+          rattle_stdev: 0.02
+        fmax: 0.01
+        optimizer: LBFGS
     step-1:
-      script: singlepoint
-      config_id: batch
+      asimmodule: geometry_optimization.cell_relax
       args:
+        calc_id: lj_Ar
         image:
-          name: 'Ar'
-        properties: ['energy', 'forces']
+          image_file: step-0/image_output.xyz
+        fmax: 0.006
     step-2:
-      script: singlepoint
-      config_id: batch
+      asimmodule: geometry_optimization.ase_cubic_eos_optimization
       args:
+        calc_id: lj_Ar
         image:
-          name: 'Ar'
-        properties: ['energy', 'forces']
-    step-3:
-      script: singlepoint
-      config_id: batch
-      args:
-        image:
-          name: 'Ar'
-        properties: ['energy', 'forces']
-
+          image_file: step-1/image_output.xyz

@@ -116,6 +116,35 @@ def load_ase_calc(calc_params):
         raise
     return calc
 
+
+# def load_m3gnet(calc_params):
+#     """Load and M3GNet calculator
+
+#     :param calc_params: parameters to be passed to matgl.ext.ase.M3GNetCalculator. Must include a key "model" that points to the model used to instantiate the potential
+#     :type calc_params: Dict
+#     :return: M3GNet calculator
+#     :rtype: :class:`matgl.ext.ase.M3GNetCalculator`
+#     """
+#     from matgl.ext.ase import M3GNetCalculator
+#     import matgl
+
+#     model = calc_params.pop("model")
+#     try:
+#         pot = matgl.load_model(model)
+#         calc = M3GNetCalculator(
+#             pot,
+#             **calc_params,
+#         )
+#     except Exception:
+#         logging.error("Failed to load M3GNet with parameters:\n %s", calc_params)
+#         raise
+
+#     return calc
+
+
+# def load_chgnet(calc_params):
+#     pass
+
 # def load_espresso(calc_params):
 #     '''
 #     Load the Espresso calculator as in newer versions of ASE. This is
@@ -137,5 +166,7 @@ external_calcs = {
     'NequIP': load_nequip,
     'Allegro': load_nequip,
     'DeepPotential': load_dp,
+    # 'ChgNet': load_chgnet,
+    # 'M3GNet': load_m3gnet,
     # 'Espresso': load_espresso,
 }

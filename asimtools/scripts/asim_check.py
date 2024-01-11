@@ -4,6 +4,7 @@ Recursively check progress of jobs starting from a specified sim_input.yaml
 and pring out the progress
 '''
 import sys
+import os
 from pathlib import Path
 import argparse
 from typing import Dict, Tuple
@@ -12,7 +13,7 @@ from asimtools.utils import read_yaml
 from asimtools.job import load_job_from_directory
 
 
-def parse_command_line(args) -> Tuple[Dict, str]:
+def parse_command_line(args) -> Tuple[Dict, os.PathLike]:
     ''' Parse command line input '''
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -23,7 +24,8 @@ def parse_command_line(args) -> Tuple[Dict, str]:
     )
     args = parser.parse_args(args)
     sim_input = read_yaml(args.sim_input_file)
-    return sim_input
+    rootdir = Path('/'.join(args.sim_input_file.split('/')[:-1]))
+    return sim_input, rootdir
 
 def main(args=None) -> None:
     """Main
@@ -31,9 +33,12 @@ def main(args=None) -> None:
     :param args: cmdline args, defaults to None
     :type args: _type_, optional
     """    
-    sim_input = parse_command_line(args)
-    rootdir = sim_input['workdir']
-    jobtree = load_job_tree(rootdir)
+    sim_input, rootdir = parse_command_line(args)
+    if not sim_input['workdir'].startswith('/'):
+        workdir = rootdir / sim_input['workdir']
+    else:
+        workdir = sim_input['workdir']
+    jobtree = load_job_tree(workdir)
     print_job_tree(jobtree)
 
 def get_subjobs(workdir):
@@ -61,7 +66,7 @@ def load_job_tree(
     :return: dictionary mimicking the job tree
     :rtype: Dict
     """
-    workdir = Path(workdir)
+    workdir = Path(workdir).resolve()
 
     subjob_dirs = get_subjobs(workdir)
     if len(subjob_dirs) > 0:
@@ -73,7 +78,7 @@ def load_job_tree(
 
     job = load_job_from_directory(workdir)
     job_dict = {
-        'workdir': workdir.name,
+        'workdir_name': workdir.name,
         'job': job,
         'subjobs': subjob_dict,
     }
@@ -103,10 +108,10 @@ def print_job_tree(job_tree: Dict, indent_str='', level=0) -> None:
     reset = Fore.WHITE
     subjobs = job_tree['subjobs']
     if subjobs is not None:
-        workdir = job_tree['workdir']
+        workdir = job_tree['workdir_name']
         status, color = get_status_and_color(job_tree['job'])
-        script = job_tree['job'].sim_input['script']
-        print(color + f'{indent_str}{workdir}, script: {script},' + \
+        asimmodule = job_tree['job'].sim_input['asimmodule']
+        print(color + f'{indent_str}{workdir}, asimmodule: {asimmodule},' + \
             f'status: {status}' + reset)
         if level > 0:
             indent_str = '| ' + ' ' * level
@@ -119,11 +124,11 @@ def print_job_tree(job_tree: Dict, indent_str='', level=0) -> None:
             subjob = job_tree['job']
 
     else:
-        subjob_dir = job_tree['workdir']
+        subjob_dir = job_tree['workdir_name']
         subjob = job_tree['job']
-        script = subjob.sim_input['script']
+        asimmodule = subjob.sim_input['asimmodule']
         status, color = get_status_and_color(subjob)
-        print(color + f'{indent_str}{subjob_dir}, script: {script}, '+\
+        print(color + f'{indent_str}{subjob_dir}, asimmodule: {asimmodule}, '+\
         f'status: {status}' + reset)
 
 if __name__ == "__main__":

@@ -1,0 +1,14 @@
+asimmodule: workflows.sim_array
+workdir: image_file_results
+args:
+  key_sequence: ['args', 'image', 'image_file']
+  file_pattern: ../structures/*.cif # Relative to workdir
+  str_btn_args: [structures/Cu_, .cif]  #The substring to label result directories is between the first instances of the these two strings in the file path
+  labels: str_btn
+  template_sim_input:
+    asimmodule: singlepoint
+    args:
+      calc_id: lj_Cu
+      image:
+        image_file: {}
+   

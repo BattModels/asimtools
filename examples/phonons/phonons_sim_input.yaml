@@ -1,0 +1,11 @@
+asimmodule: phonons.ase_phonons
+workdir: phonons_results
+args:
+  calc_id: emt
+  image:
+    name: Cu
+    cubic: true
+  path: GXWXKGL
+  delta: 0.02
+  kpts: [20, 20, 20]
+  supercell: [10,10,10]

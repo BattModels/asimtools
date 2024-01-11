@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
-Execute a script given the sim_input.yaml and optionally,
-a calc_input.yaml. The called script will be run directly in the current
+Execute a asimmodule given the sim_input.yaml and optionally,
+a calc_input.yaml. The called asimmodule will be run directly in the current
 directory and environment
 '''
 
@@ -64,7 +64,7 @@ def main(args=None) -> None:
     if calc_input_file is not None:
         assert Path(calc_input_file).exists(), 'Specify valid calc input file'
         os.environ["ASIMTOOLS_CALC_INPUT"] = calc_input_file
-    script = sim_input['script']
+    asimmodule = sim_input['asimmodule']
     precommands = sim_input.get('precommands', [])
 
     for precommand in precommands:
@@ -84,36 +84,36 @@ def main(args=None) -> None:
 
             completed_process.check_returncode()
 
-    module_name = script.split('/')[-1].split('.py')[0]
-    func_name = module_name.split('.')[-1] # must match script name
+    module_name = asimmodule.split('/')[-1].split('.py')[0]
+    func_name = module_name.split('.')[-1] # must match asimmodule name
 
-    # Check if the script is a core script
-    spec = importlib.util.find_spec('.'+module_name,'asimtools.scripts')
+    # Check if the asimmodule is a core asimmodule
+    spec = importlib.util.find_spec('.'+module_name,'asimtools.asimmodules')
     if spec is not None:
         sim_module = importlib.import_module(
-            '.'+module_name,'asimtools.scripts'
+            '.'+module_name,'asimtools.asimmodules'
         )
-        logger.debug('Loaded core script %s', module_name)
+        logger.debug('Loaded core asimmodule %s', module_name)
     else:
-        # Try and find a script from the set script directory
-        script_dir = os.environ.get('ASIMTOOLS_SCRIPT_DIR', False)
-        if script_dir:
-            # script = script.replace('.', '/')
-            script = Path(script_dir) / script
+        # Try and find a asimmodule from the set asimmodule directory
+        asimmodule_dir = os.environ.get('ASIMTOOLS_ASIMMODULE_DIR', False)
+        if asimmodule_dir:
+            # asimmodule = asimmodule.replace('.', '/')
+            asimmodule = Path(asimmodule_dir) / asimmodule
             spec = importlib.util.spec_from_file_location(
-                    module_name, script
+                    module_name, asimmodule
                 )
-            logger.debug('Loading script from script directory %s', script)
+            logger.debug('Loading asimmodule from asimmodule directory %s', asimmodule)
         if spec is None:
             spec = importlib.util.spec_from_file_location(
-                module_name, script
+                module_name, asimmodule
             )
-            logger.debug('Loading script from full path %s', script)
+            logger.debug('Loading asimmodule from full path %s', asimmodule)
 
         try:
             sim_module = importlib.util.module_from_spec(spec)
         except Exception as exc:
-            err_msg = f'Failed to load module for script: "{script}"'
+            err_msg = f'Failed to load module for asimmodule: "{asimmodule}"'
             logger.error(err_msg)
             raise AttributeError(err_msg) from exc
 
@@ -121,9 +121,9 @@ def main(args=None) -> None:
         try:
             spec.loader.exec_module(sim_module)
         except Exception as exc:
-            err_txt = f'Failed to load script: {script}. Check your '
-            err_txt += 'ASIMTOOLS_SCRIPT_DIR environment variable, '
-            err_txt += 'provide the full path and ensure the script works.'
+            err_txt = f'Failed to load asimmodule: {asimmodule}. Check your '
+            err_txt += 'ASIMTOOLS_ASIMMODULE_DIR environment variable, '
+            err_txt += 'provide the full path and ensure the asimmodule works.'
             logger.error(err_txt)
             raise FileNotFoundError(err_txt) from exc
 
@@ -136,9 +136,9 @@ def main(args=None) -> None:
 
     try:
         results = sim_func(**sim_input.get('args', {}))
-        logger.info('Successfully ran script "%s" in "%s"', script, cwd)
+        logger.info('Successfully ran asimmodule "%s" in "%s"', asimmodule, cwd)
     except:
-        logger.info('Failed to run script "%s" in "%s"', script, cwd)
+        logger.info('Failed to run asimmodule "%s" in "%s"', asimmodule, cwd)
         # Restore the CALC_INPUT environment variable
         if old_calc_input_var is not None:
             os.environ["ASIMTOOLS_CALC_INPUT"] = old_calc_input_var
@@ -157,9 +157,9 @@ def main(args=None) -> None:
         if os.getenv("ASIMTOOLS_CALC_INPUT", None) is not None:
             del os.environ["ASIMTOOLS_CALC_INPUT"]
 
-    # Get job IDs from internally run scripts if any
+    # Get job IDs from internally run asimmodules if any
     job_ids = results.get('job_ids', False)
-    # Otherwise get job_ids from wherever this script is running
+    # Otherwise get job_ids from wherever this asimmodule is running
     if not job_ids:
         job_ids = os.getenv('SLURM_JOB_ID')
         results['job_ids'] = job_ids

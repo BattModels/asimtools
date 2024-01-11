@@ -1,0 +1,13 @@
+asimmodule: workflows.calc_array
+overwrite: true
+workdir: calc_id_results
+args:
+  calc_ids: [emt, lj_Cu]
+  env_ids: [inline, inline]
+  subasimmodule_input:
+    asimmodule: geometry_optimization.atom_relax
+    args:
+      image:
+        name: Cu
+        rattle_stdev: 0.05
+      fmax: 0.03

@@ -1,0 +1,12 @@
+asimmodule: singlepoint
+env_id: batch
+workdir: gpaw_results
+overwrite: true
+args:
+  calc_id: gpaw
+  image:
+    name: Ar
+    builder: bulk
+    crystalstructure: fcc
+    a: 3.0
+  properties: [energy, forces]

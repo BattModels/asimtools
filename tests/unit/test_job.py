@@ -4,8 +4,10 @@ Test Job class
 #pylint: disable=missing-function-docstring
 #pylint: disable=redefined-outer-name
 
+from pathlib import Path
 import pytest
 from asimtools.job import UnitJob
+from asimtools.utils import read_yaml
 
 def create_unitjob(sim_input, env_input, workdir, calc_input=None):
     """Helper for making a generic UnitJob object"""
@@ -23,21 +25,32 @@ def create_unitjob(sim_input, env_input, workdir, calc_input=None):
     return unitjob
 
 @pytest.mark.parametrize("env_input",[
-    "inline_env_input", "batch_env_input", "salloc_env_input"
+    "inline_env_input",
+    "batch_env_input",
+    "salloc_env_input",
 ])
-@pytest.mark.parametrize("sim_input",["do_nothing_sim_input"])
+@pytest.mark.parametrize("sim_input",[
+    "do_nothing_sim_input", "singlepoint_argon_sim_input"
+])
 def test_gen_input_files(env_input, sim_input, tmp_path, request):
     env_input = request.getfixturevalue(env_input)
     sim_input = request.getfixturevalue(sim_input)
     wdir = tmp_path / 'wdir'
     unitjob = create_unitjob(sim_input, env_input, wdir)
-    unitjob.gen_input_files()
+    unitjob.gen_input_files(write_env_input=True, write_calc_input=True)
 
     assert wdir.exists()
     assert (wdir / 'sim_input.yaml').exists()
     assert (wdir / 'calc_input.yaml').exists()
     assert (wdir / 'env_input.yaml').exists()
     assert (wdir / 'output.yaml').exists()
+    assert Path(read_yaml(wdir / 'sim_input.yaml')['workdir']) == Path('./')
+
+    # Test that we always write the input atomic structures
+    if "image" in sim_input.get('args', {}).get('image', []):
+        assert (wdir / 'image_input.xyz').exists()
+    if "images" in sim_input.get('args', {}).get('images', []):
+        assert (wdir / 'images_input.xyz').exists()
 
 @pytest.mark.parametrize("env_input",[
     "inline_env_input", "batch_env_input", "salloc_env_input"
@@ -109,10 +122,10 @@ def test_submit(
         else:
             assert new_start_time == old_start_time
 
-def test_slurm_script(tmp_path):  
+def test_slurm_asimmodule(tmp_path):  
     wdir = tmp_path / 'results'
     sim_input = {
-        'script': 'do_nothing',
+        'asimmodule': 'do_nothing',
         'env_id': 'test_batch',
         'workdir': wdir,
         'args': {'calc_id': 'test_calc_id'},
@@ -145,19 +158,19 @@ def test_slurm_script(tmp_path):
 
     with open(wdir / 'job.sh', 'r', encoding='utf-8') as f:
         lines = f.readlines()
-    jscript_txt = ' '.join(lines)
+    jasimmodule_txt = ' '.join(lines)
 
-    assert '#SBATCH -N 1' in jscript_txt
-    assert 'test_env_precommand1' in jscript_txt
-    assert 'test_env_precommand2' in jscript_txt
-    assert 'test_env_postcommand1' in jscript_txt
-    assert 'test_env_postcommand2' in jscript_txt
-    assert 'test_calc_precommand1' in jscript_txt
-    assert 'test_calc_precommand2' in jscript_txt
-    assert 'test_calc_postcommand1' in jscript_txt
-    assert 'test_calc_postcommand2' in jscript_txt
-    assert 'test_run_prefix' in jscript_txt
-    assert 'test_run_suffix' in jscript_txt
+    assert '#SBATCH -N 1' in jasimmodule_txt
+    assert 'test_env_precommand1' in jasimmodule_txt
+    assert 'test_env_precommand2' in jasimmodule_txt
+    assert 'test_env_postcommand1' in jasimmodule_txt
+    assert 'test_env_postcommand2' in jasimmodule_txt
+    assert 'test_calc_precommand1' in jasimmodule_txt
+    assert 'test_calc_precommand2' in jasimmodule_txt
+    assert 'test_calc_postcommand1' in jasimmodule_txt
+    assert 'test_calc_postcommand2' in jasimmodule_txt
+    assert 'test_run_prefix' in jasimmodule_txt
+    assert 'test_run_suffix' in jasimmodule_txt
 
     for line in lines:
         if 'test_run_prefix' in line:

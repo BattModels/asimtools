@@ -5,10 +5,10 @@ When contributing to this repository, please first discuss the change you wish t
 Please note we have a code of conduct, please follow it in all your interactions with the project.
 
 There are two main ways to contribute. One is to make changes to the existing
-codes and scripts. In this case, please make sure your change passes tests or
-submit a test accordinly. The second way to contribute is to add a new script
-to the core set of scripts. Reviewers will work with you to make sure your new
-script follows best practice including using utils, syntax highlighting, docs
+codes and asimmodules. In this case, please make sure your change passes tests or
+submit a test accordinly. The second way to contribute is to add a new asimmodule
+to the core set of asimmodules. Reviewers will work with you to make sure your new
+asimmodule follows best practice including using utils, syntax highlighting, docs
 and tests.
 
 ## Pull Request Process

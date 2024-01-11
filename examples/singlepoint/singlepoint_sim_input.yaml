@@ -1,9 +1,7 @@
-script: singlepoint
-env_id: batch
-workdir: 'results'
-overwrite: true
+asimmodule: singlepoint
+workdir: inline_results
 args:
-  calc_id: lj
+  calc_id: lj_Ar
   image:
     name: Ar
     builder: bulk

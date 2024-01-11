@@ -1,0 +1,23 @@
+asimmodule: workflows.sim_array
+workdir: crystalstructure_results
+args:
+  key_sequence: ['args', 'image']
+  labels: [fcc, bcc] # Check what happens in the results dir if you don't specify ids
+  array_values:
+  - builder: bulk
+    name: Cu
+    crystalstructure: fcc
+    a: 3.59
+  - builder: bulk
+    name: Cu
+    crystalstructure: bcc
+    a: 3.655
+  env_ids: inline
+  template_sim_input:
+    asimmodule: singlepoint
+    args:
+      calc_id: lj_Cu
+      image: {} # You can set a placeholder here or not specify. 
+        # I usually put something that would cause an error to make sure 
+        # it is substituted correctly
+   

@@ -1,0 +1,3 @@
+asimmodule: do_nothing
+args:
+  duration: 3

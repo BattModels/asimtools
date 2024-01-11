@@ -3,6 +3,8 @@ atom_style      atomic
 
 neighbor        1.0 bin
 boundary        p p p
+
+# We read in the initial structure from a file
 read_data       image_input.lmpdat
 mass            1 39.948
 

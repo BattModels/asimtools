@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
 Execute a workflow given the sim_input.yaml and optionally,
-a calc_input.yaml and/or env_input.yaml. The called script will be run
+a calc_input.yaml and/or env_input.yaml. The called asimmodule will be run
 in the specified workdir and env_id
 
 Author: mkphuthi@github.com
@@ -60,18 +60,19 @@ def parse_command_line(args) -> Tuple[Dict, Dict]:
 
     return sim_input, env_input, calc_input
 
-
 def main(args=None) -> None:
-    """Execute a workflow given the sim_input.yaml and optinally,
-    a calc_input.yaml and/or env_input.yaml. The called script will be run
+    """Execute a workflow given the sim_input.yaml and optionally,
+    a calc_input.yaml and/or env_input.yaml. The called asimmodule will be run
     in the specified workdir and env_id """
     sim_input, env_input, calc_input = parse_command_line(args)
+    sim_input['workdir'] = sim_input.get('workdir', 'results')
+
     job = UnitJob(
         sim_input=sim_input,
         env_input=env_input,
         calc_input=calc_input
     )
-    job.gen_input_files()
+    job.gen_input_files(write_calc_input=True, write_env_input=True)
     job.go_to_workdir()
     try:
         job.submit()

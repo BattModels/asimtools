@@ -1,0 +1,18 @@
+asimmodule: workflows.sim_array
+workdir: lattice_parameter_results
+args:
+  key_sequence: ['args', 'image', 'a']
+  array_values: [3.50, 3.60, 3.70]
+  env_ids: inline
+  template_sim_input:
+    asimmodule: singlepoint
+    args:
+      calc_id: lj_Cu
+      image:
+        builder: bulk
+        name: Cu
+        crystalstructure: 'fcc'
+        a: {} # You can set a placeholder here or not specify. 
+        # I usually put something that would cause an error to make sure 
+        # it is substituted correctly
+   

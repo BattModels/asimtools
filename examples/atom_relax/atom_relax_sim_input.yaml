@@ -1,11 +1,14 @@
-script: atom_relax
-env_id: srun
-workdir: 'results'
-overwrite: true
+asimmodule: geometry_optimization.atom_relax
+env_id: 
+workdir: relax_results
 args:
-  calc_id: lj
+  calc_id: lj_Ar
   image:
     name: Ar
     builder: bulk
-    crystalstructure: 'fcc'
-  fmax: 0.05
+    crystalstructure: fcc
+    a: 5.3
+    rattle_stdev: 0.03
+    repeat: [4,4,4]
+  fmax: 0.01
+  optimizer: GPMin

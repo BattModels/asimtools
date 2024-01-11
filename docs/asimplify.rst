@@ -1,13 +1,14 @@
-Developing Custom Scripts
-=========================
+Developing Custom asimmodules
+=============================
 
-This section will guide you through taking your own in-house simulation and 
-integrating it in to asimtools. The process is designed to be as 
+This section will guide you through taking your own in-house simulation and
+integrating it in to asimtools. The process is designed to be as
 straight-forward as reasonably possible. 
 
 As an example, we will ASIMplify the calculation of adsorption_energies as
-shown in ASE. To understand the code, visit the ASE `tutorials page <https://wiki.fysik.dtu.dk/ase/tutorials/db/db.html>`. Ultimately, the
-ASIMplified code will work with any element and , any calculator and any
+shown in ASE. To understand the code, visit the ASE `tutorials page
+<https://wiki.fysik.dtu.dk/ase/tutorials/db/db.html>`. Ultimately, the
+ASIMplified code will work with any element and any calculator and any
 environment and be fully parallelized job submission in just a few steps!
 
 **Use toy example** To make things easier, it is best to first replace the
@@ -37,12 +38,11 @@ provided here for reference:
         db.write(atoms, bm=B)
 
 
-**Wrap in a function** The workhorse of ASIMTools is the function, any code
+**Wrap in a function** The workhorse of ASIMTools is the asimmodule, any code
 wrapped in a function that returns a dictionary can be run within the
 ASIMTools framework. The easiest thing to do would be to take the code and
-copy and paste it in a function which is defined inside a script with the
+copy and paste it in a function which is defined inside an asimmodule with the
 same name
-
 
 .. code-block:: 
   
@@ -65,12 +65,12 @@ same name
         
         return {}
 
-Immediately as it is, this script can be run in ASIMTools. You can run it with
-the following sim_input.yaml
+Immediately as it is, this is an asimmodule can be run in ASIMTools. You can
+run it with the following sim_input.yaml
 
 .. code-block:: yaml
 
-    script: /path/to/ase_eos.py 
+    asimmodule: /path/to/ase_eos.py 
     env_id: inline
     workdir: results
 
@@ -81,8 +81,8 @@ then call
     asim-execute sim_input.yaml
 
 Only a little bit more complicated than calling ``python ase_eos.py``
-This script however still depends on specific structures and a specific
-calculator. Let's do the easy thing first, let's make the script work with any
+This asimmodule however still depends on specific structures and a specific
+calculator. Let's do the easy thing first, let's make the asimmodule work with any
 calculator using a simple change.
 
 .. code-block:: 
@@ -109,8 +109,8 @@ calculator using a simple change.
         
         return {}
 
-Just like that we can now run the script with any correctly configure
-calculator for the all the structures! We can even now run ``calc_array`` to
+Just like that we can now run the asimmodule with any correctly configured
+calculator for all the structures! We can even now run ``calc_array`` to
 iterate getting the results using different calculators.
 
 The final change we will make is to parallelize over structures as below
@@ -139,13 +139,13 @@ The final change we will make is to parallelize over structures as below
         
         return {}
 
-Easy-peasy. We now have a script that works with arbitrary environment,
+Easy-peasy. We now have an asimmodule that works with arbitrary environment,
 arbitrary calculator and arbitrary input structure (Of course the simulation
-will fail if we give a bad structure for example)
+will fail if we give a bad structure/calculator for example)
 
-We can do some final cleanup of the script so that it sends outputs to
-``output.yaml`` and logs some checkpoints. Additionally, any scripts added to
-the repository will need clear syntax highlighting and documentation.
+We can do some final cleanup of the asimmodule so that it sends outputs to
+``output.yaml`` and logs some checkpoints. Additionally, any asimmodules added
+to the repository will need clear syntax highlighting and documentation.
 
 .. code-block:: 
   
@@ -176,7 +176,7 @@ the repository will need clear syntax highlighting and documentation.
         results = {'v': float(v), 'e': float(e), 'B': float(B)}
         return results
 
-To run this script on an arbitrary structure say Argon with say the
+To run this asimmodule on an arbitrary structure say Argon with say the
 LennardJones calculator, in a slurm job we can now use the following input
 files.
 
@@ -184,20 +184,20 @@ sim_input.yaml:
 
 .. code-block:: yaml
 
-    script: /path/to/ase_eos.py 
+    asimmodule: /path/to/ase_eos.py 
     env_id: batch
     workdir: results
     args:
         image:
             builder: bulk
             name: Ar
-        calc_id: gpaw
+        calc_id: lj_Ar
 
 calc_input.yaml:
 
 .. code-block:: yaml
 
-    lj: 
+    lj_Ar: 
         name: LennardJones
         module: ase.calculators.lj
         args:
@@ -227,49 +227,50 @@ env_input.yaml:
             use_slurm: false
             interactive: true
 
-Going back to the original problem, we wanted to run the simulation of mulitple
+Going back to the original problem, we wanted to run the simulation of multiple
 different elements with the EMT calculator. To achieve that in parallel, we can
-nest the ``ase_eos`` script in a :func:`asimtools.scripts.sim_array.sim_array` script as follows
+nest the ``ase_eos`` asimmodule in a
+:func:`asimtools.asimmodules.sim_array.sim_array` asimmodule as follows
 
 sim_input.yaml:
 
 .. code-block:: yaml
 
-    script: sim_array
+    asimmodule: sim_array
     workdir: results
     args:
         key_sequence: ['args', 'image', 'name']
         array_values: ['Al', 'Ni', 'Cu', 'Pd', 'Ag', 'Pt', 'Au']
         env_ids: 'batch'
         template_sim_input:
-            script: /path/to/ase_eos.py
+            asimmodule: /path/to/ase_eos.py
             args:
                 calc_id: emt
                 image:
                     builder: bulk
                     crystalstructure: 'fcc'
 
-To make the script easier to access without having to use the full path, you
+To make the asimmodule easier to access without having to use the full path, you
 can set the environment variable
 
 .. code-block:: console
 
-    export ASIMTOOLS_SCRIPT_DIR=/path/to/my/script/dir/
+    export ASIMTOOLS_ASIMMODULE_DIR=/path/to/my/asimmodule/dir/
 
-You can then move the ``ase_eos.py`` script into a directory called ``ase_eos``
-and place it in the script directory. This allows you to refer to scripts
-prepended with the script dir as below
+You can then move the ``ase_eos.py`` asimmodule to
+``/path/to/my/asimmodule/dir/`` i.e. the asimmodule directory. This allows you
+to refer to asimmodules prepended with the asimmodule dir as below
 
 .. code-block:: yaml
 
-    script: sim_array
+    asimmodule: sim_array
     workdir: results
     args:
         key_sequence: ['args', 'image', 'name']
         array_values: ['Al', 'Ni', 'Cu', 'Pd', 'Ag', 'Pt', 'Au']
         env_ids: 'batch'
         template_sim_input:
-            script: ase_eos/ase_eos.py
+            asimmodule: ase_eos/ase_eos.py
             args:
                 calc_id: emt
                 image:

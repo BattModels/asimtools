@@ -1,10 +1,10 @@
-script: strong_scaling.strong_scaling.py
+asimmodule: strong_scaling.strong_scaling.py
 overwrite: true
 workdir: results
 args:
   ntasks: [1,2,4,8,16]
-  subscript_input:
-    script: singlepoint
+  subasimmodule_input:
+    asimmodule: singlepoint
     overwrite: true
     args:
       image:
@@ -14,7 +14,7 @@ args:
         rattle_stdev: 0.01
       calc_id: qe_li
       properties: ['energy', 'forces']
-  subscript_env_input:
+  subasimmodule_env_input:
     mode:
       use_slurm: true
       interactive: false

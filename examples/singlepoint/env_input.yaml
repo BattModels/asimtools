@@ -4,23 +4,25 @@ batch:
     interactive: false
   slurm:
     flags:
-      - -n 2
-      - -p idle
-      - --gres:gpu=0
+      - -n 1
+      - -N 1
+      - -J my_batch_job
+    # You can do things like activate environments, set environment variables
+    # etc. before running the asimmodule using precommands using bash commands
     precommands:
-      - source ~/.bashrc
-      - conda activate asimtools
+      - export MY_ASIMTOOLS_ENV_VAR="Hello"
+      - echo $MY_ASIMTOOLS_ENV_VAR
+    # You can do things like delete files that take up space etc. after the 
+    # asimmodule is run using postcommands using bash commands
+    postcommands:
+      - echo "Bye"
 srun:
   mode:
     use_slurm: true
     interactive: true
   slurm:
     flags:
-      - -n 2
-      - -p idle
-    precommands:
-      - source ~/.bashrc
-      - conda activate asimtools
+      - -n 1
 inline:
   mode:
     use_slurm: false

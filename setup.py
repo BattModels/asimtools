@@ -28,7 +28,7 @@ setup(
         "pandas",
         "pyyaml",
         "pymatgen",
-        "ase",
+        "ase<=3.22.1", # ASE redid how io calculators work beyond this version
         "colorama",
         "myst-parser",
         "sphinx",

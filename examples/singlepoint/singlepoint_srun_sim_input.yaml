@@ -1,0 +1,11 @@
+asimmodule: singlepoint
+workdir: srun_results
+env_id: srun
+args:
+  calc_id: lj_Ar
+  image:
+    name: Ar
+    builder: bulk
+    crystalstructure: 'fcc'
+    a: 3.0
+  properties: ['energy', 'forces']

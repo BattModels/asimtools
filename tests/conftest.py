@@ -68,7 +68,7 @@ def lj_argon_calc_input():
 def singlepoint_argon_sim_input():
     ''' Sim input for singlepoint calculation '''
     sim_input = {
-        'script': 'singlepoint',
+        'asimmodule': 'singlepoint',
         'prefix': 'test_',
         'image': {
             'name': 'Ar',
@@ -82,10 +82,10 @@ def singlepoint_argon_sim_input():
 @pytest.fixture
 def do_nothing_sim_input():
     ''' 
-    Sim imput for a script that just completes without doing anything
+    Sim imput for a asimmodule that just completes without doing anything
     '''
     sim_input = {
-        'script': './data/do_nothing.py',
+        'asimmodule': './data/do_nothing.py',
         'prefix': 'test_',
         'args': {
             'duration': 5,
@@ -94,12 +94,12 @@ def do_nothing_sim_input():
     return sim_input
 
 @pytest.fixture
-def do_nothing_distributed_sim_input():
+def lj_distributed_sim_input():
     ''' 
-    Sim imput for a script that just completes without doing anything
+    Sim input for a distributed job that does some lj calculations
     '''
-    subscript_input = {
-        'script': 'singlepoint',
+    subasimmodule_input = {
+        'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
             'calc_id': 'lj',
@@ -110,23 +110,13 @@ def do_nothing_distributed_sim_input():
         }
     }
     sim_input = {
-        'script': 'distributed',
+        'asimmodule': 'workflows.distributed',
         'env_id': 'inline',
         'args': {
-            'subscripts': {
-                'id-00': subscript_input,
-                'id-01': subscript_input,
-                'id-02': subscript_input,
-                'id-03': subscript_input,
-                'id-04': subscript_input,
-                'id-05': subscript_input,
-                'id-06': subscript_input,
-                'id-07': subscript_input,
-                'id-08': subscript_input,
-                'id-09': subscript_input,
-                'id-10': subscript_input,
-                'id-11': subscript_input,
-                'id-12': subscript_input,
+            'subasimmodules': {
+                'id-0000': subasimmodule_input,
+                'id-0001': subasimmodule_input,
+                'id-0002': subasimmodule_input,
             }
         }
     }
@@ -134,12 +124,12 @@ def do_nothing_distributed_sim_input():
     return sim_input
 
 @pytest.fixture
-def do_nothing_distributed_custom_name_sim_input():
+def lj_distributed_custom_name_sim_input():
     ''' 
-    Sim imput for a script that just completes without doing anything
+    Sim input for a distributed job that does some lj calculations
     '''
-    subscript_input = {
-        'script': 'singlepoint',
+    subasimmodule_input = {
+        'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
             'calc_id': 'lj',
@@ -150,22 +140,14 @@ def do_nothing_distributed_custom_name_sim_input():
         }
     }
     sim_input = {
-        'script': 'distributed',
+        'asimmodule': 'workflows.distributed',
         'env_id': 'inline',
         'args': {
-            'subscripts': {
-                'first': subscript_input,
-                'second': subscript_input,
-                'third': subscript_input,'id-03': subscript_input,
-                'id-04': subscript_input,
-                'id-05': subscript_input,
-                'id-06': subscript_input,
-                'id-07': subscript_input,
-                'id-08': subscript_input,
-                'id-09': subscript_input,
-                'id-10': subscript_input,
-                'id-11': subscript_input,
-                'id-12': subscript_input,
+            'subasimmodules': {
+                'first': subasimmodule_input,
+                'second': subasimmodule_input,
+                'third': subasimmodule_input,
+                'id-03': subasimmodule_input,
             }
         }
     }
@@ -173,12 +155,12 @@ def do_nothing_distributed_custom_name_sim_input():
     return sim_input
 
 @pytest.fixture
-def do_nothing_distributed_batch_sim_input():
+def lj_distributed_batch_sim_input():
     ''' 
-    Sim imput for a script that just completes without doing anything
+    Sim input for a distributed job that does some lj calculations
     '''
-    subscript_input = {
-        'script': 'singlepoint',
+    subasimmodule_input = {
+        'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
             'calc_id': 'lj',
@@ -189,23 +171,14 @@ def do_nothing_distributed_batch_sim_input():
         }
     }
     sim_input = {
-        'script': 'distributed',
+        'asimmodule': 'workflows.distributed',
         'env_id': 'batch',
         'args': {
-            'subscripts': {
-                'id-00': subscript_input,
-                'id-01': subscript_input,
-                'id-02': subscript_input,
-                'id-03': subscript_input,
-                'id-04': subscript_input,
-                'id-05': subscript_input,
-                'id-06': subscript_input,
-                'id-07': subscript_input,
-                'id-08': subscript_input,
-                'id-09': subscript_input,
-                'id-10': subscript_input,
-                'id-11': subscript_input,
-                'id-12': subscript_input,
+            'subasimmodules': {
+                'id-0000': subasimmodule_input,
+                'id-0001': subasimmodule_input,
+                'id-0002': subasimmodule_input,
+                'id-0003': subasimmodule_input,
             }
         }
     }
