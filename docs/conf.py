@@ -64,5 +64,6 @@ html_static_path = ['_static']
 # Intersphinx Mappings
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
-    'ase': ('https://wiki.fysik.dtu.dk/ase/', None)
+    'ase': ('https://wiki.fysik.dtu.dk/ase/', None),
+    'pymatgen': ('https://pymatgen.org/', None),
 }

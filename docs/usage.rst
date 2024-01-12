@@ -17,11 +17,11 @@ provided, the globally configured files will be used. See :ref:`envinput`. This
 command will automatically run the specified simulation in the correct
 directory and environment. 
 
-A different option is to use the following command:
+In rare cases, you can use the following command:
 
 .. code-block:: console
 
-    asim-execute sim_input.yaml -c calc_input.yaml -e env_input.yaml
+    asim-run sim_input.yaml -c calc_input.yaml
 
 This command will run the simulation in the current directory and environment.
 For most cases, you will only ever use ``asim-execute``. The differences
@@ -30,57 +30,20 @@ between ``asim-execute`` and ``asim-run`` are explained in
 
 .. _inputs:
 
+In summary, the steps you need to take to start using any of the in-built
+asimmodules, described in detail below, are the following:
+
+1. Install ASIMTools in you python environment or add it to your
+   ``PYTHONPATH``.
+2. Setup your global ``env_input.yaml`` and ``calc_input.yaml`` and set the
+   environment variables pointing to them.
+3. Write a ``sim_input.yaml`` based on the examples provided in the repository.
+   Do not hesitate to submit an issue if you are confused as we are still in a
+   testing phase
+4. asim-execute!
+
 Input files
 ***********
-
-.. _siminput:
-
-sim_input.yaml
---------------
-
-The minimal requirement to run an asimmodule is to provide a ``sim_input.yaml``
-file. An example of a ``sim_input.yaml`` is shown below:
-
-.. code-block:: yaml
-
-    asimmodule: singlepoint 
-    env_id: inline
-    overwrite: false
-    submit: true
-    workdir: results
-    precommands:
-        - export MY_ENV_VAR=3
-    args:
-        arg1: value_1
-        arg2: value_2
-        ... 
-
-The parameters are:
-
-- **asimmodule**: (str) name of core asimmodule or /path/to/my/asimmodule.py.
-  Core asimmodules defined in the asimmodules directory can be simply referred
-  to using Python dot notation. E.g. to specify the
-  :func:`asimtools.asimmodules.workflows.sim_array` asimmodule, you would
-  specify `workflows.sim_array`. Any other asimmodule should be specified as
-  either a full path or a path relative to ``ASIMTOOLS_ASIMMODULE_DIR``
-  variable to a python file. E.g. ``my_asimmodules/asim_ple.py``
-- **env_id**: (str, optional) Environment/context in which to run asimmodule
-  configured in env_input.yaml, defaults to running in the current console
-- **overwrite**: (bool, optional) (bool) whether or not to overwrite work
-  directories if they exist, defaults to false 
-- **submit**: (bool, optional) whether running the asimmodule, defaults to true 
-- **workdir**: (str, optional) The directory in which the asimmodule will be
-  run, `asim-execute` will create the directory whereas `asim-run` ignores this
-  parameter, defaults to './results'
-- **precommands**: (list, optional) a list of commands to run in the console
-  before running the asimmodule, defaults to empty list
-- **postcommands**: (list, optional) a list of commands to run in the console
-  after running the asimmodule, defaults to empty list
-- **args**: (dict) The arguments of the function being called in the asimmodule
-  as key-value pairs. These are specific to the asimmodule being run.
-
-All ASIMTools generated files are named ``sim_input.yaml`` but you can name
-user defined files as whatever you like
 
 .. _envinput:
 
@@ -267,6 +230,55 @@ implemented.
   the arguments are passed as ``calc = LennardJones(**{'sigma':3.2,
   'epsilon':3})``
 
+.. _siminput:
+
+sim_input.yaml
+--------------
+
+The minimal requirement to run an asimmodule is to provide a ``sim_input.yaml``
+file. An example of a ``sim_input.yaml`` is shown below:
+
+.. code-block:: yaml
+
+    asimmodule: singlepoint 
+    env_id: inline
+    overwrite: false
+    submit: true
+    workdir: results
+    precommands:
+        - export MY_ENV_VAR=3
+    args:
+        arg1: value_1
+        arg2: value_2
+        ... 
+
+The parameters are:
+
+- **asimmodule**: (str) name of core asimmodule or /path/to/my/asimmodule.py.
+  Core asimmodules defined in the asimmodules directory can be simply referred
+  to using Python dot notation. E.g. to specify the
+  :func:`asimtools.asimmodules.workflows.sim_array` asimmodule, you would
+  specify `workflows.sim_array`. Any other asimmodule should be specified as
+  either a full path or a path relative to ``ASIMTOOLS_ASIMMODULE_DIR``
+  variable to a python file. E.g. ``my_asimmodules/asim_ple.py``
+- **env_id**: (str, optional) Environment/context in which to run asimmodule
+  configured in env_input.yaml, defaults to running in the current console
+- **overwrite**: (bool, optional) (bool) whether or not to overwrite work
+  directories if they exist, defaults to false 
+- **submit**: (bool, optional) whether running the asimmodule, defaults to true 
+- **workdir**: (str, optional) The directory in which the asimmodule will be
+  run, `asim-execute` will create the directory whereas `asim-run` ignores this
+  parameter, defaults to './results'
+- **precommands**: (list, optional) a list of commands to run in the console
+  before running the asimmodule, defaults to empty list
+- **postcommands**: (list, optional) a list of commands to run in the console
+  after running the asimmodule, defaults to empty list
+- **args**: (dict) The arguments of the function being called in the asimmodule
+  as key-value pairs. These are specific to the asimmodule being run.
+
+All ASIMTools generated files are named ``sim_input.yaml`` but you can name
+user defined files as whatever you like
+
 .. _specifyingimages:
 
 Specifying Images/Atoms
@@ -276,9 +288,9 @@ One of the most useful applications of ASIMTools is the unification of methods
 for setting up ASE atoms objects using the same interface. If an asimmodule
 requires a single or multiple atoms objects as input, they are provided as
 either an ``image`` dictionary for a single Atoms object or ``images`` for a
-list of Atoms objects as part of the ``args`` section. Below are the
-different ways to get an atoms object. Downloading images from MaterialsProject
-and Generating them from Pymatgen will implemented in future.
+list of Atoms objects as part of the ``args`` section. Below are the different
+ways to get an atoms object. Downloading images from The Materials Project and
+Generating them from Pymatgen will be implemented in future.
 
 For a detailed description of the API, see :func:`asimtools.utils.get_atoms`
 
