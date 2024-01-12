@@ -125,18 +125,15 @@ def join_names(substrs: Sequence[str]) -> str:
     return name
 
 def get_atoms(
-    image_file: str = None,
-    builder: str = 'bulk',
-    atoms: Atoms = None,
-    repeat: Tuple[int, int, int] = None,
-    rattle_stdev: float = None,
+    image_file: Optional[str] = None,
+    builder: Optional[str] = 'bulk',
+    atoms: Optional[Atoms] = None,
+    repeat: Optional[Tuple[int, int, int]] = None,
+    rattle_stdev: Optional[float] = None,
     **kwargs
 ) -> Atoms:
     """Return an atoms object based on specified config. This is the 
-    recommended way to load atoms objects. There are three options to specify:
-    #. image_file.
-    #. builder, kwargs.
-    #. atoms.
+    recommended way to load atoms objects. 
 
     :param image_file: Path to an ASE-readable image file, defaults to None
     :type image_file: str, optional
@@ -152,7 +149,67 @@ def get_atoms(
         defaults to None
     :type rattle_stdev: float, optional
     :return: One :class:`ase.Atoms` instance
-    :rtype: Atoms
+    :rtype: Atoms, optional
+
+    There are three options one could use to specify and image or an atoms
+    objects:
+
+    #. image_file + \*\*kwargs
+    #. builder + \*\*kwargs.
+    #. atoms
+
+    Examples
+    --------
+
+    Some examples using builders from ASE. All ``**kwargs`` are passed to
+    :func:`ase.build`:
+
+    >>> get_atoms(builder='molecule', name='H2O')
+    Atoms(symbols='OH2', pbc=False)
+    >>> get_atoms(builder='bulk', name='Cu')
+    Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]])
+    >>> get_atoms(builder='bulk', name='Ar', crystalstructure='fcc', a=3.4, cubic=True)
+    Atoms(symbols='Ar4', pbc=True, cell=[3.4, 3.4, 3.4])
+    >>> get_atoms(builder='fcc100', symbol='Fe', vacuum=8, size=[4,4, 5])
+    Atoms(symbols='Cu80', pbc=[True, True, False], cell=[10.210621920333747, 10.210621920333747, 23.22], tags=...)
+
+    Some examples for reading an image from a file using :func:`ase.io.read`
+    are given below. All ``**kwargs`` are passed to :func:`ase.io.read`
+
+    >>> h2o = get_atoms(builder='molecule', name='H2O')
+    >>> h2o.write('h2o.cif')
+    >>> get_atoms(image_file='h2o.cif')
+    Atoms(symbols='OH2', pbc=False)
+    >>> get_atoms(image_file='h2o.cif', format='cif')
+    Atoms(symbols='OH2', pbc=False)
+    >>> from ase.io import write
+    >>> molecules = [get_atoms(builder='molecule', name='H2O'), get_atoms(builder='molecule', name='H2')]
+    >>> write('molecules.xyz', molecules, format='extxyz')
+    >>> get_atoms(image_file='molecules.xyz', index=0) # Pick out one structure using indexing
+    Atoms(symbols='OH2', pbc=False)
+
+    You can also make supercells and rattle the atoms
+
+    >>> li_bulk = get_atoms(name='Li')
+    >>> li_bulk.write('POSCAR', format='vasp')
+    >>> get_atoms(image_file='POSCAR', repeat=[3,3,3])
+    Atoms(symbols='Li27', pbc=True, cell=[[-5.235, 5.235, 5.235], [5.235, -5.235, 5.235], [5.235, 5.235, -5.235]])
+    >>> get_atoms(builder='bulk', name='Li', repeat=[2,2,2], rattle_stdev=0.01)
+    Atoms(symbols='Li8', pbc=True, cell=[[-3.49, 3.49, 3.49], [3.49, -3.49, 3.49], [3.49, 3.49, -3.49]])
+
+    Mostly for internal use and use in asimmodules, one can specify atoms
+    directly
+
+    >>> li_bulk = get_atoms(name='Li')
+    >>> get_atoms(atoms=li_bulk)
+    Atoms(symbols='Li', pbc=True, cell=[[-1.745, 1.745, 1.745], [1.745, -1.745, 1.745], [1.745, 1.745, -1.745]])
+
+    In an asimmodule, the ``image`` argument is always given as a dictionary,
+    you therefore have to expand it before passing it to ``get_atoms``
+
+    >>> image = {'name': 'Pt'}
+    >>> get_atoms(**image)
+    Atoms(symbols='Pt', pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]])
     """
     assert image_file is not None or \
         len(kwargs) > 0 or \
@@ -210,17 +267,14 @@ def get_images(
     **kwargs
 ) -> List[Atoms]:
     """Return a list of atoms objects based on the input arguments. Options \
-        to specify are:
-        #. image_file
-        #. pattern
-        #. images
+        to specify are: #. image_file #. pattern #. images
 
     :param image_file: Path to ASE-readable file with one or more images, \
         defaults to None
     :type image_file: str, optional
     :param pattern: String pattern of paths from which to search for images, \
-        defaults to None. This only gets one image from each file as in \
-        :func:`ase.io.read` without specifying an index
+        defaults to None. This only gets the last image from each file as in \
+        :func:`ase.io.read` if an index is not specified.
     :type pattern: str, optional
     :param patterns: Sequence of string patterns/paths from which to search \
         for images, defaults to None. This only gets one image from each file \
@@ -228,11 +282,76 @@ def get_images(
     :type pattern: str, optional
     :param images: A list of atoms objects, defaults to None
     :type images: Iterable[Atoms], optional
-    :param index: Index to specify when using :func:`ase.io.read`, \
-        defaults to ':'
+    :param index: Index to specify when using :func:`ase.io.read`, \ defaults
+        to ':'
     :type index: Union[str, int], optional
-    :return: List of :class:`ase.Atoms`
+    :param skip_failed: Whether to raise an IO error if it fails to read any of
+        the specified images or ignore errors, defaults to False
+    :type skip_failed: bool, optional
+    :raises IOError: Failed to read one of the specified images
+    :return: List of :class:`ase.Atoms` for all images found
     :rtype: List[Atoms]
+
+    There are three options one could use to specify and image or an atoms
+    objects:
+
+    #. image_file + \*\*kwargs for specifying one image file
+    #. pattern + \*\*kwargs for specifying multiple image files with a wildcard
+       character
+    #. patterns + \*\*kwargs for specifying a list of patterns to match,
+       captures the above two cases
+    #. images
+
+    Examples
+    --------
+
+    Some examples for reading images selectively from an image_file. All
+    ``**kwargs`` are passed to :func:`ase.io.read`:
+
+    >>> from asimtools.utils import get_atoms
+    >>> molecules = []
+    >>> molecules.append(get_atoms(builder='molecule', name='H2O'))
+    >>> molecules.append(get_atoms(builder='molecule', name='H2'))
+    >>> molecules.append(get_atoms(builder='molecule', name='N2'))
+    >>> write('molecules.xyz', molecules, format='extxyz')
+    >>> get_images(image_file='molecules.xyz')
+    [Atoms(symbols='OH2', pbc=False), Atoms(symbols='H2', pbc=False), Atoms(symbols='N2', pbc=False)]
+    >>> get_images(image_file='molecules.xyz', index=':2')
+    [Atoms(symbols='OH2', pbc=False), Atoms(symbols='H2', pbc=False)]
+
+    You can also use a wildcard (\*) by specifying the pattern argument. Notice
+    that the files don't have to be the same format if ASE can guess all the
+    file formats, otherwise you can specify the format argument which should
+    apply to all the images.
+
+    >>> cu = get_atoms(name='Cu')
+    >>> cu.write('bulk_cu.cfg')
+    >>> fe = get_atoms(name='Fe')
+    >>> fe.write('bulk_fe.cif')
+    >>> pt = get_atoms(name='Pt')
+    >>> pt.write('bulk_pt.cfg')
+    >>> get_images(pattern='bulk*')
+    [Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]], masses=..., momenta=...), Atoms(symbols='Fe', pbc=True, cell=[[2.48549, 0.0, 0.0], [-0.8284876429214074, 2.3433456351179887, 0.0], [-0.8284876429214074, -1.171653675382785, 2.0294079014797743]], spacegroup_kinds=...), Atoms(symbols='Pt', pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]], masses=..., momenta=...)]
+    Atoms(symbols='OH2', pbc=False)
+    >>> get_images(pattern='bulk*.cfg', format='cfg')
+    [Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]], masses=..., momenta=...), Atoms(symbols='Pt', pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]], masses=..., momenta=...)]
+    
+    You can also specify multiple patterns
+
+    >>> get_images(patterns=['bulk*.cfg', 'bulk\*.cif'])
+    [Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]], masses=..., momenta=...), Atoms(symbols='Pt', pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]], masses=..., momenta=...), Atoms(symbols='Fe', pbc=True, cell=[[2.48549, 0.0, 0.0], [-0.8284876429214074, 2.3433456351179887, 0.0], [-0.8284876429214074, -1.171653675382785, 2.0294079014797743]], spacegroup_kinds=...)]
+    
+    Or you can directly pass a list of Atoms, mostly for internal use
+
+    >>> get_images(images=molecules)
+    [Atoms(symbols='OH2', pbc=False), Atoms(symbols='H2', pbc=False), Atoms(symbols='N2', pbc=False)]
+
+    In an asimmodule, the ``images`` argument is always given as a dictionary,
+    you therefore have to expand it before passing it to ``get_images``
+
+    >>> images = {'pattern': 'bulk*'}
+    >>> get_images(**images)
+    [Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]], masses=..., momenta=...), Atoms(symbols='Fe', pbc=True, cell=[[2.48549, 0.0, 0.0], [-0.8284876429214074, 2.3433456351179887, 0.0], [-0.8284876429214074, -1.171653675382785, 2.0294079014797743]], spacegroup_kinds=...), Atoms(symbols='Pt', pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]], masses=..., momenta=...)]
     """
     assert (image_file is not None) or \
         (pattern is not None) or \

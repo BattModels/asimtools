@@ -1,5 +1,4 @@
-<img src="logo.png" alt="drawing" width="150"/>
-
+<!-- <img src="../figures/logo.png" alt="drawing" width="150"/> -->
 <!-- [![code coverage](https://img.shields.io/codecov/c/gh/materialsproject/jobflow/main)](https://codecov.io/gh/materialsproject/jobflow/) -->
 <!-- [![pypi version](https://img.shields.io/pypi/v/jobflow?color=blue)](https://pypi.org/project/jobflow/) -->
 <!-- ![supported python versions](https://img.shields.io/pypi/pyversions/jobflow) -->
