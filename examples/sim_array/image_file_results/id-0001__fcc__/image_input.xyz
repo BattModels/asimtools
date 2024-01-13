@@ -1,3 +1,0 @@
-1
-Lattice="2.55266 0.0 0.0 1.2763300000000002 2.210668407224385 0.0 1.2763300000000002 0.7368894690747951 2.0842381622709687" Properties=species:S:1:pos:R:3:spacegroup_kinds:I:1 spacegroup="P 1" unit_cell=conventional occupancy="_JSON {\"0\": {\"Cu\": 1.0}}" pbc="T T T"
-Cu       0.00000000       0.00000000       0.00000000        0

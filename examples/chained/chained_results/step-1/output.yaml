@@ -1,9 +1,0 @@
-end_time: 12:34:09, 12/13/23
-energy: -1.719379474030935
-files:
-  image: image_output.xyz
-  traj: cell_relax.traj
-final_fmax: -1.3247406169575348e-12
-job_ids: null
-start_time: 12:34:09, 12/13/23
-status: complete

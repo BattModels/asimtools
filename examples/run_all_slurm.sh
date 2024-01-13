@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 
-# These examples explicitly specify a choice of env_input.yaml and calc_input.yaml
-# If you want to use the globally set ones instead, it is not necessary to specify
-# them.
+# This runs all the examples that use slurm and will launch a number of very
+# short jobs, if any fail, feel free to check issues on github or
+# submit a new one
 
-asim-execute singlepoint_sim_input.yaml -c calc_input.yaml -e env_input.yaml
+source clean_all.sh
+
+RUNFILE="run.sh"
+
+for d in */; do
+    cd $d
+    if test -f ${RUNFILE}; then
+        source run_slurm.sh
+    fi
+    cd ../
+done

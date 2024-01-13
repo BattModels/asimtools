@@ -1,9 +1,9 @@
-Running an existing asimmodule
-==========================
+Running an Existing asimmodule
+==============================
 
-This section will guide you through running an already existing asimmodule whether
-it be one of the asimmodules provided in the main repository, from the asimmodule
-repository or a custom asimmodule you have written yourself.
+This section will guide you through running an already existing asimmodule
+whether it be one of the asimmodules provided in the main repository, from the
+asimmodule repository or a custom asimmodule you have written yourself.
 
 To run a simulation, all you need to do is run either of the following
 commands:
@@ -12,16 +12,21 @@ commands:
 
     asim-execute sim_input.yaml -c calc_input.yaml -e env_input.yaml
 
-or
+Providing ``calc_input.yaml`` or ``env_input.yaml`` is optional. If not
+provided, the globally configured files will be used. See :ref:`envinput`. This
+command will automatically run the specified simulation in the correct
+directory and environment. 
+
+A different option is to use the following command:
 
 .. code-block:: console
 
-    asim-run sim_input.yaml -c calc_input.yaml
+    asim-execute sim_input.yaml -c calc_input.yaml -e env_input.yaml
 
-In either case, providing ``calc_input.yaml`` or ``env_input.yaml`` is optional. If
-not provided, the globally configured files will be used. See :ref:`envinput`. For most
-cases, you will only ever use ``asim-execute``. The differences between
-``asim-execute`` and ``asim-run`` are explained in :ref:`asimrunvsasimexecute`.
+This command will run the simulation in the current directory and environment.
+For most cases, you will only ever use ``asim-execute``. The differences
+between ``asim-execute`` and ``asim-run`` are explained in
+:ref:`asimrunvsasimexecute`.
 
 .. _inputs:
 
@@ -33,8 +38,8 @@ Input files
 sim_input.yaml
 --------------
 
-The minimal requirement to run a asimmodule is to provide a ``sim_input.yaml`` file.
-An example of a ``sim_input.yaml`` is shown below:
+The minimal requirement to run an asimmodule is to provide a ``sim_input.yaml``
+file. An example of a ``sim_input.yaml`` is shown below:
 
 .. code-block:: yaml
 
@@ -52,22 +57,27 @@ An example of a ``sim_input.yaml`` is shown below:
 
 The parameters are:
 
-- **asimmodule**: (str) name of core asimmodule or /path/to/my/asimmodule.py 
+- **asimmodule**: (str) name of core asimmodule or /path/to/my/asimmodule.py.
+  Core asimmodules defined in the asimmodules directory can be simply referred
+  to using Python dot notation. E.g. to specify the
+  :func:`asimtools.asimmodules.workflows.sim_array` asimmodule, you would
+  specify `workflows.sim_array`. Any other asimmodule should be specified as
+  either a full path or a path relative to ``ASIMTOOLS_ASIMMODULE_DIR``
+  variable to a python file. E.g. ``my_asimmodules/asim_ple.py``
 - **env_id**: (str, optional) Environment/context in which to run asimmodule
   configured in env_input.yaml, defaults to running in the current console
 - **overwrite**: (bool, optional) (bool) whether or not to overwrite work
   directories if they exist, defaults to false 
-- **submit**: (bool, optional) whether or not to run the asimmodule or instead just
-  write the files to run the asimmodule without running the asimmodule, defaults to true 
-- **workdir**: (str, optional) The directory in which the asimmodule will be run,
-  `asim-execute` will create the directory whereas `asim-run` ignores this
-  parameter, defaults to './'
+- **submit**: (bool, optional) whether running the asimmodule, defaults to true 
+- **workdir**: (str, optional) The directory in which the asimmodule will be
+  run, `asim-execute` will create the directory whereas `asim-run` ignores this
+  parameter, defaults to './results'
 - **precommands**: (list, optional) a list of commands to run in the console
   before running the asimmodule, defaults to empty list
 - **postcommands**: (list, optional) a list of commands to run in the console
   after running the asimmodule, defaults to empty list
-- **args**: (dict) The arguments of the function being called in the asimmodule as
-  key-value pairs. These are specific to the asimmodule being run.
+- **args**: (dict) The arguments of the function being called in the asimmodule
+  as key-value pairs. These are specific to the asimmodule being run.
 
 All ASIMTools generated files are named ``sim_input.yaml`` but you can name
 user defined files as whatever you like
@@ -76,10 +86,10 @@ user defined files as whatever you like
 
 env_input.yaml
 --------------
-Additionally, one can provide an ``env_input.yaml`` file that details the kind of
-environments in which asimmodules can be run. This file can be provided with the
-asim-execute command using the ``-e`` flag or set globally. An example of an
-env_input.yaml file is given below
+Additionally, one can provide an ``env_input.yaml`` file that details the kind
+of environments in which asimmodules can be run. This file can be provided with
+the asim-execute command using the ``-e`` flag or set globally. An example of
+an env_input.yaml file is given below
 
 .. code-block:: yaml
 
@@ -96,7 +106,7 @@ env_input.yaml file is given below
         postcommands: [postcommand1, postcommand2, ...]
     
     # Concrete examples below
-    inline: # Run the asimmodule directly in the commandline
+    inline: # Run the asimmodule directly in the console
       mode:
         use_slurm: false
         interactive: true
@@ -143,22 +153,24 @@ The parameters, required, shown in the template section are  are described below
 - **env_id.mode.use_slurm**: (bool) whether or not to request a slurm
   allocation to run the asimmodule
 - **env_id.mode.interactive**: (bool) whether or not to request a slurm
-  allocation to run the asimmodule directly in the terminal (using ``salloc``) or
-  to submita batch job (using ``sbatch``)
-- **env_id.mode.run_prefix**: (str) string to append before running the asimmodule
-  e.g. if ``run_prefix=mpirun`` the asimmodule will be inkoked with the equivalent
-  of ``mpirun python my_asimmodule.py``. ``run_prefix`` in ``env_input.yaml`` is
-  always prepended before the one provided by ``calc_input.yaml``.
-- **env_id.mode.run_postfix**: (str) string to append after running the asimmodule
-  e.g. if ``run_postfix=' &> out.txt'`` the asimmodule will be inkoked with the
-  equivalent of ``python my_asimmodule.py &> out.txt``. ``run_postfix`` in
-  ``env_input.yaml`` is always appended after the one provided by
+  allocation to run the asimmodule directly in the terminal (using ``salloc``)
+  or to submita batch job (using ``sbatch``)
+- **env_id.mode.run_prefix**: (str) string to append before running the
+  asimmodule e.g. if ``run_prefix=mpirun`` the asimmodule will be invoked with
+  the equivalent of ``mpirun python my_asimmodule.py``. ``run_prefix`` in
+  ``env_input.yaml`` is always prepended before the one provided by
   ``calc_input.yaml``.
-- **env_id.slurm.flags**: (list, optional) The slurm flags for the allocation
-  as a list of flags e.g. ``[-n 4, -N 1]``
+- **env_id.mode.run_postfix**: (str) string to append after running the
+  asimmodule e.g. if ``run_postfix=' &> out.txt'`` the asimmodule will be
+  invoked with the equivalent of ``python my_asimmodule.py &> out.txt``.
+  ``run_postfix`` in ``env_input.yaml`` is always appended after the one
+  provided by ``calc_input.yaml``.
+- **env_id.slurm.flags**: (list/dict, optional) The slurm flags for the
+  allocation as a list of flags e.g. ``[-n 4, -N 1]``. One can also specify a
+  dictionary e.g. ``'{-n': 4, '-N': 1, '--mem':2G}``
 - **env_id.slurm.precommands**: (list, optional) Commands to be run/added to
-  the job asimmodule before running the asimmodule. A common use cas is loading a
-  module or activating an environment
+  the job asimmodule before running the asimmodule. A common use cas is loading
+  a module or activating an environment
 - **env_id.slurm.postcommands**: (list, optional) Commands to be run/added to
   the job asimmodule after running the asimmodule.
 
@@ -174,8 +186,9 @@ above, a global configuration file can be set using
     export ASIMTOOLS_CALC_INPUT=/path/to/my/global/calc_input.yaml
 
 or provided to asim-execute at run time. Note that if you launch a chained
-workflow with ``asim-run`` instead of ``asim-execute``, asimmodules farther down
-the chain will use the global ``calc_input.yaml``
+workflow with ``asim-run`` instead of ``asim-execute``, asimmodules farther
+down the chain will use the global ``calc_input.yaml``, so always use
+``asim-execute``
 
 
 .. code-block:: yaml
@@ -211,12 +224,24 @@ the chain will use the global ``calc_input.yaml``
       xc: PBE
       txt: gpaw_output.txt
 
+The parameters for the calculators provided directly in ASE are specified under
+the assumption that the calculator will be initiated as follows:
+
+.. code-block::
+
+    from module import name
+    calc = name(**args)
+
+This works for all calculators defined in ASE v3.22 and below. For externally
+defined calculators, you can submit an issue and we will implement it. For
+example, calculators for NequIP and Deep Potential force fields are
+implemented.
 
 - **calc_id**: (str) unique key for identifying the calculator, ``calc_id`` in
   ``sim_input.yaml`` must match one of the ``calc_id`` s defined in the
   provided ``calc_input.yaml``
 - **calc_id.name**: (str) Either the name of the class or the reference to one
-  of the provided BBBB external calculators. 
+  of the provided external calculators. 
 - **calc_id.module**: (str) The module from which the calculator class is
   imported. e.g. if ``name=LennardJones`` and ``module=ase.calculators.lj``,
   then the calculator object is imported as ``from ase.calculators.lj import
@@ -224,11 +249,11 @@ the chain will use the global ``calc_input.yaml``
   ASE format for initialization such as GPAW. Any other ASE calculator will
   need to have the instantiation defined in :ref:calculators.py
 - **calc_id.mode.run_prefix**: (str) string to append before running the asimmodule
-  e.g. if ``run_prefix=mpirun`` the asimmodule will be inkoked with the equivalent
+  e.g. if ``run_prefix=mpirun`` the asimmodule will be invoked with the equivalent
   of ``mpirun python my_asimmodule.py``. ``run_prefix`` in ``env_input.yaml`` is
   always prepended before the one provided by ``calc_input.yaml``.
 - **calc_id.mode.run_postfix**: (str) string to append after running the asimmodule
-  e.g. if ``run_postfix=' &> out.txt'`` the asimmodule will be inkoked with the
+  e.g. if ``run_postfix=' &> out.txt'`` the asimmodule will be invoked with the
   equivalent of ``python my_asimmodule.py &> out.txt``. ``run_postfix`` in
   ``env_input.yaml`` is always appended after the one provided by
   ``calc_input.yaml``.
@@ -248,14 +273,14 @@ Specifying Images/Atoms
 -----------------------
 
 One of the most useful applications of ASIMTools is the unification of methods
-for setting up ASE atoms objects using the same interface. If a asimmodule requires
-a single or multiple atoms objects as input, they are provided as either an
-``image`` dictionary for a single Atoms object or ``images`` for a list of
-Atoms objects as part of the ``args`` section. Below are all the different ways
-to get an atoms object. Downloading images from MaterialsProject and Generating
-them from Pymatgen will implemented in future.
+for setting up ASE atoms objects using the same interface. If an asimmodule
+requires a single or multiple atoms objects as input, they are provided as
+either an ``image`` dictionary for a single Atoms object or ``images`` for a
+list of Atoms objects as part of the ``args`` section. Below are the
+different ways to get an atoms object. Downloading images from MaterialsProject
+and Generating them from Pymatgen will implemented in future.
 
-For a detailed deasimmoduleion of the API, see :func:`asimtools.utils.get_atoms`
+For a detailed description of the API, see :func:`asimtools.utils.get_atoms`
 
 .. code-block:: yaml
 
@@ -295,11 +320,11 @@ For a detailed deasimmoduleion of the API, see :func:`asimtools.utils.get_atoms`
     atoms: Atoms
 
 Similarly, if the asimmodule requires multiple image inputs, there exists a
-universal interface. The keyword is strictly specified as ``images`` This is especially useful for distributing simulations
-across multiple structures or reading structures from multiple previous
-simulations.
+universal interface. The keyword is strictly specified as ``images``. This is
+especially useful for distributing simulations across multiple structures or
+reading structures from multiple previous simulations.
 
-For a detailed deasimmoduleion of the API, see :func:`asimtools.utils.get_images`
+For a detailed description of the API, see :func:`asimtools.utils.get_images`
 
 .. code-block:: yaml
 
@@ -316,7 +341,7 @@ For a detailed deasimmoduleion of the API, see :func:`asimtools.utils.get_images
     # Optional keyword argument passed to ase.io.read
     index: -1
 
-  # You can read all files matching a certain pattern using a wildcard
+  # You can read all files matching certain patterns using a wildcard
   images:
     patterns: 
     - /path/to/my/structure/files/*.cif
@@ -333,21 +358,22 @@ Usage of asim-execute and asim-run
 **********************************
 The major difference between ``asim-execute`` and ``asim-run`` is that,
 ``asim-execute`` takes into account the ``workdir`` and the ``env_id``.
-``asim-run`` will the asimmodule in the current directory and in the current
-console. In fact, ``asim-execute`` will create the ``workdir`` and then run
-``asim-run`` in the correct environment/batch job. You can always for example,
-request a slurm allocation, go to the directory where you want the asimmodule to be
-run and call ``asim-run`` from there if you would like more control or to debug.
-If you want verbose logs for debugging, you can run with the ``-d`` or 
-``--debug`` flag.
+``asim-run`` will run the asimmodule in the current directory and in the
+current console. In fact, ``asim-execute`` will create the ``workdir`` and then
+run ``asim-run`` in the correct environment/batch job. You can always for
+example, request a slurm allocation, go to the directory where you want the
+asimmodule to be run and call ``asim-run`` from there if you would like more
+control or to debug. If you want verbose logs for debugging, you can run with
+the ``-d`` or ``--debug`` flag.
 
 .. _outputs:
 
 Output files
-****************
+************
 A job or asimmodule run through ASIMTools will always produce a standard set of
-output files in addition to whatever outputs the asimmodule produces. In particular
-the most  important output are the ``output.yaml`` and the ``job.log`` file. 
+output files in addition to whatever outputs the asimmodule produces. In
+particular the most important outputs are the ``output.yaml`` and the
+``job.log`` file. 
 
 #. \``output.yaml`` contains the status of the job being run in the current
    directory which can be one of ``clean, started, complete, failed, discard``.
@@ -357,10 +383,10 @@ the most  important output are the ``output.yaml`` and the ``job.log`` file.
    This is common for example if you launch multiple jobs and one of them fails
    irredemably. Deleting the directory for that job is also ok if nothing
    depends on it downstream. Importantly, any results returned by the function
-   defined in the asimmodule are found in ``output.yaml``. asimmodule main functions
-   should always return a dictionary for this purpose.
+   defined in the asimmodule are found in ``output.yaml``. Asimmodule main
+   functions should always return a dictionary for this purpose.
 
-   An example of an ``output.yaml`` file is shown below
+   An example of an ``output.yaml`` file is shown below.
 
 .. code-block:: yaml
 
@@ -382,18 +408,20 @@ the most  important output are the ``output.yaml`` and the ``job.log`` file.
    starting from the base directory will usually lead you to the correct
    traceback that caused the failure.
 
-#. ``stderr.txt`` captures errors and backtraces from running asimmodules. This is
-   usually the most informative file for debugging. You can be directed to the
-   correct one by noting errors in ``job.log``
+#. ``stderr.txt`` captures errors and backtraces from running asimmodules. This
+   is usually the most informative file for debugging. You can be directed to
+   the correct one by noting errors in ``job.log`` files.
 
 #. ``stdout.txt`` captures any stdout from running asimmodules. It is mostly a
    safety measure for catching anything that prints to stdout and rarely has
-   useful information unless you write a asimmodule that uses ``print`` statements.
+   useful information unless you write an asimmodule that uses ``print``
+   statements. In batch jobs, this output this goes to the slurm job output.
 
 #. ``input_image.xyz`` and ``input_images.xyz`` capture the images input into
-   the asimmodule. This makes sure there is a concrete artifact for the structure
-   used in the asimmodule for the purposes of visualization and debugging. They are
-   always in ``extxyz`` format as a flexible standar format
+   the asimmodule. This makes sure there is a concrete artifact for the
+   structure used by the asimmodule for the purposes of visualization and
+   debugging. They are always in ``extxyz`` format as a flexible standard
+   format
 
 #. ``slurm*`` are slurm job files which can be named according to flags
    specified in ``env_input.yaml`` otherwise are named ``slurm_[job_id].out``
@@ -402,7 +430,7 @@ the most  important output are the ``output.yaml`` and the ``job.log`` file.
 .. _restarting:
 
 Checking job status and Restarting failed jobs
-**************************************************
+**********************************************
 To check the status of jobs, even complicated chains and distributed jobs, we
 provide the ``asim-check`` utility which can be run using:
 
@@ -413,8 +441,8 @@ provide the ``asim-check`` utility which can be run using:
 This will print the job tree, including statuses and work directories of the
 jobs whose root directory is specified as ``workdir`` in ``sim_input.yaml``.
 
-In many cases, there may be mistakes in one of your configuration files leading to
-a failed workflow. In these cases there are a few ways you could resolve the
+In many cases, there may be mistakes in one of your configuration files leading
+to a failed workflow. In these cases there are a few ways you could resolve the
 issue:
 
 * Delete the workdirectory and restart the workflow. This is why it is
@@ -429,10 +457,10 @@ issue:
   deleted so you will have to clear those manually
 
 Importing functions from asimmodules
-********************************
+************************************
 
-Because asimmodules contain what are merely Python functions, you can always import
-them and use them in any other code for example, you can import 
+Because asimmodules contain what are merely Python functions, you can always
+import them and use them in any other code for example, you can import
 :func:`asimtools.asimmodules.singlepoint` and use it as below.
 
 .. code-block:: python

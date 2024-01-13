@@ -94,9 +94,9 @@ def do_nothing_sim_input():
     return sim_input
 
 @pytest.fixture
-def do_nothing_distributed_sim_input():
+def lj_distributed_sim_input():
     ''' 
-    Sim imput for a asimmodule that just completes without doing anything
+    Sim input for a distributed job that does some lj calculations
     '''
     subasimmodule_input = {
         'asimmodule': 'singlepoint',
@@ -110,23 +110,13 @@ def do_nothing_distributed_sim_input():
         }
     }
     sim_input = {
-        'asimmodule': 'distributed',
+        'asimmodule': 'workflows.distributed',
         'env_id': 'inline',
         'args': {
             'subasimmodules': {
-                'id-00': subasimmodule_input,
-                'id-01': subasimmodule_input,
-                'id-02': subasimmodule_input,
-                'id-03': subasimmodule_input,
-                'id-04': subasimmodule_input,
-                'id-05': subasimmodule_input,
-                'id-06': subasimmodule_input,
-                'id-07': subasimmodule_input,
-                'id-08': subasimmodule_input,
-                'id-09': subasimmodule_input,
-                'id-10': subasimmodule_input,
-                'id-11': subasimmodule_input,
-                'id-12': subasimmodule_input,
+                'id-0000': subasimmodule_input,
+                'id-0001': subasimmodule_input,
+                'id-0002': subasimmodule_input,
             }
         }
     }
@@ -134,9 +124,9 @@ def do_nothing_distributed_sim_input():
     return sim_input
 
 @pytest.fixture
-def do_nothing_distributed_custom_name_sim_input():
+def lj_distributed_custom_name_sim_input():
     ''' 
-    Sim imput for a asimmodule that just completes without doing anything
+    Sim input for a distributed job that does some lj calculations
     '''
     subasimmodule_input = {
         'asimmodule': 'singlepoint',
@@ -150,22 +140,14 @@ def do_nothing_distributed_custom_name_sim_input():
         }
     }
     sim_input = {
-        'asimmodule': 'distributed',
+        'asimmodule': 'workflows.distributed',
         'env_id': 'inline',
         'args': {
             'subasimmodules': {
                 'first': subasimmodule_input,
                 'second': subasimmodule_input,
-                'third': subasimmodule_input,'id-03': subasimmodule_input,
-                'id-04': subasimmodule_input,
-                'id-05': subasimmodule_input,
-                'id-06': subasimmodule_input,
-                'id-07': subasimmodule_input,
-                'id-08': subasimmodule_input,
-                'id-09': subasimmodule_input,
-                'id-10': subasimmodule_input,
-                'id-11': subasimmodule_input,
-                'id-12': subasimmodule_input,
+                'third': subasimmodule_input,
+                'id-03': subasimmodule_input,
             }
         }
     }
@@ -173,9 +155,9 @@ def do_nothing_distributed_custom_name_sim_input():
     return sim_input
 
 @pytest.fixture
-def do_nothing_distributed_batch_sim_input():
+def lj_distributed_batch_sim_input():
     ''' 
-    Sim imput for a asimmodule that just completes without doing anything
+    Sim input for a distributed job that does some lj calculations
     '''
     subasimmodule_input = {
         'asimmodule': 'singlepoint',
@@ -189,23 +171,14 @@ def do_nothing_distributed_batch_sim_input():
         }
     }
     sim_input = {
-        'asimmodule': 'distributed',
+        'asimmodule': 'workflows.distributed',
         'env_id': 'batch',
         'args': {
             'subasimmodules': {
-                'id-00': subasimmodule_input,
-                'id-01': subasimmodule_input,
-                'id-02': subasimmodule_input,
-                'id-03': subasimmodule_input,
-                'id-04': subasimmodule_input,
-                'id-05': subasimmodule_input,
-                'id-06': subasimmodule_input,
-                'id-07': subasimmodule_input,
-                'id-08': subasimmodule_input,
-                'id-09': subasimmodule_input,
-                'id-10': subasimmodule_input,
-                'id-11': subasimmodule_input,
-                'id-12': subasimmodule_input,
+                'id-0000': subasimmodule_input,
+                'id-0001': subasimmodule_input,
+                'id-0002': subasimmodule_input,
+                'id-0003': subasimmodule_input,
             }
         }
     }

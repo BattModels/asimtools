@@ -823,4 +823,24 @@ def load_job_from_directory(workdir: str):
         calc_input = None
 
     job = Job(sim_input, env_input, calc_input)
+    
+    # This makes sure that wherever we may be loading the job from, we refer
+    # to the correct input/output files. As of now, it does not seem necessary
+    # to also change the workdir in sim_input.yaml for consistency
+    job.workdir = Path(workdir)
     return job
+
+def create_unitjob(sim_input, env_input, workdir, calc_input=None):
+    """Helper for making a generic UnitJob object, mostly for testing"""
+    env_id = list(env_input.keys())[0]
+    sim_input['env_id'] = env_id
+    if calc_input is not None:
+        calc_id = list(calc_input.keys())[0]
+        sim_input['calc_id'] = calc_id
+    sim_input['workdir'] = workdir
+    unitjob = UnitJob(
+        sim_input,
+        env_input,
+        calc_input
+    )
+    return unitjob

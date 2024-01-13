@@ -1,6 +1,0 @@
-args:
-  calc_id: lj_Ar
-  image:
-    image_file: image_input.xyz
-asimmodule: singlepoint
-workdir: .
