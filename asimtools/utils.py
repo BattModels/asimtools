@@ -267,7 +267,11 @@ def get_images(
     **kwargs
 ) -> List[Atoms]:
     """Return a list of atoms objects based on the input arguments. Options \
-        to specify are: #. image_file #. pattern #. images
+        to specify are:
+        #. image_file
+        #. pattern
+        #. patterns
+        #. images
 
     :param image_file: Path to ASE-readable file with one or more images, \
         defaults to None

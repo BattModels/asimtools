@@ -121,11 +121,12 @@ def main(args=None) -> None:
         try:
             spec.loader.exec_module(sim_module)
         except Exception as exc:
-            err_txt = f'Failed to load asimmodule: {asimmodule}. Check your '
-            err_txt += 'ASIMTOOLS_ASIMMODULE_DIR environment variable, '
-            err_txt += 'provide the full path and ensure the asimmodule works.'
-            logger.error(err_txt)
-            raise FileNotFoundError(err_txt) from exc
+            t = f'Failed to load asimmodule "{asimmodule}". Possible causes:\n'
+            t += '* The asimmodule has a bug, see traceback above\n'
+            t += '* ASIMTOOLS_ASIMMODULE_DIR variable not set properly.\n'
+            t += '* You can provide the full path to the asimmodule'
+            logger.error(t)
+            raise FileNotFoundError(t) from exc
 
     sim_func = getattr(sim_module, func_name)
 

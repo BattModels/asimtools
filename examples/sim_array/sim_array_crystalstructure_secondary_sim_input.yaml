@@ -1,0 +1,22 @@
+asimmodule: workflows.sim_array
+workdir: crystalstructure_secondary_results
+args:
+  key_sequence: ['args', 'image', 'crystalstructure']
+  labels: values
+  array_values: [fcc, bcc]
+  secondary_key_sequences: 
+  - ['args', 'image', 'a']
+  secondary_array_values:
+  - [3.59, 3.655]
+  env_ids: inline
+  template_sim_input:
+    asimmodule: singlepoint
+    args:
+      calc_id: lj_Cu
+      image:
+        name: Cu
+        builder: bulk
+        crystalstructure: {}
+        a: {}
+        
+   

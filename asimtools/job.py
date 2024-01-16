@@ -803,12 +803,12 @@ def load_job_from_directory(workdir: str):
     logger = get_logger()
     sim_inputs = glob(str(workdir / 'sim_input.yaml'))
     if len(sim_inputs) != 1:
-        logger('Multiple or no sim_input.yaml files in %s', {workdir})
+        logger.error('Multiple or no sim_input.yaml files in %s', {workdir})
     try:
         sim_input = read_yaml(glob(str(workdir / 'sim_input.yaml'))[0])
-    except:
-        logger('sim_input.yaml not found in %s', {workdir})
-        raise
+    except IndexError as exc:
+        logger.error('sim_input.yaml not found in %s', {str(workdir)})
+        raise exc
 
     env_inputs = glob(str(workdir / 'env_input.yaml'))
     if len(env_inputs) == 1:
