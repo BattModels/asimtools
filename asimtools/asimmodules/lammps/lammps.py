@@ -10,13 +10,11 @@ import subprocess
 import logging
 from asimtools.utils import (
     get_atoms,
-    join_names,
 )
 
 def lammps(
     template: str,
     image: Optional[Dict] = None,
-    prefix: str = '',
     atom_style: str = 'atomic',
     variables: Optional[Dict] = None,
     lmp_cmd: str = 'lmp',
@@ -30,8 +28,6 @@ def lammps(
     :type template: str
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`, defaults to None
     :type image: Dict, optional
-    :param prefix: Prefix to be added to input file, defaults to ''
-    :type prefix: str, optional
     :param atom_style: LAMMPS style in which to write image to Lammps data input e.g. full, atomic etc., defaults to 'atomic'
     :type atom_style: str, optional
     :param variables: Dictionary of variables to be defined into the lammps input, defaults to None
@@ -85,7 +81,7 @@ def lammps(
                 (with correct atom style) appropriately in lammps input \
                 file if you specify image keyword'
 
-    lmp_inp_file = join_names([prefix, 'input.lammps'])
+    lmp_inp_file = 'input.lammps'
     with open(lmp_inp_file, 'w', encoding='utf-8') as f:
         f.write(lmp_txt)
 
