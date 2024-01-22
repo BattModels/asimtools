@@ -277,12 +277,12 @@ to refer to asimmodules prepended with the asimmodule dir as below
                     builder: bulk
                     crystalstructure: 'fcc'
 
-The above example loops over crystals for which ASE already has BCC lattice
-parameters, but what if we want to loop over both lattice parameters and
-species? We can either specify a list of ``images`` dictionaries as
-array_values or use ``secondary_array_values``. We can also explicitly tell 
+The above example loops over crystals for which ASE already has FCC lattice
+parameters, but what if we want to loop over the species and corresponding
+lattice parameters? We can either specify a list of ``images`` dictionaries as
+``array_values`` or use ``secondary_array_values``. We can also explicitly tell
 ASIMTools to include the array_values in the directory names in the standard
-format.
+format (e.g. ``id-0000__Al__``, ``id-0001__Ni__`` etc.).
 
 .. code-block:: yaml
 
