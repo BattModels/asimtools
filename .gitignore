@@ -159,4 +159,4 @@ cython_debug/
 #.idea/
 
 # ASIMTools results
-examples/*/*results*/
+examples/*/*results/

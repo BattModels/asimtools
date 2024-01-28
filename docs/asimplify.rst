@@ -230,13 +230,13 @@ env_input.yaml:
 Going back to the original problem, we wanted to run the simulation of multiple
 different elements with the EMT calculator. To achieve that in parallel, we can
 nest the ``ase_eos`` asimmodule in a
-:func:`asimtools.asimmodules.sim_array.sim_array` asimmodule as follows
+:func:`asimtools.asimmodules.workflows.sim_array.sim_array` asimmodule as follows
 
 sim_input.yaml:
 
 .. code-block:: yaml
 
-    asimmodule: sim_array
+    asimmodule: workflows.sim_array
     workdir: results
     args:
         key_sequence: ['args', 'image', 'name']
@@ -263,11 +263,39 @@ to refer to asimmodules prepended with the asimmodule dir as below
 
 .. code-block:: yaml
 
-    asimmodule: sim_array
+    asimmodule: workflows.sim_array
     workdir: results
     args:
         key_sequence: ['args', 'image', 'name']
         array_values: ['Al', 'Ni', 'Cu', 'Pd', 'Ag', 'Pt', 'Au']
+        env_ids: 'batch'
+        template_sim_input:
+            asimmodule: ase_eos/ase_eos.py
+            args:
+                calc_id: emt
+                image:
+                    builder: bulk
+                    crystalstructure: 'fcc'
+
+The above example loops over crystals for which ASE already has FCC lattice
+parameters, but what if we want to loop over the species and corresponding
+lattice parameters? We can either specify a list of ``images`` dictionaries as
+``array_values`` or use ``secondary_array_values``. We can also explicitly tell
+ASIMTools to include the array_values in the directory names in the standard
+format (e.g. ``id-0000__Al__``, ``id-0001__Ni__`` etc.).
+
+.. code-block:: yaml
+
+    asimmodule: workflows.sim_array
+    workdir: results
+    args:
+        key_sequence: ['args', 'image', 'name']
+        array_values: ['Al', 'Ni', 'Cu', 'Pd', 'Ag', 'Pt', 'Au']
+        labels: values
+        secondary_key_sequences: 
+        - ['args', 'image', 'a']
+        secondary_array_values:
+        - [4.0479, 3.524, 3.6149, 3.8907, 4.0853, 3.9242, 4.0782]
         env_ids: 'batch'
         template_sim_input:
             asimmodule: ase_eos/ase_eos.py
