@@ -16,7 +16,7 @@ def apply_scale(old_atoms, scale):
     atoms = old_atoms.copy()
     new_cell = atoms.get_cell() * scale
     atoms.set_cell(new_cell, scale_atoms=True)
-    atoms.info['scale'] = f'{scale:.2f}'
+    atoms.info['scale'] = f'{scale:.3f}'
     return atoms
 
 def scale_unit_cells(

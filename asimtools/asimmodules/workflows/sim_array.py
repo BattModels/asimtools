@@ -9,6 +9,7 @@ Author: mkphuthi@github.com
 
 from typing import Dict, Sequence, Optional, Union
 from glob import glob
+from copy import deepcopy
 import numpy as np
 from asimtools.job import DistributedJob
 from asimtools.utils import change_dict_value
@@ -88,7 +89,10 @@ def sim_array(
         assert str_btn_args is not None, 'Provide str_btn_args for labels'
         labels = [get_str_btn(s, *str_btn_args) for s in array_values]
     elif labels == 'values':
-        labels = [f'{key_sequence[-1]}-{val}' for val in array_values]
+        if key_sequence is not None:
+            labels = [f'{key_sequence[-1]}-{val}' for val in array_values]
+        else:
+            labels = [f'value-{val}' for val in array_values]
     elif labels is None:
         labels = [str(i) for i in range(len(array_values))]
 
@@ -113,12 +117,15 @@ def sim_array(
     # a DistributedJob object
     sim_inputs = {}
     for i, val in enumerate(array_values):
-        new_sim_input = change_dict_value(
-            d=template_sim_input,
-            new_value=val,
-            key_sequence=key_sequence,
-            return_copy=True,
-        )
+        if key_sequence is not None:
+            new_sim_input = change_dict_value(
+                d=template_sim_input,
+                new_value=val,
+                key_sequence=key_sequence,
+                return_copy=True,
+            )
+        else:
+            new_sim_input = deepcopy(template_sim_input)
 
         if secondary_array_values is not None:
             for k, vs in zip(secondary_key_sequences, secondary_array_values):
