@@ -34,10 +34,10 @@ def main(args=None) -> None:
     :type args: _type_, optional
     """    
     sim_input, rootdir = parse_command_line(args)
-    if not sim_input['workdir'].startswith('/'):
-        workdir = rootdir / sim_input['workdir']
-    else:
-        workdir = sim_input['workdir']
+    workdir = sim_input.get('workdir', 'results')
+    if not workdir.startswith('/'):
+        workdir = rootdir / workdir
+
     jobtree = load_job_tree(workdir)
     print_job_tree(jobtree)
 

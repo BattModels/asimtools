@@ -6,12 +6,13 @@ on the ASE website: https://wiki.fysik.dtu.dk/ase/tutorials/db/db.html
 author: mkphuthi@github.com
 '''
 
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
 import logging
 import matplotlib.pyplot as plt
 import pandas as pd
-from ase.eos import calculate_eos
+from ase.eos import EquationOfState, calculate_eos
 from ase.io import read
+from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms
 
@@ -21,6 +22,7 @@ def ase_cubic_eos_optimization(
     npoints: Optional[int] = 5,
     eos_string: Optional[str] = 'sj',
     eps: Optional[float] = 0.04,
+    scales: Optional[Sequence] = None,
     plot: Optional[bool] = True,
 ) -> Dict:
     """Generate the energy-volume equation of state (energy calculations not parallelized)
@@ -33,7 +35,9 @@ def ase_cubic_eos_optimization(
     :type npoints: Optional[int], optional
     :param eos_string: eos_string as specified for :func:`ase.eos.calculate_eos`, defaults to 'sj'
     :type eos_string: Optional[str], optional
-    :param eps: eps as sepecified for, defaults to 0.04
+    :param eps: eps as sepecified for ase, defaults to 0.04
+    :type eps: Optional[float], optional
+    :param scales: array of values to scale the unit cell by (not volume)
     :type eps: Optional[float], optional
     :param plot: Whether to plot eos or not, defaults to True
     :type plot: Optional[bool], optional
@@ -45,9 +49,27 @@ def ase_cubic_eos_optimization(
     atoms.calc = calc
     v_init = atoms.get_volume()
     traj_file = 'eos.traj'
-    eos = calculate_eos(atoms, trajectory=traj_file, eps=eps, npoints=npoints)
+    if scales is not None:
+        traj = Trajectory('eos.traj', 'w')
+        volumes = []
+        energies = []
+        images = []
+        for scale in scales:
+            scaled_atoms = atoms.copy()
+            cell = scaled_atoms.cell
+            scaled_atoms.set_cell(cell * scale, scale_atoms=True)
+            scaled_atoms.set_calculator(calc)
+            volumes.append(scaled_atoms.get_volume())
+            energies.append(scaled_atoms.get_potential_energy())
+            traj.write(scaled_atoms)
+
+        eos = EquationOfState(volumes, energies)
+    else:
+        eos = calculate_eos(atoms, trajectory=traj_file, eps=eps, npoints=npoints)
+
     eos.eos_string = eos_string
     v0, e0, B = eos.fit()  # find minimum
+
     logging.info('Successfully fit EOS')
     # Do one more calculation at the minimum and write to disk
     new_cell = atoms.cell.copy()
