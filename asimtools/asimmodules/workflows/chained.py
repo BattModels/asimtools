@@ -18,7 +18,7 @@ def chained(
 ) -> Dict:
     """Run a workflow using the provided sim_input.yaml one after the other,
     The jobs will run one after the other, if slurm is used, job dependencies
-    will be used. Note that if one of the subasimmodules internally launches another
+    will be used. Note that if one of the subsim_inputs internally launches another
     asimmodule e.g. image_array, calc_array etc, slurm job dependencies will not
     work as expected. In those cases, we recommend running the steps one by one
     or interactively

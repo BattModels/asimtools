@@ -98,7 +98,7 @@ def lj_distributed_sim_input():
     ''' 
     Sim input for a distributed job that does some lj calculations
     '''
-    subasimmodule_input = {
+    subsim_input_input = {
         'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
@@ -113,10 +113,10 @@ def lj_distributed_sim_input():
         'asimmodule': 'workflows.distributed',
         'env_id': 'inline',
         'args': {
-            'subasimmodules': {
-                'id-0000': subasimmodule_input,
-                'id-0001': subasimmodule_input,
-                'id-0002': subasimmodule_input,
+            'subsim_inputs': {
+                'id-0000': subsim_input_input,
+                'id-0001': subsim_input_input,
+                'id-0002': subsim_input_input,
             }
         }
     }
@@ -128,7 +128,7 @@ def lj_distributed_custom_name_sim_input():
     ''' 
     Sim input for a distributed job that does some lj calculations
     '''
-    subasimmodule_input = {
+    subsim_input_input = {
         'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
@@ -143,11 +143,11 @@ def lj_distributed_custom_name_sim_input():
         'asimmodule': 'workflows.distributed',
         'env_id': 'inline',
         'args': {
-            'subasimmodules': {
-                'first': subasimmodule_input,
-                'second': subasimmodule_input,
-                'third': subasimmodule_input,
-                'id-03': subasimmodule_input,
+            'subsim_inputs': {
+                'first': subsim_input_input,
+                'second': subsim_input_input,
+                'third': subsim_input_input,
+                'id-03': subsim_input_input,
             }
         }
     }
@@ -159,7 +159,7 @@ def lj_distributed_batch_sim_input():
     ''' 
     Sim input for a distributed job that does some lj calculations
     '''
-    subasimmodule_input = {
+    subsim_input_input = {
         'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
@@ -174,11 +174,11 @@ def lj_distributed_batch_sim_input():
         'asimmodule': 'workflows.distributed',
         'env_id': 'batch',
         'args': {
-            'subasimmodules': {
-                'id-0000': subasimmodule_input,
-                'id-0001': subasimmodule_input,
-                'id-0002': subasimmodule_input,
-                'id-0003': subasimmodule_input,
+            'subsim_inputs': {
+                'id-0000': subsim_input_input,
+                'id-0001': subsim_input_input,
+                'id-0002': subsim_input_input,
+                'id-0003': subsim_input_input,
             }
         }
     }

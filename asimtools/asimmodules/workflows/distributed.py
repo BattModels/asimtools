@@ -10,7 +10,7 @@ from typing import Dict, Optional
 from asimtools.job import DistributedJob
 
 def distributed(
-    subasimmodules: Dict,
+    subsim_inputs: Dict,
     env_input: Optional[Dict] = None,
     calc_input: Optional[Dict] = None,
     array_max: Optional[int] = None,
@@ -23,9 +23,9 @@ def distributed(
     #. use_slurm: False, interactive: False, different env_ids -> Launches \
     # multiple jobs.
 
-    :param subasimmodules: Dictionary of asimmodules, each key is an ID and each \
+    :param subsim_inputs: Dictionary of asimmodules, each key is an ID and each \
         value is a sim_input file
-    :type subasimmodules: Dict
+    :type subsim_inputs: Dict
     :param env_input: env_input that overrides global file, defaults to None
     :type env_input: Optional[Dict], optional
     :param calc_input: calc_input that overrides global file, defaults to None
@@ -36,7 +36,7 @@ def distributed(
     :rtype: Dict
     """
     djob = DistributedJob(
-        sim_input=subasimmodules,
+        sim_input=subsim_inputs,
         env_input=env_input,
         calc_input=calc_input
     )

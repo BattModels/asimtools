@@ -4,7 +4,7 @@ args:
   images:
     pattern: ../structures/Ar*.cif
   array_max: 2
-  subasimmodule_input:
+  subsim_input_input:
     asimmodule: singlepoint
     env_id: batch
     args:

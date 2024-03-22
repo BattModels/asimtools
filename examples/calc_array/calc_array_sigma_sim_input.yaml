@@ -4,7 +4,7 @@ args:
   template_calc_id: lj_Cu
   key_sequence: ['args', 'sigma']
   array_values: [2.30, 2.33, 2.36]
-  subasimmodule_input:
+  subsim_input_input:
     asimmodule: singlepoint
     args:
       image:

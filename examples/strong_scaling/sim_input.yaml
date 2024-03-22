@@ -3,7 +3,7 @@ overwrite: true
 workdir: results
 args:
   ntasks: [1,2,4,8,16]
-  subasimmodule_input:
+  subsim_input_input:
     asimmodule: singlepoint
     overwrite: true
     args:
@@ -14,7 +14,7 @@ args:
         rattle_stdev: 0.01
       calc_id: qe_li
       properties: ['energy', 'forces']
-  subasimmodule_env_input:
+  subsim_input_env_input:
     mode:
       use_slurm: true
       interactive: false

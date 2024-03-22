@@ -9,6 +9,7 @@ from typing import Dict, Sequence, Optional
 import logging
 from asimtools.calculators import load_calc
 from asimtools.asimmodules.geometry_optimization.atom_relax import atom_relax
+from asimtools.asimmodules.geometry_optimization.optimize import optimize
 from asimtools.utils import (
     get_atoms,
 )
@@ -18,7 +19,8 @@ def vacancy_formation_energy(
     image: Dict,
     vacancy_index: int = 0,
     atom_relax_args: Optional[Dict] = None,
-    repeat: Optional[Sequence] = None
+    optimize_args: Optional[Dict] = None,
+    repeat: Optional[Sequence] = (1,1,1)
 ) -> Dict:
     """Calculates the monovacancy formation energy from a bulk structure
 
@@ -30,8 +32,14 @@ def vacancy_formation_energy(
     :type vacancy_index: int, optional
     :param atom_relax_args: Args to pass to
         :func:`asimtools.asimmodules.geometry_optimization.atom_relax.atom_relax`,
+        this applies if you do not want to optimize the cell at all
         defaults to None
     :type atom_relax_args: Optional[Dict], optional
+    :param optimize_args: Args to pass to
+        :func:`asimtools.asimmodules.geometry_optimization.optimize.optimize`,
+        this applies if you want to optimize both the cell and positions
+        defaults to None
+    :type optimize_args: Optional[Dict], optional
     :param repeat: Repeat to apply to image to create supercell, defaults to
         None
     :type repeat: Optional[Sequence], optional
@@ -56,20 +64,36 @@ def vacancy_formation_energy(
 
     bulk.write('bulk_image_output.xyz')
     
-    try:
-        relax_results = atom_relax(
-                calc_id=calc_id,
-                image={'atoms': vacant},
-                optimizer=atom_relax_args.get('optimizer', 'BFGS'),
-                properties=('energy','forces'),
-                fmax=atom_relax_args.get('fmax', 0.01),
-                prefix=f'vacant_relaxed',
-            )
-        logging.info('Relaxed vacant structure')
-    except ValueError:
-        logging.error("Failed to calculate energy of bulk structure, "
-                      "see calculator output")
-        raise
+    if atom_relax_args is not None:
+        try:
+            relax_results = atom_relax(
+                    calc_id=calc_id,
+                    image={'atoms': vacant},
+                    optimizer=atom_relax_args.get('optimizer', 'BFGS'),
+                    properties=('energy','forces'),
+                    fmax=atom_relax_args.get('fmax', 0.01),
+                    prefix=f'vacant_relaxed',
+                )
+            logging.info('Relaxed vacant structure')
+        except ValueError:
+            logging.error("Failed to calculate energy of bulk structure, "
+                        "see calculator output")
+            raise
+    else:
+        try:
+            relax_results = optimize(
+                    calc_id=calc_id,
+                    image={'atoms': vacant},
+                    # optimizer=optimize_args.get('optimizer', 'BFGS'),
+                    # fmax=atom_relax_args.get('fmax', 0.003),
+                    # prefix=f'vacant_optimized',
+                    **optimize_args,
+                )
+            logging.info('Relaxed vacant structure')
+        except ValueError:
+            logging.error("Failed to calculate energy of bulk structure, "
+                        "see calculator output")
+            raise
 
     vacant_e = relax_results['energy']
     vac_form_e = vacant_e - (len(vacant) / len(bulk) * bulk_e)

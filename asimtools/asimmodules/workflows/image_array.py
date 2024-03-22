@@ -13,7 +13,7 @@ from asimtools.utils import get_images
 
 def image_array(
     images: Dict,
-    subasimmodule_input: Dict,
+    subsim_input_input: Dict,
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
     labels: Sequence[str] = None,
@@ -25,8 +25,8 @@ def image_array(
 
     :param images: Images specification, see :func:`asimtools.utils.get_images`
     :type images: Dict
-    :param subasimmodule_input: sim_input of asimmodule to be run
-    :type subasimmodule_input: Dict
+    :param subsim_input_input: sim_input of asimmodule to be run
+    :type subsim_input_input: Dict
     :param calc_input: calc_input to override global file, defaults to None
     :type calc_input: Optional[Dict], optional
     :param env_input: env_input to override global file, defaults to None
@@ -58,14 +58,14 @@ def image_array(
 
     # Make individual sim_inputs for each image
     for i, image in enumerate(images):
-        new_subasimmodule_input = deepcopy(subasimmodule_input)
-        new_subasimmodule_input['args']['image'] = {
+        new_subsim_input_input = deepcopy(subsim_input_input)
+        new_subsim_input_input['args']['image'] = {
             'atoms': image
         }
-        array_sim_input[f'{labels[i]}'] = new_subasimmodule_input
+        array_sim_input[f'{labels[i]}'] = new_subsim_input_input
 
         if env_ids is not None:
-            new_subasimmodule_input['env_id'] = env_ids[i]
+            new_subsim_input_input['env_id'] = env_ids[i]
 
     # Create a distributed job object
     djob = DistributedJob(array_sim_input, env_input, calc_input)

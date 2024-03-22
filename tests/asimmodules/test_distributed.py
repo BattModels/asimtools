@@ -22,7 +22,7 @@ def test_distributed(env_input, calc_input, sim_input, tmp_path, request):
 
     assert load_job_from_directory(wdir).get_status()[1] == 'complete'
     dirs = glob(str(wdir / 'id*'))
-    assert len(dirs) == len(sim_input['args']['subasimmodules'])
+    assert len(dirs) == len(sim_input['args']['subsim_inputs'])
 
     for d in dirs:
         assert str(d).rsplit('/', maxsplit=1)[-1].startswith('id-')

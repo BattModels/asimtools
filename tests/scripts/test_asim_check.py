@@ -38,10 +38,10 @@ def test_get_subjobs(env_input, calc_input, sim_input, tmp_path, request):
     unitjob.submit()
 
     dirs = glob(str(wdir / 'id*'))
-    assert len(dirs) == len(sim_input['args']['subasimmodules'])
+    assert len(dirs) == len(sim_input['args']['subsim_inputs'])
 
     ac_dirs = get_subjobs(wdir)
-    assert len(ac_dirs) == len(sim_input['args']['subasimmodules'])
+    assert len(ac_dirs) == len(sim_input['args']['subsim_inputs'])
     for d in ac_dirs:
         assert load_job_from_directory(d).get_status()[1] == 'complete'
 
@@ -59,7 +59,7 @@ def test_load_job_tree(env_input, calc_input, sim_input, tmp_path, request):
     jd = load_job_tree(wdir)
     print(jd)
     assert jd['workdir_name'] == 'wdir'
-    assert len(jd['subjobs']) == len(sim_input['args']['subasimmodules']) 
+    assert len(jd['subjobs']) == len(sim_input['args']['subsim_inputs']) 
     for sj in jd['subjobs']:
         assert jd['subjobs'][sj]['subjobs'] is None
         assert jd['subjobs'][sj].get('workdir_name', False)
