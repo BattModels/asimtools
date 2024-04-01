@@ -242,7 +242,7 @@ class UnitJob(Job):
         # GPAW requires python asimmodule to be called with gpaw python
         # For now this is a work around but perhaps there exists a cleaner way
         if self.calc_params.get('name', '') == 'GPAW':
-            asloader = pkgutil.get_loader('asimtools.asimmodules.asim_run')
+            asloader = pkgutil.get_loader('asimtools.scripts.asim_run')
             asfile = asloader.get_filename()
             alias = f'gpaw python {asfile}'
         else:

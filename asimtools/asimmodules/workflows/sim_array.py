@@ -26,6 +26,7 @@ def sim_array(
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
     labels: Optional[Union[Sequence,str]] = 'values',
+    label_prefix: Optional[str] = None,
     str_btn_args: Optional[Dict] = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
@@ -52,6 +53,9 @@ def sim_array(
     :type arange_args: Optional[Sequence], optional
     :param labels: Custom labels to use for each simulation, defaults to None
     :type labels: Sequence, optional
+    :param label_prefix: Prefix to add before labels which can make extracting 
+        data from file paths easier, defaults to None
+    :type labels: str, optional
     :param env_ids: Environment(s) to be used for each simulation, must either
         be a list with as many env_ids as array values or a string with the
         env_id to be used by all simulations, defaults to None
@@ -95,6 +99,9 @@ def sim_array(
             labels = [f'value-{val}' for val in array_values]
     elif labels is None:
         labels = [str(i) for i in range(len(array_values))]
+
+    if label_prefix is not None:
+        labels = [label_prefix + '-' + label for label in labels]
 
     assert len(labels) == len(array_values), \
         'Num. of array_values must match num. of labels'
