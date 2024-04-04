@@ -1,0 +1,21 @@
+asimmodule: lammps.lammps
+env_id: inline
+workdir: npt_results
+overwrite: true
+submit: true
+args:
+  lmp_cmd: lmp
+  # path relative to workdir, full path usually works best, you can put them
+  # in a directory and version control!
+  template: ../lj_npt_template.lammps
+  variables:
+    NSTEPS : 100
+    THERMO_FREQ:  10
+    DUMP_FREQ:  10
+    TEMP : 900.0
+    PRES : 1.0
+    TAU_T : 0.1
+    TAU_P : 0.5
+
+
+

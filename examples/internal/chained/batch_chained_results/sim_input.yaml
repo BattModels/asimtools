@@ -1,0 +1,40 @@
+args:
+  steps:
+    step-0:
+      args:
+        calc_id: lj_Ar
+        fmax: 0.05
+        image:
+          a: 4.0
+          crystalstructure: fcc
+          name: Ar
+          rattle_stdev: 0.02
+          repeat:
+          - 3
+          - 3
+          - 3
+        optimizer: LBFGS
+      asimmodule: geometry_optimization.atom_relax
+      env_id: batch
+    step-1:
+      args:
+        calc_id: lj_Ar
+        fmax: 0.01
+        image:
+          image_file: ../step-0/image_output.xyz
+      asimmodule: geometry_optimization.cell_relax
+      env_id: batch
+    step-2:
+      args:
+        duration: 20
+      asimmodule: do_nothing
+      env_id: batch
+    step-3:
+      args:
+        calc_id: lj_Ar
+        image:
+          image_file: ../step-1/image_output.xyz
+      asimmodule: geometry_optimization.ase_cubic_eos_optimization
+      env_id: batch
+asimmodule: workflows.chained
+workdir: .

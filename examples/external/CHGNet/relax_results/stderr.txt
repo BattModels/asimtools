@@ -1,0 +1,24 @@
+/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/torch/cuda/__init__.py:141: UserWarning: CUDA initialization: The NVIDIA driver on your system is too old (found version 11040). Please update your GPU driver by downloading and installing a new version from the URL: http://www.nvidia.com/Download/index.aspx Alternatively, go to: https://pytorch.org to install a PyTorch version that has been compiled with your version of the CUDA driver. (Triggered internally at ../c10/cuda/CUDAFunctions.cpp:108.)
+  return torch._C._cuda_getDeviceCount() > 0
+/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/ase/optimize/gpmin/gpmin.py:141: UserWarning: Possible Memory Issue. There are more than 100 atoms in the unit cell. The memory of the process will increase with the number of steps, potentially causing a memory issue. Consider using a different optimizer.
+  warnings.warn(warning)
+Traceback (most recent call last):
+  File "/home/mphuthi/.conda/envs/test/bin/asim-run", line 33, in <module>
+    sys.exit(load_entry_point('asimtools', 'console_scripts', 'asim-run')())
+  File "/home/mphuthi/dev/asimtools/asimtools/scripts/asim_run.py", line 139, in main
+    results = sim_func(**sim_input.get('args', {}))
+  File "/home/mphuthi/dev/asimtools/asimtools/asimmodules/geometry_optimization/atom_relax.py", line 64, in atom_relax
+    atoms.write(image_file, format='extxyz')
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/ase/atoms.py", line 1973, in write
+    write(filename, self, format, **kwargs)
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/ase/io/formats.py", line 689, in write
+    return _write(filename, fd, format, io, images,
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/ase/parallel.py", line 254, in new_func
+    return func(*args, **kwargs)
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/ase/io/formats.py", line 725, in _write
+    return io.write(fd, images, **kwargs)
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/ase/io/formats.py", line 197, in _write_wrapper
+    return function(*args, **kwargs)
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/ase/io/extxyz.py", line 889, in write_xyz
+    xx, yy, zz, yz, xz, xy = value
+ValueError: not enough values to unpack (expected 6, got 3)

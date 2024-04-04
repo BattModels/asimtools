@@ -1,0 +1,37 @@
+asimmodule: workflows.chained
+workdir: batch_chained_results
+args:
+  steps:
+    step-0:
+      asimmodule: geometry_optimization.atom_relax
+      env_id: batch
+      args:
+        calc_id: lj_Ar
+        image:
+          name: Ar
+          crystalstructure: fcc
+          a: 4.0
+          repeat: [3,3,3]
+          rattle_stdev: 0.02
+        fmax: 0.05
+        optimizer: LBFGS
+    step-1:
+      asimmodule: geometry_optimization.cell_relax
+      env_id: batch
+      args:
+        calc_id: lj_Ar
+        image:
+          image_file: ../step-0/image_output.xyz
+        fmax: 0.01
+    step-2:
+      asimmodule: do_nothing
+      env_id: batch
+      args:
+        duration: 20 # To give you a chance to see the job dependencies
+    step-3:
+      asimmodule: geometry_optimization.ase_cubic_eos_optimization
+      env_id: batch
+      args:
+        calc_id: lj_Ar
+        image:
+          image_file: ../step-1/image_output.xyz

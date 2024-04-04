@@ -1,0 +1,26 @@
+batch:
+  mode:
+    interactive: false
+    use_slurm: true
+  slurm:
+    flags:
+    - -n 1
+    - -N 1
+    - -J my_batch_job
+    - --mem=1G
+    postcommands:
+    - echo "Bye"
+    precommands:
+    - export MY_ASIMTOOLS_ENV_VAR="Hello"
+    - echo $MY_ASIMTOOLS_ENV_VAR
+inline:
+  mode:
+    interactive: true
+    use_slurm: false
+srun:
+  mode:
+    interactive: true
+    use_slurm: true
+  slurm:
+    flags:
+    - -n 1

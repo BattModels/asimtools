@@ -589,28 +589,55 @@ def get_logger(
 
 
 def get_str_btn(
-    s: str,
+    s: Union[str,os.PathLike],
     s1: str,
     s2: str,
-    start: int = 0,
-    end: int = 0
+    occurence: Optional[int] = 0,
+    start_index: Optional[int] = 0,
 ):
-    ''' Return substring between the first instance of s1 and the first
-    instance of s2 after s1 in s. None corresponds to beginning or end of
-    string for s1 and s2 respectively '''
+    """Returns the substring between strings s1 and s2 from s
 
-    if s1 is not None:
-        i1 = s.index(s1, start) + len(s1)
-    else:
-        i1 = 0
-    if s2 is not None:
-        i2 = s[i1:].index(s2, end) + i1
-    else:
-        i2 = len(s)
-    return s[i1:i2]
+    :param s: string/path from which to extract substring
+    :type s: str
+    :param s1: substring before the desired substring, None starts from 
+        the beginning of s
+    :type s1: str
+    :param s2: substring after the desired substring, None ends at the 
+        end of the string
+    :type s2: str
+    :param occurence: which occurence to return e.g. occurence=1 returns the 
+        second time a substring is encountered, defaults to 0
+    :type occurence: int, optional
+    :param start_index: first index from which to search for substring, 
+        defaults to 0
+    :type int: int, optional
+    :return: substring
+    :rtype: _type_
+    """
+
+    j = 0
+    stop_index = len(s) + 1
+
+    s = s[start_index:stop_index]
+    while occurence - j >= 0:
+        print('0', j, s)
+        if s1 is not None:
+            i1 = s.index(s1) + len(s1)
+        else:
+            i1 = 0
+        if s2 is not None:
+            i2 = s[i1:].index(s2) + i1
+        else:
+            i2 = len(s)
+
+        if occurence - j == 0:
+            return s[i1:i2]
+
+        s = s[i1:]
+        j += 1
 
 def find_nth(haystack: str, needle: str, n: int) -> int:
-    ''' Return index of nth occurence of substrin in string '''
+    ''' Return index of nth occurence of substring in string '''
     start = haystack.find(needle)
     while start >= 0 and n > 1:
         start = haystack.find(needle, start+len(needle))
@@ -621,8 +648,8 @@ def get_nth_label(
     s: str,
     n: int = 1,
 ):
-    ''' Return nth label in a string potentially containin multiple labels,
+    ''' Return nth label in a string potentially containing multiple labels,
     indexing starts from 0 '''
     start = find_nth(s, '__', n=(n*2+1))
     print('start', start)
-    return get_str_btn(s, '__', '__', start=start)
+    return get_str_btn(s, '__', '__', start_index=start)

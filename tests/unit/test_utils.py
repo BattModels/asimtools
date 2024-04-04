@@ -18,6 +18,7 @@ from asimtools.utils import (
     get_calc_input,
     find_nth,
     get_nth_label,
+    get_str_btn,
 )
 import ase.build
 
@@ -180,6 +181,19 @@ def test_get_calc_input(tmp_path):
     assert calc_input == d
 
 @pytest.mark.parametrize("test_input, expected",[
+    (('s','y'), 'ill'),
+    (('illy','ally'), 's'),
+    (('illy', 'l', 1), 'da'),
+    (('ll', 'da', 1, 6), 'y'),
+    ((None,'ll'), 'si'),
+    (('ly',None,2), 'dally'),
+])
+def test_get_str_btn(test_input, expected):
+    ''' Get string between two substrings '''
+    s = 'sillysallywoulddillydally'
+    assert get_str_btn(s, *test_input) == expected
+
+@pytest.mark.parametrize("test_input, expected",[
     (1, 0),
     (2, 7),
     (3, 13),
@@ -190,10 +204,12 @@ def test_find_nth(test_input, expected):
     assert find_nth(s, 'me', test_input) == expected
 
 @pytest.mark.parametrize("test_input, expected",[
+    (2, 'label-3'),
     (1, 'label2'),
     (0, 'label1'),
 ])
 def test_get_nth_label(test_input, expected):
     ''' Find nth label in string '''
-    s = '/path/to/array/id-00__label1__/id-0045__label2__'
+    s = '/path/to/array/id-00__label1__/id-0045__label2__/id-0023__label-3__/'
     assert get_nth_label(s, test_input) == expected
+

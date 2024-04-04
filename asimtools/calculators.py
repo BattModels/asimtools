@@ -57,6 +57,8 @@ def load_calc(
 def load_nequip(calc_params):
     """Load NequIP or Allegro calculator
 
+    https://github.com/mir-group/nequip/tree/main
+
     :param calc_params: args to pass to loader
     :type calc_params: Dict
     :return: NequIP ase calculator
@@ -77,6 +79,8 @@ def load_nequip(calc_params):
 
 def load_dp(calc_params):
     """Load Deep Potential Calculator
+
+    https://docs.deepmodeling.com/projects/deepmd/en/master/
 
     :param calc_params: args to pass to loader
     :type calc_params: Dict
@@ -116,57 +120,132 @@ def load_ase_calc(calc_params):
         raise
     return calc
 
+def load_chgnet(calc_params):
+    """Load CHGNet Calculator
 
-# def load_m3gnet(calc_params):
-#     """Load and M3GNet calculator
+    https://chgnet.lbl.gov/#tutorials-and-docs
 
-#     :param calc_params: parameters to be passed to matgl.ext.ase.M3GNetCalculator. Must include a key "model" that points to the model used to instantiate the potential
-#     :type calc_params: Dict
-#     :return: M3GNet calculator
-#     :rtype: :class:`matgl.ext.ase.M3GNetCalculator`
-#     """
-#     from matgl.ext.ase import M3GNetCalculator
-#     import matgl
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: CHGNet calculator
+    :rtype: :class:`chgnet.model.dynamics.CHGNetCalculator`
+    """
+    from chgnet.model.dynamics import CHGNetCalculator
 
-#     model = calc_params.pop("model")
-#     try:
-#         pot = matgl.load_model(model)
-#         calc = M3GNetCalculator(
-#             pot,
-#             **calc_params,
-#         )
-#     except Exception:
-#         logging.error("Failed to load M3GNet with parameters:\n %s", calc_params)
-#         raise
+    try:
+        calc = CHGNetCalculator(**calc_params['args'])
+    except Exception:
+        logging.error("Failed to load CHGNet with parameters:\n %s", calc_params)
+        raise
 
-#     return calc
+    return calc
 
+def load_mace(calc_params):
+    """Load MACE Calculator
 
-# def load_chgnet(calc_params):
-#     pass
+    https://github.com/ACEsuit/mace?tab=readme-ov-file
 
-# def load_espresso(calc_params):
-#     '''
-#     Load the Espresso calculator as in newer versions of ASE. This is
-#     implemented for forards compatibility
-#     '''
-#     from ase.calculators.espresso import Espresso, EspressoProfile
-#     calc_args = calc_params.get('args', {})
-#     if 'command' in calc_args:
-#         command_list = calc_args['command'].split()
-#         profile = EspressoProfile(argv=command_list)
-#         calc_args.pop('command')
-#     else:
-#         profile = EspressoProfile(argv=['pw.x'])
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: MACE calculator
+    :rtype: :class:`mace.calculators.mace_mp`
+    """
+    from mace.calculators import mace_mp
 
-#     calc = Espresso(**calc_args, profile=profile)
-#     return calc
+    try:
+        calc = mace_mp(**calc_params['args'])
+    except Exception:
+        logging.error("Failed to load MACE with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
+def load_mace_off(calc_params):
+    """Load MACE Calculator
+
+    https://github.com/ACEsuit/mace?tab=readme-ov-file
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: MACE-OFF calculator
+    :rtype: :class:`mace.calculators.mace_mp`
+    """
+    from mace.calculators import mace_off
+
+    try:
+        calc = mace_off(**calc_params['args'])
+    except Exception:
+        logging.error("Failed to load MACE-OFF with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
+def load_espresso_profile(calc_params):
+    """Load Qunatum Espresso Calculator for ASE>3.22.1. If using older versions
+    such as the ones available on PyPI or conda-forge, just load it as an ASE
+    calculator. Until the new ASE version becomes an official release, we will
+    have to have both for compatibility. The interface however remains that of 
+    ASE <=3.22.1 within ASIMTools for consistency using the `command` keyword
+
+    https://wiki.fysik.dtu.dk/ase/releasenotes.html
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: Espresso calculator
+    :rtype: :class:`ase.calculators.espresso.Espresso`
+    """
+    from ase.calculators.espresso import Espresso, EspressoProfile
+
+    if 'command' in calc_params['args']:
+        command = calc_params['args'].pop('command')
+        command = command.split()
+        progind = command.index('pw.x')
+        argv = command[:progind+1]
+    else:
+        argv = ['pw.x']
+
+    try:
+        calc = Espresso(
+            **calc_params['args'],
+            profile=EspressoProfile(argv=argv)
+        )
+    except Exception:
+        logging.error("Failed to load MACE-OFF with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+    
+
+def load_m3gnet(calc_params):
+    """Load and M3GNet calculator
+
+    :param calc_params: parameters to be passed to matgl.ext.ase.M3GNetCalculator. Must include a key "model" that points to the model used to instantiate the potential
+    :type calc_params: Dict
+    :return: M3GNet calculator
+    :rtype: :class:`matgl.ext.ase.M3GNetCalculator`
+    """
+    from matgl.ext.ase import M3GNetCalculator
+    import matgl
+
+    model = calc_params.pop("model")
+    try:
+        pot = matgl.load_model(model)
+        calc = M3GNetCalculator(
+            pot,
+            **calc_params,
+        )
+    except Exception:
+        logging.error("Failed to load M3GNet with parameters:\n %s", calc_params)
+        raise
+
+    return calc
 
 external_calcs = {
     'NequIP': load_nequip,
     'Allegro': load_nequip,
     'DeepPotential': load_dp,
-    # 'ChgNet': load_chgnet,
-    # 'M3GNet': load_m3gnet,
-    # 'Espresso': load_espresso,
+    'CHGNet': load_chgnet,
+    'MACE': load_mace,
+    'EspressoProfile': load_espresso_profile,
+    'M3GNet': load_m3gnet,
 }

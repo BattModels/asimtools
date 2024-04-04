@@ -1,0 +1,24 @@
+asimmodule: lammps.lammps
+workdir: image_results
+args:
+  lmp_cmd: lmp
+  # path relative to workdir, full path usually works best, you can put them
+  # in a directory and version control!
+  template: ../lj_npt_template_with_image.lammps
+  image:
+    name: Ar
+    builder: bulk
+    crystalstructure: 'fcc'
+    a: 5.3
+    repeat: [3,3,3]
+  variables:  
+    NSTEPS : 100
+    THERMO_FREQ:  10
+    DUMP_FREQ:  10
+    TEMP : 900.0
+    PRES : 1.0
+    TAU_T : 0.1
+    TAU_P : 0.5
+
+
+

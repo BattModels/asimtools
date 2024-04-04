@@ -1,0 +1,10 @@
+asimmodule: singlepoint
+workdir: vc-relax_results
+args:
+  calc_id: QE_Li_vc-relax
+  image:
+    name: Li
+    builder: bulk
+    repeat: [2,1,1]
+    rattle_stdev: 0.01
+  properties: ['energy']

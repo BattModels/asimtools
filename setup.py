@@ -10,7 +10,7 @@ setup(
     version=version_dict["__version__"],
     description="Atomic Simulation Tools",
     author="Keith Phuthi and Emil Annevelink",
-    python_requires=">=3.9",
+    python_requires=">=3.9", # For typing using types like "list" to work
     packages=find_packages(include=[
         "asimtools",
         "asimtools.*",
@@ -28,7 +28,9 @@ setup(
         "pandas",
         "pyyaml",
         "pymatgen",
-        "ase<=3.22.1", # ASE redid how io calculators work beyond this version
+        "ase>=3.22.1", 
+        # Recommended to use the master branch of the ASE gitlab but only 
+        # required for lammps to handle masses correctly
         "colorama",
         "myst-parser",
         "sphinx",

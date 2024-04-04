@@ -1,0 +1,7 @@
+args:
+  calc_id: lj_Ar
+  image:
+    image_file: image_input.xyz
+asimmodule: geometry_optimization.ase_cubic_eos_optimization
+env_id: srun
+workdir: .

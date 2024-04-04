@@ -1,0 +1,11 @@
+asimmodule: geometry_optimization.atom_relax
+env_id: 
+workdir: cyclobutane_relax_results
+args:
+  calc_id: MACE-OFF
+  image:
+    name: cyclobutane
+    builder: molecule
+    rattle_stdev: 0.03
+  fmax: 0.01
+  optimizer: GPMin

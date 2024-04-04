@@ -1,0 +1,25 @@
+units           metal
+boundary        p p p
+atom_style      atomic
+
+neighbor        1.0 bin
+
+# We explicitly epecify the initial structure and box  in the template
+lattice         fcc 5.26
+region          box block 0 10 0 10 0 10
+create_box      1 box
+create_atoms    1 box
+
+mass            1 39.948
+
+pair_style      lj/cut 2.5
+pair_coeff      * * 0.00802236 3.54  
+
+thermo_style    custom step temp pe ke etotal press vol lx ly lz xy xz yz
+thermo          ${THERMO_FREQ}
+
+fix             1 all npt temp ${TEMP} ${TEMP} ${TAU_T} iso ${PRES} ${PRES} ${TAU_P}
+
+timestep        0.002000
+velocity        all create ${TEMP} 454883 mom yes rot yes dist gaussian
+run             ${NSTEPS} upto

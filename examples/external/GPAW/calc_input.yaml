@@ -1,0 +1,16 @@
+gpaw:
+  # There is an internal workaround for dealing with the need to run using
+  # gpaw-python rather than just python. Ideally as a user you will never 
+  # have to worry about it. Submit an issue if you run into trouble
+  name: GPAW
+  module: gpaw.calculator
+  args:
+    kpts: [2,2,2]
+    h: 0.1
+    xc: PBE
+    txt: gpaw_output.txt
+  run_prefix: srun --mpi=pmix
+  precommands:
+    - source ~/.bashrc
+    - conda activate py-gpaw # You probably want to do something like this! But
+    # ASIMTools should be installed in the environment or in your PYTHONPATH

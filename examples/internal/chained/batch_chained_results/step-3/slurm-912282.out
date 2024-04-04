@@ -1,0 +1,8 @@
+Job started on d008 at Thu Apr  4 16:56:17 EDT 2024
+/home/mphuthi/.conda/envs/asimtools/lib/python3.9/site-packages/ase/io/extxyz.py:1000: UserWarning: write_xyz() overwriting array "forces" present in atoms.arrays with stored results from calculator
+  warnings.warn('write_xyz() overwriting array "{0}" present '
+/home/mphuthi/.conda/envs/asimtools/lib/python3.9/site-packages/ase/io/extxyz.py:1000: UserWarning: write_xyz() overwriting array "stresses" present in atoms.arrays with stored results from calculator
+  warnings.warn('write_xyz() overwriting array "{0}" present '
+/home/mphuthi/.conda/envs/asimtools/lib/python3.9/site-packages/ase/io/extxyz.py:1000: UserWarning: write_xyz() overwriting array "energies" present in atoms.arrays with stored results from calculator
+  warnings.warn('write_xyz() overwriting array "{0}" present '
+Job ended at Thu Apr  4 16:56:23 EDT 2024

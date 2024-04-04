@@ -1,0 +1,9 @@
+args:
+  calc_id: M3GNet
+  fmax: 0.01
+  image:
+    image_file: image_input.xyz
+  optimizer: BFGS
+asimmodule: geometry_optimization.atom_relax
+env_id: null
+workdir: .

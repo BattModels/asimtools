@@ -1,0 +1,14 @@
+ase>=3.22.1
+colorama>=0.4.6
+cycler>=0.12.1
+docutils>=0.20.1
+matplotlib>=3.8.3
+myst-parser>=2.0.0
+numpy>=1.26.4
+pandas>=2.2.1
+pycodestyle>=2.8.0
+pydocstyle>=6.3.0
+pymatgen>=2024.3.1
+pytest>=7.2.1
+PyYAML>=6.0.1
+spglib>=2.3.1

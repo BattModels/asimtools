@@ -1,0 +1,8 @@
+args:
+  calc_id: lj_Ar
+  fmax: 0.01
+  image:
+    image_file: ../step-0/image_output.xyz
+asimmodule: geometry_optimization.cell_relax
+env_id: batch
+workdir: .

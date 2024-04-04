@@ -1,0 +1,9 @@
+CHGNet:
+  args:
+    model: null
+  name: CHGNet
+CHGNet_cpu:
+  args:
+    model: null
+    use_device: cpu
+  name: CHGNet

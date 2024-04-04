@@ -1,0 +1,12 @@
+asimmodule: workflows.image_array
+workdir: image_array_results
+args:
+  images:
+    pattern: ../structures/Ar*.cif
+  array_max: 2
+  subsim_input:
+    asimmodule: singlepoint
+    args:
+      calc_id: lj_Ar
+      properties: ['energy', 'forces']
+

@@ -1,0 +1,29 @@
+DGL backend not selected or invalid.  Assuming PyTorch for now.
+Traceback (most recent call last):
+  File "/home/mphuthi/.conda/envs/test/bin/asim-run", line 33, in <module>
+    sys.exit(load_entry_point('asimtools', 'console_scripts', 'asim-run')())
+  File "/home/mphuthi/dev/asimtools/asimtools/scripts/asim_run.py", line 139, in main
+    results = sim_func(**sim_input.get('args', {}))
+  File "/home/mphuthi/dev/asimtools/asimtools/asimmodules/geometry_optimization/atom_relax.py", line 38, in atom_relax
+    calc = load_calc(calc_id)
+  File "/home/mphuthi/dev/asimtools/asimtools/calculators.py", line 50, in load_calc
+    calc = loader(calc_params=calc_params)
+  File "/home/mphuthi/dev/asimtools/asimtools/calculators.py", line 227, in load_m3gnet
+    from matgl.ext.ase import M3GNetCalculator
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/matgl/ext/ase.py", line 29, in <module>
+    from matgl.graph.converters import GraphConverter
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/matgl/graph/converters.py", line 7, in <module>
+    import dgl
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/dgl/__init__.py", line 14, in <module>
+    from .backend import backend_name, load_backend  # usort: skip
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/dgl/backend/__init__.py", line 122, in <module>
+    load_backend(get_preferred_backend())
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/dgl/backend/__init__.py", line 51, in load_backend
+    from .._ffi.base import load_tensor_adapter  # imports DGL C library
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/dgl/_ffi/base.py", line 50, in <module>
+    _LIB, _LIB_NAME, _DIR_NAME = _load_lib()
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/dgl/_ffi/base.py", line 39, in _load_lib
+    lib = ctypes.CDLL(lib_path[0])
+  File "/home/mphuthi/.conda/envs/test/lib/python3.9/ctypes/__init__.py", line 382, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /lib64/libm.so.6: version `GLIBC_2.27' not found (required by /home/mphuthi/.conda/envs/test/lib/python3.9/site-packages/dgl/libdgl.so)

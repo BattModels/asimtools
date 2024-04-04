@@ -1,0 +1,14 @@
+asimmodule: geometry_optimization.atom_relax
+env_id: 
+workdir: relax_results
+args:
+  calc_id: CHGNet
+  image:
+    name: NaCl
+    builder: bulk
+    crystalstructure: rocksalt
+    a: 5.64
+    rattle_stdev: 0.03
+    repeat: [4,4,4]
+  fmax: 0.01
+  optimizer: GPMin

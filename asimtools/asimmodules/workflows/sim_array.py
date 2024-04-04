@@ -30,6 +30,7 @@ def sim_array(
     str_btn_args: Optional[Dict] = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
+    array_max: Optional[int] = None,
 ) -> Dict:
     """Runs the same asimmodule, iterating over multiple values of a specified
     argument based on a sim_input template provided by the user
@@ -44,7 +45,7 @@ def sim_array(
     :type array_values: Optional[Sequence], optional
     :param file_pattern: pattern of files to be iterated over in each
         simulation, defaults to None
-    :type st: Optional[str], optional
+    :type file_pattern: Optional[str], optional
     :param linspace_args: arguments to pass to :func:`numpy.linspace` to be
         iterated over in each simulation, defaults to None
     :type linspace_args: Optional[Sequence], optional
@@ -68,6 +69,8 @@ def sim_array(
         over in tandem with array_values to allow changing multiple key-value
         pairs, defaults to None
     :type secondary_array_values: Sequence, optional
+    :param array_max: Number of jobs to run at once in scheduler
+    :type array_max: int, optional
     :param calc_input: calc_input file to use, defaults to None
     :type calc_input: Optional[Dict], optional
     :param env_input: env_input to use, defaults to None
@@ -150,7 +153,7 @@ def sim_array(
 
     # Create a distributed job object
     djob = DistributedJob(sim_inputs, env_input, calc_input)
-    job_ids = djob.submit()
+    job_ids = djob.submit(array_max=array_max)
 
     results = {'job_ids': job_ids}
     return results

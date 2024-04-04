@@ -12,7 +12,6 @@ from pathlib import Path
 import argparse
 import subprocess
 from typing import Dict, Tuple
-# from ase.parallel import world
 from asimtools.utils import read_yaml, get_logger
 from asimtools.job import load_job_from_directory
 
@@ -131,7 +130,6 @@ def main(args=None) -> None:
     sim_func = getattr(sim_module, func_name)
 
     cwd = Path('.').resolve()
-    # if world.rank == 0:
     job = load_job_from_directory(cwd)
     job.start()
 
@@ -165,7 +163,6 @@ def main(args=None) -> None:
         job_ids = os.getenv('SLURM_JOB_ID')
         results['job_ids'] = job_ids
 
-    # if world.rank == 0:
     job.update_output(results)
     job.complete()
 

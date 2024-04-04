@@ -1,0 +1,61 @@
+QE_Li:
+  # If you are using ASE > 3.22.1 (current master branch)
+  name: EspressoProfile
+
+  # If you are using ASE<=3.22.1 (current stable release on conda and PyPI)
+  # uncomment the following 2 line and comment above line
+  # name: Espresso
+  # module: ase.calculators.espresso
+  
+  args:
+    kpts: [1,1,1]
+    pseudopotentials:
+      Li: Li.pbe-s-kjpaw_psl.1.0.0.UPF
+    input_data:
+      ecutwfc: 50
+      calculation: scf
+      tstress: false
+      tprnfor: false
+      occupations: smearing
+      smearing: mp
+      degauss: 0.04
+      outdir: ./out
+      disk_io: none
+      pseudo_dir: ../
+  # Specify command no matter which ASE version you are using
+    command: srun --mpi=pmix pw.x -in PREFIX.pwi > PREFIX.pwo
+  # If you want to load a module before running, or specify env variables
+  # precommands: 
+  #   - module load qe
+  #   - export ESPRESSO_PSEUDO=path/to/my/pseudo/files
+
+QE_Li_vc-relax:
+  # If you are using ASE > 3.22.1 (current master branch)
+  name: EspressoProfile
+
+  # If you are using ASE<=3.22.1 (current stable release on conda and PyPI)
+  # uncomment the following 2 line and comment above line
+  # name: Espresso
+  # module: ase.calculators.espresso
+  
+  args:
+    kpts: [1,1,1]
+    pseudopotentials:
+      Li: Li.pbe-s-kjpaw_psl.1.0.0.UPF
+    input_data:
+      ecutwfc: 50
+      calculation: vc-relax  # You would use singlepoint to do a vc-relax/md
+      tstress: true
+      tprnfor: true
+      occupations: smearing
+      smearing: mp
+      degauss: 0.04
+      outdir: ./out
+      disk_io: none
+      pseudo_dir: ../
+  # Specify command no matter which ASE version you are using
+    command: srun --mpi=pmix pw.x -in PREFIX.pwi > PREFIX.pwo
+  # If you want to load a module before running, or specify env variables
+  # precommands: 
+  #   - module load qe
+  #   - export ESPRESSO_PSEUDO=path/to/my/pseudo/files

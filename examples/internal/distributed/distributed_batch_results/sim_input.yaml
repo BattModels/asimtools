@@ -1,0 +1,41 @@
+args:
+  array_max: 2
+  subsim_inputs:
+    id-0000:
+      args:
+        calc_id: lj_Ar
+        image:
+          name: Ar
+      asimmodule: singlepoint
+      env_id: batch
+    id-0001:
+      args:
+        calc_id: lj_Ar
+        image:
+          name: Ar
+      asimmodule: geometry_optimization.atom_relax
+      env_id: batch
+    id-0002:
+      args:
+        calc_ids:
+        - emt
+        - lj_Cu
+        env_ids:
+        - inline
+        - inline
+        subsim_input_input:
+          args:
+            ase_cubic_eos_args:
+              eos_string: sj
+              eps: 0.04
+              npoints: 5
+            calc_id: emt
+            image:
+              a: 3.6
+              cubic: true
+              name: Cu
+          asimmodule: elastic_constants.cubic_energy_expansion
+      asimmodule: workflows.calc_array
+      env_id: batch
+asimmodule: workflows.distributed
+workdir: .

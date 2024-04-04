@@ -1,0 +1,12 @@
+Job started on d008 at Thu Apr  4 16:55:34 EDT 2024
+       Step     Time          Energy         fmax
+*Force-consistent energies used in optimization.
+LBFGS:    0 16:55:37       54.426182*       2.0014
+LBFGS:    1 16:55:37       54.043945*       0.7956
+LBFGS:    2 16:55:37       53.973619*       0.2441
+LBFGS:    3 16:55:37       53.963870*       0.2067
+LBFGS:    4 16:55:37       53.952948*       0.0918
+LBFGS:    5 16:55:37       53.951927*       0.0586
+LBFGS:    6 16:55:37       53.950934*       0.0559
+LBFGS:    7 16:55:37       53.950381*       0.0344
+Job ended at Thu Apr  4 16:55:37 EDT 2024

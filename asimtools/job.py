@@ -61,6 +61,17 @@ class Job():
         if self.sim_input.get('src_dir', False):
             self.sim_input['src_dir'] = self.launchdir
 
+        self.env_id = self.sim_input.get('env_id', None)
+        if self.env_id is not None:
+            self.env = self.env_input[self.env_id]
+        else:
+            self.env = {
+                'mode': {
+                    'use_slurm': False,
+                    'interactive': True,
+                }
+            } # Default is to run in current console
+
     def mkworkdir(self) -> None:
         ''' Creates the work directory if it doesn't exist '''
         if not self.workdir.exists():
@@ -186,6 +197,36 @@ class Job():
         logger = get_logger(logfile=self.workdir / logfilename, level=level)
         return logger
 
+    def _gen_slurm_batch_preamble(self) -> None:
+        ''' Generate the txt with job configuration but no run commands '''
+        slurm_params = self.env.get('slurm', {})
+
+        txt = '#!/usr/bin/sh\n\n'
+        flags = slurm_params.get('flags')
+        if isinstance(flags, dict):
+            flag_list = []
+            for k, v in flags.items():
+                assert k.startswith('-'), \
+                    'Slurm flags must start with "-" or "--"'
+                if k.startswith('--'):
+                    delim = '='
+                else:
+                    delim = ' '
+
+                flag_list.append(delim.join([k, v]))
+
+            flags = flag_list
+
+        # Allow naming jobs in sim_input files
+        job_name = self.sim_input.get('job_name', False)
+        if job_name:
+            flags.append(f'-J {job_name}')
+
+        for flag in flags:
+            txt += f'#SBATCH {flag}\n'
+
+        return txt
+
 class UnitJob(Job):
     ''' 
     Unit job object with ability to submit a slurm/interactive job.
@@ -200,15 +241,6 @@ class UnitJob(Job):
         calc_input: Union[Dict,None] = None,
     ) -> None:
         super().__init__(sim_input, env_input, calc_input)
-        self.env_id = self.sim_input.get('env_id', None)
-        if self.env_id is not None:
-            self.env = self.env_input[self.env_id]
-        else:
-            self.env = {'mode': {
-                    'use_slurm': False,
-                    'interactive': True,
-                }
-            }
 
         # Check if the asimmodule being called uses a calc_id to
         # get precommands, postcommands, run_prefixes and run_suffixes
@@ -261,24 +293,7 @@ class UnitJob(Job):
         slurm_params = self.env.get('slurm', {})
         calc_params = self.calc_params
 
-        txt = '#!/usr/bin/sh\n'
-        flags = slurm_params.get('flags')
-        if isinstance(flags, dict):
-            flag_list = []
-            for k, v in flags.items():
-                assert k.startswith('-'), \
-                    'Slurm flags must start with "-" or "--"'
-                if k.startswith('--'):
-                    delim = '='
-                else:
-                    delim = ' '
-
-                flag_list.append(delim.join([k, v]))
-
-            flags = flag_list
-
-        for flag in flags:
-            txt += f'#SBATCH {flag}\n'
+        txt = self._gen_slurm_batch_preamble()
         txt += '\n'
         for command in slurm_params.get('precommands', []):
             txt += command + '\n'
@@ -313,6 +328,7 @@ class UnitJob(Job):
         self,
         write_calc_input: bool = True,
         write_env_input: bool = False,
+        write_image: bool = True,
     ) -> None:
         ''' Write input files to working directory '''
         workdir = self.workdir
@@ -349,7 +365,9 @@ class UnitJob(Job):
         # method is consistent with complex workflows
         image = self.sim_input.get('args', {}).get('image', False)
 
-        if image:
+        # write_image is to account for chains where the image may not have
+        # been produced yet by a previous step, otherwise always read and write
+        if image and write_image:
             atoms = get_atoms(**image)
             input_image_file = 'image_input.xyz' # Relative to workdir
             # input_image_file = self.workdir.resolve() / 'image_input.xyz'
@@ -363,7 +381,7 @@ class UnitJob(Job):
             }
 
         images = self.sim_input.get('args', {}).get('images', False)
-        if images:
+        if images and write_image:
             if images.get('images', False) or images.get('image_file', False):
                 images = get_images(**images)
                 input_images_file = 'images_input.xyz' # Relative to workdir
@@ -390,6 +408,7 @@ class UnitJob(Job):
     def submit(
         self,
         dependency: Union[List,None] = None,
+        write_image: bool = True,
     ) -> Union[None,List[str]]:
         '''
         Submit a job using slurm, interactively or in the terminal
@@ -402,7 +421,7 @@ class UnitJob(Job):
         logging.info(logmsg)
         print(msg) # For printing to console
 
-        self.gen_input_files()
+        self.gen_input_files(write_image=write_image)
 
         logger = self.get_logger()
 
@@ -778,7 +797,10 @@ class ChainedJob(Job):
                         #     dependency = self.unitjobs[i-1].get_output().get('job_ids', dependency)
                         #     print(f'Dependency for step-{i} is {dependency}')
                         # print('===================')
-                        dependency = unitjob.submit(dependency=dependency)
+                        dependency = unitjob.submit(
+                            dependency=dependency,
+                            write_image=False,
+                        )
                     else:
                         txt = f'Skipping step-{step+i} since '
                         txt += f'status is {status}'

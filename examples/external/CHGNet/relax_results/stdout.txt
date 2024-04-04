@@ -1,0 +1,9 @@
+CHGNet v0.3.0 initialized with 412,525 parameters
+CHGNet will run on cpu
+       Step     Time          Energy          fmax
+GPMin:    0 18:13:53     -469.063293         0.254495
+GPMin:    1 18:13:54     -469.265320         0.065701
+GPMin:    2 18:13:55     -469.285797         0.062331
+GPMin:    3 18:13:56     -469.292206         0.040914
+GPMin:    4 18:13:57     -469.301056         0.019506
+GPMin:    5 18:13:58     -469.302490         0.007020

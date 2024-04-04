@@ -1,0 +1,30 @@
+batch:
+  mode:
+    use_slurm: true
+    interactive: false
+  slurm:
+    flags:
+      -n: 1
+      -N: 1
+      -J: my_batch_job
+      --mem: 1G
+    # You can do things like activate environments, set environment variables
+    # etc. before running the asimmodule using precommands using bash commands
+    precommands:
+      - export MY_ASIMTOOLS_ENV_VAR="Hello"
+      - echo $MY_ASIMTOOLS_ENV_VAR
+    # You can do things like delete files that take up space etc. after the 
+    # asimmodule is run using postcommands using bash commands
+    postcommands:
+      - echo "Bye"
+srun:
+  mode:
+    use_slurm: true
+    interactive: true
+  slurm:
+    flags:
+      - -n 1
+inline:
+  mode:
+    use_slurm: false
+    interactive: true
