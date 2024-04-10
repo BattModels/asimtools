@@ -18,14 +18,23 @@ def parse_command_line(args) -> Tuple[Dict, os.PathLike]:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'sim_input_file',
-        metavar='simulation_input_file',
+        metavar='sim_input_file',
         type=str,
         help='simulation input yaml file'
     )
+    parser.add_argument(
+        '-m',
+        '--max_level',
+        type=int,
+        default=-1,
+        help='Max. number of levels deep to print'
+    )
+
     args = parser.parse_args(args)
     sim_input = read_yaml(args.sim_input_file)
+    max_level = args.max_level
     rootdir = Path('/'.join(args.sim_input_file.split('/')[:-1]))
-    return sim_input, rootdir
+    return sim_input, rootdir, max_level
 
 def main(args=None) -> None:
     """Main
@@ -33,13 +42,13 @@ def main(args=None) -> None:
     :param args: cmdline args, defaults to None
     :type args: _type_, optional
     """    
-    sim_input, rootdir = parse_command_line(args)
+    sim_input, rootdir, max_level = parse_command_line(args)
     workdir = sim_input.get('workdir', 'results')
     if not workdir.startswith('/'):
         workdir = rootdir / workdir
 
     jobtree = load_job_tree(workdir)
-    print_job_tree(jobtree)
+    print_job_tree(jobtree, max_level=max_level)
 
 def get_subjobs(workdir):
     """Get all the directories with jobs in them
@@ -97,17 +106,29 @@ def get_status_and_color(job):
         color = Fore.WHITE
     return status, color
 
-def print_job_tree(job_tree: Dict, indent_str='', level=0) -> None:
+def print_job_tree(
+    job_tree: Dict,
+    indent_str: str = '',
+    level: int = 0,
+    max_level: int = -1,
+) -> None:
     """Prints the job tree given the job_tree dictionary
 
-    :param job_tree: dictionary from load_job_tree
+    :param job_tree: Job tree to print
     :type job_tree: Dict
-    :param indent: indentation of output, defaults to 0
-    :type indent: int, optional
+    :param indent_str: str to prepend, defaults to ''
+    :type indent_str: str, optional
+    :param level: Current printing level, defaults to 0
+    :type level: int, optional
+    :param max_level: Max level to print
+    :type max_level: int
     """
     reset = Fore.WHITE
     subjobs = job_tree['subjobs']
-    if subjobs is not None:
+
+    if (max_level != -1) and (level > max_level):
+        pass
+    elif subjobs is not None:
         workdir = job_tree['workdir_name']
         status, color = get_status_and_color(job_tree['job'])
         asimmodule = job_tree['job'].sim_input['asimmodule']
@@ -119,10 +140,10 @@ def print_job_tree(job_tree: Dict, indent_str='', level=0) -> None:
             print_job_tree(
                 subjobs[subjob_id],
                 indent_str=indent_str+'|-',
-                level=level+1
+                level=level+1,
+                max_level=max_level,
             )
             subjob = job_tree['job']
-
     else:
         subjob_dir = job_tree['workdir_name']
         subjob = job_tree['job']

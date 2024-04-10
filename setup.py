@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 from pathlib import Path
-
 version_dict = {}
 with open(Path(__file__).parents[0] / 'asimtools/_version.py') as fp:
     exec(fp.read(), version_dict)
@@ -34,6 +33,7 @@ setup(
         "colorama",
         "myst-parser",
         "sphinx",
+        "pytest",
     ],
     zip_safe=True,
 )

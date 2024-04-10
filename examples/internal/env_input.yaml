@@ -3,7 +3,7 @@ batch:
     use_slurm: true
     interactive: false
   slurm:
-    flags:
+    flags: # You can use a dictionary or list. See list example below
       -n: 1
       -N: 1
       -J: my_batch_job
