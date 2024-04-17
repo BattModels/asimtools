@@ -1,16 +1,20 @@
 +++++++++++++++ ASIMTOOLS START+++++++++++++++
 asimmodule: geometry_optimization.atom_relax
 Work directory: step-0
+['-N 1', '-n 2', '-p cpu', '-J step-0']
 Status: clean
 +++++++++++++++ ASIMTOOLS START+++++++++++++++
 asimmodule: geometry_optimization.cell_relax
 Work directory: step-1
+['-N 1', '-n 2', '-p cpu', '-J step-1']
 Status: clean
 +++++++++++++++ ASIMTOOLS START+++++++++++++++
 asimmodule: do_nothing
 Work directory: step-2
+['-N 1', '-n 2', '-p cpu', '-J step-2']
 Status: clean
 +++++++++++++++ ASIMTOOLS START+++++++++++++++
 asimmodule: geometry_optimization.ase_cubic_eos_optimization
 Work directory: step-3
+['-N 1', '-n 2', '-p cpu', '-J step-3']
 Status: clean

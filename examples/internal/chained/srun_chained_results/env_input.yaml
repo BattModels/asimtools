@@ -4,10 +4,10 @@ batch:
     use_slurm: true
   slurm:
     flags:
-    - -n 1
-    - -N 1
-    - -J my_batch_job
-    - --mem=1G
+      --mem: 1G
+      -J: my_batch_job
+      -N: 1
+      -n: 1
     postcommands:
     - echo "Bye"
     precommands:

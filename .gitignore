@@ -160,3 +160,4 @@ cython_debug/
 
 # ASIMTools results
 examples/*/*results/
+examples/*/*/*results/

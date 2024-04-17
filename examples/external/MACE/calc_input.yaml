@@ -1,17 +1,13 @@
-MACE_cpu: 
+MACE: 
+  name: MACE
+  args: {}
+MACE64_cpu: 
   name: MACE
   args:
     model: medium
     use_device: cpu
-MACE64_cpu: 
-name: MACE
-args:
-  model: medium
-  use_device: cpu
-  default_dtype: float64
-MACE: 
-  name: MACE
-  args: {}
+    default_dtype: float64
+  MACE: 
 MACE-OFF: 
   name: MACE
   args:

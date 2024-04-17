@@ -1,0 +1,14 @@
+asimmodule: phonopy.full_qha
+workdir: full_qha_results
+args:
+  image: 
+    name: Cu
+  calc_id: emt
+  calc_env_id: inline
+  process_env_id: inline
+  phonopy_save_path: phonopy_save.yaml # Specify path relative to this asimmodule's workdir
+  ase_cubic_eos_args:
+    scales: [0.95,0.975,1.00,1.025,1.05]
+  supercell: [10,10,10]
+  pressure: 0
+  t_max: 1500.0

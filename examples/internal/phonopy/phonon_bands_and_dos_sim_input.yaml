@@ -1,0 +1,16 @@
+asimmodule: phonopy.phonon_bands_and_dos
+workdir: phonon_bands_and_dos_results
+args:
+  image:
+    name: Cu
+  supercell: [10,10,10]
+  distance: 0.02
+  phonopy_save_path: phonopy.save
+  calc_env_id: inline
+  calc_id: emt
+  process_env_id: inline
+  # paths: ['GAMMA', 'X', 'GAMMA', 'L']
+  # labels: Optional[Sequence] = None,
+  use_seekpath: true
+  npoints: 101
+  mesh: [20, 20, 20]

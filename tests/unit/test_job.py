@@ -122,14 +122,21 @@ def test_submit(
         else:
             assert new_start_time == old_start_time
 
-def test_slurm_asimmodule(tmp_path):  
+@pytest.mark.parametrize("flags",(
+    ['-N 1 #test flag', '-n 4', '--mem-per-cpu=4G'],
+    {'-N': 1 , '-n': '4', '--mem-per-cpu': '4G'},
+))
+def test_slurm_asimmodule(flags, tmp_path):  
     wdir = tmp_path / 'results'
+    jobname = 'test_job'
     sim_input = {
         'asimmodule': 'do_nothing',
         'env_id': 'test_batch',
         'workdir': wdir,
+        'job_name': jobname,
         'args': {'calc_id': 'test_calc_id'},
     }
+
     env_input = {
         'test_batch': {
             'mode': {
@@ -137,7 +144,7 @@ def test_slurm_asimmodule(tmp_path):
                 'interactive': False,
             },
             'slurm': {
-                'flags': ['-N 1 #test flag'],
+                'flags': flags,
                 'precommands': ['test_env_precommand1', 'test_env_precommand2'],
                 'postcommands': ['test_env_postcommand1', 'test_env_postcommand2'],
             },
@@ -161,6 +168,9 @@ def test_slurm_asimmodule(tmp_path):
     jasimmodule_txt = ' '.join(lines)
 
     assert '#SBATCH -N 1' in jasimmodule_txt
+    assert '#SBATCH -n 4' in jasimmodule_txt
+    assert f'#SBATCH -J {jobname}' in jasimmodule_txt
+    assert '#SBATCH --mem-per-cpu=4' in jasimmodule_txt
     assert 'test_env_precommand1' in jasimmodule_txt
     assert 'test_env_precommand2' in jasimmodule_txt
     assert 'test_env_postcommand1' in jasimmodule_txt

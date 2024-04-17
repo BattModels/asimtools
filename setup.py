@@ -34,6 +34,8 @@ setup(
         "myst-parser",
         "sphinx",
         "pytest",
+        "phonopy",
+        "seekpath"
     ],
     zip_safe=True,
 )

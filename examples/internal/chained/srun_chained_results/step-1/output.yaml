@@ -1,9 +1,9 @@
-end_time: 16:54:56, 04/04/24
+end_time: 15:02:47, 04/12/24
 energy: -1.7193794740309347
 files:
   image: image_output.xyz
   traj: cell_relax.traj
-final_fmax: -1.3247392831621567e-12
-job_ids: '912276'
-start_time: 16:54:54, 04/04/24
+final_fmax: -1.324739172352187e-12
+job_ids: '915033'
+start_time: 15:02:46, 04/12/24
 status: complete

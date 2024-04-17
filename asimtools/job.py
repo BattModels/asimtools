@@ -56,7 +56,7 @@ class Job():
         # sim_input will be in workdir from now on so set workdir as a relative
         # path, but in this class/subclasses, always use self.workdir
         # which is the full path to avoid confusion
-        self.sim_input['workdir'] = './' 
+        self.sim_input['workdir'] = './'
         self.launchdir = Path(os.getcwd())
         if self.sim_input.get('src_dir', False):
             self.sim_input['src_dir'] = self.launchdir
@@ -197,12 +197,17 @@ class Job():
         logger = get_logger(logfile=self.workdir / logfilename, level=level)
         return logger
 
-    def _gen_slurm_batch_preamble(self) -> None:
+    def _gen_slurm_batch_preamble(
+        self,
+        slurm_params=None,
+        extra_flags=None
+    ) -> None:
         ''' Generate the txt with job configuration but no run commands '''
-        slurm_params = self.env.get('slurm', {})
+        if slurm_params is None:
+            slurm_params = self.env.get('slurm', {})
 
         txt = '#!/usr/bin/sh\n\n'
-        flags = slurm_params.get('flags')
+        flags = slurm_params.get('flags', [])
         if isinstance(flags, dict):
             flag_list = []
             for k, v in flags.items():
@@ -213,15 +218,25 @@ class Job():
                 else:
                     delim = ' '
 
-                flag_list.append(delim.join([k, v]))
+                flag_list.append(delim.join([k, str(v)]))
 
             flags = flag_list
+
+        jobname_flag = '-J ' + str(self.sim_input.get('asimmodule', 'job'))
+        for i, flag in enumerate(flags):
+            if flag.strip().startswith('-J') or flag.strip().startswith('--job-name'):
+                jobname_flag = flags.pop(i)
+                break
 
         # Allow naming jobs in sim_input files
         job_name = self.sim_input.get('job_name', False)
         if job_name:
-            flags.append(f'-J {job_name}')
+            jobname_flag = f'-J {job_name}'
 
+        flags.append(jobname_flag)
+        if extra_flags is not None:
+            # Only supporting list for extraflags, it is an internal variable
+            flags.extend(extra_flags)
         for flag in flags:
             txt += f'#SBATCH {flag}\n'
 
@@ -667,11 +682,15 @@ class DistributedJob(Job):
 
         slurm_params = env.get('slurm', {})
 
-        txt = '#!/usr/bin/sh\n'
-        for flag in slurm_params.get('flags'):
-            txt += f'#SBATCH {flag}\n'
+        txt = self._gen_slurm_batch_preamble(
+            slurm_params=slurm_params,
+            extra_flags=[
+                '-o slurm_stdout.id-%a_j%A',
+                '-e slurm_stderr.id-%a_j%A',
+            ]
+        )
 
-        txt += 'if [[ ! -z ${SLURM_ARRAY_TASK_ID} ]]; then\n'
+        txt += '\nif [[ ! -z ${SLURM_ARRAY_TASK_ID} ]]; then\n'
         txt += '    fls=( id-* )\n'
         txt += '    WORKDIR=${fls[${SLURM_ARRAY_TASK_ID}]}\n'
         txt += 'fi\n\n'
@@ -789,14 +808,9 @@ class ChainedJob(Job):
                 for i, unitjob in enumerate(self.unitjobs[step:]):
                     cur_step_complete, status = unitjob.get_status()
                     if not cur_step_complete:
-                        unitjob.env['slurm']['flags'].append(f'-J step-{step+i}')
-                        # Get latest job_id if previous step output was updated with new IDs
-                        # This should allow asimmodules that run asimmodules to use correct dependencies
-                        # print(f'Job id for step-{i} is {dependency}')
-                        # if i > 0:
-                        #     dependency = self.unitjobs[i-1].get_output().get('job_ids', dependency)
-                        #     print(f'Dependency for step-{i} is {dependency}')
-                        # print('===================')
+                        unitjob.env['slurm']['flags'].append(
+                            f'-J step-{step+i}'
+                        )
                         dependency = unitjob.submit(
                             dependency=dependency,
                             write_image=False,
@@ -845,7 +859,7 @@ def load_job_from_directory(workdir: str):
         calc_input = None
 
     job = Job(sim_input, env_input, calc_input)
-    
+
     # This makes sure that wherever we may be loading the job from, we refer
     # to the correct input/output files. As of now, it does not seem necessary
     # to also change the workdir in sim_input.yaml for consistency

@@ -19,12 +19,13 @@ def test_parse_command_line(sim_input, tmp_path):
     sim_input_file = str(tmp_path / 'sim_input.yaml')
     write_yaml(sim_input_file, sim_input)
 
-    sim_config_parse, rootdir = parse_command_line(
-        [sim_input_file]
+    sim_config_parse, rootdir, max_level = parse_command_line(
+        [sim_input_file, '-m 2']
     )
 
     assert sim_input == sim_config_parse
     assert Path(rootdir) == Path(tmp_path)
+    assert max_level == 2
 
 @pytest.mark.parametrize("calc_input",["lj_argon_calc_input"])
 @pytest.mark.parametrize("env_input",["inline_env_input"])
