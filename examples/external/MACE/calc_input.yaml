@@ -1,6 +1,11 @@
 MACE: 
   name: MACE
   args: {}
+MACE_cpu: 
+  name: MACE
+  args:
+    model: medium
+    use_device: cpu
 MACE64_cpu: 
   name: MACE
   args:

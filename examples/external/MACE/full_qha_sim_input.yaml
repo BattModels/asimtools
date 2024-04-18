@@ -1,5 +1,6 @@
 asimmodule: phonopy.full_qha
 workdir: full_qha_results
+env_id: batch
 args:
   image: 
     name: NaCl

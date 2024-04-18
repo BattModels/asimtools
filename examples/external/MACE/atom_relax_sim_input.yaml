@@ -1,5 +1,4 @@
 asimmodule: geometry_optimization.atom_relax
-env_id: 
 workdir: nacl_results
 args:
   calc_id: MACE_cpu

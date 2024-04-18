@@ -1,0 +1,31 @@
+batch:
+  mode:
+    use_slurm: true
+    interactive: false
+  slurm:
+    flags: # You can use a dictionary or list. See list example below
+      -n: 16
+      -N: 1
+      -J: NaCl
+      --mem-per-cpu: 2G
+    # You can do things like activate environments, set environment variables
+    # etc. before running the asimmodule using precommands using bash commands
+    precommands:
+      - export MY_ASIMTOOLS_ENV_VAR="Hello"
+      - echo $MY_ASIMTOOLS_ENV_VAR
+    # You can do things like delete files that take up space etc. after the 
+    # asimmodule is run using postcommands using bash commands
+    postcommands:
+      - echo "Bye"
+srun:
+  mode:
+    use_slurm: true
+    interactive: true
+  slurm:
+    flags:
+      - -n 16
+      - --mem-per-cpu=2G
+inline:
+  mode:
+    use_slurm: false
+    interactive: true
