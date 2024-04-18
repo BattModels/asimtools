@@ -7,7 +7,6 @@ MACE64_cpu:
     model: medium
     use_device: cpu
     default_dtype: float64
-  MACE: 
 MACE-OFF: 
   name: MACE
   args:
