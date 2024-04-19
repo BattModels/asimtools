@@ -21,6 +21,22 @@ def batch_env_input():
     return env_input
 
 @pytest.fixture
+def batch_dict_env_input():
+    """Batch job env_input"""
+    env_input = {
+        'batch': {
+            'mode': {
+                'use_slurm': True,
+                'interactive': False,
+            },
+            'slurm': {
+                'flags': {'-n': 1, '-J': 'test', '--mem': '1G'}
+            }
+        }
+    }
+    return env_input
+
+@pytest.fixture
 def salloc_env_input():
     """Interactive slurm job env_input"""
     env_input = {
@@ -40,7 +56,7 @@ def salloc_env_input():
 def inline_env_input():
     """Inline job env_input"""
     env_input = {
-        'batch': {
+        'inline': {
             'mode': {
                 'use_slurm': False,
                 'interactive': True,
@@ -88,7 +104,7 @@ def do_nothing_sim_input():
         'asimmodule': './data/do_nothing.py',
         'prefix': 'test_',
         'args': {
-            'duration': 5,
+            'duration': 3,
         },
     }
     return sim_input

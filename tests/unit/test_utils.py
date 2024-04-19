@@ -159,17 +159,18 @@ def test_write_and_read_yaml(tmp_path):
     assert read_d == d
 
 def test_get_env_input(tmp_path):
-    cur_env_input = os.environ.get('ASIMTOOLS_ENV_INPUT', None)
+    cur_env_input = os.environ.get('ASIMTOOLS_ENV_INPUT', False)
     test_env_input = tmp_path / 'test_env_input.yaml'
     d = {'test_env': {'mode': {'slurm': False, 'interactive': True}}}
     write_yaml(test_env_input, d)
     os.environ['ASIMTOOLS_ENV_INPUT'] = str(test_env_input)
     env_input = get_env_input()
-    os.environ['ASIMTOOLS_ENV_INPUT'] = cur_env_input
+    if cur_env_input:
+        os.environ['ASIMTOOLS_ENV_INPUT'] = cur_env_input
     assert env_input == d
 
 def test_get_calc_input(tmp_path):
-    cur_calc_input = os.environ.get('ASIMTOOLS_CALC_INPUT', None)
+    cur_calc_input = os.environ.get('ASIMTOOLS_CALC_INPUT', False)
     test_calc_input = tmp_path / 'test_calc_input.yaml'
     d = {'test_calc': {
         'name': 'EMT', 'module': 'ase.calculators.emt', 'args': {}
@@ -177,7 +178,8 @@ def test_get_calc_input(tmp_path):
     write_yaml(test_calc_input, d)
     os.environ['ASIMTOOLS_CALC_INPUT'] = str(test_calc_input)
     calc_input = get_calc_input()
-    os.environ['ASIMTOOLS_CALC_INPUT'] = cur_calc_input
+    if cur_calc_input:
+        os.environ['ASIMTOOLS_CALC_INPUT'] = cur_calc_input
     assert calc_input == d
 
 @pytest.mark.parametrize("test_input, expected",[

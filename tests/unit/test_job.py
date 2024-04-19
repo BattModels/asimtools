@@ -27,6 +27,7 @@ def create_unitjob(sim_input, env_input, workdir, calc_input=None):
 @pytest.mark.parametrize("env_input",[
     "inline_env_input",
     "batch_env_input",
+    "batch_dict_env_input",
     "salloc_env_input",
 ])
 @pytest.mark.parametrize("sim_input",[
@@ -69,7 +70,7 @@ def test_update_and_read_output(env_input, sim_input, tmp_path, request):
     assert unitjob.get_output().get('test_val', False) == 1
 
 @pytest.mark.parametrize("env_input",[
-    "inline_env_input", "batch_env_input", "salloc_env_input"
+    "inline_env_input", "batch_env_input", "batch_dict_env_input", "salloc_env_input"
 ])
 @pytest.mark.parametrize("sim_input",["do_nothing_sim_input"])
 def test_start_fail_discard_complete(env_input, sim_input, tmp_path, request):

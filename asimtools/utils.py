@@ -431,12 +431,17 @@ def new_db(dbname: str):
 
 def get_env_input() -> Dict:
     """Gets the global env_input from the environment variable, then tries
-    then ``.asimtools`` dotfile
+    then ``.asimtools`` dotfile. If an env_input.yaml is present in the 
+    work direcory, it takes precedence.
 
     :return: env_input dictionary or empty dictionary if not found
     :rtype: Dict
     """
-    env_input_file = os.getenv('ASIMTOOLS_ENV_INPUT')
+    if Path('env_input.yaml').exists():
+        env_input_file = Path('env_input.yaml').resolve()
+    else:
+        env_input_file = os.getenv('ASIMTOOLS_ENV_INPUT', None)
+
     if env_input_file is None:
         dotfile = Path('~/.asimtools')
         if dotfile.exists():

@@ -342,7 +342,7 @@ class UnitJob(Job):
     def gen_input_files(
         self,
         write_calc_input: bool = True,
-        write_env_input: bool = False,
+        write_env_input: bool = True,
         write_image: bool = True,
     ) -> None:
         ''' Write input files to working directory '''
@@ -808,9 +808,14 @@ class ChainedJob(Job):
                 for i, unitjob in enumerate(self.unitjobs[step:]):
                     cur_step_complete, status = unitjob.get_status()
                     if not cur_step_complete:
-                        unitjob.env['slurm']['flags'].append(
-                            f'-J step-{step+i}'
-                        )
+                        slurm_flags = unitjob.env['slurm']['flags']
+                        if isinstance(slurm_flags, list):
+                            unitjob.env['slurm']['flags'].append(
+                                f'-J step-{step+i}'
+                            )
+                        elif isinstance(slurm_flags, dict):
+                            unitjob.env['slurm']['flags']['-J'] = \
+                                f'step-{step+i}'
                         dependency = unitjob.submit(
                             dependency=dependency,
                             write_image=False,
@@ -862,7 +867,7 @@ def load_job_from_directory(workdir: str):
 
     # This makes sure that wherever we may be loading the job from, we refer
     # to the correct input/output files. As of now, it does not seem necessary
-    # to also change the workdir in sim_input.yaml for consistency
+    # to also change the workdir in job.sim_input for consistency
     job.workdir = Path(workdir)
     return job
 

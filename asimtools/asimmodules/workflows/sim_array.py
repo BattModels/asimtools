@@ -87,8 +87,10 @@ def sim_array(
         array_values = glob(file_pattern)
     elif linspace_args is not None:
         array_values = np.linspace(*linspace_args)
+        array_values = [float(v) for v in array_values]
     elif arange_args is not None:
         array_values = np.arange(*arange_args)
+        array_values = [float(v) for v in array_values]
 
     assert len(array_values) > 0, 'No array values or files found'
 
