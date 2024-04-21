@@ -160,6 +160,9 @@ class Job():
     def update_env_input(self, new_params) -> None:
         ''' Update calculator parameters '''
         self.env_input.update(new_params)
+        self.env_id = self.sim_input.get('env_id', None)
+        if self.env_id is not None:
+            self.env = self.env_input[self.env_id]
 
     def set_workdir(self, workdir) -> None:
         ''' Set working directory both in sim_input and instance '''
@@ -343,6 +346,7 @@ class UnitJob(Job):
         self,
         write_calc_input: bool = True,
         write_env_input: bool = True,
+        # use_links: bool = True,
         write_image: bool = True,
     ) -> None:
         ''' Write input files to working directory '''
@@ -777,7 +781,6 @@ class ChainedJob(Job):
         ''' 
         Submit a job using slurm, interactively or in the terminal
         '''
-
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
         logger = self.get_logger()

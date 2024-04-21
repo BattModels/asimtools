@@ -84,7 +84,7 @@ def sim_array(
         f'Provide only one of {possible_values}'
 
     if file_pattern is not None:
-        array_values = glob(file_pattern)
+        array_values = sorted(glob(str(file_pattern)))
     elif linspace_args is not None:
         array_values = np.linspace(*linspace_args)
         array_values = [float(v) for v in array_values]
@@ -141,7 +141,6 @@ def sim_array(
 
         if secondary_array_values is not None:
             for k, vs in zip(secondary_key_sequences, secondary_array_values):
-                print('kv', k, vs[i])
                 new_sim_input = change_dict_value(
                     d=new_sim_input,
                     new_value=vs[i],

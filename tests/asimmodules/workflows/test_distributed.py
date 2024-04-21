@@ -1,11 +1,8 @@
 """
 Tests for running asimmodules using asim_run.py
 """
-import os
 from glob import glob
-from pathlib import Path
 import pytest
-from asimtools.utils import write_yaml
 from asimtools.job import create_unitjob
 from asimtools.job import load_job_from_directory
 

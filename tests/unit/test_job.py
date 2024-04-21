@@ -70,6 +70,60 @@ def test_update_and_read_output(env_input, sim_input, tmp_path, request):
     assert unitjob.get_output().get('test_val', False) == 1
 
 @pytest.mark.parametrize("env_input",[
+    "inline_env_input", "batch_env_input", "salloc_env_input"
+])
+@pytest.mark.parametrize("calc_input",["lj_argon_calc_input"])
+@pytest.mark.parametrize("sim_input",["do_nothing_sim_input"])
+def test_update_calc_env_input(env_input, sim_input, calc_input, tmp_path, request):
+    env_input = request.getfixturevalue(env_input)
+    sim_input = request.getfixturevalue(sim_input)
+    calc_input = request.getfixturevalue(calc_input)
+    wdir = tmp_path / 'wdir'
+    unitjob = create_unitjob(sim_input, env_input, wdir)
+    env_id = unitjob.env_id
+
+    new_env_input = env_input.copy()
+    new_env_input[env_id]['precommands'] = ['precommand']
+    unitjob.update_env_input(new_env_input)
+
+    assert 'precommand' in unitjob.env_input[env_id]['precommands']
+    assert 'precommand' in unitjob.env['precommands']
+
+    new_calc_input = calc_input.copy()
+    calc_id = list(calc_input.keys())[0]
+    new_calc_input[calc_id]['precommands'] = ['precommand']
+    unitjob.update_calc_input(new_calc_input)
+    assert 'precommand' in unitjob.calc_input[calc_id]['precommands']
+
+@pytest.mark.parametrize("env_input",[
+    "inline_env_input",
+    "batch_env_input",
+    "batch_dict_env_input",
+    "salloc_env_input",
+])
+@pytest.mark.parametrize("sim_input",[
+    "do_nothing_sim_input", "singlepoint_argon_sim_input"
+])
+def test_set_workdir(env_input, sim_input, tmp_path, request):
+    env_input = request.getfixturevalue(env_input)
+    sim_input = request.getfixturevalue(sim_input)
+    wdir = tmp_path / 'wdir'
+    unitjob = create_unitjob(sim_input, env_input, wdir)
+
+    new_workdir = (tmp_path / 'new_wdir').resolve()
+    unitjob.set_workdir(new_workdir)
+    assert unitjob.get_workdir().resolve() == new_workdir
+    assert unitjob.workdir.resolve() == new_workdir
+    assert Path(unitjob.sim_input['workdir']).resolve() == new_workdir
+    assert isinstance(unitjob.sim_input['workdir'], str)
+
+    str_workdir = str((tmp_path / 'new_wdir').resolve())
+    unitjob.set_workdir(str_workdir)
+    assert unitjob.get_workdir().resolve() == new_workdir
+    assert unitjob.workdir.resolve() == new_workdir
+    assert Path(unitjob.sim_input['workdir']).resolve() == new_workdir
+
+@pytest.mark.parametrize("env_input",[
     "inline_env_input", "batch_env_input", "batch_dict_env_input", "salloc_env_input"
 ])
 @pytest.mark.parametrize("sim_input",["do_nothing_sim_input"])
@@ -90,6 +144,22 @@ def test_start_fail_discard_complete(env_input, sim_input, tmp_path, request):
     unitjob.complete()
     assert unitjob.get_output().get('end_time', False)
     assert unitjob.get_status() == (True, 'complete')
+
+@pytest.mark.parametrize("env_input",[
+    "inline_env_input", "batch_env_input", "batch_dict_env_input", "salloc_env_input"
+])
+@pytest.mark.parametrize("sim_input",["do_nothing_sim_input"])
+def test_go_to_leave_workdir(env_input, sim_input, tmp_path, request):
+    env_input = request.getfixturevalue(env_input)
+    sim_input = request.getfixturevalue(sim_input)
+    cur_dir = Path('.').resolve()
+    wdir = tmp_path / 'wdir'
+    unitjob = create_unitjob(sim_input, env_input, wdir)
+    unitjob.gen_input_files()
+    unitjob.go_to_workdir()
+    assert Path('.').resolve() == wdir.resolve()
+    unitjob.leave_workdir()
+    assert Path('.').resolve() == cur_dir
 
 @pytest.mark.parametrize("env_input",["inline_env_input"])
 @pytest.mark.parametrize("sim_input",["do_nothing_sim_input"])

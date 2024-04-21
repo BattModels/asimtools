@@ -5,6 +5,19 @@ Global fixtures used in all tests defined here
 import pytest
 
 @pytest.fixture
+def inline_env_input():
+    """Inline job env_input"""
+    env_input = {
+        'inline': {
+            'mode': {
+                'use_slurm': False,
+                'interactive': True,
+            },
+        }
+    }
+    return env_input
+
+@pytest.fixture
 def batch_env_input():
     """Batch job env_input"""
     env_input = {
@@ -53,14 +66,63 @@ def salloc_env_input():
     return env_input
 
 @pytest.fixture
-def inline_env_input():
-    """Inline job env_input"""
+def srun_env_input():
+    """Interactive slurm job env_input"""
     env_input = {
+        'srun': {
+            'mode': {
+                'use_slurm': True,
+                'interactive': True,
+            },
+            'slurm': {
+                'flags': ['-n 1', '-J test', '--mem=1G']
+            }
+        }
+    }
+    return env_input
+
+@pytest.fixture
+def all_env_input():
+    """env_input with all test envs"""
+    env_input = {
+        'srun': {
+            'mode': {
+                'use_slurm': True,
+                'interactive': True,
+            },
+            'slurm': {
+                'flags': ['-n 1', '-J test', '--mem=1G']
+            }
+        },
+        'batch': {
+            'mode': {
+                'use_slurm': True,
+                'interactive': False,
+            },
+            'slurm': {
+                'flags': {'-n': 1, '-J': 'test', '--mem': '1G'}
+            }
+        },
         'inline': {
             'mode': {
                 'use_slurm': False,
                 'interactive': True,
             },
+        },
+        'inline2': {
+            'mode': {
+                'use_slurm': False,
+                'interactive': True,
+            },
+        },
+        'salloc': {
+            'mode': {
+                'use_slurm': True,
+                'interactive': True,
+            },
+            'slurm': {
+                'flags': ['-n 1', '-J test', '--mem=1G']
+            }
         }
     }
     return env_input
