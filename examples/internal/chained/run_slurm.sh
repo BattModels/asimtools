@@ -9,3 +9,6 @@ asim-execute chained_srun_sim_input.yaml -c ../calc_input.yaml -e ../env_input.y
 
 # Run the chain of asimmodule modules in batch jobs with dependencies
 asim-execute chained_batch_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
+
+# Run a chain that internally submits an array, connected by job depndencies
+asim-execute eos_chained_array_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml

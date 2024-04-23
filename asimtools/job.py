@@ -819,9 +819,14 @@ class ChainedJob(Job):
                         elif isinstance(slurm_flags, dict):
                             unitjob.env['slurm']['flags']['-J'] = \
                                 f'step-{step+i}'
+
+                        write_image = False
+                        # Write image first step in chain being run/continued
+                        if i == 0:
+                            write_image = True
                         dependency = unitjob.submit(
                             dependency=dependency,
-                            write_image=False,
+                            write_image=write_image,
                         )
                     else:
                         txt = f'Skipping step-{step+i} since '

@@ -1,9 +1,0 @@
-end_time: 15:03:27, 04/12/24
-energy: 53.950380705469925
-files:
-  image: image_output.xyz
-  traj: atom_relax.traj
-final_fmax: 0.03441671052859319
-job_ids: '915036'
-start_time: 15:03:26, 04/12/24
-status: complete

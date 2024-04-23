@@ -67,6 +67,22 @@ def ase_cubic_eos_optimization(
     else:
         eos = calculate_eos(atoms, trajectory=traj_file, eps=eps, npoints=npoints)
 
+
+    traj = read(traj_file, index=':')
+    eos_dict = {
+        'energies': [],
+        'volumes': [],
+        'volume_scale_factors': [],
+    }
+    for struct in traj:
+        eos_dict['energies'].append(struct.get_potential_energy())
+        eos_dict['volumes'].append(struct.get_volume())
+        v_factor = struct.get_volume() / v_init
+        eos_dict['volume_scale_factors'].append(v_factor)
+
+    eos_df = pd.DataFrame(eos_dict)
+    eos_df.to_csv('eos.csv')
+
     eos.eos_string = eos_string
     v0, e0, B = eos.fit()  # find minimum
 
@@ -85,22 +101,6 @@ def ase_cubic_eos_optimization(
     if plot:
         eos.plot()
         plt.savefig('eos.png')
-
-    traj = read(traj_file, index=':')
-
-    eos_dict = {
-        'energies': [],
-        'volumes': [],
-        'volume_scale_factors': [],
-    }
-    for struct in traj:
-        eos_dict['energies'].append(struct.get_potential_energy())
-        eos_dict['volumes'].append(struct.get_volume())
-        v_factor = struct.get_volume() / v_init
-        eos_dict['volume_scale_factors'].append(v_factor)
-
-    eos_df = pd.DataFrame(eos_dict)
-    eos_df.to_csv('eos.csv')
 
     results = {
         'v0': float(v0),

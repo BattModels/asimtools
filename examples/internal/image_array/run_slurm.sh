@@ -5,4 +5,4 @@
 # them.
 
 # Run the asimmodule in an interactive job
-asim-execute image_array_batch_sim_input.yaml -c ../calc_input.yaml
+asim-execute image_array_batch_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml

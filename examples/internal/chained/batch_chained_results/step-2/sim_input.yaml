@@ -1,5 +1,0 @@
-args:
-  duration: 20
-asimmodule: do_nothing
-env_id: batch
-workdir: .

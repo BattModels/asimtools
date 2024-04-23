@@ -6,5 +6,5 @@
 
 # Example 1: This example relaxes the cell to a hydrostatic external pressure
 # of 0.05eV/Ang^3
-asim-execute symmetric_cell_relax_sim_input.yaml -c ../calc_input.yaml
+asim-execute symmetric_cell_relax_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
 

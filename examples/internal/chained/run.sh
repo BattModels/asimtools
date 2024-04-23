@@ -8,5 +8,5 @@
 # This example runs multiple asimmodules one after the other, stopping on failure
 # You can fix the failed job in its workdir or set the output.yaml status to 
 # "discard" or "complete" and rerun asim-execute to proceed
-asim-execute chained_sim_input.yaml -c ../calc_input.yaml
+asim-execute chained_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
 
