@@ -18,6 +18,9 @@ from ase.io import read
 from ase.parallel import paropen
 import ase.db
 import ase.build
+from pymatgen.ext.matproj import MPRester
+from pymatgen.core import Structure
+from pymatgen.io.ase import AseAtomsAdaptor
 
 Atoms = TypeVar('Atoms')
 
@@ -126,17 +129,24 @@ def join_names(substrs: Sequence[str]) -> str:
 
 def get_atoms(
     image_file: Optional[str] = None,
+    interface: str = 'ase',
     builder: Optional[str] = 'bulk',
     atoms: Optional[Atoms] = None,
     repeat: Optional[Tuple[int, int, int]] = None,
     rattle_stdev: Optional[float] = None,
+    mp_id: Optional[str] = None,
+    user_api_key: Optional[str] = None,
+    return_type: str = 'ase',
     **kwargs
-) -> Atoms:
-    """Return an atoms object based on specified config. This is the 
-    recommended way to load atoms objects. 
+) -> Union[Atoms, Structure]:
+    """Return an ASE Atoms or pymatgen Structure object based on specified 
+    config. This is the recommended way to load atoms objects for asimmodules.  
 
     :param image_file: Path to an ASE-readable image file, defaults to None
     :type image_file: str, optional
+    :param interface: Whether to use "ase" or "pymatgen" to create the atoms 
+        object
+    :type interface: str, optional
     :param builder: Builder to use from :mod:`ase.build`, defaults to 'bulk'. \
         Any extra keyword arguments specified are passed to the build
     :type builder: str, optional
@@ -145,11 +155,21 @@ def get_atoms(
     :param repeat: Number of times to repeat input to create supercell, \
         defaults to None
     :type repeat: Tuple[int, int, int], optional
-    :param rattle_stdev: stdev to be provided to :meth:`ase.Atoms.rattle`, \
+    :param rattle_stdev: `stdev` to be provided to :meth:`ase.Atoms.rattle`, \
+        or as `distance` to :meth:`pymatgen.core.structure.Structure.perturb`
         defaults to None
     :type rattle_stdev: float, optional
-    :return: One :class:`ase.Atoms` instance
-    :rtype: Atoms, optional
+    :param mp_id: Material Project ID to fetch structure from, defaults to None
+    :type mp_id: str, optional
+    :param user_api_key: Material Project API key, must be provided to get
+        structures from Materials Project, defaults to None
+    :type user_api_key: str, optional
+    :param return_type: When set to `ase` returns a :class:`ase.Atoms` object,
+        when set to `pymatgen` returns a 
+        :class:`pymatgen.core.structure.Structure` object, defaults to 'ase'
+    :return: One :class:`ase.Atoms` or 
+        :class:`pymatgen.core.structure.Structure` instance
+    :rtype: Union[Atoms, Structure]
 
     There are three options one could use to specify and image or an atoms
     objects:
@@ -210,35 +230,81 @@ def get_atoms(
     >>> image = {'name': 'Pt'}
     >>> get_atoms(**image)
     Atoms(symbols='Pt', pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]])
-    """
-    assert image_file is not None or \
-        len(kwargs) > 0 or \
-        atoms is not None, \
-        "Specify atoms, image_file or use ase.build tools"
 
-    if image_file is not None:
-        assert Path(image_file).exists(), \
-            f'The image_file {image_file} does not exist from {os.getcwd()}'
-        atoms = read(image_file, **kwargs)
-    elif atoms is None:
-        builder_func = getattr(ase.build, builder)
-        try:
-            atoms = builder_func(**kwargs)
-        except ValueError:
-            print('Make sure you choose a valid builder and appropriate\
-                arguments matching the functions in ase.build. \n\
-                See https://wiki.fysik.dtu.dk/ase/ase/build/build.html')
-            raise
-    else:
-        assert atoms is not None, 'Specify an input structure'
+    To get a pymatgen structure object, set the return_type to 'pymatgen'
+    >>> image = {'name': 'Pt'}
+    >>> get_atoms(**image)
+    Structure Summary
+    Lattice
+    ...
+
+    To download a structure from the Materials Project, you need to provide
+    an API key, the MP ID of the structure and set the interface to 'pymatgen'
+    >>> {'mp_id': 'mp-14', 'interface': 'pymatgen', 'user_api_key': 'acbITI9ekZ65q1KObD2355ZJZAX3AnVC'},
+    >>> get_atoms(**image)
+    Structure Summary
+    Lattice
+    abc : 2.7718585822512662 2.7718585822512662 2.7718585822512662
+    ...
+    """
+    if interface == 'ase':
+        assert image_file is not None or \
+            len(kwargs) > 0 or \
+            atoms is not None, \
+            "Specify atoms, image_file or use ase.build tools if using \
+                ASE interface"
+        if image_file is not None:
+            assert Path(image_file).exists(), \
+                f'The image_file {image_file} does not exist from {os.getcwd()}'
+            atoms = read(image_file, **kwargs)
+        elif atoms is None:
+            builder_func = getattr(ase.build, builder)
+            try:
+                atoms = builder_func(**kwargs)
+            except ValueError:
+                print('Make sure you choose a valid builder and appropriate\
+                    arguments matching the functions in ase.build. \n\
+                    See https://wiki.fysik.dtu.dk/ase/ase/build/build.html')
+                raise
+        else:
+            assert atoms is not None, 'Specify an input structure'
+    
+    if interface == 'pymatgen':
+        if mp_id is not None:
+            with MPRester(user_api_key) as mpr:
+                struct = mpr.get_structure_by_material_id(mp_id)   
+        elif builder is not None:
+            builder_func = getattr(Structure, builder)
+            try:
+                struct = builder_func(**kwargs)
+            except ValueError:
+                err_txt = 'Make sure you choose a valid builder and '
+                err_txt += 'appropriate arguments matching the functions '
+                err_txt += 'from pymatgen.core.structure \n'
+                err_txt += 'See https://pymatgen.org/pymatgen.core.html'
+                err_txt += '#module-pymatgen.core.structure'
+                print(err_txt)
+                raise
 
     if repeat is not None:
-        atoms = atoms.repeat(repeat)
+        if interface == 'ase':
+            atoms = atoms.repeat(repeat)
+        elif interface == 'pymatgen':
+            struct = struct.make_supercell(repeat)
 
-    if rattle_stdev is not None:
+    if rattle_stdev is not None and interface == 'ase':
         atoms.rattle(stdev=rattle_stdev)
+    elif rattle_stdev is not None and interface == 'pymatgen':
+        struct.perturb(distance=rattle_stdev, min_distance=0)
 
-    return atoms
+    if return_type == 'ase' and interface == 'ase':
+        return atoms
+    elif return_type == 'pymatgen' and interface == 'ase':
+        return AseAtomsAdaptor.get_structure(atoms)
+    elif return_type == 'pymatgen' and interface == 'pymatgen':
+        return struct
+    elif return_type == 'ase' and interface == 'pymatgen':
+        return AseAtomsAdaptor.get_atoms(struct, msonable=False)
 
 def parse_slice(value: str) -> slice:
     """Parses a :func:`slice` from string, like `start:stop:step`.
