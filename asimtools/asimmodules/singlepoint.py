@@ -38,7 +38,7 @@ def singlepoint(
         prefix = prefix + '_'
     else:
         prefix = ''
-
+    import time; time.sleep(20)
     if 'energy' in properties:
         try:
             energy = atoms.get_potential_energy()

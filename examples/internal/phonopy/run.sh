@@ -11,7 +11,7 @@
 
 # Example 2: This does a full quasiharmonic approximation, predicting a number
 # of thermal properties
-asim-execute qha_sim_input.yaml -c ../calc_input.yaml
+asim-execute phonon_bands_and_dos_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
 
 
 

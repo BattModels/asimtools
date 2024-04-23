@@ -8,12 +8,12 @@
 # This example runs the same calculator on FCC Cu with different
 # lattice parameters (a). 
 
-asim-execute sim_array_lattice_parameters_sim_input.yaml -c ../calc_input.yaml
+asim-execute sim_array_lattice_parameters_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
 
 # Example 2:
 # This example runs the same calculator on Cu with different
 # crystal structures
-asim-execute sim_array_crystalstructure_sim_input.yaml -c ../calc_input.yaml
+asim-execute sim_array_crystalstructure_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
 
 # Example 3:
 # This example runs the same Cu FCC structure with different calculators.

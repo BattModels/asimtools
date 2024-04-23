@@ -4,16 +4,17 @@ from typing import Dict, Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 from ase.eos import EquationOfState
-from ase.io import read
 from ase. units import GPa
 # from asimtools.job import load_output_images, load_input_images
 from asimtools.utils import (
     write_csv_from_dict,
     get_images,
+    get_atoms,
 )
 
 def postprocess(
-    images: Dict = None,
+    images: Dict,
+    initial_image: Dict,
 ) -> Tuple[None,Dict]:
     ''' plot things '''
     images = get_images(**images)
@@ -39,7 +40,7 @@ def postprocess(
         # Get equilibrium lattice scaling by interpolation
         xs = [atoms.info['scale'] for atoms in images]
         vs = []
-        atoms = read('../step-0/input_image.xyz')
+        atoms = get_atoms(**initial_image)
         for x in xs:
             samp_atoms = atoms.copy()
             samp_atoms.cell = samp_atoms.cell*x

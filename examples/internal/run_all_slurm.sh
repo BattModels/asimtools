@@ -8,7 +8,7 @@ source clean_all.sh
 
 RUNFILE="run_slurm.sh"
 
-for d in chaine*/; do
+for d in */; do
     cd $d
     if test -f ${RUNFILE}; then
         source ${RUNFILE}

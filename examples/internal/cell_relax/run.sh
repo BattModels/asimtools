@@ -7,4 +7,4 @@
 # Example 1: This relaxes all cell degrees of freedom using ase.filter.strainfilter
 # If you want to maintain symmetry, use 
 # geometry_optimization.symmetric_cell_relax asimmodule
-asim-execute cell_relax_sim_input.yaml -c ../calc_input.yaml
+asim-execute cell_relax_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml

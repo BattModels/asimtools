@@ -5,7 +5,7 @@
 # them.
 
 # Run the asimmodule in an interactive job
-asim-execute distributed_batch_sim_input.yaml -c ../calc_input.yaml
+asim-execute distributed_batch_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
 
 # Run the asimmodule in a batch job
-asim-execute distributed_mixed_sim_input.yaml -c ../calc_input.yaml
+asim-execute distributed_mixed_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml

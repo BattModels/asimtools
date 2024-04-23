@@ -1,0 +1,39 @@
+asimmodule: workflows.chained
+env_id: inline
+workdir: eos_batch_results
+args:
+  steps:
+    step-0:
+      asimmodule: transformations.scale_unit_cells
+      env_id: batch
+      args:
+        image:
+          name: Cu
+        linspace: [0.95,1.05,5]
+    step-1:
+      asimmodule: workflows.image_array
+      env_id: batch
+      args:
+        images: 
+          image_file: ../step-0/scaled_unitcells_output.xyz
+        subsim_input:
+          asimmodule: singlepoint
+          env_id: batch
+          args:
+            calc_id: emt
+    # This step is introduced to connect step 1 and 3 since step
+    # one submits jobs internally
+    step-2:
+      asimmodule: workflows.update_dependencies
+      env_id: batch
+      args:
+        prev_step_dir: ../step-1
+        next_step_dir: ../step-3
+    step-3:
+      asimmodule: eos.postprocess
+      env_id: batch
+      args:
+        images: 
+          pattern: ../step-1/id*/image_output.xyz
+        initial_image:
+          image_file: ../step-0/image_input.xyz

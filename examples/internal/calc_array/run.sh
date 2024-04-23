@@ -7,11 +7,11 @@
 # Example 1:
 # This example runs the same simulation for Cu using different calc_id values
 # See sim_array examples for an alternative way to do this
-asim-execute calc_array_calc_id_sim_input.yaml -c ../calc_input.yaml
+asim-execute calc_array_calc_id_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
 
 # Example 2:
 # This example runs the same elastic constant simulation for Cu using different calc_id values
-asim-execute calc_array_elastic_constant_sim_input.yaml -c ../calc_input.yaml
+asim-execute calc_array_elastic_constant_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
 
 # Example 3:
 # This example runs the same simulation on Cu using different Lennard-Jones sigma parameters
