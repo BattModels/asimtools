@@ -240,7 +240,9 @@ def get_atoms(
 
     To download a structure from the Materials Project, you need to provide
     an API key, the MP ID of the structure and set the interface to 'pymatgen'
-    >>> {'mp_id': 'mp-14', 'interface': 'pymatgen', 'user_api_key': 'acbITI9ekZ65q1KObD2355ZJZAX3AnVC'},
+    You can also specify whether you want the primitive(default) or 
+    conventional unit cell as a keyword argument
+    >>> {'mp_id': 'mp-14', 'interface': 'pymatgen', 'user_api_key': "USER_API_KEY", 'conventional_unit_cell': True},
     >>> get_atoms(**image)
     Structure Summary
     Lattice
@@ -272,7 +274,7 @@ def get_atoms(
     if interface == 'pymatgen':
         if mp_id is not None:
             with MPRester(user_api_key) as mpr:
-                struct = mpr.get_structure_by_material_id(mp_id)   
+                struct = mpr.get_structure_by_material_id(mp_id, **kwargs)   
         elif builder is not None:
             builder_func = getattr(Structure, builder)
             try:
