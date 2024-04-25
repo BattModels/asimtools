@@ -502,12 +502,11 @@ class UnitJob(Job):
 
             with paropen('stdout.txt', 'w', encoding='utf-8') as output_file:
                 output_file.write(completed_process.stdout)
-
+            with paropen('stderr.txt', 'w', encoding='utf-8') as err_file:
+                err_file.write(completed_process.stderr)
             if completed_process.returncode != 0:
                 err_msg = f'See {self.workdir / "stderr.txt"} for traceback.'
                 logger.error(err_msg)
-                with paropen('stderr.txt', 'w', encoding='utf-8') as err_file:
-                    err_file.write(completed_process.stderr)
                 completed_process.check_returncode()
 
         os.chdir(cur_dir)

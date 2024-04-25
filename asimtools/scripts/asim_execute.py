@@ -41,7 +41,7 @@ def parse_command_line(args) -> Tuple[Dict, Dict]:
         '-d',
         '--debug',
         action='store_true',
-        help='Set logging level'
+        help='Set logging level to debug'
     )
     args = parser.parse_args(args)
     sim_input = read_yaml(args.sim_input_file)
