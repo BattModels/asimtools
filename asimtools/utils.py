@@ -18,7 +18,6 @@ from ase.io import read
 from ase.parallel import paropen
 import ase.db
 import ase.build
-from pymatgen.ext.matproj import MPRester
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
@@ -273,6 +272,7 @@ def get_atoms(
     
     if interface == 'pymatgen':
         if mp_id is not None:
+            from pymatgen.ext.matproj import MPRester
             with MPRester(user_api_key) as mpr:
                 struct = mpr.get_structure_by_material_id(mp_id, **kwargs)   
         elif builder is not None:
