@@ -10,24 +10,26 @@
 
 This package is a lightweight workflow and simulation manager for reproducible
 atomistic simulations that can be transferred across environments, calculators
-and structures. By using in-built or user-defined asimmodules and utilities,
-users can run/build their own simulation recipes and automagically scale them
-locally or on slurm based clusters. The core idea is to separate the dependence
-of the atomistic potential/calculator and the simulations steps thereby
-allowing the same simulation to be run with multiple calculators and the same
-calculator to be used for multiple simulations without altering simulation
-code. Input and output files must follow a strict format so that consistent
-analysis pipelines can be used across users
+and structures on Unix systems. By using in-built or user-defined asimmodules
+and utilities, users can run/build their own simulation recipes and
+automagically scale them locally or on slurm based clusters. The core idea is
+to separate the dependence of the atomistic potential/calculator and the
+simulations steps thereby allowing the same simulation to be run with multiple
+calculators/codes and the same calculator to be used for multiple simulation
+parameters without altering simulation code. Input and output files follow a
+simple consisten file structure and format so that consistent analysis
+pipelines can be used across users
 
 ## Developer philosophy
 The goal of asimtools is to push all the complexity of workflow management,
 best-practices, file management etc. into the backend such that the everyday
 user only has to handle input files for existing workflows and asimmodule files
-for workflows they want to implement. The following are the guiding principles
-for how asimtools should work:
+for workflows they want to implement.This allows the user to focus on doing the
+science and designing experiments. The following are the guiding principles for
+how asimtools should work:
 
 - Asimmodules should resemble boilerplate ASE code as much as possible.
-- Asimmodules should not explicitly depend on a calculator
+- Asimmodules should avoid explicitly depending on a calculator
 - Asimmodules should not explicitly depend on the context/environment in which 
   they run
 - It should be easy to debug individual asimmodules/parts in large workflows.
@@ -36,7 +38,7 @@ for how asimtools should work:
 - Input file structure and format should be standard across all asimmodules. In
   addition all input parameters should match how they would like without
   asimtools i.e. do not provide an API!
-- Job progress tracking must be incorporated
+- Job progress tracking must be incorporated for easy debugging
 - Best practices should be built-in e.g. if multiple jobs of the same slurm
   context are submitted simulataneously, it must be a job array.
 
@@ -52,6 +54,12 @@ are discouraged, they would still work as long as the asimmodule works. The
 benefit out of the box is that you can make your asimmodule independent of
 calculator or input structures and submit them easily.
 
+We also aim to provide a standard set of robust and efficient simulation
+protocols as we develop. You can see all the implemented workflows provided
+with the package in the examples directory and modify them to your application
+If you have suggestions for improvements in methodology or code, please bring
+up an issue on github!
+
 ## Getting Started
 
 These instructions will give you a copy of the project up and running.
@@ -59,14 +67,23 @@ These instructions will give you a copy of the project up and running.
 ### Installing
 You can install asimtools in a new conda environment using:
 ```
-conda create -n asimtools python=3.7
+conda create -n asimtools python=3.9
 conda activate asimtools
 
-conda install ase -c conda-forge
+git clone https://gitlab.com/ase/ase.git && cd ase
+pip install .
+cd ../
 
 git clone https://github.com/BattModels/asimtools.git
 cd asimtools
 pip install .
+```
+
+You can also choose to use the PyPI and conda versions of ASE which are
+currently quite outdated using the following instead
+
+```
+conda install ase -c conda-forge
 ```
 
 Individual calculators may need external packages for loading those
@@ -109,7 +126,7 @@ Or you can run a test for each individual example in its directory using:
     source run.sh
 
 If no errors are reported, the tests have passed. These tests simply test the
-functionality of the code, not the validity of the simulations!
+functionality of the code, not the scientific validity of the simulations!
 
 To run tests for the provided asimmodules using slurm, you can similarly run
 the bash scripts ending with `_slurm.sh`.

@@ -10,3 +10,5 @@
 # "discard" or "complete" and rerun asim-execute to proceed
 asim-execute image_array_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
 
+asim-execute image_array_key_sequence_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
+

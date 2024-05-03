@@ -9,7 +9,7 @@ setup(
     version=version_dict["__version__"],
     description="Atomic Simulation Tools",
     author="Keith Phuthi and Emil Annevelink",
-    python_requires=">=3.9", # For typing using types like "list" to work
+    python_requires=">=3.7",
     packages=find_packages(include=[
         "asimtools",
         "asimtools.*",
@@ -29,13 +29,14 @@ setup(
         "pymatgen",
         "ase>=3.22.1", 
         # Recommended to use the master branch of the ASE gitlab but only 
-        # required for lammps to handle masses correctly
+        # required for lammps to handle masses correctly as far as we can tell
         "colorama",
         "myst-parser",
         "sphinx",
         "pytest",
         "phonopy",
-        "seekpath"
+        "seekpath",
+        "mp-api",
     ],
     zip_safe=True,
 )

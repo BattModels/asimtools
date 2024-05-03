@@ -4,7 +4,7 @@ workdir: calc_id_results
 args:
   calc_ids: [emt, lj_Cu]
   env_ids: [inline, inline]
-  subsim_input_input:
+  subsim_input:
     asimmodule: geometry_optimization.atom_relax
     args:
       image:

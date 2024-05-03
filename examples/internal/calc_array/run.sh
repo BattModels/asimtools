@@ -16,3 +16,8 @@ asim-execute calc_array_elastic_constant_sim_input.yaml -c ../calc_input.yaml -e
 # Example 3:
 # This example runs the same simulation on Cu using different Lennard-Jones sigma parameters
 asim-execute calc_array_sigma_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
+
+# Example 4:
+# This example runs the same simulation on Cu using different Lennard-Jones sigma parameters
+# while simultaneously looping over a second epsilon argument
+asim-execute calc_array_secondary_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml

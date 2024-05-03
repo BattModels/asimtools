@@ -8,12 +8,10 @@ Author: mkphuthi@github.com
 '''
 
 from typing import Dict, Sequence, Optional, Union
-from glob import glob
 from copy import deepcopy
-import numpy as np
 from asimtools.job import DistributedJob
 from asimtools.utils import change_dict_value
-from asimtools.utils import get_str_btn
+from asimtools.asimmodules.workflows.utils import prepare_array_vals
 
 def sim_array(
     template_sim_input: Dict,
@@ -56,7 +54,7 @@ def sim_array(
     :type labels: Sequence, optional
     :param label_prefix: Prefix to add before labels which can make extracting 
         data from file paths easier, defaults to None
-    :type labels: str, optional
+    :type label_prefix: str, optional
     :param env_ids: Environment(s) to be used for each simulation, must either
         be a list with as many env_ids as array values or a string with the
         env_id to be used by all simulations, defaults to None
@@ -79,51 +77,24 @@ def sim_array(
     :rtype: Dict
     """
 
-    possible_values = [array_values, file_pattern, linspace_args, arange_args]
-    assert possible_values.count(None) + 1 == len(possible_values), \
-        f'Provide only one of {possible_values}'
-
-    if file_pattern is not None:
-        array_values = sorted(glob(str(file_pattern)))
-    elif linspace_args is not None:
-        array_values = np.linspace(*linspace_args)
-        array_values = [float(v) for v in array_values]
-    elif arange_args is not None:
-        array_values = np.arange(*arange_args)
-        array_values = [float(v) for v in array_values]
-
-    assert len(array_values) > 0, 'No array values or files found'
-
-    if labels == 'str_btn':
-        assert str_btn_args is not None, 'Provide str_btn_args for labels'
-        labels = [get_str_btn(s, *str_btn_args) for s in array_values]
-    elif labels == 'values':
-        if key_sequence is not None:
-            labels = [f'{key_sequence[-1]}-{val}' for val in array_values]
-        else:
-            labels = [f'value-{val}' for val in array_values]
-    elif labels is None:
-        labels = [str(i) for i in range(len(array_values))]
-
-    if label_prefix is not None:
-        labels = [label_prefix + '-' + label for label in labels]
-
-    assert len(labels) == len(array_values), \
-        'Num. of array_values must match num. of labels'
-
-    if secondary_array_values is not None:
-        for l in secondary_array_values:
-            assert len(l) == len(labels), \
-                f"Secondary values ({len(l)}) not same length as array values"\
-                f" ({len(labels)})"
-
-    if env_ids is None:
-        pass
-    elif isinstance(env_ids, str):
-        env_ids = [env_ids for i in range(len(labels))]
-    else:
-        assert len(env_ids) == len(labels) or isinstance(env_ids, str), \
-            'Provide one env_id or as many as there are array_values'
+    results = prepare_array_vals(
+        key_sequence=key_sequence,
+        array_values=array_values,
+        file_pattern=file_pattern,
+        linspace_args=linspace_args,
+        arange_args=arange_args,
+        env_ids=env_ids,
+        labels=labels,
+        label_prefix=label_prefix,
+        str_btn_args=str_btn_args,
+        secondary_key_sequences=secondary_key_sequences,
+        secondary_array_values=secondary_array_values,
+    )
+    array_values = results['array_values']
+    labels = results['labels']
+    env_ids = results['env_ids']
+    secondary_array_values = results['secondary_array_values']
+    secondary_key_sequences = results['secondary_key_sequences']
 
     # Create sim_inputs for each array value and to create input for
     # a DistributedJob object

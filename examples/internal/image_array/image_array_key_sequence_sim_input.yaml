@@ -1,12 +1,15 @@
 asimmodule: workflows.image_array
-workdir: image_array_batch_results
+workdir: key_sequence_results
 args:
+  key_sequence: [args, image]
+  secondary_key_sequences: [[args, properties]]
+  secondary_array_values:
+    - [['energy'],['energy'],['energy', 'forces']] 
   images:
     pattern: ../structures/Ar*.cif
   array_max: 2
   subsim_input:
     asimmodule: singlepoint
-    env_id: batch
     args:
       image: {}
       calc_id: lj_Ar

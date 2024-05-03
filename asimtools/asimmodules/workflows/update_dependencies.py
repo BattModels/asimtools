@@ -11,16 +11,28 @@ from pathlib import Path
 import os
 import subprocess
 import logging
-# from copy import deepcopy
-# from asimtools.job import DistributedJob
 from asimtools.utils import read_yaml
-import time
 
 def update_dependencies(
     prev_step_dir: Optional[os.PathLike] = None,
     next_step_dir: Optional[os.PathLike] = None,
     skip_failed: bool = False,
 ) -> Dict:
+    """Asimmodule for connecting jobs where an asimmodule launches slurm jobs
+    internally, examples are image_array, sim_array and calc_array
+
+    :param prev_step_dir: workdir of previous step, usually step-[N-1] where N
+        is current step, defaults to None
+    :type prev_step_dir: Optional[os.PathLike], optional
+    :param next_step_dir: workdir of next step, usually step-[N+1] where N
+        is current step, defaults to None
+    :type next_step_dir: Optional[os.PathLike], optional
+    :param skip_failed: whether to submit if any jobs failed or not,
+        defaults to False
+    :type skip_failed: bool, optional
+    :return: Nothing
+    :rtype: Dict
+    """
 
     prev_step_dir = Path(prev_step_dir)
     next_step_dir = Path(next_step_dir)
@@ -55,5 +67,4 @@ def update_dependencies(
                 completed_process.check_returncode()
             return {}
 
-    results = {}
-    return results
+    return {}
