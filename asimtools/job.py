@@ -407,7 +407,7 @@ class UnitJob(Job):
                 ase.io.write(
                     self.workdir / input_images_file,
                     images,
-                    format='extxyz'
+                    format='extxyz',
                 )
                 sim_input['args']['images'] = {
                     'image_file': str(input_images_file),
@@ -502,8 +502,11 @@ class UnitJob(Job):
 
             with paropen('stdout.txt', 'w', encoding='utf-8') as output_file:
                 output_file.write(completed_process.stdout)
-            with paropen('stderr.txt', 'w', encoding='utf-8') as err_file:
-                err_file.write(completed_process.stderr)
+
+            if completed_process.stderr is not None:
+                with paropen('stderr.txt', 'w', encoding='utf-8') as err_file:
+                    err_file.write(completed_process.stderr)
+
             if completed_process.returncode != 0:
                 err_msg = f'See {self.workdir / "stderr.txt"} for traceback.'
                 logger.error(err_msg)
@@ -664,11 +667,13 @@ class DistributedJob(Job):
         with paropen('stdout.txt', 'w', encoding='utf-8') as output_file:
             output_file.write(completed_process.stdout)
 
+        if completed_process.stderr is not None:
+            with paropen('stderr.txt', 'w', encoding='utf-8') as err_file:
+                    err_file.write(completed_process.stderr)
+
         if completed_process.returncode != 0:
             err_msg = f'See {self.workdir / "stderr.txt"} for traceback.'
             logger.error(err_msg)
-            with paropen('stderr.txt', 'w', encoding='utf-8') as err_file:
-                err_file.write(completed_process.stderr)
             completed_process.check_returncode()
 
         job_ids = [int(completed_process.stdout.split(' ')[-1])]
@@ -835,9 +840,17 @@ class ChainedJob(Job):
             job_ids = dependency
 
         # Otherwise just submit them one after the other
+        # We only write the image if it's the first job, otherwise we refer to 
+        # wherever the image comes from in case it has to come from a previous
+        # step
         else:
-            for unitjob in self.unitjobs[step:]:
-                job_ids = unitjob.submit()
+            for i, unitjob in enumerate(self.unitjobs[step:]):
+                if i == 0:
+                    write_image = True
+                else:
+                    write_image = False
+
+                job_ids = unitjob.submit(write_image=write_image)
 
         os.chdir(cur_dir)
 

@@ -21,7 +21,7 @@ def template(
     # images: Dict, # Optional: if using multiple structures
 ) -> Dict:
     '''
-    asimmodule does xyz specifically
+    asimmodule does xyz
     '''
 
     # Some useful lines

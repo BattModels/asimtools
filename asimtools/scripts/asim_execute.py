@@ -8,13 +8,15 @@ Author: mkphuthi@github.com
 '''
 
 import sys
+import shutil
 import argparse
+from pathlib import Path
 from typing import Dict, Tuple
 from asimtools.utils import read_yaml
 from asimtools.job import UnitJob
 
 
-def parse_command_line(args) -> Tuple[Dict, Dict]:
+def parse_command_line(args) -> Tuple[Dict, Dict, Dict]:
     ''' Parse command line input '''
     parser = argparse.ArgumentParser(add_help=True)
     parser.add_argument(
@@ -43,8 +45,15 @@ def parse_command_line(args) -> Tuple[Dict, Dict]:
         action='store_true',
         help='Set logging level to debug'
     )
+    parser.add_argument(
+        '-f',
+        '--force',
+        action='store_true',
+        help='Remove the work directory before rerunning. Be careful!'
+    )
     args = parser.parse_args(args)
     sim_input = read_yaml(args.sim_input_file)
+
     # Do some cleanup of arguments
     if args.debug:
         sim_input['debug'] = True
@@ -57,6 +66,12 @@ def parse_command_line(args) -> Tuple[Dict, Dict]:
     calc_input = args.calc
     if calc_input is not None:
         calc_input = read_yaml(calc_input)
+
+    workdir = Path(sim_input['workdir'])
+
+    if workdir.exists() and args.force:
+        if workdir.resolve() != Path('./').resolve():
+            shutil.rmtree(workdir)
 
     return sim_input, env_input, calc_input
 
@@ -72,6 +87,7 @@ def main(args=None) -> None:
         env_input=env_input,
         calc_input=calc_input
     )
+
     job.gen_input_files(write_calc_input=True, write_env_input=True)
     job.go_to_workdir()
     try:
