@@ -131,11 +131,20 @@ def load_chgnet(calc_params):
     :rtype: :class:`chgnet.model.dynamics.CHGNetCalculator`
     """
     from chgnet.model.dynamics import CHGNetCalculator
+    if calc_params['args'].get('from_file', False):
+        calc_params['args'].pop('from_file')
+        try:
+            calc = CHGNetCalculator.from_file(**calc_params['args'])
+        except Exception:
+            logging.error("Failed to load CHGNet from file with parameters:\
+                \n %s", calc_params)
+            raise
 
     try:
         calc = CHGNetCalculator(**calc_params['args'])
     except Exception:
-        logging.error("Failed to load CHGNet with parameters:\n %s", calc_params)
+        logging.error("Failed to load CHGNet with parameters:\n %s", \
+            calc_params)
         raise
 
     return calc
@@ -214,7 +223,7 @@ def load_espresso_profile(calc_params):
         raise
 
     return calc
-    
+
 
 def load_m3gnet(calc_params):
     """Load and M3GNet calculator

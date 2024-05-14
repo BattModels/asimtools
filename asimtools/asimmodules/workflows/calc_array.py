@@ -17,7 +17,7 @@ from asimtools.utils import (
 )
 
 def calc_array(
-    subsim_input_input: Dict,
+    subsim_input: Dict,
     calc_ids: Sequence[str] = None,
     template_calc_id: Optional[str] = None,
     key_sequence: Optional[Sequence[str]] = None,
@@ -92,15 +92,15 @@ def calc_array(
 
     # Make individual sim_inputs for each calc
     for i, calc_id in enumerate(calc_ids):
-        new_subsim_input_input = deepcopy(subsim_input_input)
-        new_subsim_input_input['args']['calc_id'] = calc_id
-        array_sim_input[f'{labels[i]}'] = new_subsim_input_input
+        new_subsim_input = deepcopy(subsim_input)
+        new_subsim_input['args']['calc_id'] = calc_id
+        array_sim_input[f'{labels[i]}'] = new_subsim_input
 
         if env_ids is not None:
             if isinstance(env_ids, str):
-                new_subsim_input_input['env_id'] = env_ids
+                new_subsim_input['env_id'] = env_ids
             else:
-                new_subsim_input_input['env_id'] = env_ids[i]
+                new_subsim_input['env_id'] = env_ids[i]
 
     # Create a distributed job object
     djob = DistributedJob(array_sim_input, env_input, calc_input)

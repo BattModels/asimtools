@@ -22,7 +22,7 @@ args:
       args:
         calc_ids: [emt, lj_Cu]
         env_ids: [inline, inline] # Must correspond to calc_id if list is given
-        subsim_input_input:
+        subsim_input:
           asimmodule: elastic_constants.cubic_energy_expansion
           args:
             calc_id: emt

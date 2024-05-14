@@ -176,7 +176,7 @@ def lj_distributed_sim_input():
     ''' 
     Sim input for a distributed job that does some lj calculations
     '''
-    subsim_input_input = {
+    subsim_input = {
         'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
@@ -192,9 +192,9 @@ def lj_distributed_sim_input():
         'env_id': 'inline',
         'args': {
             'subsim_inputs': {
-                'id-0000': subsim_input_input,
-                'id-0001': subsim_input_input,
-                'id-0002': subsim_input_input,
+                'id-0000': subsim_input,
+                'id-0001': subsim_input,
+                'id-0002': subsim_input,
             }
         }
     }
@@ -206,7 +206,7 @@ def lj_distributed_custom_name_sim_input():
     ''' 
     Sim input for a distributed job that does some lj calculations
     '''
-    subsim_input_input = {
+    subsim_input = {
         'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
@@ -222,10 +222,10 @@ def lj_distributed_custom_name_sim_input():
         'env_id': 'inline',
         'args': {
             'subsim_inputs': {
-                'first': subsim_input_input,
-                'second': subsim_input_input,
-                'third': subsim_input_input,
-                'id-03': subsim_input_input,
+                'first': subsim_input,
+                'second': subsim_input,
+                'third': subsim_input,
+                'id-03': subsim_input,
             }
         }
     }
@@ -237,7 +237,7 @@ def lj_distributed_batch_sim_input():
     ''' 
     Sim input for a distributed job that does some lj calculations
     '''
-    subsim_input_input = {
+    subsim_input = {
         'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
@@ -253,10 +253,10 @@ def lj_distributed_batch_sim_input():
         'env_id': 'batch',
         'args': {
             'subsim_inputs': {
-                'id-0000': subsim_input_input,
-                'id-0001': subsim_input_input,
-                'id-0002': subsim_input_input,
-                'id-0003': subsim_input_input,
+                'id-0000': subsim_input,
+                'id-0001': subsim_input,
+                'id-0002': subsim_input,
+                'id-0003': subsim_input,
             }
         }
     }

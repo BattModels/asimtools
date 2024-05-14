@@ -35,7 +35,8 @@ setup(
         "sphinx",
         "pytest",
         "phonopy",
-        "seekpath"
+        "seekpath",
+        "mp-api",
     ],
     zip_safe=True,
 )
