@@ -139,13 +139,13 @@ def load_chgnet(calc_params):
             logging.error("Failed to load CHGNet from file with parameters:\
                 \n %s", calc_params)
             raise
-
-    try:
-        calc = CHGNetCalculator(**calc_params['args'])
-    except Exception:
-        logging.error("Failed to load CHGNet with parameters:\n %s", \
-            calc_params)
-        raise
+    else:
+        try:
+            calc = CHGNetCalculator(**calc_params['args'])
+        except Exception:
+            logging.error("Failed to load CHGNet with parameters:\n %s", \
+                calc_params)
+            raise
 
     return calc
 
