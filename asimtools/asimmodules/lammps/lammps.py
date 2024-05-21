@@ -26,7 +26,7 @@ def lammps(
 
     :param template: path to lammps input template file
     :type template: str
-    :param image: Image specification, see :func:`asimtools.utils.get_atoms`, defaults to None
+    :param image: Initial image for MD simulation. Image specification, see :func:`asimtools.utils.get_atoms`, defaults to None
     :type image: Dict, optional
     :param atom_style: LAMMPS style in which to write image to Lammps data input e.g. full, atomic etc., defaults to 'atomic'
     :type atom_style: str, optional

@@ -64,7 +64,7 @@ up an issue on github!
 
 These instructions will give you a copy of the project up and running.
 
-### Installing
+### Installing ASIMTools
 You can install asimtools in a new conda environment using:
 ```
 conda create -n asimtools python=3.9
@@ -86,11 +86,10 @@ currently quite outdated using the following instead
 conda install ase -c conda-forge
 ```
 
-Individual calculators may need external packages for loading those
-calculators. For example if you want to use Quantum Espresso or CASTEP, you
-will have to install them. Similarly some asimmodules e.g. `lammps.py` might
-also need external packages to be used. It is up to the user to make sure those
-are installed.
+Individual calculators may need external packages for running them. For example
+if you want to use Quantum Espresso or CASTEP, you will have to install them.
+Similarly some asimmodules e.g. `lammps.py` might also need external packages
+to be used. It is up to the user to make sure those are installed.
 
 You will also need to setup some environment variables, these variables point
 to global `env_input.yaml` and `calc_input.yaml` files with your favorite
@@ -129,7 +128,8 @@ If no errors are reported, the tests have passed. These tests simply test the
 functionality of the code, not the scientific validity of the simulations!
 
 To run tests for the provided asimmodules using slurm, you can similarly run
-the bash scripts ending with `_slurm.sh`.
+the bash scripts ending with `_slurm.sh`. This will submit a number of jobs,
+none longer than 1 minute.
     
 ## Contributing
 

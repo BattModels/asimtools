@@ -196,7 +196,7 @@ down the chain will use the global ``calc_input.yaml``, so always use
 
   # You can install a universal potential like MACE and define it as well, see
   # asimtools/calculators.py for implemented external calculators. Submit an
-  # issue if you wanted one to be implemented 
+  # issue if you want one to be implemented.
   MACE32-medium:
     name: MACE
     args:
