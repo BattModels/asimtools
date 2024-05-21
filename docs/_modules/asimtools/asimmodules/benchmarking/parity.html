@@ -3,18 +3,28 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<<<<<<< HEAD
   <title>asimtools.asimmodules.benchmarking.parity &mdash; asimtools 1.0.0 documentation</title>
+=======
+  <title>asimtools.asimmodules.benchmarking.parity &mdash; asimtools 0.0.0 documentation</title>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+<<<<<<< HEAD
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/doctools.js"></script>
         <script src="../../../../_static/sphinx_highlight.js"></script>
+=======
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=525cde36"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -25,6 +35,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+<<<<<<< HEAD
 
           
           
@@ -34,6 +45,13 @@
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+=======
+            <a href="../../../../index.html" class="icon icon-home"> asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -62,9 +80,15 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
+<<<<<<< HEAD
       <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
       <li class="breadcrumb-item active">asimtools.asimmodules.benchmarking.parity</li>
+=======
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>asimtools.asimmodules.benchmarking.parity</li>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -103,7 +127,11 @@
     <span class="n">properties</span><span class="p">:</span> <span class="n">Sequence</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;energy&#39;</span><span class="p">,</span> <span class="s1">&#39;forces&#39;</span><span class="p">,</span> <span class="s1">&#39;stress&#39;</span><span class="p">),</span>
     <span class="n">force_prob</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<<<<<<< HEAD
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates parity data for each atoms instance in subset</span>
+=======
+    <span class="sd">&quot;&quot;&quot;Calculates parity data for each atoms instance in subset</span>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 
 <span class="sd">    :param subset: List of atoms instances</span>
 <span class="sd">    :type subset: List</span>
@@ -170,7 +198,11 @@
     <span class="k">return</span> <span class="n">res</span></div>
 
 <span class="k">def</span> <span class="nf">_split_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">chunks</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+<<<<<<< HEAD
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Splits data into equal chunks and tosses the remainder</span>
+=======
+    <span class="sd">&quot;&quot;&quot;Splits data into equal chunks and tosses the remainder</span>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 
 <span class="sd">    :param data: Sequence of datapoints</span>
 <span class="sd">    :type data: Sequence</span>
@@ -189,7 +221,11 @@
     <span class="k">return</span> <span class="n">subsets</span>
 
 <div class="viewcode-block" id="rmse"><a class="viewcode-back" href="../../../../asimtools.asimmodules.benchmarking.html#asimtools.asimmodules.benchmarking.parity.rmse">[docs]</a><span class="k">def</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">yhat</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<<<<<<< HEAD
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate Root Mean Square Error between to sequences</span>
+=======
+    <span class="sd">&quot;&quot;&quot;Calculate Root Mean Square Error between to sequences</span>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 
 <span class="sd">    :param yhat: Predicted values</span>
 <span class="sd">    :type yhat: Sequence</span>
@@ -209,10 +245,17 @@
     <span class="n">index</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span>
     <span class="n">properties</span><span class="p">:</span> <span class="n">Sequence</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;energy&#39;</span><span class="p">,</span> <span class="s1">&#39;forces&#39;</span><span class="p">,</span> <span class="s1">&#39;stress&#39;</span><span class="p">),</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<<<<<<< HEAD
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates a parity plot and collects evaluation statistics comparing energy</span>
 <span class="sd">    and/or forces and/or stress to existing values in the provided dataset</span>
 
 <span class="sd">    :param images: Image specification, see :func:`asimtools.utils.get_images`</span>
+=======
+    <span class="sd">&quot;&quot;&quot;Generates a parity plot and collects evaluation statistics comparing energy</span>
+<span class="sd">    and/or forces and/or stress to existing values in the provided dataset</span>
+
+<span class="sd">    :param images: Image config, see :func:`asimtools.utils.get_images`</span>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">    :type images: Dict</span>
 <span class="sd">    :param calc_id: ID of calculator provided in calc_input or global file</span>
 <span class="sd">    :type calc_id: str</span>
@@ -306,7 +349,11 @@
   <hr/>
 
   <div role="contentinfo">
+<<<<<<< HEAD
     <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
+=======
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi, Emil Annevelink.</p>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

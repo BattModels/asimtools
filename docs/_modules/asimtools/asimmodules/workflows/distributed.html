@@ -3,7 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<<<<<<< HEAD
   <title>asimtools.asimmodules.workflows.distributed &mdash; asimtools 1.0.0 documentation</title>
+=======
+  <title>asimtools.asimmodules.workflows.distributed &mdash; asimtools 0.0.0 documentation</title>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -86,7 +90,11 @@
 <span class="kn">from</span> <span class="nn">asimtools.job</span> <span class="kn">import</span> <span class="n">DistributedJob</span>
 
 <div class="viewcode-block" id="distributed"><a class="viewcode-back" href="../../../../asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.distributed.distributed">[docs]</a><span class="k">def</span> <span class="nf">distributed</span><span class="p">(</span>
+<<<<<<< HEAD
     <span class="n">subsim_inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+=======
+    <span class="n">subasimmodules</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
     <span class="n">env_input</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">calc_input</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">array_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -99,9 +107,15 @@
 <span class="sd">    #. use_slurm: False, interactive: False, different env_ids -&gt; Launches \</span>
 <span class="sd">    # multiple jobs.</span>
 
+<<<<<<< HEAD
 <span class="sd">    :param subsim_inputs: Dictionary of asimmodules, each key is an ID and each \</span>
 <span class="sd">        value is a sim_input file</span>
 <span class="sd">    :type subsim_inputs: Dict</span>
+=======
+<span class="sd">    :param subasimmodules: Dictionary of asimmodules, each key is an ID and each \</span>
+<span class="sd">        value is a sim_input file</span>
+<span class="sd">    :type subasimmodules: Dict</span>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">    :param env_input: env_input that overrides global file, defaults to None</span>
 <span class="sd">    :type env_input: Optional[Dict], optional</span>
 <span class="sd">    :param calc_input: calc_input that overrides global file, defaults to None</span>
@@ -112,7 +126,11 @@
 <span class="sd">    :rtype: Dict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">djob</span> <span class="o">=</span> <span class="n">DistributedJob</span><span class="p">(</span>
+<<<<<<< HEAD
         <span class="n">sim_input</span><span class="o">=</span><span class="n">subsim_inputs</span><span class="p">,</span>
+=======
+        <span class="n">sim_input</span><span class="o">=</span><span class="n">subasimmodules</span><span class="p">,</span>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="n">env_input</span><span class="o">=</span><span class="n">env_input</span><span class="p">,</span>
         <span class="n">calc_input</span><span class="o">=</span><span class="n">calc_input</span>
     <span class="p">)</span>
@@ -129,7 +147,11 @@
   <hr/>
 
   <div role="contentinfo">
+<<<<<<< HEAD
     <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
+=======
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi, Emil Annevelink.</p>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

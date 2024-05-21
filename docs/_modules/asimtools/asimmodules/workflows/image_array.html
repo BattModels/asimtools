@@ -3,7 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<<<<<<< HEAD
   <title>asimtools.asimmodules.workflows.image_array &mdash; asimtools 1.0.0 documentation</title>
+=======
+  <title>asimtools.asimmodules.workflows.image_array &mdash; asimtools 0.0.0 documentation</title>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -82,6 +86,7 @@
 
 <span class="sd">&#39;&#39;&#39;</span>
 
+<<<<<<< HEAD
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">asimtools.job</span> <span class="kn">import</span> <span class="n">DistributedJob</span>
@@ -101,26 +106,50 @@
     <span class="n">str_btn_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">secondary_key_sequences</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">secondary_array_values</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+=======
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">asimtools.job</span> <span class="kn">import</span> <span class="n">DistributedJob</span>
+<span class="kn">from</span> <span class="nn">asimtools.utils</span> <span class="kn">import</span> <span class="n">get_images</span>
+
+<div class="viewcode-block" id="image_array"><a class="viewcode-back" href="../../../../asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.image_array.image_array">[docs]</a><span class="k">def</span> <span class="nf">image_array</span><span class="p">(</span>
+    <span class="n">images</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">subasimmodule_input</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">calc_input</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">env_input</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">env_ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">array_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Submit the same asimmodule on multiple images and if specified, use</span>
 <span class="sd">    different env_ids</span>
 
 <span class="sd">    :param images: Images specification, see :func:`asimtools.utils.get_images`</span>
 <span class="sd">    :type images: Dict</span>
+<<<<<<< HEAD
 <span class="sd">    :param subsim_input: sim_input of asimmodule to be run</span>
 <span class="sd">    :type subsim_input: Dict</span>
+=======
+<span class="sd">    :param subasimmodule_input: sim_input of asimmodule to be run</span>
+<span class="sd">    :type subasimmodule_input: Dict</span>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">    :param calc_input: calc_input to override global file, defaults to None</span>
 <span class="sd">    :type calc_input: Optional[Dict], optional</span>
 <span class="sd">    :param env_input: env_input to override global file, defaults to None</span>
 <span class="sd">    :type env_input: Optional[Dict], optional</span>
+<<<<<<< HEAD
 <span class="sd">    :param array_max: Maximum jobs to run simultanteously in job array, \</span>
 <span class="sd">        defaults to None</span>
 <span class="sd">    :type array_max: Optional[int], optional</span>
+=======
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">    :param labels: Custom labels for each image, defaults to None</span>
 <span class="sd">    :type labels: Sequence[str], optional</span>
 <span class="sd">    :param env_ids: Sequence of envs for each image, must be the same length \</span>
 <span class="sd">        as the total number of images, defaults to None</span>
 <span class="sd">    :type env_ids: Sequence[str], optional</span>
+<<<<<<< HEAD
 <span class="sd">    :param labels: Custom labels to use for each simulation, defaults to \</span>
 <span class="sd">        None</span>
 <span class="sd">    :param label_prefix: Prefix to add before labels which can make extracting </span>
@@ -134,10 +163,16 @@
 <span class="sd">        over in tandem with images to allow changing multiple key-value</span>
 <span class="sd">        pairs, defaults to None</span>
 <span class="sd">    :type secondary_array_values: Sequence, optional</span>
+=======
+<span class="sd">    :param array_max: Maximum jobs to run simultanteously in job array, \</span>
+<span class="sd">        defaults to None</span>
+<span class="sd">    :type array_max: Optional[int], optional</span>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">    :return: Dictionary of results</span>
 <span class="sd">    :rtype: Dict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">images</span> <span class="o">=</span> <span class="n">get_images</span><span class="p">(</span><span class="o">**</span><span class="n">images</span><span class="p">)</span>
+<<<<<<< HEAD
     <span class="n">array_values</span> <span class="o">=</span> <span class="n">images</span>
 
     <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -189,6 +224,31 @@
             <span class="n">new_sim_input</span><span class="p">[</span><span class="s1">&#39;env_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">env_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
         <span class="n">array_sim_input</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_sim_input</span>
+=======
+    <span class="n">array_sim_input</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Allow user to customize subdirectory names if needed</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">))]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">),</span> \
+            <span class="s1">&#39;Num. of images must match num. of labels&#39;</span>
+
+    <span class="k">if</span> <span class="n">env_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">),</span> \
+            <span class="sa">f</span><span class="s1">&#39;Num. images (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">)</span><span class="si">}</span><span class="s1">) must match env_ids (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span><span class="si">}</span><span class="s1">)&#39;</span>
+
+    <span class="c1"># Make individual sim_inputs for each image</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">image</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">images</span><span class="p">):</span>
+        <span class="n">new_subasimmodule_input</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">subasimmodule_input</span><span class="p">)</span>
+        <span class="n">new_subasimmodule_input</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">][</span><span class="s1">&#39;image&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;atoms&#39;</span><span class="p">:</span> <span class="n">image</span>
+        <span class="p">}</span>
+        <span class="n">array_sim_input</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_subasimmodule_input</span>
+
+        <span class="k">if</span> <span class="n">env_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_subasimmodule_input</span><span class="p">[</span><span class="s1">&#39;env_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">env_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 
     <span class="c1"># Create a distributed job object</span>
     <span class="n">djob</span> <span class="o">=</span> <span class="n">DistributedJob</span><span class="p">(</span><span class="n">array_sim_input</span><span class="p">,</span> <span class="n">env_input</span><span class="p">,</span> <span class="n">calc_input</span><span class="p">)</span>
@@ -205,7 +265,11 @@
   <hr/>
 
   <div role="contentinfo">
+<<<<<<< HEAD
     <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
+=======
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi, Emil Annevelink.</p>
+>>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
