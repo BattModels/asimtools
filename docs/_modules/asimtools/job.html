@@ -3,28 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<<<<<<< HEAD
   <title>asimtools.job &mdash; asimtools 1.0.0 documentation</title>
-=======
-  <title>asimtools.job &mdash; asimtools 0.0.0 documentation</title>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-<<<<<<< HEAD
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
-=======
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=525cde36"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,7 +25,6 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-<<<<<<< HEAD
 
           
           
@@ -45,13 +34,6 @@
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-=======
-            <a href="../../index.html" class="icon icon-home"> asimtools
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -80,15 +62,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-<<<<<<< HEAD
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
       <li class="breadcrumb-item active">asimtools.job</li>
-=======
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>asimtools.job</li>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -136,11 +112,7 @@
 <span class="n">STOP_MESSAGE</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span> <span class="o">*</span> <span class="mi">15</span> <span class="o">+</span> <span class="s1">&#39; ASIMTOOLS STOP&#39;</span> <span class="o">+</span> <span class="s1">&#39;+&#39;</span> <span class="o">*</span> <span class="mi">15</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
 
 <div class="viewcode-block" id="Job"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job">[docs]</a><span class="k">class</span> <span class="nc">Job</span><span class="p">():</span>
-<<<<<<< HEAD
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Abstract class for the job object &#39;&#39;&#39;</span>
-=======
-    <span class="sd">&#39;&#39;&#39; Abstract class for the job object &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
     <span class="c1"># pylint: disable=too-many-instance-attributes</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -160,16 +132,11 @@
         <span class="c1"># sim_input will be in workdir from now on so set workdir as a relative</span>
         <span class="c1"># path, but in this class/subclasses, always use self.workdir</span>
         <span class="c1"># which is the full path to avoid confusion</span>
-<<<<<<< HEAD
         <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="p">[</span><span class="s1">&#39;workdir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span>
-=======
-        <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="p">[</span><span class="s1">&#39;workdir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span> 
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="bp">self</span><span class="o">.</span><span class="n">launchdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;src_dir&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="p">[</span><span class="s1">&#39;src_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">launchdir</span>
 
-<<<<<<< HEAD
         <span class="bp">self</span><span class="o">.</span><span class="n">env_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;env_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_input</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">env_id</span><span class="p">]</span>
@@ -183,45 +150,28 @@
 
 <div class="viewcode-block" id="Job.mkworkdir"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.mkworkdir">[docs]</a>    <span class="k">def</span> <span class="nf">mkworkdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Creates the work directory if it doesn&#39;t exist &#39;&#39;&#39;</span>
-=======
-<div class="viewcode-block" id="Job.mkworkdir"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.mkworkdir">[docs]</a>    <span class="k">def</span> <span class="nf">mkworkdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Creates the work directory if it doesn&#39;t exist &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Job.update_status"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.update_status">[docs]</a>    <span class="k">def</span> <span class="nf">update_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Updates job status to specificied value &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_output</span><span class="p">({</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="n">status</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="Job.start"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Updates the output to signal that the job was started &#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39; Updates job status to specificied value &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_output</span><span class="p">({</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="n">status</span><span class="p">})</span></div>
-
-<div class="viewcode-block" id="Job.start"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Updates the output to signal that the job was started &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="bp">self</span><span class="o">.</span><span class="n">update_output</span><span class="p">({</span>
             <span class="s1">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%H:%M:%S, %m/</span><span class="si">%d</span><span class="s1">/%y&#39;</span><span class="p">)</span>
         <span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_status</span><span class="p">(</span><span class="s1">&#39;started&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Job.complete"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.complete">[docs]</a>    <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Updates the output to signal that the job was started &#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39; Updates the output to signal that the job was started &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="bp">self</span><span class="o">.</span><span class="n">update_output</span><span class="p">({</span>
             <span class="s1">&#39;end_time&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%H:%M:%S, %m/</span><span class="si">%d</span><span class="s1">/%y&#39;</span><span class="p">)</span>
         <span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_status</span><span class="p">(</span><span class="s1">&#39;complete&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Job.fail"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.fail">[docs]</a>    <span class="k">def</span> <span class="nf">fail</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Updates status to failed &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_status</span><span class="p">(</span><span class="s1">&#39;failed&#39;</span><span class="p">)</span></div>
 
@@ -231,41 +181,21 @@
 
 <div class="viewcode-block" id="Job.go_to_workdir"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.go_to_workdir">[docs]</a>    <span class="k">def</span> <span class="nf">go_to_workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Go to workdir &#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39; Updates status to failed &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_status</span><span class="p">(</span><span class="s1">&#39;failed&#39;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Job.discard"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.discard">[docs]</a>    <span class="k">def</span> <span class="nf">discard</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Updates status to discarded &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_status</span><span class="p">(</span><span class="s1">&#39;discard&#39;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Job.go_to_workdir"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.go_to_workdir">[docs]</a>    <span class="k">def</span> <span class="nf">go_to_workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Go to workdir &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mkworkdir</span><span class="p">()</span>
         <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Job.leave_workdir"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.leave_workdir">[docs]</a>    <span class="k">def</span> <span class="nf">leave_workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; goes to directory from which job was launched &#39;&#39;&#39;</span>
         <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">launchdir</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Job.add_output_files"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.add_output_files">[docs]</a>    <span class="k">def</span> <span class="nf">add_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Adds a file to the output file list &#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39; goes to directory from which job was launched &#39;&#39;&#39;</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">launchdir</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Job.add_output_files"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.add_output_files">[docs]</a>    <span class="k">def</span> <span class="nf">add_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Adds a file to the output file list &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;files&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">files</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">file_dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_output</span><span class="p">({</span><span class="s1">&#39;files&#39;</span><span class="p">:</span> <span class="n">file_dict</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="Job.get_sim_input"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.get_sim_input">[docs]</a>    <span class="k">def</span> <span class="nf">get_sim_input</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Get simulation input &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="p">)</span></div>
 
@@ -279,39 +209,16 @@
 
 <div class="viewcode-block" id="Job.get_output_yaml"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.get_output_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Get current output file &#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39; Get simulation input &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Job.get_calc_input"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.get_calc_input">[docs]</a>    <span class="k">def</span> <span class="nf">get_calc_input</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Get calculator input &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calc_input</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Job.get_env_input"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.get_env_input">[docs]</a>    <span class="k">def</span> <span class="nf">get_env_input</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Get environment input &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_input</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Job.get_output_yaml"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.get_output_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Get current output file &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="n">out_fname</span> <span class="o">=</span> <span class="s1">&#39;output.yaml&#39;</span>
         <span class="n">output_yaml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">/</span> <span class="n">out_fname</span>
         <span class="k">return</span> <span class="n">output_yaml</span></div>
 
 <div class="viewcode-block" id="Job.get_workdir"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.get_workdir">[docs]</a>    <span class="k">def</span> <span class="nf">get_workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Get working directory &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span></div>
 
 <div class="viewcode-block" id="Job.get_output"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Get values in output.yaml &#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39; Get working directory &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span></div>
-
-<div class="viewcode-block" id="Job.get_output"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Get values in output.yaml &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="n">output_yaml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_yaml</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">output_yaml</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">output_yaml</span><span class="p">)</span>
@@ -319,7 +226,6 @@
             <span class="k">return</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="Job.update_sim_input"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.update_sim_input">[docs]</a>    <span class="k">def</span> <span class="nf">update_sim_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Update simulation parameters &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_params</span><span class="p">)</span></div>
 
@@ -336,31 +242,12 @@
 
 <div class="viewcode-block" id="Job.set_workdir"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.set_workdir">[docs]</a>    <span class="k">def</span> <span class="nf">set_workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workdir</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Set working directory both in sim_input and instance &#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39; Update simulation parameters &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_params</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Job.update_calc_input"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.update_calc_input">[docs]</a>    <span class="k">def</span> <span class="nf">update_calc_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Update calculator parameters &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">calc_input</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_params</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Job.update_env_input"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.update_env_input">[docs]</a>    <span class="k">def</span> <span class="nf">update_env_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Update calculator parameters &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">env_input</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_params</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Job.set_workdir"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.set_workdir">[docs]</a>    <span class="k">def</span> <span class="nf">set_workdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workdir</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Set working directory both in sim_input and instance &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="n">workdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">workdir</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="p">[</span><span class="s1">&#39;workdir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">workdir</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">=</span> <span class="n">workdir</span></div>
 
 <div class="viewcode-block" id="Job.get_status"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.get_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span><span class="nb">str</span><span class="p">]:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Check job status &#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39; Check job status &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
         <span class="n">job_id</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;job_id&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">running</span> <span class="o">=</span> <span class="kc">False</span>
@@ -378,17 +265,12 @@
         <span class="k">return</span> <span class="n">complete</span><span class="p">,</span> <span class="n">status</span></div>
 
 <div class="viewcode-block" id="Job.update_output"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.update_output">[docs]</a>    <span class="k">def</span> <span class="nf">update_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_update</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Update output.yaml if it exists or write a new one &#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39; Update output.yaml if it exists or write a new one &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
         <span class="n">output</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">output_update</span><span class="p">)</span>
         <span class="n">write_yaml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_output_yaml</span><span class="p">(),</span> <span class="n">output</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Job.get_logger"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.Job.get_logger">[docs]</a>    <span class="k">def</span> <span class="nf">get_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logfilename</span><span class="o">=</span><span class="s1">&#39;job.log&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;info&#39;</span><span class="p">):</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Get the logger &#39;&#39;&#39;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="s1">&#39;Work directory does not exist yet&#39;</span>
         <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="n">logfile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">/</span> <span class="n">logfilename</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span>
@@ -441,15 +323,6 @@
 
 <div class="viewcode-block" id="UnitJob"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.UnitJob">[docs]</a><span class="k">class</span> <span class="nc">UnitJob</span><span class="p">(</span><span class="n">Job</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; </span>
-=======
-        <span class="sd">&#39;&#39;&#39; Get the logger &#39;&#39;&#39;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="s1">&#39;Work directory does not exist yet&#39;</span>
-        <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="n">logfile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">/</span> <span class="n">logfilename</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">logger</span></div></div>
-
-<div class="viewcode-block" id="UnitJob"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.UnitJob">[docs]</a><span class="k">class</span> <span class="nc">UnitJob</span><span class="p">(</span><span class="n">Job</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; </span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">    Unit job object with ability to submit a slurm/interactive job.</span>
 <span class="sd">    Unit jobs run in a specific environment and if required, run a </span>
 <span class="sd">    specific calculator. More complex workflows are built up of unit</span>
@@ -462,18 +335,6 @@
         <span class="n">calc_input</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sim_input</span><span class="p">,</span> <span class="n">env_input</span><span class="p">,</span> <span class="n">calc_input</span><span class="p">)</span>
-<<<<<<< HEAD
-=======
-        <span class="bp">self</span><span class="o">.</span><span class="n">env_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;env_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_input</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">env_id</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;use_slurm&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                    <span class="s1">&#39;interactive&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 
         <span class="c1"># Check if the asimmodule being called uses a calc_id to</span>
         <span class="c1"># get precommands, postcommands, run_prefixes and run_suffixes</span>
@@ -484,11 +345,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">calc_params</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="UnitJob.gen_run_command"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.UnitJob.gen_run_command">[docs]</a>    <span class="k">def</span> <span class="nf">gen_run_command</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">        Generates the command to run the job, independent of slurm</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">asimmodule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asimmodule&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -511,11 +368,7 @@
         <span class="c1"># GPAW requires python asimmodule to be called with gpaw python</span>
         <span class="c1"># For now this is a work around but perhaps there exists a cleaner way</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;GPAW&#39;</span><span class="p">:</span>
-<<<<<<< HEAD
             <span class="n">asloader</span> <span class="o">=</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_loader</span><span class="p">(</span><span class="s1">&#39;asimtools.scripts.asim_run&#39;</span><span class="p">)</span>
-=======
-            <span class="n">asloader</span> <span class="o">=</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_loader</span><span class="p">(</span><span class="s1">&#39;asimtools.asimmodules.asim_run&#39;</span><span class="p">)</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
             <span class="n">asfile</span> <span class="o">=</span> <span class="n">asloader</span><span class="o">.</span><span class="n">get_filename</span><span class="p">()</span>
             <span class="n">alias</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;gpaw python </span><span class="si">{</span><span class="n">asfile</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -527,39 +380,14 @@
         <span class="k">return</span> <span class="n">txt</span></div>
 
     <span class="k">def</span> <span class="nf">_gen_slurm_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">        Generates a slurm job file and if necessary writes it in </span>
 <span class="sd">        the work directory for the job</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">slurm_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;slurm&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">calc_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_params</span>
 
-<<<<<<< HEAD
         <span class="n">txt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_slurm_batch_preamble</span><span class="p">()</span>
-=======
-        <span class="n">txt</span> <span class="o">=</span> <span class="s1">&#39;#!/usr/bin/sh</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="n">flags</span> <span class="o">=</span> <span class="n">slurm_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;flags&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">flag_list</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">flags</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">assert</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">),</span> \
-                    <span class="s1">&#39;Slurm flags must start with &quot;-&quot; or &quot;--&quot;&#39;</span>
-                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;--&#39;</span><span class="p">):</span>
-                    <span class="n">delim</span> <span class="o">=</span> <span class="s1">&#39;=&#39;</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">delim</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span>
-
-                <span class="n">flag_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">delim</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">]))</span>
-
-            <span class="n">flags</span> <span class="o">=</span> <span class="n">flag_list</span>
-
-        <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">:</span>
-            <span class="n">txt</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;#SBATCH </span><span class="si">{</span><span class="n">flag</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="n">txt</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">slurm_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;precommands&#39;</span><span class="p">,</span> <span class="p">[]):</span>
             <span class="n">txt</span> <span class="o">+=</span> <span class="n">command</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -579,11 +407,7 @@
             <span class="n">slurm_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_gen_slurm_interactive_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">        Generates an srun command to run the job</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">slurm_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;slurm&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -597,17 +421,11 @@
 <div class="viewcode-block" id="UnitJob.gen_input_files"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.UnitJob.gen_input_files">[docs]</a>    <span class="k">def</span> <span class="nf">gen_input_files</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">write_calc_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<<<<<<< HEAD
         <span class="n">write_env_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="c1"># use_links: bool = True,</span>
         <span class="n">write_image</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Write input files to working directory &#39;&#39;&#39;</span>
-=======
-        <span class="n">write_env_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; Write input files to working directory &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="n">workdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span>
 
         <span class="c1"># This is the sim_input that will be written to disk so it will have</span>
@@ -642,13 +460,9 @@
         <span class="c1"># method is consistent with complex workflows</span>
         <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
-<<<<<<< HEAD
         <span class="c1"># write_image is to account for chains where the image may not have</span>
         <span class="c1"># been produced yet by a previous step, otherwise always read and write</span>
         <span class="k">if</span> <span class="n">image</span> <span class="ow">and</span> <span class="n">write_image</span><span class="p">:</span>
-=======
-        <span class="k">if</span> <span class="n">image</span><span class="p">:</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
             <span class="n">atoms</span> <span class="o">=</span> <span class="n">get_atoms</span><span class="p">(</span><span class="o">**</span><span class="n">image</span><span class="p">)</span>
             <span class="n">input_image_file</span> <span class="o">=</span> <span class="s1">&#39;image_input.xyz&#39;</span> <span class="c1"># Relative to workdir</span>
             <span class="c1"># input_image_file = self.workdir.resolve() / &#39;image_input.xyz&#39;</span>
@@ -662,22 +476,14 @@
             <span class="p">}</span>
 
         <span class="n">images</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-<<<<<<< HEAD
         <span class="k">if</span> <span class="n">images</span> <span class="ow">and</span> <span class="n">write_image</span><span class="p">:</span>
-=======
-        <span class="k">if</span> <span class="n">images</span><span class="p">:</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
             <span class="k">if</span> <span class="n">images</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="n">images</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;image_file&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">images</span> <span class="o">=</span> <span class="n">get_images</span><span class="p">(</span><span class="o">**</span><span class="n">images</span><span class="p">)</span>
                 <span class="n">input_images_file</span> <span class="o">=</span> <span class="s1">&#39;images_input.xyz&#39;</span> <span class="c1"># Relative to workdir</span>
                 <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">/</span> <span class="n">input_images_file</span><span class="p">,</span>
                     <span class="n">images</span><span class="p">,</span>
-<<<<<<< HEAD
                     <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;extxyz&#39;</span><span class="p">,</span>
-=======
-                    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;extxyz&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
                 <span class="p">)</span>
                 <span class="n">sim_input</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">][</span><span class="s1">&#39;images&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s1">&#39;image_file&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">input_images_file</span><span class="p">),</span>
@@ -697,14 +503,9 @@
 <div class="viewcode-block" id="UnitJob.submit"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.UnitJob.submit">[docs]</a>    <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dependency</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<<<<<<< HEAD
         <span class="n">write_image</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-=======
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-        <span class="sd">&#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">        Submit a job using slurm, interactively or in the terminal</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
@@ -715,11 +516,7 @@
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">logmsg</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="c1"># For printing to console</span>
 
-<<<<<<< HEAD
         <span class="bp">self</span><span class="o">.</span><span class="n">gen_input_files</span><span class="p">(</span><span class="n">write_image</span><span class="o">=</span><span class="n">write_image</span><span class="p">)</span>
-=======
-        <span class="bp">self</span><span class="o">.</span><span class="n">gen_input_files</span><span class="p">()</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 
         <span class="n">logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
 
@@ -782,7 +579,6 @@
             <span class="k">with</span> <span class="n">paropen</span><span class="p">(</span><span class="s1">&#39;stdout.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output_file</span><span class="p">:</span>
                 <span class="n">output_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">completed_process</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
 
-<<<<<<< HEAD
             <span class="k">if</span> <span class="n">completed_process</span><span class="o">.</span><span class="n">stderr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">with</span> <span class="n">paropen</span><span class="p">(</span><span class="s1">&#39;stderr.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">err_file</span><span class="p">:</span>
                     <span class="n">err_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">completed_process</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
@@ -790,13 +586,6 @@
             <span class="k">if</span> <span class="n">completed_process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;See </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s2">&quot;stderr.txt&quot;</span><span class="si">}</span><span class="s1"> for traceback.&#39;</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
-=======
-            <span class="k">if</span> <span class="n">completed_process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;See </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">/</span> <span class="s2">&quot;stderr.txt&quot;</span><span class="si">}</span><span class="s1"> for traceback.&#39;</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
-                <span class="k">with</span> <span class="n">paropen</span><span class="p">(</span><span class="s1">&#39;stderr.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">err_file</span><span class="p">:</span>
-                    <span class="n">err_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">completed_process</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
                 <span class="n">completed_process</span><span class="o">.</span><span class="n">check_returncode</span><span class="p">()</span>
 
         <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">cur_dir</span><span class="p">)</span>
@@ -816,11 +605,7 @@
         <span class="k">return</span> <span class="kc">None</span></div></div>
 
 <div class="viewcode-block" id="DistributedJob"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.DistributedJob">[docs]</a><span class="k">class</span> <span class="nc">DistributedJob</span><span class="p">(</span><span class="n">Job</span><span class="p">):</span>
-<<<<<<< HEAD
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Array job object with ability to submit simultaneous jobs &#39;&#39;&#39;</span>
-=======
-    <span class="sd">&#39;&#39;&#39; Array job object with ability to submit simultaneous jobs &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sim_input</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
@@ -886,11 +671,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="c1"># Necessary for compatibility with job.submit</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">        Submits the jobs. If submitting lots of batch jobs, we </span>
 <span class="sd">        recommend using DistributedJob.submit_array</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -909,11 +690,7 @@
         <span class="n">dependency</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="c1"># Necessary for compatibility with job.submit</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">        Submits a job array if all the jobs have the same env and use slurm</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gen_input_files</span><span class="p">()</span>
@@ -966,7 +743,6 @@
         <span class="k">with</span> <span class="n">paropen</span><span class="p">(</span><span class="s1">&#39;stdout.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output_file</span><span class="p">:</span>
             <span class="n">output_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">completed_process</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
 
-<<<<<<< HEAD
         <span class="k">if</span> <span class="n">completed_process</span><span class="o">.</span><span class="n">stderr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">paropen</span><span class="p">(</span><span class="s1">&#39;stderr.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">err_file</span><span class="p">:</span>
                     <span class="n">err_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">completed_process</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
@@ -974,24 +750,13 @@
         <span class="k">if</span> <span class="n">completed_process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;See </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s2">&quot;stderr.txt&quot;</span><span class="si">}</span><span class="s1"> for traceback.&#39;</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
-=======
-        <span class="k">if</span> <span class="n">completed_process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;See </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">/</span> <span class="s2">&quot;stderr.txt&quot;</span><span class="si">}</span><span class="s1"> for traceback.&#39;</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
-            <span class="k">with</span> <span class="n">paropen</span><span class="p">(</span><span class="s1">&#39;stderr.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">err_file</span><span class="p">:</span>
-                <span class="n">err_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">completed_process</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
             <span class="n">completed_process</span><span class="o">.</span><span class="n">check_returncode</span><span class="p">()</span>
 
         <span class="n">job_ids</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">completed_process</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
         <span class="k">return</span> <span class="n">job_ids</span></div>
 
     <span class="k">def</span> <span class="nf">_gen_array_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">        Generates a slurm job array file and if necessary </span>
 <span class="sd">        writes it in the work directory for the job. Only works</span>
 <span class="sd">        if there is one config_id for all jobs</span>
@@ -1001,7 +766,6 @@
 
         <span class="n">slurm_params</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;slurm&#39;</span><span class="p">,</span> <span class="p">{})</span>
 
-<<<<<<< HEAD
         <span class="n">txt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_slurm_batch_preamble</span><span class="p">(</span>
             <span class="n">slurm_params</span><span class="o">=</span><span class="n">slurm_params</span><span class="p">,</span>
             <span class="n">extra_flags</span><span class="o">=</span><span class="p">[</span>
@@ -1011,13 +775,6 @@
         <span class="p">)</span>
 
         <span class="n">txt</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">if [[ ! -z $</span><span class="si">{SLURM_ARRAY_TASK_ID}</span><span class="s1"> ]]; then</span><span class="se">\n</span><span class="s1">&#39;</span>
-=======
-        <span class="n">txt</span> <span class="o">=</span> <span class="s1">&#39;#!/usr/bin/sh</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">slurm_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;flags&#39;</span><span class="p">):</span>
-            <span class="n">txt</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;#SBATCH </span><span class="si">{</span><span class="n">flag</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
-
-        <span class="n">txt</span> <span class="o">+=</span> <span class="s1">&#39;if [[ ! -z $</span><span class="si">{SLURM_ARRAY_TASK_ID}</span><span class="s1"> ]]; then</span><span class="se">\n</span><span class="s1">&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="n">txt</span> <span class="o">+=</span> <span class="s1">&#39;    fls=( id-* )</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="n">txt</span> <span class="o">+=</span> <span class="s1">&#39;    WORKDIR=$</span><span class="si">{fls[${SLURM_ARRAY_TASK_ID}]}</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="n">txt</span> <span class="o">+=</span> <span class="s1">&#39;fi</span><span class="se">\n\n</span><span class="s1">&#39;</span>
@@ -1042,11 +799,7 @@
             <span class="n">slurm_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DistributedJob.gen_input_files"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.DistributedJob.gen_input_files">[docs]</a>    <span class="k">def</span> <span class="nf">gen_input_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Write input files to working directory &#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39; Write input files to working directory &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_array</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_gen_array_script</span><span class="p">()</span>
@@ -1054,11 +807,7 @@
             <span class="n">unitjob</span><span class="o">.</span><span class="n">gen_input_files</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="DistributedJob.submit"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.DistributedJob.submit">[docs]</a>    <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; </span>
-=======
-        <span class="sd">&#39;&#39;&#39; </span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">        Submit a job using slurm, interactively or in the terminal</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
@@ -1074,11 +823,7 @@
         <span class="k">return</span> <span class="n">job_ids</span></div></div>
 
 <div class="viewcode-block" id="ChainedJob"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.ChainedJob">[docs]</a><span class="k">class</span> <span class="nc">ChainedJob</span><span class="p">(</span><span class="n">Job</span><span class="p">):</span>
-<<<<<<< HEAD
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-=======
-    <span class="sd">&#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 <span class="sd">    Jobs made of smaller sequential unitjobs. Note that this only works</span>
 <span class="sd">    well with unit jobs. If one of the UnitJobs calls asimmodules, internally,</span>
 <span class="sd">    slurm will fail to build the correct dependencies but the files will be</span>
@@ -1109,7 +854,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">unitjobs</span> <span class="o">=</span> <span class="n">unitjobs</span>
 
 <div class="viewcode-block" id="ChainedJob.get_last_output"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.ChainedJob.get_last_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_output</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-<<<<<<< HEAD
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Returns the output of the last job in the chain &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unitjobs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span></div>
 
@@ -1117,16 +861,6 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; </span>
 <span class="sd">        Submit a job using slurm, interactively or in the terminal</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-=======
-        <span class="sd">&#39;&#39;&#39; Returns the output of the last job in the chain &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unitjobs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="ChainedJob.submit"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.ChainedJob.submit">[docs]</a>    <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dependency</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-        <span class="sd">&#39;&#39;&#39; </span>
-<span class="sd">        Submit a job using slurm, interactively or in the terminal</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
         <span class="n">cur_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
         <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="p">)</span>
         <span class="n">logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
@@ -1157,7 +891,6 @@
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">unitjob</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unitjobs</span><span class="p">[</span><span class="n">step</span><span class="p">:]):</span>
                     <span class="n">cur_step_complete</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">unitjob</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">cur_step_complete</span><span class="p">:</span>
-<<<<<<< HEAD
                         <span class="n">slurm_flags</span> <span class="o">=</span> <span class="n">unitjob</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="s1">&#39;slurm&#39;</span><span class="p">][</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span>
                         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slurm_flags</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                             <span class="n">unitjob</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="s1">&#39;slurm&#39;</span><span class="p">][</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -1175,17 +908,6 @@
                             <span class="n">dependency</span><span class="o">=</span><span class="n">dependency</span><span class="p">,</span>
                             <span class="n">write_image</span><span class="o">=</span><span class="n">write_image</span><span class="p">,</span>
                         <span class="p">)</span>
-=======
-                        <span class="n">unitjob</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="s1">&#39;slurm&#39;</span><span class="p">][</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-J step-</span><span class="si">{</span><span class="n">step</span><span class="o">+</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                        <span class="c1"># Get latest job_id if previous step output was updated with new IDs</span>
-                        <span class="c1"># This should allow asimmodules that run asimmodules to use correct dependencies</span>
-                        <span class="c1"># print(f&#39;Job id for step-{i} is {dependency}&#39;)</span>
-                        <span class="c1"># if i &gt; 0:</span>
-                        <span class="c1">#     dependency = self.unitjobs[i-1].get_output().get(&#39;job_ids&#39;, dependency)</span>
-                        <span class="c1">#     print(f&#39;Dependency for step-{i} is {dependency}&#39;)</span>
-                        <span class="c1"># print(&#39;===================&#39;)</span>
-                        <span class="n">dependency</span> <span class="o">=</span> <span class="n">unitjob</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">dependency</span><span class="o">=</span><span class="n">dependency</span><span class="p">)</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">txt</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Skipping step-</span><span class="si">{</span><span class="n">step</span><span class="o">+</span><span class="n">i</span><span class="si">}</span><span class="s1"> since &#39;</span>
                         <span class="n">txt</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;status is </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -1194,7 +916,6 @@
             <span class="n">job_ids</span> <span class="o">=</span> <span class="n">dependency</span>
 
         <span class="c1"># Otherwise just submit them one after the other</span>
-<<<<<<< HEAD
         <span class="c1"># We only write the image if it&#39;s the first job, otherwise we refer to </span>
         <span class="c1"># wherever the image comes from in case it has to come from a previous</span>
         <span class="c1"># step</span>
@@ -1206,11 +927,6 @@
                     <span class="n">write_image</span> <span class="o">=</span> <span class="kc">False</span>
 
                 <span class="n">job_ids</span> <span class="o">=</span> <span class="n">unitjob</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">write_image</span><span class="o">=</span><span class="n">write_image</span><span class="p">)</span>
-=======
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">unitjob</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unitjobs</span><span class="p">[</span><span class="n">step</span><span class="p">:]:</span>
-                <span class="n">job_ids</span> <span class="o">=</span> <span class="n">unitjob</span><span class="o">.</span><span class="n">submit</span><span class="p">()</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
 
         <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">cur_dir</span><span class="p">)</span>
 
@@ -1218,11 +934,7 @@
 
 
 <div class="viewcode-block" id="load_job_from_directory"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.load_job_from_directory">[docs]</a><span class="k">def</span> <span class="nf">load_job_from_directory</span><span class="p">(</span><span class="n">workdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<<<<<<< HEAD
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Loads a job from a given directory &#39;&#39;&#39;</span>
-=======
-    <span class="sd">&#39;&#39;&#39; Loads a job from a given directory &#39;&#39;&#39;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
     <span class="n">workdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">workdir</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">workdir</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;Work director </span><span class="si">{</span><span class="n">workdir</span><span class="si">}</span><span class="s1"> does not exist&#39;</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">()</span>
@@ -1248,26 +960,15 @@
         <span class="n">calc_input</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">sim_input</span><span class="p">,</span> <span class="n">env_input</span><span class="p">,</span> <span class="n">calc_input</span><span class="p">)</span>
-<<<<<<< HEAD
 
     <span class="c1"># This makes sure that wherever we may be loading the job from, we refer</span>
     <span class="c1"># to the correct input/output files. As of now, it does not seem necessary</span>
     <span class="c1"># to also change the workdir in job.sim_input for consistency</span>
-=======
-    
-    <span class="c1"># This makes sure that wherever we may be loading the job from, we refer</span>
-    <span class="c1"># to the correct input/output files. As of now, it does not seem necessary</span>
-    <span class="c1"># to also change the workdir in sim_input.yaml for consistency</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
     <span class="n">job</span><span class="o">.</span><span class="n">workdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">workdir</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">job</span></div>
 
 <div class="viewcode-block" id="create_unitjob"><a class="viewcode-back" href="../../asimtools.html#asimtools.job.create_unitjob">[docs]</a><span class="k">def</span> <span class="nf">create_unitjob</span><span class="p">(</span><span class="n">sim_input</span><span class="p">,</span> <span class="n">env_input</span><span class="p">,</span> <span class="n">workdir</span><span class="p">,</span> <span class="n">calc_input</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<<<<<<< HEAD
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper for making a generic UnitJob object, mostly for testing&quot;&quot;&quot;</span>
-=======
-    <span class="sd">&quot;&quot;&quot;Helper for making a generic UnitJob object, mostly for testing&quot;&quot;&quot;</span>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
     <span class="n">env_id</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">env_input</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">sim_input</span><span class="p">[</span><span class="s1">&#39;env_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">env_id</span>
     <span class="k">if</span> <span class="n">calc_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1289,11 +990,7 @@
   <hr/>
 
   <div role="contentinfo">
-<<<<<<< HEAD
     <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
-=======
-    <p>&#169; Copyright 2023, Mgcini Keith Phuthi, Emil Annevelink.</p>
->>>>>>> 4201b1be2307ed41caa6bf90c8c8c84a7c0dc980
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
