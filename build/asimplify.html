@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Developing Custom Asimmodules &mdash; asimtools 1.0.0 documentation</title>
@@ -11,14 +11,16 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Using built-in workflow tools" href="workflows.html" />
-    <link rel="prev" title="Running an Existing asimmodule" href="usage.html" /> 
+    <link rel="prev" title="Running an Existing Asimmodule" href="usage.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -26,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> asimtools
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            asimtools
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -59,8 +65,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Developing Custom Asimmodules</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Developing Custom Asimmodules</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/asimplify.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -130,9 +136,9 @@ same name</p>
 </div>
 <p>Immediately as it is, this is an asimmodule can be run in ASIMTools. You can
 run it with the following sim_input.yaml</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ase_eos.py</span><span class="w"></span>
-<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inline</span><span class="w"></span>
-<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ase_eos.py</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inline</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span>
 </pre></div>
 </div>
 <p>then call</p>
@@ -231,44 +237,44 @@ to the repository will need clear syntax highlighting and documentation.</p>
 LennardJones calculator, in a slurm job we can now use the following input
 files.</p>
 <p>sim_input.yaml:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ase_eos.py</span><span class="w"></span>
-<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span><span class="w"></span>
-<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span><span class="w"></span>
-<span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span><span class="w"></span>
-<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ar</span><span class="w"></span>
-<span class="w">    </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lj_Ar</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ase_eos.py</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ar</span>
+<span class="w">    </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lj_Ar</span>
 </pre></div>
 </div>
 <p>calc_input.yaml:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">lj_Ar</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LennardJones</span><span class="w"></span>
-<span class="w">    </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase.calculators.lj</span><span class="w"></span>
-<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">sigma</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.54</span><span class="w"></span>
-<span class="w">        </span><span class="nt">epsilon</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.00802236</span><span class="w"></span>
-<span class="nt">emt</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EMT</span><span class="w"></span>
-<span class="w">    </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase.calculators.emt</span><span class="w"></span>
-<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">lj_Ar</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LennardJones</span>
+<span class="w">    </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase.calculators.lj</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">sigma</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.54</span>
+<span class="w">        </span><span class="nt">epsilon</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.00802236</span>
+<span class="nt">emt</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EMT</span>
+<span class="w">    </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase.calculators.emt</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
 </pre></div>
 </div>
 <p>env_input.yaml:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">batch</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">use_slurm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">        </span><span class="nt">interactive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">    </span><span class="nt">slurm</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">flags</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-n 2</span><span class="w"></span>
-<span class="w">        </span><span class="nt">precommands</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source ~/.bashrc</span><span class="w"></span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda activate asimtools</span><span class="w"></span>
-<span class="nt">inline</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">use_slurm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">        </span><span class="nt">interactive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">batch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">use_slurm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">interactive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">slurm</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">flags</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-n 2</span>
+<span class="w">        </span><span class="nt">precommands</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source ~/.bashrc</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda activate asimtools</span>
+<span class="nt">inline</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">use_slurm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">        </span><span class="nt">interactive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
 </div>
 <p>Going back to the original problem, we wanted to run the simulation of multiple
@@ -276,19 +282,19 @@ different elements with the EMT calculator. To achieve that in parallel, we can
 nest the <code class="docutils literal notranslate"><span class="pre">ase_eos</span></code> asimmodule in a
 <a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.sim_array.sim_array" title="asimtools.asimmodules.workflows.sim_array.sim_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.asimmodules.workflows.sim_array.sim_array()</span></code></a> asimmodule as follows</p>
 <p>sim_input.yaml:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.sim_array</span><span class="w"></span>
-<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span><span class="w"></span>
-<span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;args&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;image&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">array_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;Al&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ni&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Cu&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pd&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ag&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pt&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Au&#39;</span><span class="p p-Indicator">]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">env_ids</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;batch&#39;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">template_sim_input</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ase_eos.py</span><span class="w"></span>
-<span class="w">        </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emt</span><span class="w"></span>
-<span class="w">            </span><span class="nt">image</span><span class="p">:</span><span class="w"></span>
-<span class="w">                </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span><span class="w"></span>
-<span class="w">                </span><span class="nt">crystalstructure</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;fcc&#39;</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.sim_array</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;args&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;image&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">array_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;Al&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ni&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Cu&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pd&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ag&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pt&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Au&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">env_ids</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;batch&#39;</span>
+<span class="w">    </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/ase_eos.py</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emt</span>
+<span class="w">            </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span>
+<span class="w">                </span><span class="nt">crystalstructure</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;fcc&#39;</span>
 </pre></div>
 </div>
 <p>To make the asimmodule easier to access without having to use the full path, you
@@ -299,19 +305,19 @@ can set the environment variable</p>
 <p>You can then move the <code class="docutils literal notranslate"><span class="pre">ase_eos.py</span></code> asimmodule to
 <code class="docutils literal notranslate"><span class="pre">/path/to/my/asimmodule/dir/</span></code> i.e. the asimmodule directory. This allows you
 to refer to asimmodules prepended with the asimmodule dir as below</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.sim_array</span><span class="w"></span>
-<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span><span class="w"></span>
-<span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;args&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;image&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">array_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;Al&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ni&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Cu&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pd&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ag&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pt&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Au&#39;</span><span class="p p-Indicator">]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">env_ids</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;batch&#39;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">template_sim_input</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase_eos/ase_eos.py</span><span class="w"></span>
-<span class="w">        </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emt</span><span class="w"></span>
-<span class="w">            </span><span class="nt">image</span><span class="p">:</span><span class="w"></span>
-<span class="w">                </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span><span class="w"></span>
-<span class="w">                </span><span class="nt">crystalstructure</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;fcc&#39;</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.sim_array</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;args&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;image&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">array_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;Al&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ni&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Cu&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pd&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ag&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pt&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Au&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">env_ids</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;batch&#39;</span>
+<span class="w">    </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase_eos/ase_eos.py</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emt</span>
+<span class="w">            </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span>
+<span class="w">                </span><span class="nt">crystalstructure</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;fcc&#39;</span>
 </pre></div>
 </div>
 <p>The above example loops over crystals for which ASE already has FCC lattice
@@ -320,24 +326,24 @@ lattice parameters? We can either specify a list of <code class="docutils litera
 <code class="docutils literal notranslate"><span class="pre">array_values</span></code> or use <code class="docutils literal notranslate"><span class="pre">secondary_array_values</span></code>. We can also explicitly tell
 ASIMTools to include the array_values in the directory names in the standard
 format (e.g. <code class="docutils literal notranslate"><span class="pre">id-0000__Al__</span></code>, <code class="docutils literal notranslate"><span class="pre">id-0001__Ni__</span></code> etc.).</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.sim_array</span><span class="w"></span>
-<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span><span class="w"></span>
-<span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;args&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;image&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">array_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;Al&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ni&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Cu&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pd&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ag&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pt&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Au&#39;</span><span class="p p-Indicator">]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">values</span><span class="w"></span>
-<span class="w">    </span><span class="nt">secondary_key_sequences</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;args&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;image&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;a&#39;</span><span class="p p-Indicator">]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">secondary_array_values</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">4.0479</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.524</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.6149</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.8907</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4.0853</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.9242</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4.0782</span><span class="p p-Indicator">]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">env_ids</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;batch&#39;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">template_sim_input</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase_eos/ase_eos.py</span><span class="w"></span>
-<span class="w">        </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emt</span><span class="w"></span>
-<span class="w">            </span><span class="nt">image</span><span class="p">:</span><span class="w"></span>
-<span class="w">                </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span><span class="w"></span>
-<span class="w">                </span><span class="nt">crystalstructure</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;fcc&#39;</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.sim_array</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;args&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;image&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">array_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;Al&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ni&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Cu&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pd&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Ag&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Pt&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;Au&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">values</span>
+<span class="w">    </span><span class="nt">secondary_key_sequences</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;args&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;image&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;a&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">secondary_array_values</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">4.0479</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.524</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.6149</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.8907</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4.0853</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.9242</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4.0782</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">env_ids</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;batch&#39;</span>
+<span class="w">    </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase_eos/ase_eos.py</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emt</span>
+<span class="w">            </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span>
+<span class="w">                </span><span class="nt">crystalstructure</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;fcc&#39;</span>
 </pre></div>
 </div>
 </section>
@@ -346,7 +352,7 @@ format (e.g. <code class="docutils literal notranslate"><span class="pre">id-000
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="usage.html" class="btn btn-neutral float-left" title="Running an Existing asimmodule" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usage.html" class="btn btn-neutral float-left" title="Running an Existing Asimmodule" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="workflows.html" class="btn btn-neutral float-right" title="Using built-in workflow tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

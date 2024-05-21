@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>asimtools.calculators &mdash; asimtools 0.0.0 documentation</title>
+  <title>asimtools.calculators &mdash; asimtools 1.0.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -133,6 +133,8 @@
 <div class="viewcode-block" id="load_nequip"><a class="viewcode-back" href="../../asimtools.html#asimtools.calculators.load_nequip">[docs]</a><span class="k">def</span> <span class="nf">load_nequip</span><span class="p">(</span><span class="n">calc_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load NequIP or Allegro calculator</span>
 
+<span class="sd">    https://github.com/mir-group/nequip/tree/main</span>
+
 <span class="sd">    :param calc_params: args to pass to loader</span>
 <span class="sd">    :type calc_params: Dict</span>
 <span class="sd">    :return: NequIP ase calculator</span>
@@ -153,6 +155,8 @@
 
 <div class="viewcode-block" id="load_dp"><a class="viewcode-back" href="../../asimtools.html#asimtools.calculators.load_dp">[docs]</a><span class="k">def</span> <span class="nf">load_dp</span><span class="p">(</span><span class="n">calc_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load Deep Potential Calculator</span>
+
+<span class="sd">    https://docs.deepmodeling.com/projects/deepmd/en/master/</span>
 
 <span class="sd">    :param calc_params: args to pass to loader</span>
 <span class="sd">    :type calc_params: Dict</span>
@@ -192,59 +196,143 @@
         <span class="k">raise</span>
     <span class="k">return</span> <span class="n">calc</span></div>
 
+<div class="viewcode-block" id="load_chgnet"><a class="viewcode-back" href="../../asimtools.html#asimtools.calculators.load_chgnet">[docs]</a><span class="k">def</span> <span class="nf">load_chgnet</span><span class="p">(</span><span class="n">calc_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load CHGNet Calculator</span>
 
-<span class="c1"># def load_m3gnet(calc_params):</span>
-<span class="c1">#     &quot;&quot;&quot;Load and M3GNet calculator</span>
+<span class="sd">    https://chgnet.lbl.gov/#tutorials-and-docs</span>
 
-<span class="c1">#     :param calc_params: parameters to be passed to matgl.ext.ase.M3GNetCalculator. Must include a key &quot;model&quot; that points to the model used to instantiate the potential</span>
-<span class="c1">#     :type calc_params: Dict</span>
-<span class="c1">#     :return: M3GNet calculator</span>
-<span class="c1">#     :rtype: :class:`matgl.ext.ase.M3GNetCalculator`</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     from matgl.ext.ase import M3GNetCalculator</span>
-<span class="c1">#     import matgl</span>
+<span class="sd">    :param calc_params: args to pass to loader</span>
+<span class="sd">    :type calc_params: Dict</span>
+<span class="sd">    :return: CHGNet calculator</span>
+<span class="sd">    :rtype: :class:`chgnet.model.dynamics.CHGNetCalculator`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">chgnet.model.dynamics</span> <span class="kn">import</span> <span class="n">CHGNetCalculator</span>
+    <span class="k">if</span> <span class="n">calc_params</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;from_file&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">calc_params</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;from_file&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">calc</span> <span class="o">=</span> <span class="n">CHGNetCalculator</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="o">**</span><span class="n">calc_params</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to load CHGNet from file with parameters:</span><span class="se">\</span>
+<span class="s2">                </span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">calc_params</span><span class="p">)</span>
+            <span class="k">raise</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">calc</span> <span class="o">=</span> <span class="n">CHGNetCalculator</span><span class="p">(</span><span class="o">**</span><span class="n">calc_params</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to load CHGNet with parameters:</span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> \
+                <span class="n">calc_params</span><span class="p">)</span>
+            <span class="k">raise</span>
 
-<span class="c1">#     model = calc_params.pop(&quot;model&quot;)</span>
-<span class="c1">#     try:</span>
-<span class="c1">#         pot = matgl.load_model(model)</span>
-<span class="c1">#         calc = M3GNetCalculator(</span>
-<span class="c1">#             pot,</span>
-<span class="c1">#             **calc_params,</span>
-<span class="c1">#         )</span>
-<span class="c1">#     except Exception:</span>
-<span class="c1">#         logging.error(&quot;Failed to load M3GNet with parameters:\n %s&quot;, calc_params)</span>
-<span class="c1">#         raise</span>
+    <span class="k">return</span> <span class="n">calc</span></div>
 
-<span class="c1">#     return calc</span>
+<div class="viewcode-block" id="load_mace"><a class="viewcode-back" href="../../asimtools.html#asimtools.calculators.load_mace">[docs]</a><span class="k">def</span> <span class="nf">load_mace</span><span class="p">(</span><span class="n">calc_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load MACE Calculator</span>
+
+<span class="sd">    https://github.com/ACEsuit/mace?tab=readme-ov-file</span>
+
+<span class="sd">    :param calc_params: args to pass to loader</span>
+<span class="sd">    :type calc_params: Dict</span>
+<span class="sd">    :return: MACE calculator</span>
+<span class="sd">    :rtype: :class:`mace.calculators.mace_mp`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">mace.calculators</span> <span class="kn">import</span> <span class="n">mace_mp</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">calc</span> <span class="o">=</span> <span class="n">mace_mp</span><span class="p">(</span><span class="o">**</span><span class="n">calc_params</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to load MACE with parameters:</span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">calc_params</span><span class="p">)</span>
+        <span class="k">raise</span>
+
+    <span class="k">return</span> <span class="n">calc</span></div>
+
+<div class="viewcode-block" id="load_mace_off"><a class="viewcode-back" href="../../asimtools.html#asimtools.calculators.load_mace_off">[docs]</a><span class="k">def</span> <span class="nf">load_mace_off</span><span class="p">(</span><span class="n">calc_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load MACE Calculator</span>
+
+<span class="sd">    https://github.com/ACEsuit/mace?tab=readme-ov-file</span>
+
+<span class="sd">    :param calc_params: args to pass to loader</span>
+<span class="sd">    :type calc_params: Dict</span>
+<span class="sd">    :return: MACE-OFF calculator</span>
+<span class="sd">    :rtype: :class:`mace.calculators.mace_mp`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">mace.calculators</span> <span class="kn">import</span> <span class="n">mace_off</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">calc</span> <span class="o">=</span> <span class="n">mace_off</span><span class="p">(</span><span class="o">**</span><span class="n">calc_params</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to load MACE-OFF with parameters:</span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">calc_params</span><span class="p">)</span>
+        <span class="k">raise</span>
+
+    <span class="k">return</span> <span class="n">calc</span></div>
+
+<div class="viewcode-block" id="load_espresso_profile"><a class="viewcode-back" href="../../asimtools.html#asimtools.calculators.load_espresso_profile">[docs]</a><span class="k">def</span> <span class="nf">load_espresso_profile</span><span class="p">(</span><span class="n">calc_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load Qunatum Espresso Calculator for ASE&gt;3.22.1. If using older versions</span>
+<span class="sd">    such as the ones available on PyPI or conda-forge, just load it as an ASE</span>
+<span class="sd">    calculator. Until the new ASE version becomes an official release, we will</span>
+<span class="sd">    have to have both for compatibility. The interface however remains that of </span>
+<span class="sd">    ASE &lt;=3.22.1 within ASIMTools for consistency using the `command` keyword</span>
+
+<span class="sd">    https://wiki.fysik.dtu.dk/ase/releasenotes.html</span>
+
+<span class="sd">    :param calc_params: args to pass to loader</span>
+<span class="sd">    :type calc_params: Dict</span>
+<span class="sd">    :return: Espresso calculator</span>
+<span class="sd">    :rtype: :class:`ase.calculators.espresso.Espresso`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">ase.calculators.espresso</span> <span class="kn">import</span> <span class="n">Espresso</span><span class="p">,</span> <span class="n">EspressoProfile</span>
+
+    <span class="k">if</span> <span class="s1">&#39;command&#39;</span> <span class="ow">in</span> <span class="n">calc_params</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]:</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="n">calc_params</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;command&#39;</span><span class="p">)</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">progind</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;pw.x&#39;</span><span class="p">)</span>
+        <span class="n">argv</span> <span class="o">=</span> <span class="n">command</span><span class="p">[:</span><span class="n">progind</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">argv</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;pw.x&#39;</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">calc</span> <span class="o">=</span> <span class="n">Espresso</span><span class="p">(</span>
+            <span class="o">**</span><span class="n">calc_params</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">],</span>
+            <span class="n">profile</span><span class="o">=</span><span class="n">EspressoProfile</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">argv</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to load MACE-OFF with parameters:</span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">calc_params</span><span class="p">)</span>
+        <span class="k">raise</span>
+
+    <span class="k">return</span> <span class="n">calc</span></div>
 
 
-<span class="c1"># def load_chgnet(calc_params):</span>
-<span class="c1">#     pass</span>
+<div class="viewcode-block" id="load_m3gnet"><a class="viewcode-back" href="../../asimtools.html#asimtools.calculators.load_m3gnet">[docs]</a><span class="k">def</span> <span class="nf">load_m3gnet</span><span class="p">(</span><span class="n">calc_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load and M3GNet calculator</span>
 
-<span class="c1"># def load_espresso(calc_params):</span>
-<span class="c1">#     &#39;&#39;&#39;</span>
-<span class="c1">#     Load the Espresso calculator as in newer versions of ASE. This is</span>
-<span class="c1">#     implemented for forards compatibility</span>
-<span class="c1">#     &#39;&#39;&#39;</span>
-<span class="c1">#     from ase.calculators.espresso import Espresso, EspressoProfile</span>
-<span class="c1">#     calc_args = calc_params.get(&#39;args&#39;, {})</span>
-<span class="c1">#     if &#39;command&#39; in calc_args:</span>
-<span class="c1">#         command_list = calc_args[&#39;command&#39;].split()</span>
-<span class="c1">#         profile = EspressoProfile(argv=command_list)</span>
-<span class="c1">#         calc_args.pop(&#39;command&#39;)</span>
-<span class="c1">#     else:</span>
-<span class="c1">#         profile = EspressoProfile(argv=[&#39;pw.x&#39;])</span>
+<span class="sd">    :param calc_params: parameters to be passed to matgl.ext.ase.M3GNetCalculator. Must include a key &quot;model&quot; that points to the model used to instantiate the potential</span>
+<span class="sd">    :type calc_params: Dict</span>
+<span class="sd">    :return: M3GNet calculator</span>
+<span class="sd">    :rtype: :class:`matgl.ext.ase.M3GNetCalculator`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">matgl.ext.ase</span> <span class="kn">import</span> <span class="n">M3GNetCalculator</span>
+    <span class="kn">import</span> <span class="nn">matgl</span>
 
-<span class="c1">#     calc = Espresso(**calc_args, profile=profile)</span>
-<span class="c1">#     return calc</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">calc_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pot</span> <span class="o">=</span> <span class="n">matgl</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="n">calc</span> <span class="o">=</span> <span class="n">M3GNetCalculator</span><span class="p">(</span>
+            <span class="n">pot</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">calc_params</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to load M3GNet with parameters:</span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">calc_params</span><span class="p">)</span>
+        <span class="k">raise</span>
+
+    <span class="k">return</span> <span class="n">calc</span></div>
 
 <span class="n">external_calcs</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;NequIP&#39;</span><span class="p">:</span> <span class="n">load_nequip</span><span class="p">,</span>
     <span class="s1">&#39;Allegro&#39;</span><span class="p">:</span> <span class="n">load_nequip</span><span class="p">,</span>
     <span class="s1">&#39;DeepPotential&#39;</span><span class="p">:</span> <span class="n">load_dp</span><span class="p">,</span>
-    <span class="c1"># &#39;ChgNet&#39;: load_chgnet,</span>
-    <span class="c1"># &#39;M3GNet&#39;: load_m3gnet,</span>
-    <span class="c1"># &#39;Espresso&#39;: load_espresso,</span>
+    <span class="s1">&#39;CHGNet&#39;</span><span class="p">:</span> <span class="n">load_chgnet</span><span class="p">,</span>
+    <span class="s1">&#39;MACE&#39;</span><span class="p">:</span> <span class="n">load_mace</span><span class="p">,</span>
+    <span class="s1">&#39;EspressoProfile&#39;</span><span class="p">:</span> <span class="n">load_espresso_profile</span><span class="p">,</span>
+    <span class="s1">&#39;M3GNet&#39;</span><span class="p">:</span> <span class="n">load_m3gnet</span><span class="p">,</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -255,7 +343,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Mgcini Keith Phuthi, Emil Annevelink.</p>
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

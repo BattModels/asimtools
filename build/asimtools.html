@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>asimtools package &mdash; asimtools 1.0.0 documentation</title>
@@ -11,9 +11,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -26,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> asimtools
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            asimtools
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -48,7 +54,12 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-asimtools.calculators">asimtools.calculators module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#asimtools.calculators.load_ase_calc"><code class="docutils literal notranslate"><span class="pre">load_ase_calc()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#asimtools.calculators.load_calc"><code class="docutils literal notranslate"><span class="pre">load_calc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#asimtools.calculators.load_chgnet"><code class="docutils literal notranslate"><span class="pre">load_chgnet()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#asimtools.calculators.load_dp"><code class="docutils literal notranslate"><span class="pre">load_dp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#asimtools.calculators.load_espresso_profile"><code class="docutils literal notranslate"><span class="pre">load_espresso_profile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#asimtools.calculators.load_m3gnet"><code class="docutils literal notranslate"><span class="pre">load_m3gnet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#asimtools.calculators.load_mace"><code class="docutils literal notranslate"><span class="pre">load_mace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#asimtools.calculators.load_mace_off"><code class="docutils literal notranslate"><span class="pre">load_mace_off()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#asimtools.calculators.load_nequip"><code class="docutils literal notranslate"><span class="pre">load_nequip()</span></code></a></li>
 </ul>
 </li>
@@ -104,9 +115,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="modules.html">asimtools</a> &raquo;</li>
-      <li>asimtools package</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">asimtools</a></li>
+      <li class="breadcrumb-item active">asimtools package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/asimtools.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -285,9 +296,28 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="asimtools.calculators.load_chgnet">
+<span class="sig-prename descclassname"><span class="pre">asimtools.calculators.</span></span><span class="sig-name descname"><span class="pre">load_chgnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asimtools/calculators.html#load_chgnet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.calculators.load_chgnet" title="Permalink to this definition"></a></dt>
+<dd><p>Load CHGNet Calculator</p>
+<p><a class="reference external" href="https://chgnet.lbl.gov/#tutorials-and-docs">https://chgnet.lbl.gov/#tutorials-and-docs</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>calc_params</strong> (<em>Dict</em>) – args to pass to loader</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>CHGNet calculator</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">chgnet.model.dynamics.CHGNetCalculator</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="asimtools.calculators.load_dp">
 <span class="sig-prename descclassname"><span class="pre">asimtools.calculators.</span></span><span class="sig-name descname"><span class="pre">load_dp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asimtools/calculators.html#load_dp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.calculators.load_dp" title="Permalink to this definition"></a></dt>
 <dd><p>Load Deep Potential Calculator</p>
+<p><a class="reference external" href="https://docs.deepmodeling.com/projects/deepmd/en/master/">https://docs.deepmodeling.com/projects/deepmd/en/master/</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>calc_params</strong> (<em>Dict</em>) – args to pass to loader</p>
@@ -302,9 +332,85 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="asimtools.calculators.load_espresso_profile">
+<span class="sig-prename descclassname"><span class="pre">asimtools.calculators.</span></span><span class="sig-name descname"><span class="pre">load_espresso_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asimtools/calculators.html#load_espresso_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.calculators.load_espresso_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Load Qunatum Espresso Calculator for ASE&gt;3.22.1. If using older versions
+such as the ones available on PyPI or conda-forge, just load it as an ASE
+calculator. Until the new ASE version becomes an official release, we will
+have to have both for compatibility. The interface however remains that of 
+ASE &lt;=3.22.1 within ASIMTools for consistency using the <cite>command</cite> keyword</p>
+<p><a class="reference external" href="https://wiki.fysik.dtu.dk/ase/releasenotes.html">https://wiki.fysik.dtu.dk/ase/releasenotes.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>calc_params</strong> (<em>Dict</em>) – args to pass to loader</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Espresso calculator</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://wiki.fysik.dtu.dk/ase/ase/calculators/espresso.html#ase.calculators.espresso.Espresso" title="(in ASE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ase.calculators.espresso.Espresso</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.calculators.load_m3gnet">
+<span class="sig-prename descclassname"><span class="pre">asimtools.calculators.</span></span><span class="sig-name descname"><span class="pre">load_m3gnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asimtools/calculators.html#load_m3gnet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.calculators.load_m3gnet" title="Permalink to this definition"></a></dt>
+<dd><p>Load and M3GNet calculator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>calc_params</strong> (<em>Dict</em>) – parameters to be passed to matgl.ext.ase.M3GNetCalculator. Must include a key “model” that points to the model used to instantiate the potential</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>M3GNet calculator</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">matgl.ext.ase.M3GNetCalculator</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.calculators.load_mace">
+<span class="sig-prename descclassname"><span class="pre">asimtools.calculators.</span></span><span class="sig-name descname"><span class="pre">load_mace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asimtools/calculators.html#load_mace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.calculators.load_mace" title="Permalink to this definition"></a></dt>
+<dd><p>Load MACE Calculator</p>
+<p><a class="reference external" href="https://github.com/ACEsuit/mace?tab=readme-ov-file">https://github.com/ACEsuit/mace?tab=readme-ov-file</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>calc_params</strong> (<em>Dict</em>) – args to pass to loader</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>MACE calculator</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mace.calculators.mace_mp</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.calculators.load_mace_off">
+<span class="sig-prename descclassname"><span class="pre">asimtools.calculators.</span></span><span class="sig-name descname"><span class="pre">load_mace_off</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asimtools/calculators.html#load_mace_off"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.calculators.load_mace_off" title="Permalink to this definition"></a></dt>
+<dd><p>Load MACE Calculator</p>
+<p><a class="reference external" href="https://github.com/ACEsuit/mace?tab=readme-ov-file">https://github.com/ACEsuit/mace?tab=readme-ov-file</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>calc_params</strong> (<em>Dict</em>) – args to pass to loader</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>MACE-OFF calculator</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mace.calculators.mace_mp</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="asimtools.calculators.load_nequip">
 <span class="sig-prename descclassname"><span class="pre">asimtools.calculators.</span></span><span class="sig-name descname"><span class="pre">load_nequip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asimtools/calculators.html#load_nequip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.calculators.load_nequip" title="Permalink to this definition"></a></dt>
 <dd><p>Load NequIP or Allegro calculator</p>
+<p><a class="reference external" href="https://github.com/mir-group/nequip/tree/main">https://github.com/mir-group/nequip/tree/main</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>calc_params</strong> (<em>Dict</em>) – args to pass to loader</p>
@@ -527,7 +633,7 @@ specific calculator. More complex workflows are built up of unit
 jobs</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="asimtools.job.UnitJob.gen_input_files">
-<span class="sig-name descname"><span class="pre">gen_input_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">write_calc_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_env_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/asimtools/job.html#UnitJob.gen_input_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.job.UnitJob.gen_input_files" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">gen_input_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">write_calc_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_env_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/asimtools/job.html#UnitJob.gen_input_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.job.UnitJob.gen_input_files" title="Permalink to this definition"></a></dt>
 <dd><p>Write input files to working directory</p>
 </dd></dl>
 
@@ -539,7 +645,7 @@ jobs</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="asimtools.job.UnitJob.submit">
-<span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/asimtools/job.html#UnitJob.submit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.job.UnitJob.submit" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/asimtools/job.html#UnitJob.submit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.job.UnitJob.submit" title="Permalink to this definition"></a></dt>
 <dd><p>Submit a job using slurm, interactively or in the terminal</p>
 </dd></dl>
 
@@ -628,29 +734,39 @@ key sequences. Key-value pairs are set in the given order</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="asimtools.utils.find_nth">
 <span class="sig-prename descclassname"><span class="pre">asimtools.utils.</span></span><span class="sig-name descname"><span class="pre">find_nth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">haystack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">needle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="_modules/asimtools/utils.html#find_nth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.utils.find_nth" title="Permalink to this definition"></a></dt>
-<dd><p>Return index of nth occurence of substrin in string</p>
+<dd><p>Return index of nth occurence of substring in string</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="asimtools.utils.get_atoms">
-<span class="sig-prename descclassname"><span class="pre">asimtools.utils.</span></span><span class="sig-name descname"><span class="pre">get_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bulk'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Atoms</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.12)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rattle_stdev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Atoms</span></span></span><a class="reference internal" href="_modules/asimtools/utils.html#get_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.utils.get_atoms" title="Permalink to this definition"></a></dt>
-<dd><p>Return an atoms object based on specified config. This is the 
-recommended way to load atoms objects.</p>
+<span class="sig-prename descclassname"><span class="pre">asimtools.utils.</span></span><span class="sig-name descname"><span class="pre">get_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ase'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bulk'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Atoms</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.12)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rattle_stdev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mp_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ase'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Atoms</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pymatgen.org/pymatgen.core.html#pymatgen.core.structure.Structure" title="(in pymatgen v2023.7.17)"><span class="pre">Structure</span></a></span></span><a class="reference internal" href="_modules/asimtools/utils.html#get_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.utils.get_atoms" title="Permalink to this definition"></a></dt>
+<dd><p>Return an ASE Atoms or pymatgen Structure object based on specified 
+config. This is the recommended way to load atoms objects for asimmodules.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>image_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – Path to an ASE-readable image file, defaults to None</p></li>
+<li><p><strong>interface</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – Whether to use “ase” or “pymatgen” to create the atoms 
+object</p></li>
 <li><p><strong>builder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – Builder to use from <a class="reference external" href="https://wiki.fysik.dtu.dk/ase/ase/build/build.html#module-ase.build" title="(in ASE)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ase.build</span></code></a>, defaults to ‘bulk’.         Any extra keyword arguments specified are passed to the build</p></li>
 <li><p><strong>atoms</strong> (<em>Atoms</em><em>, </em><em>optional</em>) – <a class="reference external" href="https://wiki.fysik.dtu.dk/ase/ase/atoms.html#ase.Atoms" title="(in ASE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ase.Atoms</span></code></a> object, defaults to None</p></li>
 <li><p><strong>repeat</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em><em>, </em><em>optional</em>) – Number of times to repeat input to create supercell,         defaults to None</p></li>
-<li><p><strong>rattle_stdev</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – stdev to be provided to <a class="reference external" href="https://wiki.fysik.dtu.dk/ase/ase/atoms.html#ase.Atoms.rattle" title="(in ASE)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ase.Atoms.rattle()</span></code></a>,         defaults to None</p></li>
+<li><p><strong>rattle_stdev</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – <cite>stdev</cite> to be provided to <a class="reference external" href="https://wiki.fysik.dtu.dk/ase/ase/atoms.html#ase.Atoms.rattle" title="(in ASE)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ase.Atoms.rattle()</span></code></a>,         or as <cite>distance</cite> to <a class="reference external" href="https://pymatgen.org/pymatgen.core.html#pymatgen.core.structure.Structure.perturb" title="(in pymatgen v2023.7.17)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pymatgen.core.structure.Structure.perturb()</span></code></a>
+defaults to None</p></li>
+<li><p><strong>mp_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – Material Project ID to fetch structure from, defaults to None</p></li>
+<li><p><strong>user_api_key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – Material Project API key, must be provided to get
+structures from Materials Project, defaults to None</p></li>
+<li><p><strong>return_type</strong> – When set to <cite>ase</cite> returns a <a class="reference external" href="https://wiki.fysik.dtu.dk/ase/ase/atoms.html#ase.Atoms" title="(in ASE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ase.Atoms</span></code></a> object,
+when set to <cite>pymatgen</cite> returns a 
+<a class="reference external" href="https://pymatgen.org/pymatgen.core.html#pymatgen.core.structure.Structure" title="(in pymatgen v2023.7.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.core.structure.Structure</span></code></a> object, defaults to ‘ase’</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>One <a class="reference external" href="https://wiki.fysik.dtu.dk/ase/ase/atoms.html#ase.Atoms" title="(in ASE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ase.Atoms</span></code></a> instance</p>
+<dd class="field-even"><p>One <a class="reference external" href="https://wiki.fysik.dtu.dk/ase/ase/atoms.html#ase.Atoms" title="(in ASE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ase.Atoms</span></code></a> or 
+<a class="reference external" href="https://pymatgen.org/pymatgen.core.html#pymatgen.core.structure.Structure" title="(in pymatgen v2023.7.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.core.structure.Structure</span></code></a> instance</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Atoms, optional</p>
+<dd class="field-odd"><p>Union[Atoms, Structure]</p>
 </dd>
 </dl>
 <p>There are three options one could use to specify and image or an atoms
@@ -712,6 +828,26 @@ you therefore have to expand it before passing it to <code class="docutils liter
 <span class="go">Atoms(symbols=&#39;Pt&#39;, pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]])</span>
 </pre></div>
 </div>
+<p>To get a pymatgen structure object, set the <cite>return_type</cite> to “pymatgen”</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">image</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Pt&#39;</span><span class="p">,</span> <span class="s1">&#39;return_type&#39;</span><span class="p">:</span> <span class="s1">&#39;pymatgen&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_atoms</span><span class="p">(</span><span class="o">**</span><span class="n">image</span><span class="p">)</span>
+<span class="go">Structure Summary</span>
+<span class="go">Lattice</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<p>To download a structure from the Materials Project, you need to provide
+an API key, the MP ID of the structure and set the interface to ‘pymatgen’
+You can also specify whether you want the primitive(default) or 
+conventional unit cell as a keyword argument</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">{</span><span class="s1">&#39;mp_id&#39;</span><span class="p">:</span> <span class="s1">&#39;mp-14&#39;</span><span class="p">,</span> <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="s1">&#39;pymatgen&#39;</span><span class="p">,</span> <span class="s1">&#39;user_api_key&#39;</span><span class="p">:</span> <span class="s2">&quot;USER_API_KEY&quot;</span><span class="p">,</span> <span class="s1">&#39;conventional_unit_cell&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_atoms</span><span class="p">(</span><span class="o">**</span><span class="n">image</span><span class="p">)</span>
+<span class="go">Structure Summary</span>
+<span class="go">Lattice</span>
+<span class="go">abc : 2.7718585822512662 2.7718585822512662 2.7718585822512662</span>
+<span class="go">...</span>
+</pre></div>
+</div>
 </section>
 </dd></dl>
 
@@ -740,7 +876,8 @@ then <code class="docutils literal notranslate"><span class="pre">.asimtools</sp
 <dt class="sig sig-object py" id="asimtools.utils.get_env_input">
 <span class="sig-prename descclassname"><span class="pre">asimtools.utils.</span></span><span class="sig-name descname"><span class="pre">get_env_input</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/utils.html#get_env_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.utils.get_env_input" title="Permalink to this definition"></a></dt>
 <dd><p>Gets the global env_input from the environment variable, then tries
-then <code class="docutils literal notranslate"><span class="pre">.asimtools</span></code> dotfile</p>
+then <code class="docutils literal notranslate"><span class="pre">.asimtools</span></code> dotfile. If an env_input.yaml is present in the 
+work direcory, it takes precedence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>env_input dictionary or empty dictionary if not found</p>
@@ -858,16 +995,35 @@ you therefore have to expand it before passing it to <code class="docutils liter
 <dl class="py function">
 <dt class="sig sig-object py" id="asimtools.utils.get_nth_label">
 <span class="sig-prename descclassname"><span class="pre">asimtools.utils.</span></span><span class="sig-name descname"><span class="pre">get_nth_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asimtools/utils.html#get_nth_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.utils.get_nth_label" title="Permalink to this definition"></a></dt>
-<dd><p>Return nth label in a string potentially containin multiple labels,
+<dd><p>Return nth label in a string potentially containing multiple labels,
 indexing starts from 0</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="asimtools.utils.get_str_btn">
-<span class="sig-prename descclassname"><span class="pre">asimtools.utils.</span></span><span class="sig-name descname"><span class="pre">get_str_btn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">s1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">s2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asimtools/utils.html#get_str_btn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.utils.get_str_btn" title="Permalink to this definition"></a></dt>
-<dd><p>Return substring between the first instance of s1 and the first
-instance of s2 after s1 in s. None corresponds to beginning or end of
-string for s1 and s2 respectively</p>
+<span class="sig-prename descclassname"><span class="pre">asimtools.utils.</span></span><span class="sig-name descname"><span class="pre">get_str_btn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">s1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">s2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">occurence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asimtools/utils.html#get_str_btn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.utils.get_str_btn" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the substring between strings s1 and s2 from s</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – string/path from which to extract substring</p></li>
+<li><p><strong>s1</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – substring before the desired substring, None starts from 
+the beginning of s</p></li>
+<li><p><strong>s2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – substring after the desired substring, None ends at the 
+end of the string</p></li>
+<li><p><strong>occurence</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>optional</em>) – which occurence to return e.g. occurence=1 returns the 
+second time a substring is encountered, defaults to 0</p></li>
+<li><p><strong>start_index</strong> – first index from which to search for substring, 
+defaults to 0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>substring</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>_type_</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

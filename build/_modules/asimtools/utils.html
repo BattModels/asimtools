@@ -3,16 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>asimtools.utils &mdash; asimtools 0.0.0 documentation</title>
+  <title>asimtools.utils &mdash; asimtools 1.0.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=525cde36"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -23,11 +25,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> asimtools
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            asimtools
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -56,9 +62,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>asimtools.utils</li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">asimtools.utils</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -88,11 +94,13 @@
 <span class="kn">from</span> <span class="nn">ase.parallel</span> <span class="kn">import</span> <span class="n">paropen</span>
 <span class="kn">import</span> <span class="nn">ase.db</span>
 <span class="kn">import</span> <span class="nn">ase.build</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core</span> <span class="kn">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">pymatgen.io.ase</span> <span class="kn">import</span> <span class="n">AseAtomsAdaptor</span>
 
 <span class="n">Atoms</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Atoms&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="read_yaml"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.read_yaml">[docs]</a><span class="k">def</span> <span class="nf">read_yaml</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Read a yaml file</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a yaml file</span>
 
 <span class="sd">    :param yaml_path: Path to yaml file</span>
 <span class="sd">    :type yaml_path: str</span>
@@ -107,7 +115,7 @@
     <span class="k">return</span> <span class="n">output</span></div>
 
 <div class="viewcode-block" id="write_yaml"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.write_yaml">[docs]</a><span class="k">def</span> <span class="nf">write_yaml</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">yaml_Dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Write a dictionary to a yaml file</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a dictionary to a yaml file</span>
 
 <span class="sd">    :param yaml_path: Path to write yaml to</span>
 <span class="sd">    :type yaml_path: str</span>
@@ -119,7 +127,7 @@
         <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">yaml_Dict</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="get_axis_lims"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.get_axis_lims">[docs]</a><span class="k">def</span> <span class="nf">get_axis_lims</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">padding</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Get an estimate of good limits for a plot axis&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get an estimate of good limits for a plot axis&quot;&quot;&quot;</span>
     <span class="n">data_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
     <span class="n">data_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
     <span class="n">diff</span> <span class="o">=</span> <span class="n">data_max</span> <span class="o">-</span> <span class="n">data_min</span>
@@ -133,7 +141,7 @@
     <span class="n">header</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Write a tabulated csv to a file from a dictionary. The keys will</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a tabulated csv to a file from a dictionary. The keys will</span>
 <span class="sd">    become the columns and the values will be the columns, All columns used </span>
 <span class="sd">    must have the same length. kwargs are passed to </span>
 <span class="sd">    :func:`pandas.Dataframe.to_csv()`</span>
@@ -158,7 +166,7 @@
     <span class="k">return</span> <span class="n">csv_data</span></div>
 
 <div class="viewcode-block" id="strip_symbols"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.strip_symbols">[docs]</a><span class="k">def</span> <span class="nf">strip_symbols</span><span class="p">(</span><span class="n">substr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Helper function to format filenames using standard</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to format filenames using standard</span>
 
 <span class="sd">    :param substr: substring</span>
 <span class="sd">    :type substr: str</span>
@@ -175,7 +183,7 @@
     <span class="k">return</span> <span class="n">substr</span></div>
 
 <div class="viewcode-block" id="join_names"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.join_names">[docs]</a><span class="k">def</span> <span class="nf">join_names</span><span class="p">(</span><span class="n">substrs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Join multiple strings using a hyphen neatly</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Join multiple strings using a hyphen neatly</span>
 
 <span class="sd">    :param substrs: Sequence of strings to merge</span>
 <span class="sd">    :type substrs: Sequence[str]</span>
@@ -196,17 +204,24 @@
 
 <div class="viewcode-block" id="get_atoms"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.get_atoms">[docs]</a><span class="k">def</span> <span class="nf">get_atoms</span><span class="p">(</span>
     <span class="n">image_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">interface</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ase&#39;</span><span class="p">,</span>
     <span class="n">builder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;bulk&#39;</span><span class="p">,</span>
     <span class="n">atoms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Atoms</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">repeat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">rattle_stdev</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">mp_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">user_api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ase&#39;</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Atoms</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Return an atoms object based on specified config. This is the </span>
-<span class="sd">    recommended way to load atoms objects. </span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Atoms</span><span class="p">,</span> <span class="n">Structure</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an ASE Atoms or pymatgen Structure object based on specified </span>
+<span class="sd">    config. This is the recommended way to load atoms objects for asimmodules.  </span>
 
 <span class="sd">    :param image_file: Path to an ASE-readable image file, defaults to None</span>
 <span class="sd">    :type image_file: str, optional</span>
+<span class="sd">    :param interface: Whether to use &quot;ase&quot; or &quot;pymatgen&quot; to create the atoms </span>
+<span class="sd">        object</span>
+<span class="sd">    :type interface: str, optional</span>
 <span class="sd">    :param builder: Builder to use from :mod:`ase.build`, defaults to &#39;bulk&#39;. \</span>
 <span class="sd">        Any extra keyword arguments specified are passed to the build</span>
 <span class="sd">    :type builder: str, optional</span>
@@ -215,11 +230,21 @@
 <span class="sd">    :param repeat: Number of times to repeat input to create supercell, \</span>
 <span class="sd">        defaults to None</span>
 <span class="sd">    :type repeat: Tuple[int, int, int], optional</span>
-<span class="sd">    :param rattle_stdev: stdev to be provided to :meth:`ase.Atoms.rattle`, \</span>
+<span class="sd">    :param rattle_stdev: `stdev` to be provided to :meth:`ase.Atoms.rattle`, \</span>
+<span class="sd">        or as `distance` to :meth:`pymatgen.core.structure.Structure.perturb`</span>
 <span class="sd">        defaults to None</span>
 <span class="sd">    :type rattle_stdev: float, optional</span>
-<span class="sd">    :return: One :class:`ase.Atoms` instance</span>
-<span class="sd">    :rtype: Atoms, optional</span>
+<span class="sd">    :param mp_id: Material Project ID to fetch structure from, defaults to None</span>
+<span class="sd">    :type mp_id: str, optional</span>
+<span class="sd">    :param user_api_key: Material Project API key, must be provided to get</span>
+<span class="sd">        structures from Materials Project, defaults to None</span>
+<span class="sd">    :type user_api_key: str, optional</span>
+<span class="sd">    :param return_type: When set to `ase` returns a :class:`ase.Atoms` object,</span>
+<span class="sd">        when set to `pymatgen` returns a </span>
+<span class="sd">        :class:`pymatgen.core.structure.Structure` object, defaults to &#39;ase&#39;</span>
+<span class="sd">    :return: One :class:`ase.Atoms` or </span>
+<span class="sd">        :class:`pymatgen.core.structure.Structure` instance</span>
+<span class="sd">    :rtype: Union[Atoms, Structure]</span>
 
 <span class="sd">    There are three options one could use to specify and image or an atoms</span>
 <span class="sd">    objects:</span>
@@ -280,38 +305,89 @@
 <span class="sd">    &gt;&gt;&gt; image = {&#39;name&#39;: &#39;Pt&#39;}</span>
 <span class="sd">    &gt;&gt;&gt; get_atoms(**image)</span>
 <span class="sd">    Atoms(symbols=&#39;Pt&#39;, pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> \
-        <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> \
-        <span class="n">atoms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
-        <span class="s2">&quot;Specify atoms, image_file or use ase.build tools&quot;</span>
 
-    <span class="k">if</span> <span class="n">image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">Path</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> \
-            <span class="sa">f</span><span class="s1">&#39;The image_file </span><span class="si">{</span><span class="n">image_file</span><span class="si">}</span><span class="s1"> does not exist from </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="n">atoms</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">atoms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">builder_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ase</span><span class="o">.</span><span class="n">build</span><span class="p">,</span> <span class="n">builder</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">atoms</span> <span class="o">=</span> <span class="n">builder_func</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Make sure you choose a valid builder and appropriate</span><span class="se">\</span>
-<span class="s1">                arguments matching the functions in ase.build. </span><span class="se">\n\</span>
-<span class="s1">                See https://wiki.fysik.dtu.dk/ase/ase/build/build.html&#39;</span><span class="p">)</span>
-            <span class="k">raise</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">atoms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Specify an input structure&#39;</span>
+<span class="sd">    To get a pymatgen structure object, set the `return_type` to &quot;pymatgen&quot;</span>
+
+<span class="sd">    &gt;&gt;&gt; image = {&#39;name&#39;: &#39;Pt&#39;, &#39;return_type&#39;: &#39;pymatgen&#39;}</span>
+<span class="sd">    &gt;&gt;&gt; get_atoms(**image)</span>
+<span class="sd">    Structure Summary</span>
+<span class="sd">    Lattice</span>
+<span class="sd">    ...</span>
+
+<span class="sd">    To download a structure from the Materials Project, you need to provide</span>
+<span class="sd">    an API key, the MP ID of the structure and set the interface to &#39;pymatgen&#39;</span>
+<span class="sd">    You can also specify whether you want the primitive(default) or </span>
+<span class="sd">    conventional unit cell as a keyword argument</span>
+
+<span class="sd">    &gt;&gt;&gt; {&#39;mp_id&#39;: &#39;mp-14&#39;, &#39;interface&#39;: &#39;pymatgen&#39;, &#39;user_api_key&#39;: &quot;USER_API_KEY&quot;, &#39;conventional_unit_cell&#39;: True},</span>
+<span class="sd">    &gt;&gt;&gt; get_atoms(**image)</span>
+<span class="sd">    Structure Summary</span>
+<span class="sd">    Lattice</span>
+<span class="sd">    abc : 2.7718585822512662 2.7718585822512662 2.7718585822512662</span>
+<span class="sd">    ...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">interface</span> <span class="o">==</span> <span class="s1">&#39;ase&#39;</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> \
+            <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> \
+            <span class="n">atoms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+            <span class="s2">&quot;Specify atoms, image_file or use ase.build tools if using </span><span class="se">\</span>
+<span class="s2">                ASE interface&quot;</span>
+        <span class="k">if</span> <span class="n">image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">Path</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> \
+                <span class="sa">f</span><span class="s1">&#39;The image_file </span><span class="si">{</span><span class="n">image_file</span><span class="si">}</span><span class="s1"> does not exist from </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">atoms</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">atoms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ase</span><span class="o">.</span><span class="n">build</span><span class="p">,</span> <span class="n">builder</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">atoms</span> <span class="o">=</span> <span class="n">builder_func</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Make sure you choose a valid builder and appropriate</span><span class="se">\</span>
+<span class="s1">                    arguments matching the functions in ase.build. </span><span class="se">\n\</span>
+<span class="s1">                    See https://wiki.fysik.dtu.dk/ase/ase/build/build.html&#39;</span><span class="p">)</span>
+                <span class="k">raise</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">atoms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Specify an input structure&#39;</span>
+    
+    <span class="k">if</span> <span class="n">interface</span> <span class="o">==</span> <span class="s1">&#39;pymatgen&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mp_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pymatgen.ext.matproj</span> <span class="kn">import</span> <span class="n">MPRester</span>
+            <span class="k">with</span> <span class="n">MPRester</span><span class="p">(</span><span class="n">user_api_key</span><span class="p">)</span> <span class="k">as</span> <span class="n">mpr</span><span class="p">:</span>
+                <span class="n">struct</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_structure_by_material_id</span><span class="p">(</span><span class="n">mp_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>   
+        <span class="k">elif</span> <span class="n">builder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">Structure</span><span class="p">,</span> <span class="n">builder</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">struct</span> <span class="o">=</span> <span class="n">builder_func</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">err_txt</span> <span class="o">=</span> <span class="s1">&#39;Make sure you choose a valid builder and &#39;</span>
+                <span class="n">err_txt</span> <span class="o">+=</span> <span class="s1">&#39;appropriate arguments matching the functions &#39;</span>
+                <span class="n">err_txt</span> <span class="o">+=</span> <span class="s1">&#39;from pymatgen.core.structure </span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="n">err_txt</span> <span class="o">+=</span> <span class="s1">&#39;See https://pymatgen.org/pymatgen.core.html&#39;</span>
+                <span class="n">err_txt</span> <span class="o">+=</span> <span class="s1">&#39;#module-pymatgen.core.structure&#39;</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">err_txt</span><span class="p">)</span>
+                <span class="k">raise</span>
 
     <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">atoms</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">interface</span> <span class="o">==</span> <span class="s1">&#39;ase&#39;</span><span class="p">:</span>
+            <span class="n">atoms</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">interface</span> <span class="o">==</span> <span class="s1">&#39;pymatgen&#39;</span><span class="p">:</span>
+            <span class="n">struct</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">make_supercell</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">rattle_stdev</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">rattle_stdev</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">interface</span> <span class="o">==</span> <span class="s1">&#39;ase&#39;</span><span class="p">:</span>
         <span class="n">atoms</span><span class="o">.</span><span class="n">rattle</span><span class="p">(</span><span class="n">stdev</span><span class="o">=</span><span class="n">rattle_stdev</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">rattle_stdev</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">interface</span> <span class="o">==</span> <span class="s1">&#39;pymatgen&#39;</span><span class="p">:</span>
+        <span class="n">struct</span><span class="o">.</span><span class="n">perturb</span><span class="p">(</span><span class="n">distance</span><span class="o">=</span><span class="n">rattle_stdev</span><span class="p">,</span> <span class="n">min_distance</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">atoms</span></div>
+    <span class="k">if</span> <span class="n">return_type</span> <span class="o">==</span> <span class="s1">&#39;ase&#39;</span> <span class="ow">and</span> <span class="n">interface</span> <span class="o">==</span> <span class="s1">&#39;ase&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">atoms</span>
+    <span class="k">elif</span> <span class="n">return_type</span> <span class="o">==</span> <span class="s1">&#39;pymatgen&#39;</span> <span class="ow">and</span> <span class="n">interface</span> <span class="o">==</span> <span class="s1">&#39;ase&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">AseAtomsAdaptor</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">return_type</span> <span class="o">==</span> <span class="s1">&#39;pymatgen&#39;</span> <span class="ow">and</span> <span class="n">interface</span> <span class="o">==</span> <span class="s1">&#39;pymatgen&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">struct</span>
+    <span class="k">elif</span> <span class="n">return_type</span> <span class="o">==</span> <span class="s1">&#39;ase&#39;</span> <span class="ow">and</span> <span class="n">interface</span> <span class="o">==</span> <span class="s1">&#39;pymatgen&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">AseAtomsAdaptor</span><span class="o">.</span><span class="n">get_atoms</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">msonable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="parse_slice"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.parse_slice">[docs]</a><span class="k">def</span> <span class="nf">parse_slice</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">slice</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Parses a :func:`slice` from string, like `start:stop:step`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parses a :func:`slice` from string, like `start:stop:step`.</span>
 
 <span class="sd">    :param value: Slice string</span>
 <span class="sd">    :type value: str</span>
@@ -336,7 +412,7 @@
     <span class="n">skip_failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Atoms</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Return a list of atoms objects based on the input arguments. Options \</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a list of atoms objects based on the input arguments. Options \</span>
 <span class="sd">        to specify are:</span>
 <span class="sd">        #. image_file</span>
 <span class="sd">        #. pattern</span>
@@ -439,7 +515,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">images</span> <span class="o">=</span> <span class="p">[</span><span class="n">images</span><span class="p">]</span>
     <span class="k">elif</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">image_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+        <span class="n">image_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">))</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> \
             <span class="sa">f</span><span class="s1">&#39;No images matching pattern &quot;</span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s1">&quot; from &quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
 
@@ -468,7 +544,7 @@
     <span class="k">elif</span> <span class="n">patterns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">patterns</span><span class="p">:</span>
-            <span class="n">image_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+            <span class="n">image_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">))</span>
             <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> \
                 <span class="sa">f</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t include pattern &quot;</span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s1">&quot; if no files match&#39;</span>
             <span class="n">images</span> <span class="o">+=</span> <span class="n">get_images</span><span class="p">(</span>
@@ -488,7 +564,7 @@
     <span class="k">return</span> <span class="n">images</span></div>
 
 <div class="viewcode-block" id="new_db"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.new_db">[docs]</a><span class="k">def</span> <span class="nf">new_db</span><span class="p">(</span><span class="n">dbname</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Creates a new ASE database overwriting an old one</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a new ASE database overwriting an old one</span>
 
 <span class="sd">    :param dbname: Name for the new database</span>
 <span class="sd">    :type dbname: str</span>
@@ -500,13 +576,18 @@
     <span class="k">return</span> <span class="n">ase</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbname</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="get_env_input"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.get_env_input">[docs]</a><span class="k">def</span> <span class="nf">get_env_input</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Gets the global env_input from the environment variable, then tries</span>
-<span class="sd">    then ``.asimtools`` dotfile</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the global env_input from the environment variable, then tries</span>
+<span class="sd">    then ``.asimtools`` dotfile. If an env_input.yaml is present in the </span>
+<span class="sd">    work direcory, it takes precedence.</span>
 
 <span class="sd">    :return: env_input dictionary or empty dictionary if not found</span>
 <span class="sd">    :rtype: Dict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">env_input_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;ASIMTOOLS_ENV_INPUT&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;env_input.yaml&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">env_input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;env_input.yaml&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">env_input_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;ASIMTOOLS_ENV_INPUT&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">env_input_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dotfile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;~/.asimtools&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dotfile</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -528,7 +609,7 @@
     <span class="k">return</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="get_calc_input"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.get_calc_input">[docs]</a><span class="k">def</span> <span class="nf">get_calc_input</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Gets the global calc_input from the environment variable, then tries</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the global calc_input from the environment variable, then tries</span>
 <span class="sd">    then ``.asimtools`` dotfile</span>
 
 <span class="sd">    :return: calc_input dictionary or empty dictionary if not found</span>
@@ -556,7 +637,7 @@
     <span class="k">return</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="check_if_slurm_job_is_running"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.check_if_slurm_job_is_running">[docs]</a><span class="k">def</span> <span class="nf">check_if_slurm_job_is_running</span><span class="p">(</span><span class="n">slurm_job_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">int</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;Checks if the slurm job with specifying job_id is running</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks if the slurm job with specifying job_id is running</span>
 
 <span class="sd">    :param slurm_job_id: Job ID as str or int</span>
 <span class="sd">    :type slurm_job_id: Union[str,int]</span>
@@ -582,7 +663,7 @@
     <span class="n">key_sequence</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
     <span class="n">return_copy</span><span class="p">:</span> <span class="nb">bool</span>  <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Changes a value in the specified dictionary given by following the </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Changes a value in the specified dictionary given by following the </span>
 <span class="sd">    key sequence</span>
 
 <span class="sd">    :param d: dictionary to be changed</span>
@@ -617,7 +698,7 @@
     <span class="n">key_sequences</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
     <span class="n">return_copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Changes values in the specified dictionary given by following the </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Changes values in the specified dictionary given by following the </span>
 <span class="sd">    key sequences. Key-value pairs are set in the given order</span>
 
 <span class="sd">    :param d: dictionary to be changed</span>
@@ -641,7 +722,7 @@
     <span class="n">fstr</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> |</span><span class="si">%(module)s</span><span class="s1">|</span><span class="si">%(funcName)s</span><span class="s1">| </span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
     <span class="n">level</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Get the logger &#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Get the logger &#39;&#39;&#39;</span>
 
     <span class="n">level_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;debug&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
@@ -659,28 +740,55 @@
 
 
 <div class="viewcode-block" id="get_str_btn"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.get_str_btn">[docs]</a><span class="k">def</span> <span class="nf">get_str_btn</span><span class="p">(</span>
-    <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">s</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
     <span class="n">s1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">s2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="n">end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">occurence</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">start_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Return substring between the first instance of s1 and the first</span>
-<span class="sd">    instance of s2 after s1 in s. None corresponds to beginning or end of</span>
-<span class="sd">    string for s1 and s2 respectively &#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the substring between strings s1 and s2 from s</span>
 
-    <span class="k">if</span> <span class="n">s1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">i1</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">i1</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">s2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">i2</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i1</span><span class="p">:]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">+</span> <span class="n">i1</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">i2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">s</span><span class="p">[</span><span class="n">i1</span><span class="p">:</span><span class="n">i2</span><span class="p">]</span></div>
+<span class="sd">    :param s: string/path from which to extract substring</span>
+<span class="sd">    :type s: str</span>
+<span class="sd">    :param s1: substring before the desired substring, None starts from </span>
+<span class="sd">        the beginning of s</span>
+<span class="sd">    :type s1: str</span>
+<span class="sd">    :param s2: substring after the desired substring, None ends at the </span>
+<span class="sd">        end of the string</span>
+<span class="sd">    :type s2: str</span>
+<span class="sd">    :param occurence: which occurence to return e.g. occurence=1 returns the </span>
+<span class="sd">        second time a substring is encountered, defaults to 0</span>
+<span class="sd">    :type occurence: int, optional</span>
+<span class="sd">    :param start_index: first index from which to search for substring, </span>
+<span class="sd">        defaults to 0</span>
+<span class="sd">    :type int: int, optional</span>
+<span class="sd">    :return: substring</span>
+<span class="sd">    :rtype: _type_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stop_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">stop_index</span><span class="p">]</span>
+    <span class="k">while</span> <span class="n">occurence</span> <span class="o">-</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">s1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">i1</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">i1</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">s2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">i2</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i1</span><span class="p">:]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span> <span class="o">+</span> <span class="n">i1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">i2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">occurence</span> <span class="o">-</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">s</span><span class="p">[</span><span class="n">i1</span><span class="p">:</span><span class="n">i2</span><span class="p">]</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i1</span><span class="p">:]</span>
+        <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
 <div class="viewcode-block" id="find_nth"><a class="viewcode-back" href="../../asimtools.html#asimtools.utils.find_nth">[docs]</a><span class="k">def</span> <span class="nf">find_nth</span><span class="p">(</span><span class="n">haystack</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">needle</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-    <span class="sd">&#39;&#39;&#39; Return index of nth occurence of substrin in string &#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Return index of nth occurence of substring in string &#39;&#39;&#39;</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">haystack</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">needle</span><span class="p">)</span>
     <span class="k">while</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">haystack</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">needle</span><span class="p">,</span> <span class="n">start</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">needle</span><span class="p">))</span>
@@ -691,11 +799,11 @@
     <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Return nth label in a string potentially containin multiple labels,</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Return nth label in a string potentially containing multiple labels,</span>
 <span class="sd">    indexing starts from 0 &#39;&#39;&#39;</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">find_nth</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;__&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">get_str_btn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;__&#39;</span><span class="p">,</span> <span class="s1">&#39;__&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">get_str_btn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;__&#39;</span><span class="p">,</span> <span class="s1">&#39;__&#39;</span><span class="p">,</span> <span class="n">start_index</span><span class="o">=</span><span class="n">start</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
@@ -705,7 +813,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Mgcini Keith Phuthi, Emil Annevelink.</p>
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
