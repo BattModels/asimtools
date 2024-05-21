@@ -230,8 +230,9 @@ def get_atoms(
     >>> get_atoms(**image)
     Atoms(symbols='Pt', pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]])
 
-    To get a pymatgen structure object, set the return_type to 'pymatgen'
-    >>> image = {'name': 'Pt'}
+    To get a pymatgen structure object, set the `return_type` to "pymatgen"
+
+    >>> image = {'name': 'Pt', 'return_type': 'pymatgen'}
     >>> get_atoms(**image)
     Structure Summary
     Lattice
@@ -241,6 +242,7 @@ def get_atoms(
     an API key, the MP ID of the structure and set the interface to 'pymatgen'
     You can also specify whether you want the primitive(default) or 
     conventional unit cell as a keyword argument
+
     >>> {'mp_id': 'mp-14', 'interface': 'pymatgen', 'user_api_key': "USER_API_KEY", 'conventional_unit_cell': True},
     >>> get_atoms(**image)
     Structure Summary
