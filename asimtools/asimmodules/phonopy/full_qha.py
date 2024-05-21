@@ -17,7 +17,7 @@ def full_qha(
     properties of a given structure. Calculated properties included 
     vibrational free energy heat capacity, thermal expansion etc.
 
-    :param image: Image 
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms` 
     :type image: Dict
     :param calc_id: calc_id
     :type calc_id: str

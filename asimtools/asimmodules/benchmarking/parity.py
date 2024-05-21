@@ -136,7 +136,7 @@ def parity(
     """Generates a parity plot and collects evaluation statistics comparing energy
     and/or forces and/or stress to existing values in the provided dataset
 
-    :param images: Image config, see :func:`asimtools.utils.get_images`
+    :param images: Image specification, see :func:`asimtools.utils.get_images`
     :type images: Dict
     :param calc_id: ID of calculator provided in calc_input or global file
     :type calc_id: str

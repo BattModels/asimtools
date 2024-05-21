@@ -1,21 +1,24 @@
 #!/usr/bin/env python
 '''
 Runs the same asimmodule, iterating over multiple values of a specified
-argument based on a sim_input template provided by the user. The tasks are run
-simultaneously if resources are available
+argument one after the other based on a sim_input template provided by the user
 
 Author: mkphuthi@github.com
 
 '''
 
 from typing import Dict, Sequence, Optional, Union
+import os
+from pathlib import Path
 from copy import deepcopy
-from asimtools.job import DistributedJob
+from asimtools.job import ChainedJob
 from asimtools.utils import change_dict_value
 from asimtools.asimmodules.workflows.utils import prepare_array_vals
 
-def sim_array(
+def iterative(
     template_sim_input: Dict,
+    dependent_file: Optional[os.PathLike] = None,
+    dependent_file_key_sequence: Optional[Sequence[str]] = None,
     key_sequence: Optional[Sequence[str]] = None,
     array_values: Optional[Sequence] = None,
     file_pattern: Optional[str] = None,
@@ -24,12 +27,12 @@ def sim_array(
     env_ids: Optional[Union[Sequence[str],str]] = None,
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
-    labels: Optional[Union[Sequence,str]] = 'values',
-    label_prefix: Optional[str] = None,
+    # labels: Optional[Union[Sequence,str]] = 'values',
+    # label_prefix: Optional[str] = None,
     str_btn_args: Optional[Dict] = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
-    array_max: Optional[int] = None,
+    # array_max: Optional[int] = None,
 ) -> Dict:
     """Runs the same asimmodule, iterating over multiple values of a specified
     argument based on a sim_input template provided by the user
@@ -85,14 +88,15 @@ def sim_array(
         linspace_args=linspace_args,
         arange_args=arange_args,
         env_ids=env_ids,
-        labels=labels,
-        label_prefix=label_prefix,
+        # labels=None,
+        # label_prefix=label_prefix,
         str_btn_args=str_btn_args,
         secondary_key_sequences=secondary_key_sequences,
         secondary_array_values=secondary_array_values,
     )
     array_values = results['array_values']
-    labels = results['labels']
+    print(array_values)
+    labels = [f'step-{i}' for i in range(len(array_values))]
     env_ids = results['env_ids']
     secondary_array_values = results['secondary_array_values']
     secondary_key_sequences = results['secondary_key_sequences']
@@ -111,6 +115,17 @@ def sim_array(
         else:
             new_sim_input = deepcopy(template_sim_input)
 
+        if dependent_file_key_sequence is not None and i > 0:
+            dep_arg = str(Path(f'../step-{i-1}') / dependent_file)
+            new_sim_input = change_dict_value(
+                d=new_sim_input,
+                new_value=dep_arg,
+                key_sequence=dependent_file_key_sequence,
+                return_copy=False,
+            )
+        else:
+            new_sim_input = deepcopy(new_sim_input)
+
         if secondary_array_values is not None:
             for k, vs in zip(secondary_key_sequences, secondary_array_values):
                 new_sim_input = change_dict_value(
@@ -124,9 +139,9 @@ def sim_array(
             new_sim_input['env_id'] = env_ids[i]
         sim_inputs[labels[i]] = new_sim_input
 
-    # Create a distributed job object
-    djob = DistributedJob(sim_inputs, env_input, calc_input)
-    job_ids = djob.submit(array_max=array_max)
+    # Create a chained job object
+    cjob = ChainedJob(sim_inputs, env_input, calc_input)
+    job_ids = cjob.submit()
 
     results = {'job_ids': job_ids}
     return results

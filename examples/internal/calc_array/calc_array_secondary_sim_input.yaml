@@ -1,0 +1,14 @@
+asimmodule: workflows.calc_array
+workdir: secondary_results
+args:
+  template_calc_id: lj_Cu
+  key_sequence: ['args', 'sigma']
+  linspace_args: [2.3, 2.36, 3]
+  secondary_key_sequences: [[args, 'epsilon']]
+  secondary_array_values: 
+   - [0.396, 0.409, 0.421]
+  subsim_input:
+    asimmodule: singlepoint
+    args:
+      image:
+        name: Cu

@@ -16,7 +16,15 @@ def postprocess(
     images: Dict,
     initial_image: Dict,
 ) -> Tuple[None,Dict]:
-    ''' plot things '''
+    """Plot an eos given a number of images and the initial image
+
+    :param images: Scaled images specification, see :func:`asimtools.utils.get_images`
+    :type images: Dict
+    :param initial_image: Original image  specification, see :func:`asimtools.utils.get_atoms`
+    :type initial_image: Dict
+    :return: Empty dict
+    :rtype: Tuple[None,Dict]
+    """
     images = get_images(**images)
     volumes = np.array([at.get_volume() for at in images])
     energies = np.array([at.get_potential_energy() for at in images])
