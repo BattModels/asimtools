@@ -695,7 +695,6 @@ def get_str_btn(
 
     s = s[start_index:stop_index]
     while occurence - j >= 0:
-        print('0', j, s)
         if s1 is not None:
             i1 = s.index(s1) + len(s1)
         else:
@@ -726,5 +725,4 @@ def get_nth_label(
     ''' Return nth label in a string potentially containing multiple labels,
     indexing starts from 0 '''
     start = find_nth(s, '__', n=(n*2+1))
-    print('start', start)
     return get_str_btn(s, '__', '__', start_index=start)
