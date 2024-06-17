@@ -57,7 +57,7 @@ different languages to change from one type of atomistic potential or atomic
 structure to another. This leads to poor reproducibility and inefficient
 transfer of code from one researcher to the next. In addition, there exists a
 zoo of tools and packages for atomic simulation with more being developed every
-day `[Walsh:2024]`. There is however no unifying framework that can encompass
+day `[@walsh_open_2024]`. There is however no unifying framework that can encompass
 all these tools without significant software development effort. Significant
 effort should not be necessary because while the source of the fundamental
 outputs of atomistic potentials such as energy, forces etc. may differ,
@@ -76,14 +76,14 @@ can be easily added to the library of provided asimmodules and iterated on.
 This will allow the community to develop a robust set of shareable simulation
 protocols. The flexibility of ASIMTools allows integration of any kind of
 simulation tools such as the heavily used Atomic Simulation Environment
-`[Larsen:2017]` pymatgen `[Ong:2015]`, LAMMPS `[Thompson:2022]` etc. with
+`[@larsen_atomic_2017]` pymatgen `[@ong_python_2013]`, LAMMPS `[@thompson_lammps_2022]` etc. with
 examples provided. With the asimmodules defined, users only need to provide a
 set of inputs in the form of yaml files that define the parameters used for
 each simulation and are therefore a concrete record of used parameters. 
 
 # State of the Field
 There exist a number of popular workflow tools for atomistic simulations such
-as Aiida `[@Hubar:2020]`, Fireworks `[@Anubhav:2015]` and many more. These
+as Aiida `[@huber_aiida_2020]`, Fireworks `[@jain_fireworks_2015]` and many more. These
 tools provide frameworks for constructing complex workflows with different
 underlying principles. Some managers enforce strict rules that ensure that data
 obeys FAIR principles and emphasizes data provenance and reproducibility. These
@@ -94,7 +94,7 @@ that returns a Python dictionary. Any such code can work in ASIMTools and with
 a few extra steps, the protocol can be made to support an arbitrary calculator
 and input structure.
 
-In some workflow managers, such as Atomic Simulation Recipes `[@Gjerding:2021]`,
+In some workflow managers, such as Atomic Simulation Recipes `[@gjerding_atomic_2021]`,
 once workflows are built, it can often be difficult to quickly change and
 iterate over key parameters such as the choice of atomistic calculator or
 structure as they are intrinsically built into the code. This is particularly
