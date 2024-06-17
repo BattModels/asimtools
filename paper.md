@@ -1,5 +1,5 @@
 ---
-title: 'ASIMTools: A lightweight framework for scaleable and reproducible atomic simulations'
+title: 'ASIMTools: A lightweight framework for scalable and reproducible atomic simulations'
 tags:
   - Python
   - atomic simulation
@@ -32,16 +32,15 @@ bibliography: paper.bib
 
 Atomic SIMulation Tools (`ASIMTools`) is a lightweight workflow and simulation
 manager for reproducible atomistic simulations on Unix-based systems. Within
-the framework, simulations can be transferred across environments, DFT codes,
+the framework, simulations can be transferred across computing environments, DFT codes,
 interatomic potentials and atomic structures. By using in-built or user-defined
 python modules (called asimmodules) and utilities, users can run simulation
 recipes and automatically scale them on slurm based clusters or locally on
 their console. The core idea is to separate the dependence of the atomistic
-potential/calculator, the simulation environment and the simulation protocol
+potential/calculator, the computing environment and the simulation protocol
 thereby allowing the same simulation to be run with different calculators,
 structures or on different computers with just a change of one parameter in an
-input file after initial setup. This is extremely useful at a time when
-benchmarking Machine Learning Interatomic Potentials has become a core part of
+input file after initial setup. This is increasingly necessary as benchmarking Machine Learning Interatomic Potentials has become a core part of
 computational materials science. Input and output files follow a simple
 standard format, usually yaml, providing a simple interface that also acts as a
 record of the parameters used in a simulation without having to edit python
@@ -55,7 +54,7 @@ academia and industry. However, simulation protocols and workflows used by
 researchers are typically difficult to transfer to systems using different
 inputs, codes and environments. It often involves rewriting entire scripts in
 different languages to change from one type of atomistic potential or atomic
-structure to another. This leads to poor reproducability and inefficient
+structure to another. This leads to poor reproducibility and inefficient
 transfer of code from one researcher to the next. In addition, there exists a
 zoo of tools and packages for atomic simulation with more being developed every
 day `[Walsh:2024]`. There is however no unifying framework that can encompass
@@ -87,7 +86,7 @@ There exist a number of popular workflow tools for atomistic simulations such
 as Aiida `[@Hubar:2020]`, Fireworks `[@Anubhav:2015]` and many more. These
 tools provide frameworks for constructing complex workflows with different
 underlying principles. Some managers enforce strict rules that ensure that data
-obeys FAIR principles and emphasize data provenance and reproducibility. These
+obeys FAIR principles and emphasizes data provenance and reproducibility. These
 methods however tend to be fairly large packages with steep learning curves.
 ASIMTools provides a simple interface as a starting point that can transform
 any code into ASIMTools compatible code by simply wrapping it in a function
@@ -125,7 +124,7 @@ cumbersome at first, the benefit of this approach becomes apparent with
 repeated use and in high-throughput workflows. The global calc_input.yaml and
 env_input.yaml configuration files describe the possible calculators and
 environments respectively and are accessible to all simulations. Therefore they
-only need to be modified when new environments or calculators are configured
+only need to be modified when new environments or calculators are configured,
 which is rare. The asimmodule, a python module, forms the heart of the
 approach. A large library of asimmodules and corresponding examples are
 provided within ASIMTools for standard atomic calculations. Users can also
@@ -145,7 +144,7 @@ inline in a console to running it using the slurm scheduler without the need to
 write a job script. Just as well, the input image can be provided from any
 source e.g. a file, constructed using ASE as in Figure.
 \autoref{fig:singlepoint} or downloaded from Materials Project. This modularity
-without the need to touch any code or alter the simulation code, potentially
+without the need to touch any code or alter the simulation code and potentially
 introducing bugs, is useful for benchmarks and comparing parameter choices.
 
 ![Schematic showing the connection between the modular input yaml files. The sim_input.yaml is the main imput file which specifies the environment, calculator (if used) and asimmodule to be run.\label{fig:singlepoint}](figures/singlepoint.png){ width=100% }
@@ -160,14 +159,14 @@ ASIMTools automatically knows to submit jobs in parallel in slurm where
 possible without user intervention. Additionally, simulation protocols can be
 chained together if they have dependent results irrespective of whether they
 are run in slurm in different environments or in a console without user
-intervention. This means that once an asimmodule is written to perform a single
+Intervention with multiple examples provided. This means that once an asimmodule is written to perform a single
 simulation protocol using ASIMTools principles, it can immediately be run with
 any defined input structure, calculator on any computing environment at scale.
 
 Below is an example sim_input.yaml for performing a number of singlepoint
-calculations on strucutures with different lattice constants. Because the
+calculations on structures with different lattice constants. Because the
 calc_input.yaml, env_input.yaml and asimmodule were already defined before,
-they need not be defined again.
+they need not be defined again. The `key_sequence` determines the key that will be distributed with the values in `array_values`. In the example below, the sequence defines the lattice parameter a that is nested within image that is itself in args.
 
 ```
 asimmodule: workflows.sim_array
@@ -186,7 +185,7 @@ args:
 
 # Conclusion and Availability
 The ASIMTools package is a powerful tool for building and executing atomic
-simulation protocols locally at scale. The code is hosted on a public Github
+simulation protocols locally and at scale. The code is hosted on a public Github
 repository (https://github.com/BattModels/asimtools) with a number of examples.
 Interested users are encouraged to submit issues, contact developers and make
 pull requests, particularly for adding new simulation protocols to the library.
@@ -271,4 +270,5 @@ We acknowledge feedback from Kian Pu, Lance Kavalsky, Hancheng Zhao and Ziqi Wan
 	Keywords = {Research data, Theory and computation},
 	Pages = {16--17},
 } -->
+
 
