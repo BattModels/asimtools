@@ -67,7 +67,7 @@ def parse_command_line(args) -> Tuple[Dict, Dict, Dict]:
     if calc_input is not None:
         calc_input = read_yaml(calc_input)
 
-    workdir = Path(sim_input['workdir'])
+    workdir = Path(sim_input.get('workdir', 'results'))
 
     if workdir.exists() and args.force:
         if workdir.resolve() != Path('./').resolve():
