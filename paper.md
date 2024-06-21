@@ -19,7 +19,7 @@ affiliations:
    index: 1
  - name: Carnegie Mellon University
    index: 2
-date: 31 May 2024
+date: 17 June 2024
 bibliography: paper.bib
 
 # # Optional fields if submitting to a AAS journal too, see this blog post:
@@ -32,16 +32,17 @@ bibliography: paper.bib
 
 Atomic SIMulation Tools (`ASIMTools`) is a lightweight workflow and simulation
 manager for reproducible atomistic simulations on Unix-based systems. Within
-the framework, simulations can be transferred across computing environments, DFT codes,
-interatomic potentials and atomic structures. By using in-built or user-defined
-python modules (called asimmodules) and utilities, users can run simulation
-recipes and automatically scale them on slurm based clusters or locally on
-their console. The core idea is to separate the dependence of the atomistic
-potential/calculator, the computing environment and the simulation protocol
-thereby allowing the same simulation to be run with different calculators,
-structures or on different computers with just a change of one parameter in an
-input file after initial setup. This is increasingly necessary as benchmarking Machine Learning Interatomic Potentials has become a core part of
-computational materials science. Input and output files follow a simple
+the framework, simulations can be transferred across computing environments,
+DFT codes, interatomic potentials and atomic structures. By using in-built or
+user-defined python modules (called asimmodules) and utilities, users can run
+simulation recipes and automatically scale them on slurm based clusters or
+locally on their console. The core idea is to separate the dependence of the
+atomistic potential/calculator, the computing environment and the simulation
+protocol thereby allowing the same simulation to be run with different
+calculators, structures or on different computers with just a change of one
+parameter in an input file after initial setup. This is increasingly necessary
+as benchmarking Machine Learning Interatomic Potentials has become a core part
+of computational materials science. Input and output files follow a simple
 standard format, usually yaml, providing a simple interface that also acts as a
 record of the parameters used in a simulation without having to edit python
 scripts. The minimal set of requirements means any materials science codes can
@@ -57,13 +58,13 @@ different languages to change from one type of atomistic potential or atomic
 structure to another. This leads to poor reproducibility and inefficient
 transfer of code from one researcher to the next. In addition, there exists a
 zoo of tools and packages for atomic simulation with more being developed every
-day `[@walsh_open_2024]`. There is however no unifying framework that can encompass
-all these tools without significant software development effort. Significant
-effort should not be necessary because while the source of the fundamental
-outputs of atomistic potentials such as energy, forces etc. may differ,
-simulation protocols built on these outputs should converge towards the most
-accurate and computationally efficient. ASIMTools focuses on this last aspect
-by introducing asimmodules which are simply Python functions that act as
+day `[@walsh_open_2024]`. There is however no unifying framework that can
+encompass all these tools without significant software development effort.
+Significant effort should not be necessary because while the source of the
+fundamental outputs of atomistic potentials such as energy, forces etc. may
+differ, simulation protocols built on these outputs should converge towards the
+most accurate and computationally efficient. ASIMTools focuses on this last
+aspect by introducing asimmodules which are simply Python functions that act as
 simulation protocols which have no dependence on a specific atomistic potential
 or computational environment or atomic structure. Through iteration and
 community input, these simulation protocols will hopefully converge towards
@@ -76,36 +77,38 @@ can be easily added to the library of provided asimmodules and iterated on.
 This will allow the community to develop a robust set of shareable simulation
 protocols. The flexibility of ASIMTools allows integration of any kind of
 simulation tools such as the heavily used Atomic Simulation Environment
-`[@larsen_atomic_2017]` pymatgen `[@ong_python_2013]`, LAMMPS `[@thompson_lammps_2022]` etc. with
-examples provided. With the asimmodules defined, users only need to provide a
-set of inputs in the form of yaml files that define the parameters used for
-each simulation and are therefore a concrete record of used parameters. 
+`[@larsen_atomic_2017]` pymatgen `[@ong_python_2013]`, LAMMPS
+`[@thompson_lammps_2022]` etc. with examples provided. With the asimmodules
+defined, users only need to provide a set of inputs in the form of yaml files
+that define the parameters used for each simulation and are therefore a
+concrete record of used parameters. 
 
 # State of the Field
 There exist a number of popular workflow tools for atomistic simulations such
-as Aiida `[@huber_aiida_2020]`, Fireworks `[@jain_fireworks_2015]` and many more. These
-tools provide frameworks for constructing complex workflows with different
-underlying principles. Some managers enforce strict rules that ensure that data
-obeys FAIR principles and emphasizes data provenance and reproducibility. These
-methods however tend to be fairly large packages with steep learning curves.
-ASIMTools provides a simple interface as a starting point that can transform
-any code into ASIMTools compatible code by simply wrapping it in a function
-that returns a Python dictionary. Any such code can work in ASIMTools and with
-a few extra steps, the protocol can be made to support an arbitrary calculator
-and input structure.
+as Aiida `[@huber_aiida_2020]`, Fireworks `[@jain_fireworks_2015]` and many
+more. These tools provide frameworks for constructing complex workflows with
+different underlying principles. Some managers enforce strict rules that ensure
+that data obeys FAIR principles and emphasizes data provenance and
+reproducibility. These methods however tend to be fairly large packages with
+steep learning curves. ASIMTools provides a simple interface as a starting
+point that can transform any code into ASIMTools compatible code by simply
+wrapping it in a function that returns a Python dictionary. Any such code can
+work in ASIMTools and with a few extra steps, the protocol can be made to
+support an arbitrary calculator and input structure.
 
-In some workflow managers, such as Atomic Simulation Recipes `[@gjerding_atomic_2021]`,
-once workflows are built, it can often be difficult to quickly change and
-iterate over key parameters such as the choice of atomistic calculator or
-structure as they are intrinsically built into the code. This is particularly
-challenging in an age where machine learning models are becoming more popular.
-Workflows involving machine learning interatomic potentials tend to require the
-ability to repeat the same calculations on different examples, using different
-calculators on different hardware iteratively. This is where the value of
-ASIMTools lies in contrast to more established workflows. ASIMTools is not
-designed to replace the more powerful workflow managers but rather to
-supplement them. This is achieved by providing unified inputs that can be
-easily integrated into, for example, Aiida as Python functions/asimmodules
+In some workflow managers, such as Atomic Simulation Recipes
+`[@gjerding_atomic_2021]`, once workflows are built, it can often be difficult
+to quickly change and iterate over key parameters such as the choice of
+atomistic calculator or structure as they are intrinsically built into the
+code. This is particularly challenging in an age where machine learning models
+are becoming more popular. Workflows involving machine learning interatomic
+potentials tend to require the ability to repeat the same calculations on
+different examples, using different calculators on different hardware
+iteratively. This is where the value of ASIMTools lies in contrast to more
+established workflows. ASIMTools is not designed to replace the more powerful
+workflow managers but rather to supplement them. This is achieved by providing
+unified inputs that can be easily integrated into, for example, Aiida as Python
+functions/asimmodules
 while also being a stand-alone lightweight workflow manager for simpler cases.
 
 # Examples
@@ -159,14 +162,18 @@ ASIMTools automatically knows to submit jobs in parallel in slurm where
 possible without user intervention. Additionally, simulation protocols can be
 chained together if they have dependent results irrespective of whether they
 are run in slurm in different environments or in a console without user
-Intervention with multiple examples provided. This means that once an asimmodule is written to perform a single
-simulation protocol using ASIMTools principles, it can immediately be run with
-any defined input structure, calculator on any computing environment at scale.
+Intervention with multiple examples provided. This means that once an
+asimmodule is written to perform a single simulation protocol using ASIMTools
+principles, it can immediately be run with any defined input structure,
+calculator on any computing environment at scale.
 
 Below is an example sim_input.yaml for performing a number of singlepoint
 calculations on structures with different lattice constants. Because the
 calc_input.yaml, env_input.yaml and asimmodule were already defined before,
-they need not be defined again. The `key_sequence` determines the key that will be distributed with the values in `array_values`. In the example below, the sequence defines the lattice parameter a that is nested within image that is itself in args.
+they need not be defined again. The `key_sequence` determines the key that will
+be distributed with the values in `array_values`. In the example below, the
+sequence defines the lattice parameter a that is nested within image that is
+itself in args.
 
 ```
 asimmodule: workflows.sim_array
