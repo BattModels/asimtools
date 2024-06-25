@@ -111,6 +111,12 @@ unified inputs that can be easily integrated into, for example, Aiida as Python
 functions/asimmodules
 while also being a stand-alone lightweight workflow manager for simpler cases.
 
+# Usage To-Date
+
+ASIMTools has been used in the benchmarking Machine Learning Interatomic
+Potentials [@phuthi_accurate_2024] and creating a workflow for calculation of
+vibrational properties of solids calculations [@phuthi_vibrational_2024].
+
 # Examples
 We present two examples of simulation protocols, many more can be found in the
 ASIMTools documentation.
