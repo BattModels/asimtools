@@ -14,6 +14,10 @@ authors:
     orcid: 0000-0001-5035-7807
     equal-contrib: false
     affiliation: "2" # (Multiple affiliations must be quoted)
+  - name: Venkatasubramanian Viswanathan
+    orcid: 0000-0003-1060-5495
+    equal-contrib: false
+    affiliation: "1" # (Multiple affiliations must be quoted)
 affiliations:
  - name: University of Michigan
    index: 1
