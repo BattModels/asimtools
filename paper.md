@@ -19,9 +19,9 @@ authors:
     equal-contrib: false
     affiliation: "1" # (Multiple affiliations must be quoted)
 affiliations:
- - name: University of Michigan
+ - name: University of Michigan, United States
    index: 1
- - name: Carnegie Mellon University
+ - name: Carnegie Mellon University, United States
    index: 2
 date: 17 June 2024
 bibliography: paper.bib
@@ -39,25 +39,25 @@ manager for reproducible atomistic simulations on Unix-based systems. Within
 the framework, simulations can be transferred across computing environments,
 DFT codes, interatomic potentials and atomic structures. By using in-built or
 user-defined python modules (called asimmodules) and utilities, users can run
-simulation recipes and automatically scale them on slurm based clusters or
+simulation protocols and automatically scale them on slurm based clusters or
 locally on their console. The core idea is to separate the dependence of the
 atomistic potential/calculator, the computing environment and the simulation
 protocol thereby allowing the same simulation to be run with different
-calculators, structures or on different computers with just a change of one
-parameter in an input file after initial setup. This is increasingly necessary
-as benchmarking Machine Learning Interatomic Potentials has become a core part
-of computational materials science. Input and output files follow a simple
-standard format, usually yaml, providing a simple interface that also acts as a
-record of the parameters used in a simulation without having to edit python
-scripts. The minimal set of requirements means any materials science codes can
-be incorporated into an ASIMTools workflow in a unified way.
+calculators, atomic structures or on different computers with just a change of
+one parameter in an input file after initial setup. This is increasingly
+necessary as benchmarking Machine Learning Interatomic Potentials has become a
+core part of computational materials science. Input and output files follow a
+simple standard format, usually yaml, providing a simple interface that also
+acts as a record of the parameters used in a simulation without having to edit
+python scripts. The minimal set of requirements means any materials science
+codes can be incorporated into an ASIMTools workflow in a unified way.
 
 # Statement of need
 
 Atomic simulations are a key component of modern day materials science in both
 academia and industry. However, simulation protocols and workflows used by
 researchers are typically difficult to transfer to systems using different
-inputs, codes and environments. It often involves rewriting entire scripts in
+inputs, codes and computing environments. It often involves rewriting entire scripts in
 different languages to change from one type of atomistic potential or atomic
 structure to another. This leads to poor reproducibility and inefficient
 transfer of code from one researcher to the next. In addition, there exists a
@@ -75,11 +75,10 @@ community input, these simulation protocols will hopefully converge towards
 best practice and ensure reproducibility of simulation results.
 
 `ASIMTools` is for users interested in performing atomistic calculations on
-UNIX-like operating systems and/or on slurm based High Performance Computing
-clusters. By defining simulation protocols as functions in "asimmodules", they
+UNIX-like operating systems and/or on slurm-based High Performance Computing
+clusters. By defining simulation protocols as "asimmodules", they
 can be easily added to the library of provided asimmodules and iterated on.
-This will allow the community to develop a robust set of shareable simulation
-protocols. The flexibility of ASIMTools allows integration of any kind of
+The flexibility of ASIMTools allows integration of any kind of
 simulation tools such as the heavily used Atomic Simulation Environment
 [@larsen_atomic_2017] pymatgen [@ong_python_2013], LAMMPS
 [@thompson_lammps_2022] etc. with examples provided. With the asimmodules
@@ -98,22 +97,22 @@ steep learning curves. ASIMTools provides a simple interface as a starting
 point that can transform any code into ASIMTools compatible code by simply
 wrapping it in a function that returns a Python dictionary. Any such code can
 work in ASIMTools and with a few extra steps, the protocol can be made to
-support an arbitrary calculator and input structure.
+support an arbitrary calculator and input atomic structure.
 
 In some workflow managers, such as Atomic Simulation Recipes
-[@gjerding_atomic_2021], once workflows are built, it can often be difficult
-to quickly change and iterate over key parameters such as the choice of
-atomistic calculator or structure as they are intrinsically built into the
-code. This is particularly challenging in an age where machine learning models
-are becoming more popular. Workflows involving machine learning interatomic
-potentials tend to require the ability to repeat the same calculations on
-different examples, using different calculators on different hardware
-iteratively. This is where the value of ASIMTools lies in contrast to more
-established workflows. ASIMTools is not designed to replace the more powerful
-workflow managers but rather to supplement them. This is achieved by providing
-unified inputs that can be easily integrated into, for example, Aiida as Python
-functions/asimmodules
-while also being a stand-alone lightweight workflow manager for simpler cases.
+[@gjerding_atomic_2021], once workflows are built, it can often be difficult to
+quickly change and iterate over key parameters such as the choice of atomistic
+calculator or structure as they are intrinsically built into the code. This is
+particularly challenging in an age where machine learning models are becoming
+more popular. Workflows involving machine learning interatomic potentials tend
+to require the ability to repeat the same calculations on different examples,
+using different calculators on different hardware iteratively. This is where
+the value of ASIMTools lies in contrast to more established workflows.
+ASIMTools is not designed to replace the more powerful workflow managers but
+rather to supplement them. This is achieved by providing unified inputs that
+can be easily integrated into, for example, Aiida as Python
+functions/asimmodules while also being a stand-alone lightweight workflow
+manager for simpler cases.
 
 # Usage To-Date
 
@@ -121,7 +120,7 @@ ASIMTools has been used in the benchmarking Machine Learning Interatomic
 Potentials [@phuthi_accurate_2024] and creating a workflow for calculation of
 vibrational properties of solids calculations [@phuthi_vibrational_2024].
 
-# Examples
+<!-- # Examples
 We present two examples of simulation protocols, many more can be found in the
 ASIMTools documentation.
 
@@ -198,94 +197,25 @@ args:
 				name: Ar
 				crystalstructure: fcc
 				a: null  # Iterate over this value
-```
+``` -->
 
 # Conclusion and Availability
 The ASIMTools package is a powerful tool for building and executing atomic
-simulation protocols locally and at scale. The code is hosted on a public Github
-repository (https://github.com/BattModels/asimtools) with a number of examples.
+simulation protocols locally and at scale on slurm-based HPC infrastructure.
+The code is hosted on a public Github repository
+(https://github.com/BattModels/asimtools) with a number of examples.
+Asimmodules for common calculations are also implemeted with examples.
 Interested users are encouraged to submit issues, contact developers and make
 pull requests, particularly for adding new simulation protocols to the library.
 
-<!-- # Mathematics
-
-Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
-
-Double dollars make self-standing equations: -->
-
-<!-- # Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferredp
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)" -->
-
 # Author Contribution Statement
 
-Conceptualization by Keith Phuthi. Coding and development by Keith Phuthi and Emil Annevelink. Paper writing by Keith Phuthi. Project management by all.
-
-<!-- # Figures
-
-Figures can be included like this: -->
-<!-- ![Schematic showing the connection between the modular input yaml files. The sim_input.yaml is the main imput file which specifies the environment, calculator (if used) and asimmodule to be run.\label{fig:singlepoint}](figures/singlepoint.png) -->
-
-<!-- ![Schematic showing the connection between the modular input yaml files. The sim_input.yaml is the main imput file which specifies the environment, calculator (if used) and asimmodule to be run.\label{fig:singlepoint}](singlepoint.pdf){ width=100% }
-and referenced from text using \autoref{fig:example}. -->
+Conceptualization by Keith Phuthi. Coding and development by Keith Phuthi and
+Emil Annevelink. Paper writing by Keith Phuthi. Project management by all.
 
 # Acknowledgements
 
-We acknowledge feedback from Kian Pu, Lance Kavalsky, Hancheng Zhao and Ziqi Wang.
+We acknowledge feedback from Kian Pu, Lance Kavalsky, Hancheng Zhao and Ziqi
+Wang.
 
-<!-- # References -->
-<!-- Example paper.bib file:
-
-@article{Pearson:2017,
-  	url = {http://adsabs.harvard.edu/abs/2017arXiv170304627P},
-  	Archiveprefix = {arXiv},
-  	Author = {{Pearson}, S. and {Price-Whelan}, A.~M. and {Johnston}, K.~V.},
-  	Eprint = {1703.04627},
-  	Journal = {ArXiv e-prints},
-  	Keywords = {Astrophysics - Astrophysics of Galaxies},
-  	Month = mar,
-  	Title = {{Gaps in Globular Cluster Streams: Pal 5 and the Galactic Bar}},
-  	Year = 2017
-}
-
-@book{Binney:2008,
-  	url = {http://adsabs.harvard.edu/abs/2008gady.book.....B},
-  	Author = {{Binney}, J. and {Tremaine}, S.},
-  	Booktitle = {Galactic Dynamics: Second Edition, by James Binney and Scott Tremaine.~ISBN 978-0-691-13026-2 (HB).~Published by Princeton University Press, Princeton, NJ USA, 2008.},
-  	Publisher = {Princeton University Press},
-  	Title = {{Galactic Dynamics: Second Edition}},
-  	Year = 2008
-}
-
-@article{Walsh:2024,
-	Title = {Open computational materials science},
-	Volume = {23},
-	copyright = {2024 Springer Nature Limited},
-	issn = {1476-4660},
-	url = {https://www.nature.com/articles/s41563-023-01699-7},
-	doi = {10.1038/s41563-023-01699-7},
-	Abstract = {The materials modelling community is emerging as a champion for reproducible and reusable science. Aron Walsh discusses how FAIR databases, collaborative codes and transparent workflows are advancing this movement.},
-	Language = {en},
-	Number = {1},
-	urldate = {2024-01-11},
-	Journal = {Nature Materials},
-	Author = {Walsh, Aron},
-	Month = jan,
-	Year = {2024},
-	Note = {Number: 1
-  Publisher: Nature Publishing Group},
-	Keywords = {Research data, Theory and computation},
-	Pages = {16--17},
-} -->
-
-
+# References
