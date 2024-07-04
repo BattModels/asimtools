@@ -1,0 +1,12 @@
+asimmodule: geometry_optimization.refined_symmetric_cell_relax
+workdir: cell_relax_results
+env_id: highmem
+args:
+  rough_calc_id: MACE32_medium_cpu
+  refined_calc_id: MACE64_medium
+  image:
+    name: Li
+    repeat: [3,3,3]
+    rattle_stdev: 0.1
+  fmax: 0.005  # See ASE docs StrainFilter for best choices for setting this
+
