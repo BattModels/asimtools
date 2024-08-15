@@ -817,8 +817,13 @@ class ChainedJob(Job):
                     if not cur_step_complete:
                         slurm_flags = unitjob.env['slurm']['flags']
                         if isinstance(slurm_flags, list):
+                            job_name = unitjob.sim_input.get('job_name',False)
+                            if not job_name:
+                                job_name = f'-J step-{step+i}'
+                            else:
+                                job_name = f'-J step-{step+i}-{job_name}'
                             unitjob.env['slurm']['flags'].append(
-                                f'-J step-{step+i}'
+                                job_name
                             )
                         elif isinstance(slurm_flags, dict):
                             unitjob.env['slurm']['flags']['-J'] = \
