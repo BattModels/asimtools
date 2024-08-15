@@ -25,6 +25,7 @@ def qha_properties(
     volumes = ev_df['volumes'].to_numpy()
     energies = ev_df['energies'].to_numpy()
     thermal_properties_files = glob(thermal_properties_file_pattern)
+    thermal_properties_files = sorted(thermal_properties_files)
     assert len(thermal_properties_files) > 0, \
         f'No files matching {thermal_properties_file_pattern} in {os.getcwd()}'
 
