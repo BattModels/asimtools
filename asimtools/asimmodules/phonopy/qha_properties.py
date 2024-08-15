@@ -13,7 +13,7 @@ from phonopy import PhonopyQHA
 
 def qha_properties(
     ev_csv: str,
-    phonopy_save_path: str,
+    # phonopy_save_path: str,
     thermal_properties_file_pattern: str,
     pressure: Optional[float] = None,
     t_min: float = 0,

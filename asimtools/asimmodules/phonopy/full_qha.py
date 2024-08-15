@@ -80,7 +80,7 @@ def full_qha(
                                             },
                                             'supercell': supercell,
                                             'distance': 0.02,
-                                            'phonopy_save_path': phonopy_save_path,
+                                            'phonopy_save_path': '../'+phonopy_save_path,
                                         },
                                     },
                                     'step-1': {
@@ -99,7 +99,7 @@ def full_qha(
                                         'env_id': process_env_id,
                                         'args': {
                                             'supercell_image_file_pattern': '../step-1/id-*/image_output.xyz',
-                                            'phonopy_save_path': phonopy_save_path,
+                                            'phonopy_save_path': '../'+phonopy_save_path,
                                             'use_seekpath': True,
                                         },
                                     },
@@ -107,7 +107,7 @@ def full_qha(
                                         'asimmodule': 'phonopy.thermal_properties',
                                         'env_id': process_env_id,
                                         'args': {
-                                            'phonopy_save_path': phonopy_save_path,
+                                            'phonopy_save_path': '../'+phonopy_save_path,
                                             't_max': t_max,
                                             'suffix': {}
                                         },
@@ -127,7 +127,7 @@ def full_qha(
                     'env_id': process_env_id,
                     'args': {
                         'ev_csv': '../step-0/eos.csv',
-                        'phonopy_save_path': phonopy_save_path,
+                        # 'phonopy_save_path': phonopy_save_path,
                         'thermal_properties_file_pattern': '../step-1/id-*/step-3/thermal_properties-*.yaml',
                         't_max': t_max - 10,
                         'pressure': pressure,
