@@ -5,7 +5,6 @@ from asimtools.job import UnitJob
 def full_qha(
     image: Dict,
     calc_id: str,
-    phonopy_save_path: str,
     calc_env_id: Optional[str] = None,
     process_env_id: Optional[str] = None,
     ase_cubic_eos_args: Optional[Dict] = None,
@@ -21,9 +20,6 @@ def full_qha(
     :type image: Dict
     :param calc_id: calc_id
     :type calc_id: str
-    :param phonopy_save_path: Path where phonopy save yaml is saved, this file
-        is important to keep for easier postprocess/analsyis
-    :type phonopy_save_path: str
     :param calc_env_id: env_id for running calculator, defaults to None
     :type calc_env_id: Optional[str], optional
     :param process_env_id: env_id for running light pre/post-processing, 
@@ -43,7 +39,6 @@ def full_qha(
     :rtype: Dict
     """
 
-    phonopy_save_path = str(Path(phonopy_save_path).resolve())
     ase_cubic_eos_args['image'] = image
     ase_cubic_eos_args['calc_id'] = calc_id
     scales = ase_cubic_eos_args.get('scales', False)
@@ -80,7 +75,7 @@ def full_qha(
                                             },
                                             'supercell': supercell,
                                             'distance': 0.02,
-                                            'phonopy_save_path': '../'+phonopy_save_path,
+                                            'phonopy_save_path': '../phonopy_save.yaml',
                                         },
                                     },
                                     'step-1': {
@@ -99,7 +94,7 @@ def full_qha(
                                         'env_id': process_env_id,
                                         'args': {
                                             'supercell_image_file_pattern': '../step-1/id-*/image_output.xyz',
-                                            'phonopy_save_path': '../'+phonopy_save_path,
+                                            'phonopy_save_path': '../phonopy_save.yaml',
                                             'use_seekpath': True,
                                         },
                                     },
@@ -107,7 +102,7 @@ def full_qha(
                                         'asimmodule': 'phonopy.thermal_properties',
                                         'env_id': process_env_id,
                                         'args': {
-                                            'phonopy_save_path': '../'+phonopy_save_path,
+                                            'phonopy_save_path': '../phonopy_save.yaml',
                                             't_max': t_max,
                                             'suffix': {}
                                         },
@@ -127,7 +122,6 @@ def full_qha(
                     'env_id': process_env_id,
                     'args': {
                         'ev_csv': '../step-0/eos.csv',
-                        # 'phonopy_save_path': phonopy_save_path,
                         'thermal_properties_file_pattern': '../step-1/id-*/step-3/thermal_properties-*.yaml',
                         't_max': t_max - 10,
                         'pressure': pressure,
