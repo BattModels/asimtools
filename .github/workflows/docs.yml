@@ -15,7 +15,9 @@ jobs:
           python-version: '3.9'
       - name: Install dependencies
         run: |
-          pip install sphinx sphinx_rtd_theme myst_parser autodoc asimtools
+          pip install sphinx sphinx_rtd_theme myst_parser autodoc
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -e .
       - name: Sphinx build
         run: |
           sphinx-build docs docs_build
