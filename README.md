@@ -18,7 +18,8 @@ simulations steps thereby allowing the same simulation to be run with multiple
 calculators/codes and the same calculator to be used for multiple simulation
 parameters without altering simulation code. Input and output files follow a
 simple consisten file structure and format so that consistent analysis
-pipelines can be used across users
+pipelines can be used across users. For a concrete example of how ASIMTools
+achieves this, see the [Developing Custom Asimmodules](https://eeg.engin.umich.edu/asimtools/asimplify.html) page
 
 ## Developer philosophy
 The goal of asimtools is to push all the complexity of workflow management,
@@ -65,25 +66,43 @@ up an issue on github!
 These instructions will give you a copy of the project up and running.
 
 ### Installing ASIMTools
-You can install asimtools in a new conda environment using:
+
+If you prefer to use a conda a environment, you can create and activate one
+using: 
 ```
 conda create -n asimtools python=3.9
 conda activate asimtools
+```
 
-git clone https://gitlab.com/ase/ase.git && cd ase
-pip install .
-cd ../
+Then you can install asimtools either using pip or by cloning the source code
+from github. Note that the cloned version might have some minor bug fixes that
+are not included in the official PyPI release. It is also easier to go through
+the examples if you clone the repository.
+
+To install the latest asimtools release from PyPI, you can simply use
+
+```
+pip install asimtools
+```
+
+To install from source use
+
+```
+git clone
+https://gitlab.com/ase/ase.git && cd ase pip install . cd ../
 
 git clone https://github.com/BattModels/asimtools.git
 cd asimtools
 pip install .
 ```
 
-You can also choose to use the PyPI and conda versions of ASE which are
-currently quite outdated using the following instead
+You can also choose to use the latest version of ASE since the ones on PyPI and
+conda are quite outdated.
 
 ```
-conda install ase -c conda-forge
+git clone https://gitlab.com/ase/ase.git
+cd ase
+pip install .
 ```
 
 Individual calculators may need external packages for running them. For example
