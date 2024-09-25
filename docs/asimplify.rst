@@ -251,7 +251,7 @@ env_input.yaml:
             use_slurm: false
             interactive: true
 
-#. Running multiple simulations in a workflow
+6. Running multiple simulations in a workflow
 ---------------------------------------------
 Going back to the original problem, we wanted to run the simulation of multiple
 different elements with the EMT calculator. To achieve that in parallel, we can
