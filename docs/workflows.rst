@@ -23,6 +23,10 @@ are:
    the other, e.g. if step 2 results depend on step 1 etc. This allows building
    multi-step workflows.
 
+#. :func:`asimtools.asimmodules.iterative.iterative` - Run the same asimmodule
+   over and over until some condition is reached. This asimmodule is still
+   under active development
+
 Examples for each type of workflow are given in the examples directory and
 documentation can be found in :mod:`asimtools.asimmodules`. They also serve as
 templates for you to build your own workflows directly using
