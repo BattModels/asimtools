@@ -17,9 +17,9 @@ to separate the dependence of the atomistic potential/calculator and the
 simulations steps thereby allowing the same simulation to be run with multiple
 calculators/codes and the same calculator to be used for multiple simulation
 parameters without altering simulation code. Input and output files follow a
-simple consisten file structure and format so that consistent analysis
+simple consistent file structure and format so that consistent analysis
 pipelines can be used across users. For a concrete example of how ASIMTools
-achieves this, see the [Developing Custom Asimmodules](https://eeg.engin.umich.edu/asimtools/asimplify.html) page
+achieves this, see the [Developing Custom Asimmodules](https://eeg.engin.umich.edu/asimtools/asimplify.html) page.
 
 ## Developer philosophy
 The goal of asimtools is to push all the complexity of workflow management,
