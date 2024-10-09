@@ -1,0 +1,601 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Running an Existing Asimmodule &mdash; asimtools 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Developing Custom Asimmodules" href="asimplify.html" />
+    <link rel="prev" title="README" href="include_readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="include_readme.html">README</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Running asimmodules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#input-files">Input files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#env-input-yaml">env_input.yaml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#calc-input-yaml">calc_input.yaml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sim-input-yaml">sim_input.yaml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#specifying-images-atoms">Specifying Images/Atoms</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#usage-of-asim-execute-and-asim-run">Usage of asim-execute and asim-run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#output-files">Output files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checking-job-status-and-restarting-failed-jobs">Checking job status and Restarting failed jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#importing-functions-from-asimmodules-and-the-api">Importing functions from asimmodules and the API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="asimplify.html">Custom asimmodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflows.html">Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="include_contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asimtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Running an Existing Asimmodule</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="running-an-existing-asimmodule">
+<h1>Running an Existing Asimmodule<a class="headerlink" href="#running-an-existing-asimmodule" title="Link to this heading"></a></h1>
+<p>This section will guide you through running an already existing asimmodule
+whether it be one of the asimmodules provided in the main repository, from the
+asimmodule repository or a custom asimmodule you have written yourself.</p>
+<p>To run a simulation, all you need to do is run either of the following
+commands:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">asim-execute sim_input.yaml -c calc_input.yaml -e env_input.yaml</span>
+</pre></div>
+</div>
+<p>Providing <code class="docutils literal notranslate"><span class="pre">calc_input.yaml</span></code> or <code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> is optional. If not
+provided, the globally configured files will be used. See <a class="reference internal" href="#envinput"><span class="std std-ref">env_input.yaml</span></a>. This
+command will automatically run the specified simulation in the correct
+directory and environment.</p>
+<p>In rare cases, you can use the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">asim-run sim_input.yaml -c calc_input.yaml</span>
+</pre></div>
+</div>
+<p>This command will run the simulation in the current directory and environment.
+For most cases, you will only ever use <code class="docutils literal notranslate"><span class="pre">asim-execute</span></code>. The differences
+between <code class="docutils literal notranslate"><span class="pre">asim-execute</span></code> and <code class="docutils literal notranslate"><span class="pre">asim-run</span></code> are explained in
+<a class="reference internal" href="#asimrunvsasimexecute"><span class="std std-ref">Usage of asim-execute and asim-run</span></a>.</p>
+<p id="inputs">In summary, the steps you need to take to start using any of the in-built
+asimmodules, described in detail below, are the following:</p>
+<ol class="arabic simple">
+<li><p>Install ASIMTools in you python environment or add it to your
+<code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>.</p></li>
+<li><p>Setup your global <code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">calc_input.yaml</span></code> and set the
+environment variables pointing to them.</p></li>
+<li><p>Write a <code class="docutils literal notranslate"><span class="pre">sim_input.yaml</span></code> based on the examples provided in the repository.
+Do not hesitate to submit an issue if you are confused as we are still in a
+testing phase</p></li>
+<li><p>asim-execute!</p></li>
+</ol>
+<section id="input-files">
+<h2>Input files<a class="headerlink" href="#input-files" title="Link to this heading"></a></h2>
+<section id="env-input-yaml">
+<span id="envinput"></span><h3>env_input.yaml<a class="headerlink" href="#env-input-yaml" title="Link to this heading"></a></h3>
+<p>One can provide an <code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> file that details the kind
+of environments in which asimmodules can be run. This file can be provided with
+the asim-execute command using the <code class="docutils literal notranslate"><span class="pre">-e</span></code> flag or set globally. An example of
+an env_input.yaml file is given below</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># template</span>
+<span class="nt">env_id</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">mode</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">use_slurm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">interactive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">run_prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="w">    </span><span class="nt">run_suffix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="w">  </span><span class="nt">slurm</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">flags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">flag1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">flag2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">...</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">precommands</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">precommand1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">precommand2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">...</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">postcommands</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">postcommand1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">postcommand2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">...</span><span class="p p-Indicator">]</span>
+
+<span class="c1"># Concrete examples below</span>
+<span class="nt">inline</span><span class="p">:</span><span class="w"> </span><span class="c1"># Run the asimmodule directly in the console</span>
+<span class="w">  </span><span class="nt">mode</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">use_slurm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">interactive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="nt">batch_job</span><span class="p">:</span><span class="w"> </span><span class="c1"># Submit a batch job using slurm with 2 tasks</span>
+<span class="w">  </span><span class="nt">mode</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">use_slurm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">interactive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">  </span><span class="nt">slurm</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">flags</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-n 2</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--mem-per-cpu=2G</span>
+<span class="w">    </span><span class="nt">precommands</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source ~/.bashrc</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda activate asimtools</span>
+<span class="w">    </span><span class="nt">postcommands</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda deactivate asimtools</span>
+<span class="c1"># Submit an interactive job using slurm, you can use a dictionary</span>
+<span class="c1"># for the flags</span>
+<span class="nt">interactive_job</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">mode</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">use_slurm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">interactive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">slurm</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">flags</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">-n</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">--gres</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gpu:2</span>
+<span class="w">    </span><span class="nt">precommands</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">module load lammps</span>
+</pre></div>
+</div>
+<p>The highest level key is the <code class="docutils literal notranslate"><span class="pre">env_id</span></code> which is the one specified in the
+<code class="docutils literal notranslate"><span class="pre">sim_input.yaml</span></code>. An <code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> can have any number of <code class="docutils literal notranslate"><span class="pre">env_id</span></code> s.
+That way you can specify one global file if you use the same environments
+repeatedly. You can configure a global config file by setting
+the environment variable.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">export ASIMTOOLS_ENV_INPUT=/path/to/my/global/env_input.yaml</span>
+</pre></div>
+</div>
+<p>If you do not provide an <code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> and there is no file called
+<code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> in the work directory, ASIMTools will look for the
+<code class="docutils literal notranslate"><span class="pre">env_id</span></code> in the global file.</p>
+<p>The parameters, required, shown in the template section are described below</p>
+<ul class="simple">
+<li><p><strong>env_id</strong>: (str) unique key for identifying the environment, <code class="docutils literal notranslate"><span class="pre">env_id</span></code> in
+<code class="docutils literal notranslate"><span class="pre">sim_input.yaml</span></code> must match one of the <code class="docutils literal notranslate"><span class="pre">env_id</span></code> s defined in the
+<code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> being used.</p></li>
+<li><p><strong>env_id.mode.use_slurm</strong>: (bool) whether or not to request a slurm
+allocation to run the asimmodule</p></li>
+<li><p><strong>env_id.mode.interactive</strong>: (bool) whether or not to run the asimmodule
+directly in the terminal (using <code class="docutils literal notranslate"><span class="pre">salloc</span></code>) or to submit a batch job (using
+<code class="docutils literal notranslate"><span class="pre">sbatch</span></code>).</p></li>
+<li><p><strong>env_id.mode.run_prefix</strong>: (str) string to append before running the
+asimmodule e.g. if <code class="docutils literal notranslate"><span class="pre">run_prefix=mpirun</span></code> the asimmodule will be invoked with
+the equivalent of <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">python</span> <span class="pre">my_asimmodule.py</span></code>. <code class="docutils literal notranslate"><span class="pre">run_prefix</span></code> in
+<code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> is always prepended before the one provided by
+<code class="docutils literal notranslate"><span class="pre">calc_input.yaml</span></code>.</p></li>
+<li><p><strong>env_id.mode.run_suffix</strong>: (str) string to append after running the
+asimmodule e.g. if <code class="docutils literal notranslate"><span class="pre">run_suffix:</span> <span class="pre">'</span> <span class="pre">&amp;&gt;</span> <span class="pre">out.txt'</span></code> is provided, the asimmodule
+will be invoked with the equivalent of <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">my_asimmodule.py</span> <span class="pre">&amp;&gt;</span>
+<span class="pre">out.txt</span></code>. <code class="docutils literal notranslate"><span class="pre">run_suffix</span></code> in <code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> is always appended after the
+one provided by <code class="docutils literal notranslate"><span class="pre">calc_input.yaml</span></code>.</p></li>
+<li><p><strong>env_id.slurm.flags</strong>: (list/dict, optional) The slurm flags for the
+allocation as a list of flags e.g. <code class="docutils literal notranslate"><span class="pre">[-n</span> <span class="pre">4,</span> <span class="pre">-N</span> <span class="pre">1]</span></code>. One can also specify a
+dictionary e.g. <code class="docutils literal notranslate"><span class="pre">'{-n':</span> <span class="pre">4,</span> <span class="pre">'-N':</span> <span class="pre">1,</span> <span class="pre">'--mem':2G}</span></code></p></li>
+<li><p><strong>env_id.slurm.precommands</strong>: (list, optional) Commands to be run/added to
+the job script before running the asimmodule. A common use case is loading
+a module or activating an environment.</p></li>
+<li><p><strong>env_id.slurm.postcommands</strong>: (list, optional) Commands to be run/added to
+the job asimmodule after running the asimmodule. e.g. for file cleanup or
+moving files after the job is complete.</p></li>
+</ul>
+</section>
+<section id="calc-input-yaml">
+<span id="calcinput"></span><h3>calc_input.yaml<a class="headerlink" href="#calc-input-yaml" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">calc_input.yaml</span></code> is used to configure an ASE calculator. As
+above, a global configuration file can be set using</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">export ASIMTOOLS_CALC_INPUT=/path/to/my/global/calc_input.yaml</span>
+</pre></div>
+</div>
+<p>or provided to asim-execute at run time. Note that if you launch a chained
+workflow with <code class="docutils literal notranslate"><span class="pre">asim-run</span></code> instead of <code class="docutils literal notranslate"><span class="pre">asim-execute</span></code>, asimmodules farther
+down the chain will use the global <code class="docutils literal notranslate"><span class="pre">calc_input.yaml</span></code>, so always use
+<code class="docutils literal notranslate"><span class="pre">asim-execute</span></code></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Template</span>
+<span class="nt">calc_id</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="w">  </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="w">  </span><span class="nt">precommands</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">precommand1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">...</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">postcommands</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">postcommand1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">...</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">run_prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="w">  </span><span class="nt">run_suffix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">arg1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">value_1</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+
+<span class="c1"># Concrete examples</span>
+<span class="c1"># Here is a simple LJ potential from ASE</span>
+<span class="nt">lj</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LennardJones</span>
+<span class="w">  </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase.calculators.lj</span>
+<span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">sigma</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.54</span>
+<span class="w">    </span><span class="nt">epsilon</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.00802236</span>
+
+<span class="c1"># GPAW needs a run_prefix to work in parallel using mpirun</span>
+<span class="nt">gpaw</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GPAW</span>
+<span class="w">  </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gpaw.calculator</span>
+<span class="w">  </span><span class="nt">run_prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun</span>
+<span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">kpts</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="nv">2</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">h</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">    </span><span class="nt">xc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PBE</span>
+<span class="w">    </span><span class="nt">txt</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gpaw_output.txt</span>
+
+<span class="c1"># You can install a universal potential like MACE and define it as well, see</span>
+<span class="c1"># asimtools/calculators.py for implemented external calculators. Submit an</span>
+<span class="c1"># issue if you want one to be implemented.</span>
+<span class="nt">MACE32-medium</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MACE</span>
+<span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">medium</span>
+<span class="w">    </span><span class="nt">use_device</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cuda</span>
+</pre></div>
+</div>
+<p>The parameters for the calculators provided directly in ASE are specified under
+the assumption that the calculator will be initiated as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">module</span> <span class="kn">import</span> <span class="n">name</span>
+<span class="n">calc</span> <span class="o">=</span> <span class="n">name</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This works for all calculators defined in ASE v3.22 and below, for newer
+versions of ASE, you might need to use the versions that use profiles e.g. use
+<code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">EspressoProfile</span></code> not <code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">Espresso</span></code> until those become stable in
+ASE. For externally defined calculators, you can submit an issue and we will
+implement it. For example, calculators for NequIP, Deep Potential, MACE, CHGNet
+and M3GNet force fields are implemented.</p>
+<ul class="simple">
+<li><p><strong>calc_id</strong>: (str) unique key for identifying the calculator, <code class="docutils literal notranslate"><span class="pre">calc_id</span></code> in
+<code class="docutils literal notranslate"><span class="pre">sim_input.yaml</span></code> must match one of the <code class="docutils literal notranslate"><span class="pre">calc_id</span></code> s defined in the
+provided <code class="docutils literal notranslate"><span class="pre">calc_input.yaml</span></code></p></li>
+<li><p><strong>calc_id.name</strong>: (str) Either the name of the class or the reference to one
+of the provided external calculators.</p></li>
+<li><p><strong>calc_id.module</strong>: (str) The module from which the calculator class is
+imported. e.g. if <code class="docutils literal notranslate"><span class="pre">name=LennardJones</span></code> and <code class="docutils literal notranslate"><span class="pre">module=ase.calculators.lj</span></code>,
+then the calculator object is imported as <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">ase.calculators.lj</span> <span class="pre">import</span>
+<span class="pre">LennardJones</span></code>. This works if the calculator is available in ASE or follows
+ASE format for initialization such as GPAW. Any other ASE calculator will
+need to have the instantiation defined in :ref:calculators.py</p></li>
+<li><p><strong>calc_id.mode.run_prefix</strong>: (str) string to append before running the
+asimmodule e.g. if <code class="docutils literal notranslate"><span class="pre">run_prefix=mpirun</span></code> the asimmodule will be invoked with
+the equivalent of <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">python</span> <span class="pre">my_asimmodule.py</span></code>. <code class="docutils literal notranslate"><span class="pre">run_prefix</span></code> in
+<code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> is always prepended before the one provided by
+<code class="docutils literal notranslate"><span class="pre">calc_input.yaml</span></code>.</p></li>
+<li><p><strong>calc_id.mode.run_suffix</strong>: (str) string to append after running the
+asimmodule e.g. if <code class="docutils literal notranslate"><span class="pre">run_postfix='</span> <span class="pre">&amp;&gt;</span> <span class="pre">out.txt'</span></code> the asimmodule will be
+invoked with the equivalent of <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">my_asimmodule.py</span> <span class="pre">&amp;&gt;</span> <span class="pre">out.txt</span></code>.
+<code class="docutils literal notranslate"><span class="pre">run_postfix</span></code> in <code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> is always appended after the one
+provided by <code class="docutils literal notranslate"><span class="pre">calc_input.yaml</span></code>.</p></li>
+<li><p><strong>calc_id.precommands</strong>: (list, optional) Commands to be run/added to the job
+asimmodule before running the asimmodule. A common use case is loading a
+module or activating an environment</p></li>
+<li><p><strong>calc_id.postcommands</strong>: (list, optional) Commands to be run/added to the
+job asimmodule after running the asimmodule. e.g. cleaning up bulky tmp or
+wavefunction files</p></li>
+<li><p><strong>calc_id.args</strong>: (dict) key-value pairs to be passed as arguments for the
+initialization of the calculator class. e.g. if the class is LennardJones,
+the arguments are passed as <code class="docutils literal notranslate"><span class="pre">calc</span> <span class="pre">=</span> <span class="pre">LennardJones(**{'sigma':3.2,</span>
+<span class="pre">'epsilon':3})</span></code></p></li>
+</ul>
+</section>
+<section id="sim-input-yaml">
+<span id="siminput"></span><h3>sim_input.yaml<a class="headerlink" href="#sim-input-yaml" title="Link to this heading"></a></h3>
+<p>The minimal requirement to run an asimmodule is to provide a <code class="docutils literal notranslate"><span class="pre">sim_input.yaml</span></code>
+file. An example of a <code class="docutils literal notranslate"><span class="pre">sim_input.yaml</span></code> is shown below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">singlepoint</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inline</span>
+<span class="nt">overwrite</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nt">submit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results</span>
+<span class="nt">precommands</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">export MY_ENV_VAR=3</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">arg1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">value_1</span>
+<span class="w">    </span><span class="nt">arg2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">value_2</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ul class="simple">
+<li><p><strong>asimmodule</strong>: (str) name of core asimmodule or /path/to/my/asimmodule.py.
+Core asimmodules defined in the asimmodules directory can be simply referred
+to using Python dot notation. E.g. to specify the
+<a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.sim_array" title="asimtools.asimmodules.workflows.sim_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.asimmodules.workflows.sim_array()</span></code></a> asimmodule, you would
+specify <cite>workflows.sim_array</cite>. Any other asimmodule should be specified as
+either a full path or a path relative to <code class="docutils literal notranslate"><span class="pre">ASIMTOOLS_ASIMMODULE_DIR</span></code>
+variable to a python file. E.g. <code class="docutils literal notranslate"><span class="pre">my_asimmodules/asim_ple.py</span></code></p></li>
+<li><p><strong>env_id</strong>: (str, optional) Environment/context in which to run asimmodule
+configured in env_input.yaml, defaults to running in the current console</p></li>
+<li><p><strong>overwrite</strong>: (bool, optional) (bool) whether or not to overwrite work
+directories if they exist, defaults to false</p></li>
+<li><p><strong>submit</strong>: (bool, optional) whether to run the asimmodule. If set to false
+it will just write the input files which is very useful for testing before
+submitting large workflows. You can go in and test one example before
+resubmitting with <code class="docutils literal notranslate"><span class="pre">submit=True</span></code>, defaults to true</p></li>
+<li><p><strong>workdir</strong>: (str, optional) The directory in which the asimmodule will be
+run, <cite>asim-execute</cite> will create the directory whereas <cite>asim-run</cite> ignores this
+parameter entirely, defaults to ‘./results’</p></li>
+<li><p><strong>precommands</strong>: (list, optional) a list of commands to run in the console
+before running the asimmodule, defaults to empty list</p></li>
+<li><p><strong>postcommands</strong>: (list, optional) a list of commands to run in the console
+after running the asimmodule, defaults to empty list</p></li>
+<li><p><strong>args</strong>: (dict) The arguments of the function being called in the asimmodule
+as key-value pairs. These are specific to the asimmodule being run.</p></li>
+</ul>
+<p>All ASIMTools generated files are named <code class="docutils literal notranslate"><span class="pre">sim_input.yaml</span></code> but you can name
+user defined files as whatever you like</p>
+</section>
+<section id="specifying-images-atoms">
+<span id="specifyingimages"></span><h3>Specifying Images/Atoms<a class="headerlink" href="#specifying-images-atoms" title="Link to this heading"></a></h3>
+<p>One of the most useful applications of ASIMTools is the unification of methods
+for setting up ASE atoms objects using the same interface. If an asimmodule
+requires a single or multiple atoms objects as input, they are provided as
+either an <code class="docutils literal notranslate"><span class="pre">image</span></code> dictionary for a single Atoms object or <code class="docutils literal notranslate"><span class="pre">images</span></code> for a
+list of Atoms objects as part of the <code class="docutils literal notranslate"><span class="pre">args</span></code> section. Below are the different
+ways to get an atoms object. You can also download images from The Materials
+Project and for some cases generate them using Pymatgen.</p>
+<p>For a detailed description of the API and examples, see
+<a class="reference internal" href="asimtools.html#asimtools.utils.get_atoms" title="asimtools.utils.get_atoms"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.utils.get_atoms()</span></code></a></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reading a specific image from a structure file using ase.io.read</span>
+<span class="nt">image</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">image_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/my/ASE-readable/image/file.xyz</span>
+<span class="w">  </span><span class="c1"># Optional keyword argument passed to ase.io.read</span>
+<span class="w">  </span><span class="nt">index</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+
+<span class="c1"># Building a bulk crystal using ase.build.bulk</span>
+<span class="nt">image</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bulk</span>
+<span class="w">  </span><span class="c1"># Optional keyword arguments passed to the builder, must match ASE exactly</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Li</span>
+<span class="w">  </span><span class="nt">crystalstructure</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bcc</span>
+<span class="w">  </span><span class="nt">a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4.3</span>
+<span class="w">  </span><span class="nt">cubic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+
+<span class="c1"># Building a surface using ase.build.fcc100</span>
+<span class="nt">image</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fcc100</span>
+<span class="w">  </span><span class="c1"># Optional keyword arguments passed to the builder, must match ASE exactly</span>
+<span class="w">  </span><span class="nt">symbol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Fe</span>
+<span class="w">  </span><span class="nt">vacuum</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
+<span class="w">  </span><span class="nt">periodic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+
+<span class="c1"># Building a 3x3x3 supercell of Ar using ase.build.bulk then</span>
+<span class="c1"># Atoms.repeat(repeat) and then applying Atoms.rattle(stdev=rattle_stdev)</span>
+<span class="nt">image</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ar</span>
+<span class="w">  </span><span class="nt">repeat</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">3</span><span class="p p-Indicator">,</span><span class="nv">3</span><span class="p p-Indicator">,</span><span class="nv">3</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">rattle_stdev</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+
+<span class="c1"># You can even supply an atoms object directly so that the interface is</span>
+<span class="c1"># universal. This is most useful in the asimmodule code itself.</span>
+<span class="nt">image</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">atoms</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Atoms</span>
+
+<span class="c1"># An example downloading a structure from Materials Project using your own</span>
+<span class="c1"># USER_API_KEY</span>
+<span class="nt">image</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">mp_id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mp-14&#39;</span>
+<span class="w">  </span><span class="nt">interface</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pymatgen</span>
+<span class="w">  </span><span class="nt">user_api_key</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;USER_API_KEY&quot;</span>
+<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">conventional_unit_cell&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+<p>Similarly, if the asimmodule requires multiple image inputs, there exists a
+universal interface. The keyword is usually specified as <code class="docutils literal notranslate"><span class="pre">images</span></code>. This is
+especially useful for distributing simulations across multiple structures or
+reading structures from multiple previous simulations, even in different
+directories.</p>
+<p>For a detailed description of the API, see <a class="reference internal" href="asimtools.html#asimtools.utils.get_images" title="asimtools.utils.get_images"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.utils.get_images()</span></code></a></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reading specific images from a structure file using ase.io.read</span>
+<span class="nt">images</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">image_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/my/ASE-readable/image/file.xyz</span>
+<span class="w">  </span><span class="c1"># Optional keyword arguments passed to ase.io.read</span>
+<span class="w">  </span><span class="nt">index</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3:8&#39;</span>
+<span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">extxyz</span>
+
+<span class="c1"># You can read all files matching a certain pattern using a wildcard</span>
+<span class="nt">images</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/my/structure/files/*.cif</span>
+<span class="w">  </span><span class="c1"># Optional keyword argument passed to ase.io.read</span>
+<span class="w">  </span><span class="nt">index</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-1</span>
+
+<span class="c1"># You can read all files matching certain patterns using a wildcard</span>
+<span class="nt">images</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">patterns</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/my/structure/files/*.cif</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/my/other/structure/files/*.cfg</span>
+
+<span class="c1"># You can even supply a list of atoms objects directly so that the interface</span>
+<span class="c1"># is universal. This is most useful in the asimmodule code itself.</span>
+<span class="nt">images</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">images</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Atoms1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Atoms2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">...</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="usage-of-asim-execute-and-asim-run">
+<span id="asimrunvsasimexecute"></span><h2>Usage of asim-execute and asim-run<a class="headerlink" href="#usage-of-asim-execute-and-asim-run" title="Link to this heading"></a></h2>
+<p>The major difference between <code class="docutils literal notranslate"><span class="pre">asim-execute</span></code> and <code class="docutils literal notranslate"><span class="pre">asim-run</span></code> is that,
+<code class="docutils literal notranslate"><span class="pre">asim-execute</span></code> takes into account the <code class="docutils literal notranslate"><span class="pre">workdir</span></code> and the <code class="docutils literal notranslate"><span class="pre">env_id</span></code>.
+<code class="docutils literal notranslate"><span class="pre">asim-run</span></code> will run the asimmodule in the current directory and in the
+current console. In fact, <code class="docutils literal notranslate"><span class="pre">asim-execute</span></code> will create the <code class="docutils literal notranslate"><span class="pre">workdir</span></code> and then
+run <code class="docutils literal notranslate"><span class="pre">asim-run</span></code> in the correct environment/batch job. You can always for
+example, request a slurm allocation, go to the directory where you want the
+asimmodule to be run and call <code class="docutils literal notranslate"><span class="pre">asim-run</span></code> from there if you would like more
+control or to debug. If you want verbose logs for debugging, you can run with
+the <code class="docutils literal notranslate"><span class="pre">-d</span></code> or <code class="docutils literal notranslate"><span class="pre">--debug</span></code> flag.</p>
+</section>
+<section id="output-files">
+<span id="outputs"></span><h2>Output files<a class="headerlink" href="#output-files" title="Link to this heading"></a></h2>
+<p>A job or asimmodule run through ASIMTools will always produce a standard set of
+output files in addition to whatever outputs the asimmodule produces. In
+particular the most important outputs are the <code class="docutils literal notranslate"><span class="pre">output.yaml</span></code> and the
+<code class="docutils literal notranslate"><span class="pre">job.log</span></code> file.</p>
+<ol class="arabic">
+<li><p>``output.yaml`` contains the status of the job being run in the current
+directory which can be one of <code class="docutils literal notranslate"><span class="pre">clean,</span> <span class="pre">started,</span> <span class="pre">complete,</span> <span class="pre">failed,</span> <span class="pre">discard</span></code>.
+The statuses are self-explanatory, the <code class="docutils literal notranslate"><span class="pre">discard</span></code> status is never written
+by ASIMTools but a user can edit an <code class="docutils literal notranslate"><span class="pre">output.yaml</span></code> file and change it’s
+status to <code class="docutils literal notranslate"><span class="pre">discard</span></code> to tell ASIMTools to ignore that job in any workflows.
+This is common for example if you launch multiple jobs and one of them fails
+irredemably. Deleting the directory for that job is also ok if nothing
+depends on it downstream. Importantly, any results returned by the function
+defined in the asimmodule are found in <code class="docutils literal notranslate"><span class="pre">output.yaml</span></code>. Asimmodule functions
+should always return a dictionary of only primitive types for this purpose.</p>
+<p>An example of an <code class="docutils literal notranslate"><span class="pre">output.yaml</span></code> file is shown below.</p>
+</li>
+</ol>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Successful output for singlepoint asimmodule</span>
+<span class="nt">end_time</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2023-08-28 21:50:51.368025</span>
+<span class="nt">energy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">13.77302319846367</span><span class="w">  </span><span class="c1">#This was added by the scinglepoint asimmodule</span>
+<span class="nt">files</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">image_output.xyz</span>
+<span class="nt">job_ids</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;372919&#39;</span>
+<span class="nt">start_time</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2023-08-28 21:50:46.188300</span>
+<span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">complete</span>
+
+<span class="c1"># Failed output</span>
+<span class="nt">start_time</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">14:29:55, 10/06/23</span>
+<span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">failed</span>
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">job.log</span></code> captures the logged output of <code class="docutils literal notranslate"><span class="pre">asim-run</span></code> or asimmodules
+that use logging. It is extremely useful for debugging as following the logs
+starting from the base directory will usually lead you to the correct
+traceback that caused the failure.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stderr.txt</span></code> captures errors and backtraces from running asimmodules. This
+is usually the most informative file for debugging. You can be directed to
+the correct one by noting errors in <code class="docutils literal notranslate"><span class="pre">job.log</span></code> files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stdout.txt</span></code> captures any stdout from running asimmodules. It is mostly a
+safety measure for catching anything that prints to stdout and rarely has
+useful information unless you write an asimmodule that uses <code class="docutils literal notranslate"><span class="pre">print</span></code>
+statements. In batch jobs, this output this goes to the slurm job output.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_image.xyz</span></code> and <code class="docutils literal notranslate"><span class="pre">input_images.xyz</span></code> capture the images input into
+the asimmodule. This makes sure there is a concrete artifact for the
+structure used by the asimmodule for the purposes of visualization and
+debugging. They are always in <code class="docutils literal notranslate"><span class="pre">extxyz</span></code> format as a flexible standard
+format</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slurm*</span></code> are slurm job files which can be named according to flags
+specified in <code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> otherwise are named
+<code class="docutils literal notranslate"><span class="pre">slurm_stdout.id-%a_j%A</span></code> or <code class="docutils literal notranslate"><span class="pre">slurm_stderr.id-%a_j%A</span></code> after job and array
+IDs</p></li>
+</ol>
+</section>
+<section id="checking-job-status-and-restarting-failed-jobs">
+<span id="restarting"></span><h2>Checking job status and Restarting failed jobs<a class="headerlink" href="#checking-job-status-and-restarting-failed-jobs" title="Link to this heading"></a></h2>
+<p>To check the status of jobs, even complicated chains and distributed jobs, we
+provide the <code class="docutils literal notranslate"><span class="pre">asim-check</span></code> utility which can be run using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">asim-check /path/to/sim_input.yaml</span>
+</pre></div>
+</div>
+<p>This will print the job tree, including statuses and work directories of the
+jobs whose root directory is specified as <code class="docutils literal notranslate"><span class="pre">workdir</span></code> in <code class="docutils literal notranslate"><span class="pre">sim_input.yaml</span></code>.</p>
+<p>In many cases, there may be mistakes in one of your configuration files leading
+to a failed workflow. In these cases there are a few ways you could resolve the
+issue:</p>
+<ul class="simple">
+<li><p>Delete the work directory and restart the workflow. This is why it is
+recommended that the base <code class="docutils literal notranslate"><span class="pre">sim_input.yaml</span></code> has <code class="docutils literal notranslate"><span class="pre">workdir</span></code> set to a new
+directory that only has the results of the workflow.</p></li>
+<li><p>Modify the ASIMTools generated <code class="docutils literal notranslate"><span class="pre">sim_input.yaml</span></code> to fix the problem. If
+there are downstream <code class="docutils literal notranslate"><span class="pre">sim_input.yaml</span></code> files in a chain, they will have to
+be deleted or set <code class="docutils literal notranslate"><span class="pre">overwrite=True</span></code>. Deleting is recommended for safety
+purposes.</p></li>
+<li><p>Simply rerun <code class="docutils literal notranslate"><span class="pre">asim-execute</span></code>. This will rerun the jobs, skipping any jobs
+with a status of <code class="docutils literal notranslate"><span class="pre">complete</span></code> or <code class="docutils literal notranslate"><span class="pre">discard</span></code>. Note that error files are not
+deleted so you will have to clear those manually. Use this with caution!</p></li>
+</ul>
+</section>
+<section id="importing-functions-from-asimmodules-and-the-api">
+<h2>Importing functions from asimmodules and the API<a class="headerlink" href="#importing-functions-from-asimmodules-and-the-api" title="Link to this heading"></a></h2>
+<p>Because asimmodules contain what are merely Python functions, you can always
+import them and use them in any other code for example, you can import
+<a class="reference internal" href="asimtools.asimmodules.html#module-asimtools.asimmodules.singlepoint" title="asimtools.asimmodules.singlepoint"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.asimmodules.singlepoint()</span></code></a> and use it as below.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">asimtools.asimmodules.singlepoint</span> <span class="kn">import</span> <span class="n">singlepoint</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">singlepoint</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Ar&#39;</span><span class="p">},</span> <span class="n">calc_id</span><span class="o">=</span><span class="s1">&#39;lj&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also use the utils and tools e.g. to load a calculator using just a
+<code class="docutils literal notranslate"><span class="pre">calc_id</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">asimtools.calculators</span> <span class="kn">import</span> <span class="n">load_calc</span>
+
+<span class="n">calc</span> <span class="o">=</span> <span class="n">load_calc</span><span class="p">(</span><span class="s1">&#39;lj&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="include_readme.html" class="btn btn-neutral float-left" title="README" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="asimplify.html" class="btn btn-neutral float-right" title="Developing Custom Asimmodules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
