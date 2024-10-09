@@ -57,7 +57,7 @@ calculator or input structures and submit them easily.
 
 We also aim to provide a standard set of robust and efficient simulation
 protocols as we develop. You can see all the implemented workflows provided
-with the package in the examples directory and modify them to your application
+with the package in the examples directory and modify them to your application.
 If you have suggestions for improvements in methodology or code, please bring
 up an issue on github!
 
