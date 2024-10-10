@@ -116,7 +116,7 @@ def image_array(
 
     # Create a distributed job object
     djob = DistributedJob(array_sim_input, env_input, calc_input)
-    job_ids = djob.submit(array_max=array_max)
+    job_ids = djob.submit(array_max=array_max, write_image=True)
 
     results = {'job_ids': job_ids}
     return results

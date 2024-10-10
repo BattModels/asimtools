@@ -236,12 +236,12 @@ def load_m3gnet(calc_params):
     from matgl.ext.ase import M3GNetCalculator
     import matgl
 
-    model = calc_params.pop("model")
+    model = calc_params['args'].pop("model")
     try:
         pot = matgl.load_model(model)
         calc = M3GNetCalculator(
             pot,
-            **calc_params,
+            **calc_params['args'],
         )
     except Exception:
         logging.error("Failed to load M3GNet with parameters:\n %s", calc_params)

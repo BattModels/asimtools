@@ -389,14 +389,12 @@ class UnitJob(Job):
         if image and write_image:
             atoms = get_atoms(**image)
             input_image_file = 'image_input.xyz' # Relative to workdir
-            # input_image_file = self.workdir.resolve() / 'image_input.xyz'
             atoms.write(
                 self.workdir / input_image_file,
                 format='extxyz'
             )
             sim_input['args']['image'] = {
                 'image_file': str(input_image_file),
-                # 'image_file': str((self.workdir / input_image_file).resolve())
             }
 
         images = self.sim_input.get('args', {}).get('images', False)
@@ -439,7 +437,6 @@ class UnitJob(Job):
         logmsg = f'Submitting "{self.sim_input["asimmodule"]}" in "{self.workdir}"'
         logging.info(logmsg)
         print(msg) # For printing to console
-
         self.gen_input_files(write_image=write_image)
 
         logger = self.get_logger()
@@ -604,7 +601,9 @@ class DistributedJob(Job):
         # dependencies but that can be implemented later
         job_ids = []
         for unitjob in self.unitjobs:
-            job_id = unitjob.submit()
+            job_id = unitjob.submit(
+                write_image=kwargs.get('write_image', True)
+            )
             job_ids.append(job_id)
         return job_ids
 

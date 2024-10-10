@@ -5,6 +5,7 @@ Runs a user defined lammps script or template
 Author: mkphuthi@github.com
 '''
 from typing import Dict, Optional
+import sys
 from pathlib import Path
 import subprocess
 import logging
@@ -49,12 +50,22 @@ def lammps(
     if image is not None:
         atoms = get_atoms(**image)
         if masses:
-            atoms.write(
-                'image_input.lmpdat',
-                format='lammps-data',
-                atom_style=atom_style,
-                masses=masses,
-            )
+            try:
+                atoms.write(
+                    'image_input.lmpdat',
+                    format='lammps-data',
+                    atom_style=atom_style,
+                    masses=masses,
+                )
+            except TypeError as te:
+                err_txt = 'Need ASE version >=3.23 to support writing '
+                err_txt += 'masses to lammps input file. Add mass keyword to '
+                err_txt += 'lammps template instead'
+
+                print(err_txt, file=sys.stderr)
+                logging.error(err_txt)
+                raise Exception(err_txt) from te
+
         else:
             atoms.write(
             'image_input.lmpdat',

@@ -12,7 +12,6 @@ def forces(
     calc_env_id: Optional[str] = None,
 ) -> Dict:
 
-    calc = load_calc(calc_id)
     images = get_images(**images)
     singlepoint_input={
         'asimmodule': 'singlepoint',
