@@ -20,8 +20,6 @@ def forces(
             'properties': ['energy', 'forces']
         },
     }
-    if calc_env_id is not None:
-        singlepoint_input.update({'env_id': calc_env_id,})
 
     results = image_array(
         images={
@@ -29,6 +27,7 @@ def forces(
         },
         labels=[f'supercell-{j:03d}' for j in range(len(images))],
         subsim_input=singlepoint_input,
+        env_ids=calc_env_id,
     )
 
     return results

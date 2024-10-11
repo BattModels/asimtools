@@ -689,10 +689,9 @@ def get_str_btn(
     :return: substring
     :rtype: _type_
     """
-
+    s = str(s)
     j = 0
     stop_index = len(s) + 1
-
     s = s[start_index:stop_index]
     while occurence - j >= 0:
         if s1 is not None:
@@ -719,10 +718,11 @@ def find_nth(haystack: str, needle: str, n: int) -> int:
     return start
 
 def get_nth_label(
-    s: str,
+    s: os.PathLike,
     n: int = 1,
 ):
     ''' Return nth label in a string potentially containing multiple labels,
     indexing starts from 0 '''
+    s = str(s)
     start = find_nth(s, '__', n=(n*2+1))
     return get_str_btn(s, '__', '__', start_index=start)

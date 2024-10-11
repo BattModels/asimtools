@@ -5,7 +5,7 @@ from asimtools.job import UnitJob
 def full_qha(
     image: Dict,
     calc_id: str,
-    phonopy_save_path: str,
+    phonopy_save_path: Optional[str] = None,
     calc_env_id: Optional[str] = None,
     process_env_id: Optional[str] = None,
     ase_cubic_eos_args: Optional[Dict] = None,
@@ -43,7 +43,10 @@ def full_qha(
     :rtype: Dict
     """
 
-    phonopy_save_path = str(Path(phonopy_save_path).resolve())
+    if phonopy_save_path is None:
+        phonopy_save_path = str((Path('..') / 'phonopy_save.yaml').resolve())
+    else:
+        phonopy_save_path = str(Path(phonopy_save_path).resolve())
     ase_cubic_eos_args['image'] = image
     ase_cubic_eos_args['calc_id'] = calc_id
     scales = ase_cubic_eos_args.get('scales', False)
@@ -85,13 +88,14 @@ def full_qha(
                                     },
                                     'step-1': {
                                         'asimmodule': 'phonopy.forces',
-                                        'env_id': calc_env_id,
+                                        'env_id': process_env_id,
                                         'args': {
                                             'images': {
                                                 'pattern': '../step-0/supercell-*',
                                                 'format': 'vasp',
                                             },
                                             'calc_id': calc_id,
+                                            'calc_env_id': calc_env_id,
                                         },
                                     },
                                     'step-2': {
@@ -127,7 +131,6 @@ def full_qha(
                     'env_id': process_env_id,
                     'args': {
                         'ev_csv': '../step-0/eos.csv',
-                        'phonopy_save_path': phonopy_save_path,
                         'thermal_properties_file_pattern': '../step-1/id-*/step-3/thermal_properties-*.yaml',
                         't_max': t_max - 10,
                         'pressure': pressure,
