@@ -648,14 +648,14 @@ class DistributedJob(Job):
 
             command = [
                 'sbatch',
-                f'--array=[0-{njobs-1}]{arr_max_str}',
+                f'--array=0-{njobs-1}{arr_max_str}',
                 '-d', f'afterok:{dependstr}',
                 'job_array.sh'
             ]
         else:
             command = [
                 'sbatch',
-                f'--array=[0-{njobs-1}]{arr_max_str}',
+                f'--array=0-{njobs-1}{arr_max_str}',
                 'job_array.sh'
             ]
 

@@ -1,0 +1,11 @@
+vasp_PBE:
+  name: Vasp
+  module: ase.calculators.vasp
+  precommands:
+    - module load myvasp
+  args:
+    prec: Normal
+    xc: PBE
+    lreal: False
+    command: srun vasp_std
+
