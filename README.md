@@ -96,7 +96,7 @@ cd asimtools
 pip install .
 ```
 
-You can also choose to use the latest version of ASE since the ones on PyPI and
+We recommend you use the latest version of ASE since the ones on PyPI and
 conda are quite outdated.
 
 ```
@@ -105,10 +105,24 @@ cd ase
 pip install .
 ```
 
-Individual calculators may need external packages for running them. For example
-if you want to use Quantum Espresso or CASTEP, you will have to install them.
-Similarly some asimmodules e.g. `lammps.py` might also need external packages
-to be used. It is up to the user to make sure those are installed.
+You can optionally install the dependencies used for development using
+
+```
+pip install ".[dev]"
+```
+Or install some popular Universal Machine Learning Interactomic Potentials
+(matgl, mace-torh, chgnet) using
+
+```
+pip install ".[mlip]"
+```
+Making sure the correct versions and dependencies are installed correctly is
+probably more stable if you follow their individual installation instructions.
+
+Other individual calculators may need external packages for running them. For
+example if you want to use Quantum Espresso or CASTEP, you will have to install
+them. Similarly some asimmodules e.g. `lammps.py` might also need external
+packages to be used. It is up to the user to make sure those are installed.
 
 You will also need to setup some environment variables, these variables point
 to global `env_input.yaml` and `calc_input.yaml` files with your favorite
