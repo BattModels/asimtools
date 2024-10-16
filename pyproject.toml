@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "asimtools"
+version = "0.0.1"
+authors = [
+  { name="Keith Phuthi", email="mkphuthi@gmail.com" },
+]
+maintainers = [
+  { name="Keith Phuthi", email="mkphuthi@gmail.com" },
+]
+description = "A lightweight python package for managing and running atomic simulation workflows"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux"
+]
+
+[project.urls]
+Homepage = "https://github.com/BattModels/asimtools"
+Issues = "https://github.com/BattModels/asimtools/issues"
