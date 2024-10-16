@@ -18,8 +18,28 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: MacOS",
-    "Operating System :: POSIX :: Linux"
+    "Operating System :: Unix"
 ]
+dependecies = [
+    "pandas",
+    "pyyaml",
+    "pymatgen",
+    "ase>=3.22.1", 
+    # Recommended to use the master branch of the ASE gitlab but only 
+    # required for lammps to handle masses correctly as far as we can tell
+    "colorama",
+    "myst-parser",
+    "sphinx",
+    "pytest",
+    "phonopy",
+    "seekpath",
+    "mp-api",
+]
+
+[project.scripts]
+asim-run = "asimtools.scripts.asim_run:main"
+asim-execute = "asimtools.scripts.asim_execute:main"
+asim-check = "asimtools.scripts.asim_check:main"
 
 [project.urls]
 Homepage = "https://github.com/BattModels/asimtools"
