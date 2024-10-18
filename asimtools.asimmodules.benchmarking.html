@@ -1,0 +1,221 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>asimtools.asimmodules.benchmarking package &mdash; asimtools 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asimtools.asimmodules.elastic_constants package" href="asimtools.asimmodules.elastic_constants.html" />
+    <link rel="prev" title="asimtools.asimmodules package" href="asimtools.asimmodules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="include_readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Running asimmodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asimplify.html">Custom asimmodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflows.html">Workflows</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Docs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asimtools.html">asimtools package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="asimtools.asimmodules.html">asimtools.asimmodules package</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">asimtools.asimmodules.benchmarking package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.elastic_constants.html">asimtools.asimmodules.elastic_constants package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.eos.html">asimtools.asimmodules.eos package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html">asimtools.asimmodules.geometry_optimization package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.lammps.html">asimtools.asimmodules.lammps package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.phonons.html">asimtools.asimmodules.phonons package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.surface_energies.html">asimtools.asimmodules.surface_energies package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.transformations.html">asimtools.asimmodules.transformations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.vacancy_formation_energy.html">asimtools.asimmodules.vacancy_formation_energy package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.workflows.html">asimtools.asimmodules.workflows package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.html#module-asimtools.asimmodules.do_nothing">asimtools.asimmodules.do_nothing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.html#module-asimtools.asimmodules.singlepoint">asimtools.asimmodules.singlepoint module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.html#module-asimtools.asimmodules.template">asimtools.asimmodules.template module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.html#module-asimtools.asimmodules">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools.calculators">asimtools.calculators module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools.job">asimtools.job module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools.utils">asimtools.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="include_contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asimtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">asimtools</a></li>
+          <li class="breadcrumb-item"><a href="asimtools.html">asimtools package</a></li>
+          <li class="breadcrumb-item"><a href="asimtools.asimmodules.html">asimtools.asimmodules package</a></li>
+      <li class="breadcrumb-item active">asimtools.asimmodules.benchmarking package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/asimtools.asimmodules.benchmarking.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="asimtools-asimmodules-benchmarking-package">
+<h1>asimtools.asimmodules.benchmarking package<a class="headerlink" href="#asimtools-asimmodules-benchmarking-package" title="Link to this heading"></a></h1>
+<section id="module-asimtools.asimmodules.benchmarking.parity">
+<span id="asimtools-asimmodules-benchmarking-parity-module"></span><h2>asimtools.asimmodules.benchmarking.parity module<a class="headerlink" href="#module-asimtools.asimmodules.benchmarking.parity" title="Link to this heading"></a></h2>
+<p>Generates a parity plot and collects evaluation statistics comparing energy
+and/or forces and/or stress to existing values in the provided dataset. This
+asimmodule can work in parallel based on the number of cores specified.</p>
+<p>Author: <a class="reference external" href="mailto:mkphuthi&#37;&#52;&#48;github&#46;com">mkphuthi<span>&#64;</span>github<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.asimmodules.benchmarking.parity.calc_parity_data">
+<span class="sig-prename descclassname"><span class="pre">asimtools.asimmodules.benchmarking.parity.</span></span><span class="sig-name descname"><span class="pre">calc_parity_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.13)"><span class="pre">Sequence</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('energy',</span> <span class="pre">'forces',</span> <span class="pre">'stress')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/asimmodules/benchmarking/parity.html#calc_parity_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.asimmodules.benchmarking.parity.calc_parity_data" title="Link to this definition"></a></dt>
+<dd><p>Calculates parity data for each atoms instance in subset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subset</strong> (<em>List</em>) – List of atoms instances</p></li>
+<li><p><strong>calc_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – calc_id specification</p></li>
+<li><p><strong>properties</strong> (<em>List</em><em>, </em><em>optional</em>) – Properties to evaluate, choose from “energy”,         “forces” and “stress”, defaults to (‘energy’, ‘forces’, ‘stress’)</p></li>
+<li><p><strong>force_prob</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>optional</em>) – Fraction of forces to consider, may speed up sampling         large structures by subsampling forces randomly, defaults to 1.0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with reference and predicted values for each         property</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.asimmodules.benchmarking.parity.parity">
+<span class="sig-prename descclassname"><span class="pre">asimtools.asimmodules.benchmarking.parity.</span></span><span class="sig-name descname"><span class="pre">parity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nprocs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'meV'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">':'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.13)"><span class="pre">Sequence</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('energy',</span> <span class="pre">'forces',</span> <span class="pre">'stress')</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/asimtools/asimmodules/benchmarking/parity.html#parity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.asimmodules.benchmarking.parity.parity" title="Link to this definition"></a></dt>
+<dd><p>Generates a parity plot and collects evaluation statistics comparing energy
+and/or forces and/or stress to existing values in the provided dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images</strong> (<em>Dict</em>) – Image specification, see <a class="reference internal" href="asimtools.html#asimtools.utils.get_images" title="asimtools.utils.get_images"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.utils.get_images()</span></code></a></p></li>
+<li><p><strong>calc_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – ID of calculator provided in calc_input or global file</p></li>
+<li><p><strong>force_prob</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>optional</em>) – Fraction of forces to consider in force parity,         can be used for speeding up large structures by only subsampling        randomly, defaults to 1.0</p></li>
+<li><p><strong>nprocs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – Number of process to parallelize over, must be less than         number of datapoints, defaults to 1</p></li>
+<li><p><strong>unit</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – Unit to plot, choose from meV, eV or kcal/mol,         defaults to ‘meV’</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – index of data to use from full dataset, defaults to ‘:’</p></li>
+<li><p><strong>properties</strong> (<em>Sequence</em><em>, </em><em>optional</em>) – Properties to evaluate, choose from “energy”,         “forces” and “stress”, defaults to (‘energy’, ‘forces’, ‘stress’)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of results</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="asimtools.asimmodules.benchmarking.parity.rmse">
+<span class="sig-prename descclassname"><span class="pre">asimtools.asimmodules.benchmarking.parity.</span></span><span class="sig-name descname"><span class="pre">rmse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yhat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.13)"><span class="pre">Sequence</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.13)"><span class="pre">Sequence</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/asimtools/asimmodules/benchmarking/parity.html#rmse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#asimtools.asimmodules.benchmarking.parity.rmse" title="Link to this definition"></a></dt>
+<dd><p>Calculate Root Mean Square Error between to sequences</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yhat</strong> (<em>Sequence</em>) – Predicted values</p></li>
+<li><p><strong>y</strong> (<em>Sequence</em>) – True values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>RMSE</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-asimtools.asimmodules.benchmarking">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asimtools.asimmodules.benchmarking" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="asimtools.asimmodules.html" class="btn btn-neutral float-left" title="asimtools.asimmodules package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="asimtools.asimmodules.elastic_constants.html" class="btn btn-neutral float-right" title="asimtools.asimmodules.elastic_constants package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
