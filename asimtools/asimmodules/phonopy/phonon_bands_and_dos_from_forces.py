@@ -13,13 +13,40 @@ from asimtools.utils import get_str_btn, get_images
 
 def phonon_bands_and_dos_from_forces(
     supercell_image_file_pattern: str,
-    phonopy_save_path: str,
-    paths: Optional[Sequence] = None,
+    phonopy_save_path: os.PathLike,
+    paths: Optional[Sequence[Sequence[Sequence]]] = None,
     labels: Optional[Sequence] = None,
     use_seekpath: Optional[bool] = False,
     npoints: int = 51,
-    mesh: Union[ArrayLike,float] = [20, 20, 20],
+    mesh: Union[Sequence,float] = [20, 20, 20],
 ) -> Dict:
+    """Calculate phonon bands and DOS from already calculated forces. 
+    The images with calculatd forces should correspond to the displacements 
+    in the phonopy save file
+
+    :param supercell_image_file_pattern: images where forces are calculated
+    :type supercell_image_file_pattern: str
+    :param phonopy_save_path: phonopy save file path with corresponding displacements
+    :type phonopy_save_path: str
+    :param paths: Path through BZ for bands plot, given as a list of 
+        disconnected paths of arbitrary length where each path is specified by
+        a series of coordinates 
+        e.g. [[(0,0,0),(0,0,1)],[(0,0,0),(0.5,0.5,0.0),(0.25,0.25,0.25)]],
+        defaults to None
+    :type paths: Optional[Sequence[Sequence[Sequence]]], optional
+    :param labels: What to label the special points specified in the path,
+        defaults to None
+    :type labels: Optional[Sequence], optional
+    :param use_seekpath: Auto-generate a bandpath using seekpath,
+        defaults to False
+    :type use_seekpath: Optional[bool], optional
+    :param npoints: How many points to sample for each segment, defaults to 51
+    :type npoints: int, optional
+    :param mesh: Mesh to use for binning DOS, defaults to [20, 20, 20]
+    :type mesh: Union[ArrayLike,float], optional
+    :return: Results
+    :rtype: Dict
+    """
     assert use_seekpath or paths is not None, \
         'Provide explicit band paths or set use_seekpath=True to automate'
     images = get_images(pattern=supercell_image_file_pattern)

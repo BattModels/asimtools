@@ -14,15 +14,16 @@ def full_qha(
     pressure: Optional[float] = None,
 ) -> Dict:
     """Perform a full Quasiharmonic Approximation and predict thermal 
-    properties of a given structure. Calculated properties included 
-    vibrational free energy heat capacity, thermal expansion etc.
+    properties of a given structure. Calculated properties include
+    vibrational free energy, heat capacity, thermal expansion etc.
 
     :param image: Image specification, see :func:`asimtools.utils.get_atoms` 
     :type image: Dict
-    :param calc_id: calc_id
+    :param calc_id: calc_id specification
     :type calc_id: str
     :param phonopy_save_path: Path where phonopy save yaml is saved, this file
-        is important to keep for easier postprocess/analsyis
+        is important to keep for easier postprocessing/analsyis, we recommend 
+        keeping the default, defaults to None
     :type phonopy_save_path: str
     :param calc_env_id: env_id for running calculator, defaults to None
     :type calc_env_id: Optional[str], optional
@@ -30,7 +31,8 @@ def full_qha(
         defaults to None
     :type process_env_id: Optional[str], optional
     :param ase_cubic_eos_args: arguments to pass to 
-        :func:`asimtools.asimmodules.geometry_optimization.ase_cubic_eos.ase_cubic_eos` , defaults to None
+        :func:`asimtools.asimmodules.geometry_optimization.ase_cubic_eos.ase_cubic_eos` ,
+        defaults to None
     :type ase_cubic_eos_args: Optional[Dict], optional
     :param supercell: supercell to use for finite difference method, 
         defaults to [5,5,5]

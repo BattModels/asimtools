@@ -18,6 +18,7 @@ def lammps(
     image: Optional[Dict] = None,
     atom_style: str = 'atomic',
     variables: Optional[Dict] = None,
+    placeholders: Optional[Dict] = None,
     lmp_cmd: str = 'lmp',
     masses: bool = True,
 ) -> Dict:
@@ -33,6 +34,8 @@ def lammps(
     :type atom_style: str, optional
     :param variables: Dictionary of variables to be defined into the lammps input, defaults to None
     :type variables: Dict, optional
+    :param placeholders: Dictionary of placeholders to be filled into the lammps input, defaults to None
+    :type placeholders: Dict, optional
     :param lmp_cmd: Command with which to run LAMMPS, defaults to 'lmp'
     :type lmp_cmd: str, optional
     :param masses: Whether to specify atomic masses in LAMMPS data input, requires ASE>3.23.0, defaults to True
@@ -83,7 +86,12 @@ def lammps(
     with open(template, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 
+    if placeholders is None:
+        placeholders = {}
+
     for line in lines:
+        for placeholder in placeholders:
+            line = line.replace(placeholder, placeholders[placeholder])
         lmp_txt += line
 
     if image is not None:

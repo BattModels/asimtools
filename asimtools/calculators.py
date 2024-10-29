@@ -149,7 +149,7 @@ def load_chgnet(calc_params):
 
     return calc
 
-def load_mace(calc_params):
+def load_mace_mp(calc_params):
     """Load MACE Calculator
 
     https://github.com/ACEsuit/mace?tab=readme-ov-file
@@ -165,6 +165,28 @@ def load_mace(calc_params):
         calc = mace_mp(**calc_params['args'])
     except Exception:
         logging.error("Failed to load MACE with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
+def load_mace(calc_params):
+    """Load MACE Calculator
+
+    https://github.com/ACEsuit/mace?tab=readme-ov-file
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: MACE calculator
+    :rtype: :class:`mace.calculators.mace_mp`
+    """
+    from mace.calculators import MACECalculator
+
+    try:
+        calc = MACECalculator(**calc_params['args'])
+    except Exception:
+        logging.error(
+            "Failed to load MACECalculator with parameters:\n %s", calc_params
+        )
         raise
 
     return calc
@@ -254,7 +276,8 @@ external_calcs = {
     'Allegro': load_nequip,
     'DeepPotential': load_dp,
     'CHGNet': load_chgnet,
-    'MACE': load_mace,
+    'MACE': load_mace_mp,
+    'MACECalculator': load_mace,
     'EspressoProfile': load_espresso_profile,
     'M3GNet': load_m3gnet,
 }

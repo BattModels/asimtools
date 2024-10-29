@@ -27,7 +27,7 @@ def phonon_bands_and_dos(
     npoints: Optional[int] = 51,
     mesh: Optional[Union[ArrayLike,float]] = [20, 20, 20],
 ) -> Dict:
-    """Calculates band structure and density of states using phonopy.
+    """Workflow to calculate phonon bands and density of states using phonopy.
 
     :param image: Image specification. See :ref:`asimtools.utils.get_image`.
     :type image: Dict
@@ -41,17 +41,25 @@ def phonon_bands_and_dos(
     :type supercell: ArrayLike, optional
     :param distance: Distance in phonopy, defaults to 0.02
     :type distance: float, optional
-    :param phonopy_save_path: Where to put the phonopy yaml, defaults to 'phonopy_save.yaml'
+    :param phonopy_save_path: Where to put the phonopy yaml, defaults to 
+        'phonopy_save.yaml'
     :type phonopy_save_path: str, optional
-    :param paths: Paths to display in band  structure. Has shape Np*Nk*3 where Np is the number of disconnected paths, Kn is the number of points in each path and lastly the coordinate axes in kspace, defaults to None
-    :type paths: Optional[ArrayLike], optional
+    :param paths: Path through BZ for bands plot. Has shape Np*Nik*3 where Np 
+        is the number of disconnected paths, Nik is the number of points in
+        the i-th path and the last dimension is the coordinates in kspace,
+        e.g. [[(0,0,0),(0,0,1)],[(0,0,0),(0.5,0.5,0.0),(0.25,0.25,0.25)]],
+        has two disconnected paths with 2 and 3 points respectively,
+        defaults to None
+    :type paths: Optional[Sequence[Sequence[Sequence]]], optional
     :param labels: Labels for each point provided in paths, defaults to None
     :type labels: Optional[ArrayLike], optional
-    :param use_seekpath: Automatically generate a suggested path, defaults to True
+    :param use_seekpath: Automatically generate a suggested path, defaults to 
+        True
     :type use_seekpath: Optional[bool], optional
     :param npoints: Number of points for band path, defaults to 51
     :type npoints: int, optional
-    :param mesh: Size of kpoint mesh for DOS either as integer or array of length 3, defaults to [20, 20, 20]
+    :param mesh: Size of kpoint mesh for DOS either as integer or array of 
+        length 3, defaults to [20, 20, 20]
     :type mesh: Union[ArrayLike,float], optional
     :return: result
     :rtype: Dict

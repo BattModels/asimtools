@@ -16,6 +16,19 @@ def generate_phonopy_displacements(
     distance: float = 0.01,
     phonopy_save_path: str = 'phonopy_params.yaml'
 ) -> Dict:
+    """Generates displacements for phonopy calculations
+
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
+    :type image: Dict
+    :param supercell: Size of supercell relative to input image
+    :type supercell: Sequence[int]
+    :param distance: distance to displace atoms, defaults to 0.01
+    :type distance: float, optional
+    :param phonopy_save_path: Where the phonopy save file is saved, other asimmodule might use it, defaults to 'phonopy_params.yaml'
+    :type phonopy_save_path: str, optional
+    :return: Results
+    :rtype: Dict
+    """
 
     atoms = get_atoms(**image)
     atoms.write('POSCAR-unitcell', format='vasp')
