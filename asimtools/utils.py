@@ -146,15 +146,15 @@ def get_atoms(
     :param interface: Whether to use "ase" or "pymatgen" to create the atoms 
         object
     :type interface: str, optional
-    :param builder: Builder to use from :mod:`ase.build`, defaults to 'bulk'. \
+    :param builder: Builder to use from :mod:`ase.build`, defaults to 'bulk'.
         Any extra keyword arguments specified are passed to the build
     :type builder: str, optional
     :param atoms: :class:`ase.Atoms` object, defaults to None
     :type atoms: Atoms, optional
-    :param repeat: Number of times to repeat input to create supercell, \
+    :param repeat: Number of times to repeat input to create supercell,
         defaults to None
     :type repeat: Tuple[int, int, int], optional
-    :param rattle_stdev: `stdev` to be provided to :meth:`ase.Atoms.rattle`, \
+    :param rattle_stdev: `stdev` to be provided to :meth:`ase.Atoms.rattle`,
         or as `distance` to :meth:`pymatgen.core.structure.Structure.perturb`
         defaults to None
     :type rattle_stdev: float, optional
@@ -336,27 +336,27 @@ def get_images(
     skip_failed: bool = False,
     **kwargs
 ) -> List[Atoms]:
-    """Return a list of atoms objects based on the input arguments. Options \
+    r"""Return a list of atoms objects based on the input arguments. Options
         to specify are:
         #. image_file
         #. pattern
         #. patterns
         #. images
 
-    :param image_file: Path to ASE-readable file with one or more images, \
+    :param image_file: Path to ASE-readable file with one or more images,
         defaults to None
     :type image_file: str, optional
-    :param pattern: String pattern of paths from which to search for images, \
-        defaults to None. This only gets the last image from each file as in \
+    :param pattern: String pattern of paths from which to search for images,
+        defaults to None. This only gets the last image from each file as in
         :func:`ase.io.read` if an index is not specified.
     :type pattern: str, optional
-    :param patterns: Sequence of string patterns/paths from which to search \
-        for images, defaults to None. This only gets one image from each file \
+    :param patterns: Sequence of string patterns/paths from which to search
+        for images, defaults to None. This only gets one image from each file
         as in :func:`ase.io.read` without specifying an index
     :type pattern: str, optional
     :param images: A list of atoms objects, defaults to None
     :type images: Iterable[Atoms], optional
-    :param index: Index to specify when using :func:`ase.io.read`, \ defaults
+    :param index: Index to specify when using :func:`ase.io.read`, defaults
         to ':'
     :type index: Union[str, int], optional
     :param skip_failed: Whether to raise an IO error if it fails to read any of

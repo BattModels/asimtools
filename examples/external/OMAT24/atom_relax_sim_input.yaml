@@ -1,0 +1,13 @@
+asimmodule: geometry_optimization.atom_relax
+workdir: nacl_results
+args:
+  calc_id: OMAT24_eqV2_153M
+  image:
+    name: NaCl
+    builder: bulk
+    crystalstructure: rocksalt
+    a: 5.64
+    rattle_stdev: 0.03
+    repeat: [2,2,2]
+  fmax: 0.01
+  optimizer: BFGS

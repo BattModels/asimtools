@@ -271,6 +271,25 @@ def load_m3gnet(calc_params):
 
     return calc
 
+def load_omat24(calc_params):
+    """Load and OMAT24 calculator
+
+    :param calc_params: parameters to be passed to fairchem.core.OCPCalculator.
+        Must include a key "model" that points to the model used to instantiate the potential
+    :type calc_params: Dict
+    :return: OMAT24 calculator
+    :rtype: :class:`fairchem.core.OCPCalculator`
+    """
+    from fairchem.core import OCPCalculator
+
+    try:
+        calc = OCPCalculator(**calc_params['args'])
+    except Exception:
+        logging.error("Failed to load OMAT24 with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
 external_calcs = {
     'NequIP': load_nequip,
     'Allegro': load_nequip,
@@ -280,4 +299,5 @@ external_calcs = {
     'MACECalculator': load_mace,
     'EspressoProfile': load_espresso_profile,
     'M3GNet': load_m3gnet,
+    'OMAT24': load_omat24,
 }

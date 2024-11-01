@@ -1,0 +1,10 @@
+OMAT24_eqV2_153M: 
+  name: OMAT24
+  args:
+    checkpoint_path: "/global/homes/m/mkphuthi/repos/OMAT24/eqV2_153M_omat.pt" #Download from fairchem repository
+
+OMAT24_eqV2_31M_mp.pt: 
+  name: OMAT24
+  args:
+    checkpoint_path: "/global/homes/m/mkphuthi/repos/OMAT24/eqV2_31M_mp.pt"
+
