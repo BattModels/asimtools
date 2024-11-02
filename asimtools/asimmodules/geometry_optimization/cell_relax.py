@@ -21,6 +21,7 @@ def cell_relax(
     image: Dict,
     optimizer: str = 'BFGS',
     fmax: float = 0.002,
+    steps: int = 1000,
     mask: Optional[Sequence] = None,
     prefix: Optional[str] = None,
 ) -> Dict:
@@ -36,6 +37,8 @@ def cell_relax(
     :type optimizer: str, optional
     :param fmax: Maximum stress in eV/$\AA^3$, defaults to 0.002
     :type fmax: float, optional
+    :param steps: Maximum number of steps to run, defaults to 1000
+    :type steps: int, optional
     :param mask: Mask to constrain cell deformation while relaxing, defaults to None
     :type mask: Optional[Sequence], optional
     :return: Dictionary of results including, final energy, stress and output files
@@ -61,7 +64,7 @@ def cell_relax(
     )
     dyn.attach(traj)
     try:
-        dyn.run(fmax=fmax)
+        dyn.run(fmax=fmax, steps=steps)
     except Exception:
         print('Failed to optimize atoms')
         raise
