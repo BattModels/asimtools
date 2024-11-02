@@ -6,10 +6,10 @@ Test Job class
 
 from pathlib import Path
 import pytest
-from asimtools.job import UnitJob
+from asimtools.job import UnitJob, check_job_tree_complete
 from asimtools.utils import read_yaml
 
-def create_unitjob(sim_input, env_input, workdir, calc_input=None):
+def create_unitjob(sim_input, env_input, workdir, calc_input=None, status=None):
     """Helper for making a generic UnitJob object"""
     env_id = list(env_input.keys())[0]
     sim_input['env_id'] = env_id
@@ -22,6 +22,8 @@ def create_unitjob(sim_input, env_input, workdir, calc_input=None):
         env_input,
         calc_input
     )
+    if status is not None:
+        unitjob.set_status(status)
     return unitjob
 
 @pytest.mark.parametrize("env_input",[
@@ -260,3 +262,170 @@ def test_slurm_asimmodule(flags, tmp_path):
         if 'test_run_suffix' in line:
             assert 'asim-run' in line
             assert line.index('test_run_suffix') > line.index('asim-run')
+
+class FloatingJob(UnitJob):
+    '''A job that can be in any status without being written to disk'''
+    def __init__(self, sim_input, env_input, calc_input=None, status='clean'):
+        super().__init__(sim_input, env_input, calc_input)
+        self.status = status
+
+    def get_status(self):
+        completed = False
+        if self.status == 'complete':
+            completed = True
+        return completed, self.status
+
+complete_job = FloatingJob(
+    {'asimmodule': 'do_nothing'},
+    {'inline_env': {'mode': {'use_slurm': False}}},
+    status='complete',  
+)
+
+discard_job = FloatingJob(
+    {'asimmodule': 'do_nothing'},
+    {'inline_env': {'mode': {'use_slurm': False}}},
+    status='discard',
+)
+
+failed_job = FloatingJob(
+    {'asimmodule': 'do_nothing'},
+    {'inline_env': {'mode': {'use_slurm': False}}},
+    status='failed',
+)
+
+clean_job = FloatingJob(
+    {'asimmodule': 'do_nothing'},
+    {'inline_env': {'mode': {'use_slurm': False}}},
+    status='clean',
+)
+
+@pytest.mark.parametrize("test_input, expected",[
+    ({
+        'workdir_name': 'dummy',
+        'job': complete_job,
+        'subjobs': None,
+    }, (True, 'complete')),
+    ({
+        'workdir_name': 'dummy',
+        'job': failed_job,
+        'subjobs': None,
+    }, (False, 'failed')),
+    ({
+        'workdir_name': 'dummy',
+        'job': clean_job,
+        'subjobs': None,
+    }, (False, 'clean')),
+    ({
+        'workdir_name': 'dummy',
+        'job': discard_job,
+        'subjobs': None,
+    }, (True, 'discard')),
+    ({
+        'workdir_name': 'dummy',
+        'job': complete_job,
+        'subjobs': {
+            'id-0000': {
+                'workdir_name': 'dummy',
+                'job': complete_job,
+                'subjobs': None,
+            },
+            'id-0001': {
+                'workdir_name': 'dummy',
+                'job': complete_job,
+                'subjobs': None,
+            },
+        }
+    }, (True, 'complete')),
+    ({
+        'workdir_name': 'dummy',
+        'job': complete_job,
+        'subjobs': {
+            'id-0000': {
+                'workdir_name': 'dummy',
+                'job': discard_job,
+                'subjobs': None,
+            },
+            'id-0001': {
+                'workdir_name': 'dummy',
+                'job': complete_job,
+                'subjobs': None,
+            },
+        }
+    }, (True, 'complete')),
+    ({
+        'workdir_name': 'dummy',
+        'job': complete_job,
+        'subjobs': {
+            'id-0000': {
+                'workdir_name': 'dummy',
+                'job': complete_job,
+                'subjobs': None,
+            },
+            'id-0001': {
+                'workdir_name': 'dummy',
+                'job': failed_job,
+                'subjobs': None,
+            },
+        }
+    }, (False, 'failed')),
+    ({
+        'workdir_name': 'dummy',
+        'job': complete_job,
+        'subjobs': {
+            'id-0000': {
+                'workdir_name': 'dummy',
+                'job': complete_job,
+                'subjobs': None,
+            },
+            'id-0001': {
+                'workdir_name': 'dummy',
+                'job': complete_job,
+                'subjobs': {
+                    'id-0000': {
+                        'workdir_name': 'dummy',
+                        'job': discard_job,
+                        'subjobs': None,
+                    },
+                    'id-0001': {
+                        'workdir_name': 'dummy',
+                        'job': clean_job,
+                        'subjobs': None,
+                    },
+                },
+            },
+        }
+    }, (False, 'clean')),
+    ({
+        'workdir_name': 'dummy',
+        'job': complete_job,
+        'subjobs': {
+            'id-0000': {
+                'workdir_name': 'dummy',
+                'job': complete_job,
+                'subjobs': None,
+            },
+            'id-0001': {
+                'workdir_name': 'dummy',
+                'job': complete_job,
+                'subjobs': {
+                    'id-0000': {
+                        'workdir_name': 'dummy',
+                        'job': complete_job,
+                        'subjobs': None,
+                    },
+                    'id-0001': {
+                        'workdir_name': 'dummy',
+                        'job': complete_job,
+                        'subjobs': None,
+                    },
+                },
+            },
+        }
+    }, (True, 'complete')),
+])
+def test_check_job_tree_complete(tmp_path, test_input, expected):
+    ''' Test check_job_tree_complete '''
+
+    assert check_job_tree_complete(test_input) == expected
+    assert check_job_tree_complete(test_input, skip_failed=True)[0] == True
+    

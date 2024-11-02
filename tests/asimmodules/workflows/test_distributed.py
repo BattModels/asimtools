@@ -28,3 +28,5 @@ def test_distributed(env_input, calc_input, sim_input, tmp_path, request):
         assert uj.get_status()[1] == 'complete'
 
         assert uj.get_sim_input()['workdir'] == './'
+
+    assert unitjob.get_status(descend=True) == (True, 'complete')
