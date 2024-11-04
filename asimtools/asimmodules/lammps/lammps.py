@@ -7,6 +7,7 @@ Author: mkphuthi@github.com
 from typing import Dict, Optional
 import sys
 from pathlib import Path
+from numpy.random import randint
 import subprocess
 import logging
 from asimtools.utils import (
@@ -21,6 +22,7 @@ def lammps(
     placeholders: Optional[Dict] = None,
     lmp_cmd: str = 'lmp',
     masses: bool = True,
+    seed: Optional[int] = None,
 ) -> Dict:
     """Runs a lammps script based on a specified template, variables can be 
     specified as arguments to be defined in the final LAMMPS input file if 
@@ -28,23 +30,31 @@ def lammps(
 
     :param template: path to lammps input template file
     :type template: str
-    :param image: Initial image for MD simulation. Image specification, see :func:`asimtools.utils.get_atoms`, defaults to None
+    :param image: Initial image for MD simulation. Image specification, 
+        see :func:`asimtools.utils.get_atoms`, defaults to None
     :type image: Dict, optional
-    :param atom_style: LAMMPS style in which to write image to Lammps data input e.g. full, atomic etc., defaults to 'atomic'
+    :param atom_style: LAMMPS style in which to write image to Lammps data 
+        input e.g. full, atomic etc., defaults to 'atomic'
     :type atom_style: str, optional
-    :param variables: Dictionary of variables to be defined into the lammps input, defaults to None
+    :param variables: Dictionary of variables to be defined into the lammps 
+        input, defaults to None
     :type variables: Dict, optional
-    :param placeholders: Dictionary of placeholders to be filled into the lammps input, defaults to None
+    :param placeholders: Dictionary of placeholders to be filled into the 
+        lammps input, defaults to None
     :type placeholders: Dict, optional
     :param lmp_cmd: Command with which to run LAMMPS, defaults to 'lmp'
     :type lmp_cmd: str, optional
-    :param masses: Whether to specify atomic masses in LAMMPS data input, requires ASE>3.23.0, defaults to True
+    :param masses: Whether to specify atomic masses in LAMMPS data input, 
+        requires ASE>3.23.0, defaults to True
     :type masses: bool, optional
+    :param seed: Random seed for anywhere necessary in the template. You will 
+        need to put the 'SEED'  placeholder anywhere you want a random 
+        seed to be placed, if seed=None, a random one is generated, 
+        defaults to None
+    :type seed: int, optional
     :return: LAMMPS out file names
     :rtype: Dict
-    """    ''' 
-    Runs a lammps simulation based on a template lammps input script
-    '''
+    """
     if variables is None:
         variables = {}
 
@@ -90,6 +100,11 @@ def lammps(
         placeholders = {}
 
     for line in lines:
+        if 'SEED' in line and 'SEED' not in placeholders:
+            if seed is None:
+                seed = str(randint(0, 100000))
+            line = line.replace('SEED', seed)
+
         for placeholder in placeholders:
             line = line.replace(placeholder, placeholders[placeholder])
         lmp_txt += line
