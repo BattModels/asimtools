@@ -77,7 +77,7 @@ class Job():
         if not self.workdir.exists():
             self.workdir.mkdir()
 
-    def update_status(self, status: str) -> None:
+    def set_status(self, status: str) -> None:
         ''' Updates job status to specificied value '''
         self.update_output({'status': status})
 
@@ -86,22 +86,22 @@ class Job():
         self.update_output({
             'start_time': datetime.now().strftime('%H:%M:%S, %m/%d/%y')
         })
-        self.update_status('started')
+        self.set_status('started')
 
     def complete(self) -> None:
         ''' Updates the output to signal that the job was started '''
         self.update_output({
             'end_time': datetime.now().strftime('%H:%M:%S, %m/%d/%y')
         })
-        self.update_status('complete')
+        self.set_status('complete')
 
     def fail(self) -> None:
         ''' Updates status to failed '''
-        self.update_status('failed')
+        self.set_status('failed')
 
     def discard(self) -> None:
         ''' Updates status to discarded '''
-        self.update_status('discard')
+        self.set_status('discard')
 
     def go_to_workdir(self) -> None:
         ''' Go to workdir '''
@@ -170,7 +170,7 @@ class Job():
         self.sim_input['workdir'] = str(workdir.resolve())
         self.workdir = workdir
 
-    def get_status(self, display=False) -> Tuple[bool,str]:
+    def get_status(self, descend=False, display=False) -> Tuple[bool,str]:
         ''' Check job status '''
         output = self.get_output()
         job_id = output.get('job_id', False)
@@ -179,11 +179,16 @@ class Job():
             running = check_if_slurm_job_is_running(job_id)
         if running:
             status = 'started'
-            self.update_status(status)
+            self.set_status(status)
             complete = False
         else:
-            status = output.get('status', 'clean')
-            complete = status == 'complete'
+            if not descend:
+                status = output.get('status', 'clean')
+                complete = status == 'complete'
+            else:
+                job_tree = load_job_tree(self.workdir)
+                complete, status = check_job_tree_complete(job_tree)
+
         if display:
             print(f'Status: {status}')
         return complete, status
@@ -812,7 +817,9 @@ class ChainedJob(Job):
             if step != len(self.unitjobs):
                 dependency = None
                 for i, unitjob in enumerate(self.unitjobs[step:]):
-                    cur_step_complete, status = unitjob.get_status()
+                    cur_step_complete, status = unitjob.get_status(
+                        descend=True
+                    )
                     if not cur_step_complete:
                         slurm_flags = unitjob.env['slurm']['flags']
                         if isinstance(slurm_flags, list):
@@ -828,14 +835,44 @@ class ChainedJob(Job):
                             unitjob.env['slurm']['flags']['-J'] = \
                                 f'step-{step+i}'
 
-                        write_image = False
-                        # Write image first step in chain being run/continued
-                        if i == 0:
-                            write_image = True
-                        dependency = unitjob.submit(
-                            dependency=dependency,
-                            write_image=write_image,
-                        )
+                        #if there is a following job
+                        if i < len(self.unitjobs)-1:
+                            curjob = unitjob
+                            nextjob = self.unitjobs[i+1]
+                            nextjob.env['slurm']['flags'].append(
+                                f'--dependency=afterok:{dependency}'
+                            )
+
+                            #   Add a postcommand doing the following
+                            nextworkdir = os.path.relpath(
+                                nextjob.workdir,
+                                curjob.workdir
+                            )
+                            curworkdir = os.path.relpath(
+                                curjob.workdir,
+                                nextjob.workdir
+                            )
+                            #   go into the next workdir
+                            postcommands = [f'cd {nextworkdir}']
+                            #   submit the next job dependent on the current one
+                            postcommands += [
+                                'asim-execute sim_input.yaml \
+                                    -c calc_input.yaml \
+                                    -e env_input.yaml'
+                            ]
+                            postcommands += [f'cd {curworkdir}']
+                        
+                        #   submit the next job dependent on the current one   
+                        # Prvious working solution
+                        # write_image = False
+                        # # Write image first step in chain being run/continued
+                        # if i == 0:
+                        #     write_image = True
+                        # dependency = unitjob.submit(
+                        #     dependency=dependency,
+                        #     write_image=write_image,
+                        # )
+
                     else:
                         txt = f'Skipping step-{step+i} since '
                         txt += f'status is {status}'
@@ -909,3 +946,67 @@ def create_unitjob(sim_input, env_input, workdir, calc_input=None):
         calc_input
     )
     return unitjob
+
+def get_subjobs(workdir):
+    """Get all the directories with jobs in them
+
+    :param workdir: _description_
+    :type workdir: _type_
+    :return: _description_
+    :rtype: _type_
+    """
+    subjob_dirs = []
+    for subdir in workdir.iterdir():
+        subsim_input = subdir / 'sim_input.yaml'
+        if subsim_input.exists():
+            subjob_dirs.append(subdir)
+
+    return sorted(subjob_dirs)
+
+def load_job_tree(
+    workdir: str = './',
+) -> Dict:
+    """Loads all the jobs in a directory in a tree format using recursion
+
+    :param workdir: root directory from which to recursively find jobs, defaults to './'
+    :type workdir: str, optional
+    :return: dictionary mimicking the job tree
+    :rtype: Dict
+    """
+    workdir = Path(workdir).resolve()
+
+    subjob_dirs = get_subjobs(workdir)
+    if len(subjob_dirs) > 0:
+        subjob_dict = {}
+        for subjob_dir in subjob_dirs:
+            subjob_dict[subjob_dir.name] = load_job_tree(subjob_dir)
+    else:
+        subjob_dict = None
+
+    job = load_job_from_directory(workdir)
+    job_dict = {
+        'workdir_name': workdir.name,
+        'job': job,
+        'subjobs': subjob_dict,
+    }
+    return job_dict
+
+def check_job_tree_complete(job_tree: Dict, skip_failed: bool=False) -> bool:
+    if job_tree['subjobs'] is None:
+        status = job_tree['job'].get_status()[1]
+        if status == 'complete' or status =='discard' or skip_failed:
+            return True, status
+        else:
+            return False, status
+    else:
+        complete_so_far = True
+        for subjob_id in job_tree['subjobs']:
+            subjob = job_tree['subjobs'][subjob_id]
+            complete, status = check_job_tree_complete(
+                subjob,
+                skip_failed=skip_failed
+            )
+            complete_so_far = complete_so_far and complete
+            if not complete_so_far:
+                return False, status
+        return True, status
