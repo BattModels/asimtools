@@ -429,7 +429,7 @@ class UnitJob(Job):
 
     def submit(
         self,
-        dependency: Union[List,None] = None,
+        dependency: Union[List,None,str] = None,
         write_image: bool = True,
     ) -> Union[None,List[str]]:
         '''
@@ -472,6 +472,8 @@ class UnitJob(Job):
         if use_slurm and not interactive:
             if dependency is not None:
                 dependstr = None
+                if dependency == 'current':
+                    dependency = [os.environ['SLURM_JOB_ID']]
                 for dep in dependency:
                     if dependstr is None:
                         dependstr = str(dep) if dep is not None else None
@@ -816,34 +818,34 @@ class ChainedJob(Job):
         if all_slurm and all_not_interactive:
             if step != len(self.unitjobs):
                 dependency = None
-                for i, unitjob in enumerate(self.unitjobs[step:]):
-                    cur_step_complete, status = unitjob.get_status(
-                        descend=True
-                    )
+                only_write = False
+                for i, curjob in enumerate(self.unitjobs[step:]):
+                    if not (curjob.workdir / 'sim_input.yaml').exists():
+                        cur_step_complete = False
+                    else:
+                        cur_step_complete, status = curjob.get_status(
+                            descend=True
+                        )
                     if not cur_step_complete:
-                        slurm_flags = unitjob.env['slurm']['flags']
+                        print(f'XXXX Step {step+i} not complete, submitting')
+                        slurm_flags = curjob.env['slurm']['flags']
                         if isinstance(slurm_flags, list):
-                            job_name = unitjob.sim_input.get('job_name',False)
+                            job_name = curjob.sim_input.get('job_name',False)
                             if not job_name:
                                 job_name = f'-J step-{step+i}'
                             else:
                                 job_name = f'-J step-{step+i}-{job_name}'
-                            unitjob.env['slurm']['flags'].append(
+                            curjob.env['slurm']['flags'].append(
                                 job_name
                             )
                         elif isinstance(slurm_flags, dict):
-                            unitjob.env['slurm']['flags']['-J'] = \
+                            curjob.env['slurm']['flags']['-J'] = \
                                 f'step-{step+i}'
 
                         #if there is a following job
                         if i < len(self.unitjobs)-1:
-                            curjob = unitjob
                             nextjob = self.unitjobs[i+1]
-                            nextjob.env['slurm']['flags'].append(
-                                f'--dependency=afterok:{dependency}'
-                            )
 
-                            #   Add a postcommand doing the following
                             nextworkdir = os.path.relpath(
                                 nextjob.workdir,
                                 curjob.workdir
@@ -852,26 +854,36 @@ class ChainedJob(Job):
                                 curjob.workdir,
                                 nextjob.workdir
                             )
-                            #   go into the next workdir
-                            postcommands = [f'cd {nextworkdir}']
-                            #   submit the next job dependent on the current one
-                            postcommands += [
-                                'asim-execute sim_input.yaml \
-                                    -c calc_input.yaml \
-                                    -e env_input.yaml'
-                            ]
+                            # Add postcommands to go into the next workdir
+                            postcommands = curjob.env['slurm'].get(
+                                'postcommands', []
+                            )
+                            postcommands += ['\n#Submitting next step:']
+                            postcommands += [f'cd {nextworkdir}']
+                            # submit the next job dependent in the current
+                            # bash script
+                            submit_txt = 'asim-execute sim_input.yaml '
+                            submit_txt += '-c calc_input.yaml '
+                            submit_txt += '-e env_input.yaml '
+                            postcommands += [submit_txt]
                             postcommands += [f'cd {curworkdir}']
-                        
+                            curjob.env['slurm']['postcommands'] = postcommands
+
                         #   submit the next job dependent on the current one   
                         # Prvious working solution
-                        # write_image = False
-                        # # Write image first step in chain being run/continued
-                        # if i == 0:
-                        #     write_image = True
-                        # dependency = unitjob.submit(
-                        #     dependency=dependency,
-                        #     write_image=write_image,
-                        # )
+                        write_image = False
+                        # Write image first step in chain being run/continued
+                        if i == 0:
+                            write_image = True
+
+                        if only_write:
+                            curjob.gen_input_files(write_image=write_image)
+                        else:
+                            dependency = curjob.submit(
+                                dependency=dependency,
+                                write_image=write_image,
+                            )
+                            only_write = True
 
                     else:
                         txt = f'Skipping step-{step+i} since '
