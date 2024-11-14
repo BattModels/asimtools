@@ -61,7 +61,12 @@ def optimize(
         raise
 
     image_file = 'image_output.xyz'
-    atoms.write(image_file, format='extxyz')
+    atoms.write(
+        image_file,
+        format='extxyz',
+        write_info=False,
+        write_results=True,
+    )
 
     energy = float(atoms.get_potential_energy())
     final_fmax = float(atoms.get_stress().max())

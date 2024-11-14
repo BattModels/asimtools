@@ -61,7 +61,12 @@ def atom_relax(
         raise
 
     image_file = prefix + 'image_output.xyz'
-    atoms.write(image_file, format='extxyz')
+    atoms.write(
+        image_file,
+        format='extxyz',
+        write_info=False,
+        write_results=True,
+    )
 
     energy = float(atoms.get_potential_energy())
     final_fmax = float(np.sqrt((atoms.get_forces() ** 2).sum(axis=1).max()))

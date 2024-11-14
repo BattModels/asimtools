@@ -67,7 +67,12 @@ def cell_relax(
         raise
 
     image_file = join_names([prefix, 'image_output.xyz'])[:-2]
-    atoms.write(image_file, format='extxyz')
+    atoms.write(
+        image_file,
+        format='extxyz',
+        write_info=False,
+        write_results=True,
+    )
 
     energy = float(atoms.get_potential_energy())
     final_fmax = float(atoms.get_stress().max())
