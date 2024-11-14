@@ -1,5 +1,6 @@
 from typing import Dict, Sequence, Optional, Union
 from glob import glob
+from natsort import natsorted
 import numpy as np
 from asimtools.utils import get_str_btn
 
@@ -63,7 +64,7 @@ def prepare_array_vals(
         f'Provide only one of {[str(v) for v in possible_strs]}'
 
     if file_pattern is not None:
-        array_values = sorted(glob(str(file_pattern)))
+        array_values = natsorted(glob(str(file_pattern)))
     elif linspace_args is not None:
         array_values = np.linspace(*linspace_args)
         array_values = [float(v) for v in array_values]

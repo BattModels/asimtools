@@ -22,11 +22,7 @@ def distribution(
 ) -> Dict:
     unit_factors = {'meV': 1000, 'eV': 1, 'kcal/mol': 23.0621}
     unit_factor = unit_factors[unit]
-    units = {
-        'energy': f'{unit}/atom',
-        'forces': f'{unit}'+r'/$\AA$',
-        'stress': f'{unit}'+r'/$\AA^3$',
-    }
+
     unit_dict = {
         'energy': f'{unit}/atom',
         'forces': f'{unit}'+r'/$\AA$',
@@ -67,8 +63,9 @@ def distribution(
     for prop in ['energy', 'volume', 'enthalpy']:
         print(prop, results[prop])
         results[prop] = results[prop] / results['natoms']
-
-
+    
+    for prop in ['forces', 'stress', 'pressure', 'energy', 'enthalpy']:
+        results[prop] = results[prop] / unit_factor
 
     for prop in unit_dict:
         fig = plt.figure()

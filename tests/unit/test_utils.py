@@ -139,16 +139,20 @@ def test_change_dict_values(test_input, expected):
     assert new_d != d
 
 @pytest.mark.parametrize("test_input, expected",[
-    (':', slice(None, None, None)),
-    ('1:', slice(1, None, None)),
-    (':4', slice(None, 4, None)),
-    ('1:5', slice(1, 5, None)),
-    ('::-1', slice(None, None, -1)),
-    ('3:67:4', slice(3, 67, 4)),
+    ((':', ), slice(None, None, None)),
+    (('1:', ), slice(1, None, None)),
+    ((':4', ), slice(None, 4, None)),
+    (('1:5', ), slice(1, 5, None)),
+    (('::-1', ), slice(None, None, -1)),
+    (('3:67:4', ), slice(3, 67, 4)),
+    (('1:', True), '$(seq 1 1 $END)'),
+    (('1:5', True), '$(seq 1 1 5)'),
+    (('::-1', True), '$(seq 0 -1 $END)'),
+    (('3:67:4', True), '$(seq 3 4 67)'),
 ])
 def test_parse_slice(test_input, expected):
     ''' Test parsing a slice '''
-    assert parse_slice(test_input) == expected
+    assert parse_slice(*test_input) == expected
 
 def test_write_and_read_yaml(tmp_path):
     d = {'test_key': 'test_value'}
