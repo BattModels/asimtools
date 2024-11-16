@@ -14,6 +14,7 @@ def distributed(
     env_input: Optional[Dict] = None,
     calc_input: Optional[Dict] = None,
     array_max: Optional[int] = None,
+    group_size: int = 1,
 ) -> Dict:
     """Distributes a set of jobs based on inpout parameter. The scnarios are
     as follows:
@@ -32,6 +33,8 @@ def distributed(
     :type calc_input: Optional[Dict], optional
     :param array_max: Maximum number of jobs to run in array, defaults to None
     :type array_max: Optional[int], optional
+    :param group_size: Number of jobs to group together, defaults to 1
+    :type group_size: int, optional
     :return: Dictionary of results
     :rtype: Dict
     """
@@ -40,7 +43,7 @@ def distributed(
         env_input=env_input,
         calc_input=calc_input
     )
-    job_ids = djob.submit(array_max=array_max)
+    job_ids = djob.submit(array_max=array_max, group_size=group_size)
 
     results = {'job_ids': job_ids}
     return results

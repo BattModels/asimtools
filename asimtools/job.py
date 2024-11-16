@@ -595,13 +595,105 @@ class DistributedJob(Job):
         )
 
         if same_env and all_slurm:
-            self.use_slurm_array = True
-        elif same_env and all_bash:
-            self.use_bash_array = True
+            self.use_slurm = True
         else:
-            self.use_slurm_array = False
+            self.use_slurm = False
+        
+        if all_bash:
+            self.use_bash = True
 
         self.unitjobs = unitjobs
+
+    def _gen_array_script(
+        self,
+        write: bool = True,
+        group_size: int = 1,
+    ) -> None:
+        '''
+        Generates a slurm job array file and if necessary 
+        writes it in the work directory for the job. Only works
+        if there is one env_id for all jobs
+        '''
+        env_id = self.unitjobs[0].env_id
+        env = self.env_input[env_id]
+
+        slurm_params = env.get('slurm', {})
+
+        txt = self._gen_slurm_batch_preamble(
+            slurm_params=slurm_params,
+            extra_flags=[
+                '-o slurm_stdout.id-%a_j%A',
+                '-e slurm_stderr.id-%a_j%A',
+            ]
+        )
+
+        txt += 'echo "Job started on `hostname` at `date`"\n'
+        txt += 'CUR_DIR=`pwd`\n'
+        txt += 'echo "LAUNCHDIR: ${CUR_DIR}"\n'
+        txt += f'GROUP_SIZE={group_size}\n'
+        seqtxt = '$(seq $((${SLURM_ARRAY_TASK_ID}*${GROUP_SIZE})) '
+        seqtxt += '$(((${SLURM_ARRAY_TASK_ID}+1)*${GROUP_SIZE})))'
+        txt += f'WORKDIRS=($(ls -dv ./id-*))\n'
+        txt += f'for i in {seqtxt}; do\n'
+        txt += 'cd ${WORKDIRS[$i]};\n'
+        # else:
+        #     txt += '\nif [[ ! -z ${SLURM_ARRAY_TASK_ID} ]]; then\n'
+        #     txt += '    fls=( id-* )\n'
+        #     txt += '    WORKDIR=${fls[${SLURM_ARRAY_TASK_ID}]}\n'
+        #     txt += 'fi\n\n'
+        # txt += 'cd ${WORKDIR}\n'
+        txt += '\n'
+        txt += '\n'.join(slurm_params.get('precommands', []))
+        txt += '\n'
+        txt += '\n'.join(self.unitjobs[0].calc_params.get('precommands', []))
+        txt += '\n'
+        txt += 'echo "WORKDIR: ${WORKDIRS[$i]}"\n'
+        txt += self.unitjobs[0].gen_run_command() + '\n'
+        txt += '\n'.join(slurm_params.get('postcommands', []))
+        txt += '\n'
+        txt += 'cd ${CUR_DIR}\n'
+        txt += 'done\n'
+        txt += 'echo "Job ended at `date`"'
+
+        if write:
+            slurm_file = self.workdir / 'job_array.sh'
+            slurm_file.write_text(txt)
+
+    def _gen_bash_script(
+        self,
+        write: bool = True,
+    ) -> None:
+        '''
+        Generates a bash script for job submission and if necessary 
+        writes it in the work directory for the job. Only works
+        if there is one env_id for all jobs
+        '''
+        env_id = self.unitjobs[0].env_id
+        env = self.env_input[env_id]
+
+        txt = '#!/usr/bin/env sh\n\n'
+        # txt += f'WDIRS=($(ls -dv ./id-*))\n'
+        txt += f'for WORKDIR in id-*; do\n'
+        txt += '    cd ${WORKDIR};\n'
+        txt += '\n'.join(self.unitjobs[0].calc_params.get('precommands', []))
+        txt += '\n    asim-run sim_input.yaml -c calc_input.yaml\n'
+        txt += '\n'.join(self.unitjobs[0].calc_params.get('precommands', []))
+        txt += f'\n    cd ../;\n'
+        txt += 'done'
+
+        if write:
+            script_file = self.workdir / 'bash_script.sh'
+            script_file.write_text(txt)
+
+    def gen_input_files(self) -> None:
+        ''' Write input files to working directory '''
+
+        if self.use_slurm:
+            self._gen_array_script()
+        if self.use_bash:
+            self._gen_bash_script()
+        for unitjob in self.unitjobs:
+            unitjob.gen_input_files()
 
     def submit_jobs(
         self,
@@ -639,10 +731,10 @@ class DistributedJob(Job):
             return None
 
         command = [
-            'source ',
-            'job_script.sh',
+            'sh',
+            './bash_script.sh',
         ]
-
+        print(command)
         completed_process = subprocess.run(
             command, check=False, capture_output=True, text=True,
         )
@@ -661,8 +753,8 @@ class DistributedJob(Job):
             logger.error(err_msg)
             completed_process.check_returncode()
 
-        if os.env.get('SLURM_JOB_ID', False):
-            job_ids = [int(os.env['SLURM_JOB_ID'])]
+        if os.environ.get('SLURM_JOB_ID', False):
+            job_ids = [int(os.environ['SLURM_JOB_ID'])]
         else:
             job_ids = None
         return job_ids
@@ -671,7 +763,8 @@ class DistributedJob(Job):
         self,
         array_max=None,
         dependency: Union[List[str],None] = None,
-        **kwargs, # Necessary for compatibility with job.submit
+        group_size: int = 1,
+        **kwargs,
     ) -> Union[None,List[int]]:
         '''
         Submits a job array if all the jobs have the same env and use slurm
@@ -697,6 +790,15 @@ class DistributedJob(Job):
                 arr_max_str = f'%{arr_max}'
             else:
                 arr_max_str = ''
+
+        if group_size > 1:
+            nslurm_jobs = int(np.ceil(njobs / group_size))
+            self._gen_array_script(
+                dist_ids=f'0-{nslurm_jobs-1}{arr_max_str}'
+            )
+        # if group_size is not 1
+        #    write the bash submission script
+        #    the submit command is to submit the bash script
 
         if dependency is not None:
             dependstr = None
@@ -738,91 +840,6 @@ class DistributedJob(Job):
         job_ids = [int(completed_process.stdout.split(' ')[-1])]
         return job_ids
 
-    def _gen_array_script(self, write: bool = True) -> None:
-        '''
-        Generates a slurm job array file and if necessary 
-        writes it in the work directory for the job. Only works
-        if there is one env_id for all jobs
-        '''
-        env_id = self.unitjobs[0].env_id
-        env = self.env_input[env_id]
-
-        slurm_params = env.get('slurm', {})
-
-        txt = self._gen_slurm_batch_preamble(
-            slurm_params=slurm_params,
-            extra_flags=[
-                '-o slurm_stdout.id-%a_j%A',
-                '-e slurm_stderr.id-%a_j%A',
-            ]
-        )
-
-        txt += '\nif [[ ! -z ${SLURM_ARRAY_TASK_ID} ]]; then\n'
-        txt += '    fls=( id-* )\n'
-        txt += '    WORKDIR=${fls[${SLURM_ARRAY_TASK_ID}]}\n'
-        txt += 'fi\n\n'
-        txt += 'CUR_DIR=`pwd`\n'
-        txt += 'cd ${WORKDIR}\n'
-        txt += '\n'
-        txt += '\n'.join(slurm_params.get('precommands', []))
-        txt += '\n'
-        txt += '\n'.join(self.unitjobs[0].calc_params.get('precommands', []))
-        txt += '\n'
-        txt += 'echo "LAUNCHDIR: ${CUR_DIR}"\n'
-        txt += 'echo "WORKDIR: ${WORKDIR}"\n'
-        txt += 'echo "Job started on `hostname` at `date`"\n'
-        txt += self.unitjobs[0].gen_run_command() + '\n'
-        txt += '\n'.join(slurm_params.get('postcommands', []))
-        txt += '\n'
-        txt += 'cd ${CUR_DIR}\n'
-        txt += 'echo "Job ended at `date`"'
-
-        if write:
-            slurm_file = self.workdir / 'job_array.sh'
-            slurm_file.write_text(txt)
-
-    def _gen_bash_script(
-        self,
-        write: bool = True,
-        dist_ids: Union[str,Sequence,None] = None
-    ) -> None:
-        '''
-        Generates a bash script for job submission and if necessary 
-        writes it in the work directory for the job. Only works
-        if there is one env_id for all jobs
-        '''
-        env_id = self.unitjobs[0].env_id
-        env = self.env_input[env_id]
-        if dist_ids is None:
-            ids2run = '$(seq 1 $END)'
-        elif isinstance(dist_ids, str):
-            ids2run = parse_slice(dist_ids, bash=True)
-        else:
-            ids2run = '('+ ' '.join(dist_ids) + ')'
-
-        txt = '#!/usr/bin/sh\n\n'
-        txt += f'WDIRS=($(ls -dv ./id-*))\n'
-        txt += f'for i in {ids2run}; do\n'
-        txt += '    cd ${{WDIRS[$i]}};\n'
-        txt += '\n'.join(self.unitjobs
-        [0].calc_params.get('precommands', []))
-        txt += '\n    asim-run sim_input.yaml -c calc_input.yaml\n'
-        txt += '\n'.join(self.unitjobs[0].calc_params.get('precommands', []))
-        txt += f'\n    cd {self.workdir};\n'
-        txt += 'done'
-
-        if write:
-            script_file = self.workdir / 'job_script.sh'
-            script_file.write_text(txt)
-
-    def gen_input_files(self) -> None:
-        ''' Write input files to working directory '''
-
-        if self.use_slurm_array:
-            self._gen_array_script()
-        for unitjob in self.unitjobs:
-            unitjob.gen_input_files()
-
     def submit(self, **kwargs) -> None:
         ''' 
         Submit a job using slurm, interactively or in the terminal
@@ -831,9 +848,9 @@ class DistributedJob(Job):
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
         job_ids = None
-        if self.use_slurm_array:
+        if self.use_slurm:
             job_ids = self.submit_slurm_array(**kwargs)
-        elif self.use_bash_array:
+        elif self.use_bash:
             job_ids = self.submit_bash_array(**kwargs)
         else:
             job_ids = self.submit_jobs(**kwargs)

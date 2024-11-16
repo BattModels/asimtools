@@ -33,6 +33,7 @@ dependencies = [
     # Recommended to use the master branch of the ASE>=3.23 from gitlab but only 
     # required for lammps to handle masses correctly so far
     "colorama",
+    "natsort",
     "mp-api",
 ]
 

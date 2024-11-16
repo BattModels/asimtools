@@ -26,6 +26,10 @@ srun:
   slurm:
     flags:
       - -n 1
+bash:
+  mode:
+    use_bash: true
+    interactive: true
 inline:
   mode:
     use_slurm: false
