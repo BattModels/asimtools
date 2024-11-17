@@ -1,0 +1,9 @@
+asimmodule: mlips.compute_deviation
+workdir: compute_deviation_results
+args:
+  images: 
+    image_file: /Users/keith/dev/asimtools/examples/external/active_learning/training_data/Ar_unlabeled_data.xyz
+  template_calc_input: null
+  model_weights_key_sequence: null
+  model_weights_pattern: null
+  calc_ids: [lj-0, lj-1, lj-2]

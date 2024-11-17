@@ -10,15 +10,17 @@ from asimtools.utils import get_calc_input
 # pylint: disable=import-error
 
 def load_calc(
-    calc_id: str = None,
+    calc_id: Optional[str] = None,
     calc_input: Optional[Dict] = None
 ):
     """Loads a calculator using given calc_id or calc_input
 
-    :param calc_id: ID/key to use to load calculator from the supplied/global\
-        calc_input file, defaults to None
+    :param calc_id: ID/key to use to load calculator from the supplied or \
+        global calc_input file, provide only one of calc_id or calc_input, \
+        defaults to None
     :type calc_id: str, optional
-    :param calc_input: calc_input dictionary for a single calculator\
+    :param calc_input: calc_input dictionary for a single calculator \
+        , provide only one of calc_id or calc_input, \
         , defaults to None
     :type calc_input: Optional[Dict], optional
     :return: ASE calculator instance

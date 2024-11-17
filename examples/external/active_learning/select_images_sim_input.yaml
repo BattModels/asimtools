@@ -1,0 +1,7 @@
+asimmodule: mlips.select_images
+workdir: select_images_results
+args:
+  image_file: /Users/keith/dev/asimtools/examples/external/active_learning/compute_deviation_results/images_input.xyz
+  deviation_csv: /Users/keith/dev/asimtools/examples/external/active_learning/compute_deviation_results/deviations.csv
+  column: force_max_std
+  thresholds: [0.0046, 0.0048]

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Runs a user defined lammps script or template 
+Runs a user defined lammps script or template. LAMMPS must be installed 
 
 Author: mkphuthi@github.com
 '''
