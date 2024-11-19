@@ -200,7 +200,7 @@ class Job():
         output.update(output_update)
         write_yaml(self.get_output_yaml(), output)
 
-    def get_logger(self, logfilename='job.log', level='info'):
+    def get_logger(self, logfilename='stdout.txt', level='info'):
         ''' Get the logger '''
         assert self.workdir.exists(), 'Work directory does not exist yet'
         logger = get_logger(logfile=self.workdir / logfilename, level=level)
@@ -659,7 +659,7 @@ class DistributedJob(Job):
             slurm_file = self.workdir / 'job_array.sh'
             slurm_file.write_text(txt)
 
-    def _gen_bash_script(
+    def _gen_sh_script(
         self,
         write: bool = True,
     ) -> None:
@@ -668,21 +668,19 @@ class DistributedJob(Job):
         writes it in the work directory for the job. Only works
         if there is one env_id for all jobs
         '''
-        env_id = self.unitjobs[0].env_id
-        env = self.env_input[env_id]
 
         txt = '#!/usr/bin/env sh\n\n'
-        # txt += f'WDIRS=($(ls -dv ./id-*))\n'
         txt += f'for WORKDIR in id-*; do\n'
         txt += '    cd ${WORKDIR};\n'
         txt += '\n'.join(self.unitjobs[0].calc_params.get('precommands', []))
-        txt += '\n    asim-run sim_input.yaml -c calc_input.yaml\n'
+        txt += '\n    asim-run sim_input.yaml -c calc_input.yaml '
+        txt += '>stdout.txt 2>stderr.txt\n'
         txt += '\n'.join(self.unitjobs[0].calc_params.get('precommands', []))
         txt += f'\n    cd ../;\n'
         txt += 'done'
 
         if write:
-            script_file = self.workdir / 'bash_script.sh'
+            script_file = self.workdir / 'sh_script.sh'
             script_file.write_text(txt)
 
     def gen_input_files(self) -> None:
@@ -691,7 +689,7 @@ class DistributedJob(Job):
         if self.use_slurm:
             self._gen_array_script()
         if self.use_bash:
-            self._gen_bash_script()
+            self._gen_sh_script()
         for unitjob in self.unitjobs:
             unitjob.gen_input_files()
 
@@ -732,9 +730,9 @@ class DistributedJob(Job):
 
         command = [
             'sh',
-            './bash_script.sh',
+            './sh_script.sh',
         ]
-        print(command)
+
         completed_process = subprocess.run(
             command, check=False, capture_output=True, text=True,
         )

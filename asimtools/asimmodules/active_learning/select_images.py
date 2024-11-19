@@ -1,5 +1,6 @@
-from typing import Dict, Sequence
+from typing import Dict, Sequence, Optional
 import os
+import random
 import pandas as pd
 from ase.io import write
 from asimtools.utils import (
@@ -10,7 +11,8 @@ def select_images(
     image_file: os.PathLike,
     deviation_csv: os.PathLike,
     thresholds: Sequence[float],
-    column: str = 'force_mean_std',
+    column: Optional[str] = 'force_mean_std',
+    max_images: Optional[int] = None,
 ) -> Dict:
     """Select images based on deviation values
 
@@ -23,6 +25,8 @@ def select_images(
     :type thresholds: Sequence[float]
     :param column: Column of csv to use, defaults to 'force_mean_std'
     :type column: str, optional
+    :param max_images: Maximum number of images to select, defaults to None
+    :type max_images: int, optional
     :return: Dictionary with stats on selected images
     :rtype: Dict
     """
@@ -34,10 +38,15 @@ def select_images(
 
     images = get_images(image_file=image_file)
     selected_images = [images[i] for i in selected_idxs]
+    random.shuffle(selected_images)
+    num_selected = len(selected_images)
+    if max_images is not None:
+        selected_images = selected_images[:max_images]
     write('selected_images.xyz', selected_images)
     results = {
-        'num_selected': len(selected_images),
-        'fraction_selected': len(selected_images)/len(images),
+        'num_selected': num_selected,
+        'fraction_selected': num_selected/len(images),
+        'final_size': len(selected_images),
         'selected_idxs': list(selected_idxs),
     }
     return results

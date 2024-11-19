@@ -1,0 +1,25 @@
+asimmodule: lammps.lammps
+workdir: npt_results
+overwrite: true
+submit: true
+args:
+  image:
+    image_file: /Users/keith/dev/asimtools/examples/external/active_learning/data/test.xyz
+    index: -1
+  lmp_cmd: lmp
+  # path relative to workdir, full path usually works best, you can put them
+  # in a directory and version control!
+  template: /Users/keith/dev/asimtools/examples/external/active_learning/npt_template.lammps
+  variables:
+    NSTEPS : 100
+    THERMO_FREQ:  10
+    DUMP_FREQ:  10
+    TEMP : 900.0
+    PRES : 1.0
+    TAU_T : 0.1
+    TAU_P : 0.5
+  placeholders: # Convenient way to define things like force field parameters, see template
+    NEWTON: "newton on"
+    DUMP_MODIFY_ELEMENT: "dump_modify all element Na Ta O Cl"
+    PAIR_STYLE: "pair_style      lj/cut 2.5"
+    PAIR_COEFF: "pair_coeff      * * 0.00802236 3.54"

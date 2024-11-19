@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 '''
-Runs a user defined lammps script or template. LAMMPS must be installed 
+Asimmodule for training MACE models
 
 Author: mkphuthi@github.com
 '''
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 import sys
 from pathlib import Path
 import logging
 import warnings
 warnings.filterwarnings("ignore")
+import json
 from numpy.random import randint
 from mace.cli.run_train import main as mace_run_train_main
 
@@ -29,41 +30,16 @@ def train_mace(
 
     if isinstance(config, str):
         with open(config, 'r') as fp:
-            config = yaml.safe_load(fp)
+            config = json.load(fp)
     
     if randomize_seed:
         config['seed'] = randint(0, 1000000)
 
     config_file_path = str(Path("mace_config.yaml").resolve())
     with open(config_file_path, "w") as f:
-        f.write(config)
+        json.dump(config, f, indent=2)
 
     logging.getLogger().handlers.clear()
     sys.argv = ["program", "--config", config_file_path]
     mace_run_train_main()
     return {}
-
-
-train_mace(
-    config={
-        "model": "MACE",
-        "num_channels": 32,
-        "max_L": 0,
-        "r_max": 4.0,
-        "name": "mace02_com1_gen1",
-        "model_dir": "MACE_models",
-        "log_dir": "MACE_models",
-        "checkpoints_dir": "MACE_models",
-        "results_dir": "MACE_models",
-        "train_file": "data/solvent_xtb_train_23_gen1.xyz",
-        "valid_file": "data/solvent_xtb_train_50.xyz",
-        "test_file": "data/solvent_xtb_test.xyz",
-        "energy_key": "energy_xtb",
-        "forces_key": "forces_xtb",
-        "device": "cuda",
-        "batch_size": 10,
-        "max_num_epochs": 500,
-        "swa": True,
-        "seed": 1234,
-    }
-)

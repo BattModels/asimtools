@@ -737,3 +737,36 @@ def get_nth_label(
     s = str(s)
     start = find_nth(s, '__', n=(n*2+1))
     return get_str_btn(s, '__', '__', start_index=start)
+
+def expand_wildcards(d: Dict, root_path: os.PathLike = None) -> Dict:
+    """Expands paths in a dictionary
+
+    :param d: Dictionary to expand paths in
+    :type d: Dict[str, Any]
+    :param root_path: Root path to expand paths from
+    :type root_path: os.PathLike
+    :return: Dictionary with expanded paths
+    :rtype: Dict[str, Any]
+    """
+    import os
+    def expand_value(value: str, root_path: os.PathLike = None) -> Union[str, list]:
+        if '*' in value:
+            if root_path is None:
+                root_path = Path('./')
+            else:
+                root_path = Path(root_path)
+            paths = glob(str(root_path / value))
+            assert len(paths) == 1, \
+                f'{len(paths)} matching paths found for {value}, must be only 1'
+            value = paths[0]
+            value = os.path.relpath(value, root_path)
+        return value
+
+    for key, value in d.items():
+        if isinstance(value, str):
+            d[key] = expand_value(value, root_path=root_path)
+        elif isinstance(value, dict):
+            d[key] = expand_wildcards(value, root_path=root_path)
+
+
+    return d

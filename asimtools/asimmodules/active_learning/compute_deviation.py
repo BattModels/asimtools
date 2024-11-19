@@ -5,6 +5,7 @@ from natsort import natsorted
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from ase.io import write
 from asimtools.calculators import load_calc
 from asimtools.utils import (
     change_dict_value,
@@ -13,7 +14,7 @@ from asimtools.utils import (
 
 def compute_deviation(
     images: Dict,
-    template_calc_input: Optional[Dict] = None,
+    template_calc_params: Optional[Dict] = None,
     model_weights_key_sequence: Optional[Sequence] = None,
     model_weights_pattern: Optional[os.PathLike] = None,
     calc_ids: Optional[Sequence] = None,
@@ -22,10 +23,10 @@ def compute_deviation(
 
     :param images: Images specification, see :func:`asimtools.utils.get_images`
     :type images: Dict
-    :param template_calc_input: Template calc_input, defaults to None
-    :type template_calc_input: Optional[Dict]
+    :param template_calc_params: Template calc_params, defaults to None
+    :type template_calc_params: Optional[Dict]
     :param model_weights_key_sequence: Sequence of keys to change in the
-        template calc_input
+        template calc_params
     :type model_weights_key_sequence: Optional[Sequence]
     :param model_weights_pattern: Pattern of model weights files, defaults to
         None
@@ -41,14 +42,14 @@ def compute_deviation(
 
         calc_dict = {}
         for i, model_weights_file in enumerate(model_weights_files):
-            new_calc_input = change_dict_value(
-                template_calc_input,
+            new_calc_params = change_dict_value(
+                template_calc_params,
                 model_weights_file,
                 key_sequence=model_weights_key_sequence,
                 return_copy=True
             )
 
-            calc_dict[f'calc-{i}'] = new_calc_input
+            calc_dict[f'calc-{i}'] = new_calc_params
     else:
         calc_dict = {calc_id: calc_id for calc_id in calc_ids}
 
@@ -56,6 +57,8 @@ def compute_deviation(
 
     images = get_images(**images)
     assert len(images) > 0, 'No images found'
+
+    write('images_input.xyz', images)
 
     prop_dict = {
         prop: {calc_id: [] for calc_id in calc_dict} for prop in properties
@@ -74,7 +77,7 @@ def compute_deviation(
             if isinstance(calc_dict[calc_id], str):
                 calc = load_calc(calc_id=calc_dict[calc_id])
             else:
-                calc = load_calc(calc_input=calc_dict[calc_id])
+                calc = load_calc(calc_params=calc_dict[calc_id])
 
             atoms.set_calculator(calc)
             energy = atoms.get_potential_energy(atoms)

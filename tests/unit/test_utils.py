@@ -19,6 +19,7 @@ from asimtools.utils import (
     find_nth,
     get_nth_label,
     get_str_btn,
+    expand_wildcards,
 )
 import ase.build
 
@@ -219,3 +220,18 @@ def test_get_nth_label(test_input, expected):
     s = '/path/to/array/id-00__label1__/id-0045__label2__/id-0023__label-3__/'
     assert get_nth_label(s, test_input) == expected
 
+@pytest.mark.parametrize("test_input, expected",[
+    ({'a': 'asdf'}, {'a': 'asdf'}),
+    ({'a': 'asd*'}, {'a': 'asdf'}),
+    ({'a': {'b': 'asd*'}}, {'a': {'b': 'asdf'}}),
+    ({'a': {'b': 'asd*', 'c': 'zx*'}}, {'a': {'b': 'asdf', 'c': 'zxcv'}}),
+])
+def test_expand_wildcards(test_input, expected, tmp_path):
+    ''' Test expanding paths '''
+    fls = ['asdf', 'ascf', 'zxcv']
+    for fl in fls:
+        with open(tmp_path / fl, 'w') as f:
+            f.write('')
+    print(f'Found paths in {os.getcwd()}: {[f for f in Path(tmp_path).glob("*")]}')
+    
+    assert expand_wildcards(test_input, root_path=tmp_path) == expected

@@ -14,7 +14,7 @@ from asimtools.utils import (
 
 def collect_images(
     images: Dict,
-    out_format: str = 'extxyz',
+    out_format: str = 'xyz',
     prefixes: Sequence[str] = ['output_images'],
     splits: Optional[Sequence[float]] = (1,),
     shuffle: bool = True,

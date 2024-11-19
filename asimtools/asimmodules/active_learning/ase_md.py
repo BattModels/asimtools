@@ -22,6 +22,7 @@ from asimtools.calculators import load_calc
 from asimtools.utils import (
     get_atoms,
     get_images,
+    expand_wildcards,
 )
 
 def langevin_nvt(
@@ -176,7 +177,8 @@ def ase_md(
     """Runs ASE MD simulations. This is only recommended for small systems and
     for testing. For larger systems, use LAMMPS or more purpose-built code
 
-    :param calc_spec: calc specification
+    :param calc_spec: calc specification, any entries specified with asterisk 
+        wildcards will be expanded
     :type calc_spec: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
@@ -203,6 +205,7 @@ def ase_md(
     :rtype: Dict
     """
 
+    calc_spec = expand_wildcards(calc_spec)
     calc = load_calc(**calc_spec)
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)
@@ -238,7 +241,6 @@ def ase_md(
             pfactor=None,
             ttime=ttime,
         )
-    
 
     if plot:
         plot_thermo(images={'image_file': 'output.traj'})
