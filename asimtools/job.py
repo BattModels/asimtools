@@ -590,8 +590,8 @@ class DistributedJob(Job):
             [uj.env['mode'].get('use_slurm', False) for uj in unitjobs]
         )
 
-        all_bash = np.all(
-            [uj.env['mode'].get('bash', True) for uj in unitjobs]
+        all_sh = np.all(
+            [uj.env['mode'].get('use_sh', False) for uj in unitjobs]
         )
 
         if same_env and all_slurm:
@@ -599,8 +599,10 @@ class DistributedJob(Job):
         else:
             self.use_slurm = False
         
-        if all_bash:
-            self.use_bash = True
+        if all_sh:
+            self.use_sh = True
+        else:
+            self.use_sh = False
 
         self.unitjobs = unitjobs
 
@@ -664,7 +666,7 @@ class DistributedJob(Job):
         write: bool = True,
     ) -> None:
         '''
-        Generates a bash script for job submission and if necessary 
+        Generates a sh script for job submission and if necessary 
         writes it in the work directory for the job. Only works
         if there is one env_id for all jobs
         '''
@@ -683,13 +685,13 @@ class DistributedJob(Job):
             script_file = self.workdir / 'sh_script.sh'
             script_file.write_text(txt)
 
-    def gen_input_files(self) -> None:
+    def gen_input_files(self, **kwargs) -> None:
         ''' Write input files to working directory '''
 
         if self.use_slurm:
-            self._gen_array_script()
-        if self.use_bash:
-            self._gen_sh_script()
+            self._gen_array_script(**kwargs)
+        if self.use_sh:
+            self._gen_sh_script(**kwargs)
         for unitjob in self.unitjobs:
             unitjob.gen_input_files()
 
@@ -716,12 +718,12 @@ class DistributedJob(Job):
                     raise exc
         return job_ids
 
-    def submit_bash_array(
+    def submit_sh_array(
         self,
         **kwargs,
     ) -> Union[None,List[int]]:
         '''
-        Submits jobs using a bash script. Proceeds even if some jobs fail
+        Submits jobs using a sh script. Proceeds even if some jobs fail
         '''
         self.gen_input_files()
         logger = self.get_logger()
@@ -774,7 +776,7 @@ class DistributedJob(Job):
         '''
         Submits a job array if all the jobs have the same env and use slurm
         '''
-        self.gen_input_files()
+        self.gen_input_files(group_size=group_size)
         logger = self.get_logger()
 
         unitjobs = [] # Track jobs that are supposed to be submitted
@@ -798,12 +800,10 @@ class DistributedJob(Job):
 
         if group_size > 1:
             nslurm_jobs = int(np.ceil(njobs / group_size))
-            self._gen_array_script(
-                dist_ids=f'0-{nslurm_jobs-1}{arr_max_str}'
-            )
-        # if group_size is not 1
-        #    write the bash submission script
-        #    the submit command is to submit the bash script
+        else:
+            nslurm_jobs = njobs
+        
+        # self._gen_array_script(group_size=group_size)
 
         if dependency is not None:
             dependstr = None
@@ -815,14 +815,14 @@ class DistributedJob(Job):
 
             command = [
                 'sbatch',
-                f'--array=0-{njobs-1}{arr_max_str}',
+                f'--array=0-{nslurm_jobs-1}{arr_max_str}',
                 '-d', f'afterok:{dependstr}',
                 'job_array.sh'
             ]
         else:
             command = [
                 'sbatch',
-                f'--array=0-{njobs-1}{arr_max_str}',
+                f'--array=0-{nslurm_jobs-1}{arr_max_str}',
                 'job_array.sh'
             ]
 
@@ -855,8 +855,8 @@ class DistributedJob(Job):
         job_ids = None
         if self.use_slurm:
             job_ids = self.submit_slurm_array(**kwargs)
-        elif self.use_bash:
-            job_ids = self.submit_bash_array(**kwargs)
+        elif self.use_sh:
+            job_ids = self.submit_sh_array(**kwargs)
         else:
             job_ids = self.submit_jobs(**kwargs)
         self.update_output({'job_ids': job_ids}) # For chained job
@@ -982,7 +982,7 @@ class ChainedJob(Job):
                         #     postcommands += ['\n#Submitting next step:']
                         #     postcommands += [f'cd {nextworkdir}']
                         #     # submit the next job dependent in the current
-                        #     # bash script
+                        #     # sh script
                         #     submit_txt = 'asim-execute sim_input.yaml '
                         #     submit_txt += '-c calc_input.yaml '
                         #     submit_txt += '-e env_input.yaml '

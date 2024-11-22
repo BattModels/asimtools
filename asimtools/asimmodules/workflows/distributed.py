@@ -47,10 +47,11 @@ def distributed(
         env_input=env_input,
         calc_input=calc_input
     )
-    job_ids = djob.submit(array_max=array_max, group_size=group_size)
+
     job_ids = djob.submit(
         array_max=array_max,
-        skip_failed=skip_failed
+        skip_failed=skip_failed,
+        group_size=group_size,
     )
 
     results = {'job_ids': job_ids}

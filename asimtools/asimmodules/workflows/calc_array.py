@@ -34,6 +34,7 @@ def calc_array(
     secondary_array_values: Optional[Sequence] = None,
     array_max: Optional[int] = None,
     skip_failed: Optional[bool] = False,
+    group_size: int = 1,
 ) -> Dict:
     """Apply the same asimmodule using different calculators and if necessary
     different environments
@@ -76,6 +77,8 @@ def calc_array(
     :type array_max: Optional[int], optional
     :param skip_failed: Skip failed jobs and move to next, defaults to False
     :type skip_failed: Optional[bool], optional
+    :param group_size: Number of jobs to group together, defaults to 1
+    :type group_size: int, optional
     :return: Dictionary of results
     :rtype: Dict
     """
@@ -173,7 +176,8 @@ def calc_array(
     djob = DistributedJob(array_sim_input, env_input, calc_input)
     job_ids = djob.submit(
         array_max=array_max,
-        skip_failed=skip_failed
+        skip_failed=skip_failed,
+        group_size=group_size,
     )
 
     results = {'job_ids': job_ids}

@@ -26,6 +26,7 @@ def image_array(
     str_btn_args: Optional[Dict] = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
+    group_size: int = 1,
 ) -> Dict:
     """Submit the same asimmodule on multiple images and if specified, use
     different env_ids
@@ -61,6 +62,8 @@ def image_array(
         over in tandem with images to allow changing multiple key-value
         pairs, defaults to None
     :type secondary_array_values: Sequence, optional
+    :param group_size: Number of jobs to group together, defaults to 1
+    :type group_size: int, optional
     :return: Dictionary of results
     :rtype: Dict
     """
@@ -122,7 +125,8 @@ def image_array(
     job_ids = djob.submit(
         array_max=array_max,
         skip_failed=skip_failed,
-        write_image=True
+        write_image=True,
+        group_size=group_size,
     )
 
     results = {'job_ids': job_ids}
