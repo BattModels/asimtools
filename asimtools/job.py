@@ -845,58 +845,6 @@ class DistributedJob(Job):
         job_ids = [int(completed_process.stdout.split(' ')[-1])]
         return job_ids
 
-    def _gen_array_script(self, write: bool = True) -> None:
-        '''
-        Generates a slurm job array file and if necessary 
-        writes it in the work directory for the job. Only works
-        if there is one config_id for all jobs
-        '''
-        env_id = self.unitjobs[0].env_id
-        env = self.env_input[env_id]
-
-        slurm_params = env.get('slurm', {})
-
-        txt = self._gen_slurm_batch_preamble(
-            slurm_params=slurm_params,
-            extra_flags=[
-                '-o slurm_stdout.id-%a_j%A',
-                '-e slurm_stderr.id-%a_j%A',
-            ]
-        )
-
-        txt += '\nif [[ ! -z ${SLURM_ARRAY_TASK_ID} ]]; then\n'
-        txt += '    fls=( id-* )\n'
-        txt += '    WORKDIR=${fls[${SLURM_ARRAY_TASK_ID}]}\n'
-        txt += 'fi\n\n'
-        txt += 'CUR_DIR=`pwd`\n'
-        txt += 'cd ${WORKDIR}\n'
-        txt += '\n'
-        txt += '\n'.join(slurm_params.get('precommands', []))
-        txt += '\n'
-        txt += '\n'.join(self.unitjobs[0].calc_params.get('precommands', []))
-        txt += '\n'
-        txt += 'echo "LAUNCHDIR: ${CUR_DIR}"\n'
-        txt += 'echo "WORKDIR: ${WORKDIR}"\n'
-        txt += 'echo "Job started on `hostname` at `date`"\n'
-        txt += self.unitjobs[0].gen_run_command() + '\n'
-        txt += '\n'.join(self.unitjobs[0].calc_params.get('postcommands', []))
-        txt += '\n'.join(slurm_params.get('postcommands', []))
-        txt += '\n'
-        txt += 'cd ${CUR_DIR}\n'
-        txt += 'echo "Job ended at `date`"'
-
-        if write:
-            slurm_file = self.workdir / 'job_array.sh'
-            slurm_file.write_text(txt)
-
-    def gen_input_files(self) -> None:
-        ''' Write input files to working directory '''
-
-        if self.use_array:
-            self._gen_array_script()
-        for unitjob in self.unitjobs:
-            unitjob.gen_input_files()
-
     def submit(self, **kwargs) -> None:
         ''' 
         Submit a job using slurm, interactively or in the current console

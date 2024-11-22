@@ -13,7 +13,7 @@ PAIR_COEFF
 
 thermo_style    custom step temp pe ke etotal press vol lx ly lz xy xz yz
 thermo          ${THERMO_FREQ}
-# dump            1 all custom ${DUMP_FREQ} traj/dump.lammpstrj id type x y z
+# dump            1 all custom ${DUMP_FREQ} dump.lammpstrj id type x y z
 
 fix             1 all npt temp ${TEMP} ${TEMP} ${TAU_T} iso ${PRES} ${PRES} ${TAU_P}
 
