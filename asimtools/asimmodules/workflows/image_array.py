@@ -18,6 +18,7 @@ def image_array(
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
     array_max: Optional[int] = None,
+    skip_failed: Optional[bool] = False,
     key_sequence: Optional[Sequence[str]] = None,
     env_ids: Optional[Union[Sequence[str],str]] = None,
     labels: Optional[Union[Sequence,str]] = None,
@@ -40,6 +41,8 @@ def image_array(
     :param array_max: Maximum jobs to run simultanteously in job array, \
         defaults to None
     :type array_max: Optional[int], optional
+    :param skip_failed: Skip failed jobs and move to next, defaults to False
+    :type skip_failed: Optional[bool], optional
     :param labels: Custom labels for each image, defaults to None
     :type labels: Sequence[str], optional
     :param env_ids: Sequence of envs for each image, must be the same length \
@@ -116,7 +119,11 @@ def image_array(
 
     # Create a distributed job object
     djob = DistributedJob(array_sim_input, env_input, calc_input)
-    job_ids = djob.submit(array_max=array_max, write_image=True)
+    job_ids = djob.submit(
+        array_max=array_max,
+        skip_failed=skip_failed,
+        write_image=True
+    )
 
     results = {'job_ids': job_ids}
     return results

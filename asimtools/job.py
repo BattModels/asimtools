@@ -601,10 +601,17 @@ class DistributedJob(Job):
         # dependencies but that can be implemented later
         job_ids = []
         for unitjob in self.unitjobs:
-            job_id = unitjob.submit(
-                write_image=kwargs.get('write_image', True)
-            )
-            job_ids.append(job_id)
+            try:
+                job_id = unitjob.submit(
+                    write_image=kwargs.get('write_image', True)
+                )
+                job_ids.append(job_id)
+            except Exception as exc:
+                logger = self.get_logger()
+                logger.error(f'Error submitting job in {unitjob.workdir}')
+                logger.error(exc)
+                if not kwargs.get('skip_failed', False):
+                    raise exc
         return job_ids
 
     def submit_array(
@@ -712,6 +719,7 @@ class DistributedJob(Job):
         txt += 'echo "WORKDIR: ${WORKDIR}"\n'
         txt += 'echo "Job started on `hostname` at `date`"\n'
         txt += self.unitjobs[0].gen_run_command() + '\n'
+        txt += '\n'.join(self.unitjobs[0].calc_params.get('postcommands', []))
         txt += '\n'.join(slurm_params.get('postcommands', []))
         txt += '\n'
         txt += 'cd ${CUR_DIR}\n'
@@ -731,7 +739,7 @@ class DistributedJob(Job):
 
     def submit(self, **kwargs) -> None:
         ''' 
-        Submit a job using slurm, interactively or in the terminal
+        Submit a job using slurm, interactively or in the current console
         '''
 
         cur_dir = Path('.').resolve()
