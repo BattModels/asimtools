@@ -627,7 +627,7 @@ class DistributedJob(Job):
             ]
         )
 
-        txt += 'echo "Job started on `hostname` at `date`"\n'
+        txt += '\necho "Job started on `hostname` at `date`"\n'
         txt += 'CUR_DIR=`pwd`\n'
         txt += 'echo "LAUNCHDIR: ${CUR_DIR}"\n'
         txt += f'GROUP_SIZE={group_size}\n'
@@ -946,33 +946,43 @@ class ChainedJob(Job):
                             curjob.env['slurm']['flags']['-J'] = \
                                 f'step-{step+i}'
 
-                        #if there is a following job
-                        if i < len(self.unitjobs)-1:
-                            nextjob = self.unitjobs[i+1]
+                        # if i < len(self.unitjobs)-1:
+                        #     nextjob = self.unitjobs[i+1]
 
-                            nextworkdir = os.path.relpath(
-                                nextjob.workdir,
-                                curjob.workdir
-                            )
-                            curworkdir = os.path.relpath(
-                                curjob.workdir,
-                                nextjob.workdir
-                            )
-                            # Add postcommands to go into the next workdir
-                            postcommands = curjob.env['slurm'].get(
-                                'postcommands', []
-                            )
-                            postcommands += ['\n#Submitting next step:']
-                            postcommands += [f'cd {nextworkdir}']
-                            # submit the next job dependent in the current
-                            # bash script
-                            submit_txt = 'asim-execute sim_input.yaml '
-                            submit_txt += '-c calc_input.yaml '
-                            submit_txt += '-e env_input.yaml '
-                            postcommands += [submit_txt]
-                            postcommands += [f'cd {curworkdir}']
-                            curjob.env['slurm']['postcommands'] = postcommands
+                        #     curworkdir = os.path.relpath(
+                        #         curjob.workdir,
+                        #         nextjob.workdir
+                        #     )
+                        #     nextjob.sim_input['dependent_dir'] = str(curworkdir)
 
+                        # #### dep in job script implementation
+                        # #if there is a following job
+                        # if i < len(self.unitjobs)-1:
+                        #     nextjob = self.unitjobs[i+1]
+
+                        #     nextworkdir = os.path.relpath(
+                        #         nextjob.workdir,
+                        #         curjob.workdir
+                        #     )
+                        #     curworkdir = os.path.relpath(
+                        #         curjob.workdir,
+                        #         nextjob.workdir
+                        #     )
+                        #     # Add postcommands to go into the next workdir
+                        #     postcommands = curjob.env['slurm'].get(
+                        #         'postcommands', []
+                        #     )
+                        #     postcommands += ['\n#Submitting next step:']
+                        #     postcommands += [f'cd {nextworkdir}']
+                        #     # submit the next job dependent in the current
+                        #     # bash script
+                        #     submit_txt = 'asim-execute sim_input.yaml '
+                        #     submit_txt += '-c calc_input.yaml '
+                        #     submit_txt += '-e env_input.yaml '
+                        #     postcommands += [submit_txt]
+                        #     postcommands += [f'cd {curworkdir}']
+                        #     curjob.env['slurm']['postcommands'] = postcommands
+                        # #####
                         #   submit the next job dependent on the current one   
                         # Prvious working solution
                         write_image = False
@@ -987,7 +997,7 @@ class ChainedJob(Job):
                                 dependency=dependency,
                                 write_image=write_image,
                             )
-                            only_write = True
+                            # only_write = True
 
                     else:
                         txt = f'Skipping step-{step+i} since '

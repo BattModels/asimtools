@@ -17,7 +17,7 @@ cm3 = (meters * 100)**3
 
 def distribution(
     images: Dict,
-    unit: str = 'meV',
+    unit: str = 'eV',
     bins: int = 50,
 ) -> Dict:
     unit_factors = {'meV': 1000, 'eV': 1, 'kcal/mol': 23.0621}
@@ -45,7 +45,7 @@ def distribution(
         results['volume'].append(atoms.get_volume())
         stress = atoms.get_stress(voigt=True)
         results['stress'].extend(
-            list(np.array(stress))
+            list(np.array(stress)) * unit_factor
         )
         results['pressure'].append(-np.sum(stress[:3])/3)
         mass = np.sum(atoms.get_masses())
@@ -61,11 +61,10 @@ def distribution(
         results['energy'] + results['pressure'] * results['volume']
     )
     for prop in ['energy', 'volume', 'enthalpy']:
-        print(prop, results[prop])
         results[prop] = results[prop] / results['natoms']
     
     for prop in ['forces', 'stress', 'pressure', 'energy', 'enthalpy']:
-        results[prop] = results[prop] / unit_factor
+        results[prop] = results[prop] * unit_factor
 
     for prop in unit_dict:
         fig = plt.figure()
