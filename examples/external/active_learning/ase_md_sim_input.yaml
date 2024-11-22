@@ -1,0 +1,22 @@
+asimmodule: ase_md.ase_md.py
+workdir: ase_md_results
+args:
+  calc_spec:
+    calc_id: lj_Ar
+      # name: MACE
+      # args:
+      #   model: /Users/keith/dev/asimtools/examples/external/active_learning/train_mace_results/MACE_models/mace_test_compiled.model
+      #   use_device: cpu
+  image:
+    name: Ar
+    cubic: True
+    repeat: [4,4,4]
+  timestep: 0.098
+  temp: 300
+  dynamics: nvt
+  nsteps: 400
+  # friction: float = 1e-2,
+  # ttime: float = 25*fs,
+  # pfactor: float = None, #(75*fs)**2 * 14*GPa, #14 is bulk modulus of material i.e. Li
+  # externalstress: float = 0,
+  # plot: bool = True,

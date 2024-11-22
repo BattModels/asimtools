@@ -10,20 +10,26 @@ from asimtools.utils import get_calc_input
 # pylint: disable=import-error
 
 def load_calc(
-    calc_id: str = None,
-    calc_input: Optional[Dict] = None
+    calc_id: Optional[str] = None,
+    calc_input: Optional[Dict] = None,
+    calc_params: Optional[Dict] = None,
 ):
-    """Loads a calculator using given calc_id or calc_input
+    """Loads a calculator using given calc_id or calc_input. Provide only one of
+    calc_id or calc_input and calc_id or calc_params
 
-    :param calc_id: ID/key to use to load calculator from the supplied/global\
-        calc_input file, defaults to None
+    :param calc_id: ID/key to use to load calculator from the supplied or \
+        global calc_input file, defaults to None
     :type calc_id: str, optional
-    :param calc_input: calc_input dictionary for a single calculator\
-        , defaults to None
+    :param calc_input: calc_input dictionary, same form as calc_input yaml \
     :type calc_input: Optional[Dict], optional
+    :param calc_params: calc_params dictionary for a single calculator \
+        calc_params, defaults to None
+    :type calc_params: Optional[Dict], optional
     :return: ASE calculator instance
     :rtype: :class:`ase.calculators.calculators.Calculator`
     """
+    assert calc_id is not None or calc_params is not None, \
+        'Provide one of calc_id or calc_id and calc_input or calc_params'
     if calc_id is not None:
         if calc_input is None:
             calc_input = get_calc_input()
@@ -35,6 +41,7 @@ def load_calc(
             raise KeyError(msg) from exc
         except AttributeError as exc:
             raise AttributeError('No calc_input found') from exc
+
     name = calc_params.get('name', None)
 
     if 'module' in calc_params:

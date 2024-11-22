@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "asimtools"
+description = "A lightweight python package for managing and running atomic simulation workflows"
+version = "0.1.0"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+  { name="Keith Phuthi", email="mkphuthi@gmail.com" },
+]
+maintainers = [
+  { name="Keith Phuthi", email="mkphuthi@gmail.com" },
+]
+keywords = ["high-throughput", "workflow", "atomistic", "simulation"]
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering",
+    "Intended Audience :: Science/Research",
+    "Development Status :: 4 - Beta",
+    "Operating System :: MacOS",
+    "Operating System :: Unix"
+]
+dependencies = [
+    "pandas",
+    "pyyaml",
+    "pymatgen",
+    "ase>=3.22.1", 
+    # Recommended to use the master branch of the ASE>=3.23 from gitlab but only 
+    # required for lammps to handle masses correctly so far
+    "colorama",
+    "natsort",
+    "mp-api",
+]
+
+[tool.setuptools.packages.find]
+include = [
+  "asimtools",
+  "asimtools.*",
+  "asimtools.scripts.*.*",
+]
+
+[project.optional-dependencies]
+dev = [
+    "asimtools[tests, docs, phonons]",
+]
+mlip = ["matgl>=1.1.2", "chgnet>=0.3.3", "mace-torch>=0.3.3"]
+phonons = ["phonopy>=2.20.0", "seekpath>=2.1.0"]
+tests = ["pytest>=7.4.0", "pytest-cov>=3.0.0"]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "myst-parser",
+]
+
+[project.scripts]
+asim-run = "asimtools.scripts.asim_run:main"
+asim-execute = "asimtools.scripts.asim_execute:main"
+asim-check = "asimtools.scripts.asim_check:main"
+
+[project.urls]
+repository = "https://github.com/BattModels/asimtools"
+issues = "https://github.com/BattModels/asimtools/issues"
+documentation = "https://battmodels.github.io/asimtools/"
+
+[tool.pytest.ini_options]
+log_cli_level = "warn"
+pythonpath = "asimtools"
+testpaths = ["tests"]

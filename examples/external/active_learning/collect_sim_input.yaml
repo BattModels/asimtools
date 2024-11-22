@@ -1,0 +1,8 @@
+asimmodule: data.collect_images
+workdir: collect_images_results
+args:
+  images:
+    image_file: /Users/keith/dev/asimtools/examples/external/active_learning/ase_md_results/output.traj
+    index: ':'
+  splits: [0.6, 0.2, 0.2]
+  prefixes: ['train', 'val', 'test']

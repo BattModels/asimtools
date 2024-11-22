@@ -1,0 +1,18 @@
+lj-0: 
+  name: LennardJones
+  module: ase.calculators.lj
+  args:
+    sigma: 3.0
+    epsilon: 0.003
+lj-1: 
+  name: LennardJones
+  module: ase.calculators.lj
+  args:
+    sigma: 3.6
+    epsilon: 0.009
+lj-2: 
+  name: LennardJones
+  module: ase.calculators.lj
+  args:
+    sigma: 4.2
+    epsilon: 0.013

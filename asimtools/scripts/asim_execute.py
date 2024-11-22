@@ -41,9 +41,17 @@ def parse_command_line(args) -> Tuple[Dict, Dict, Dict]:
     )
     parser.add_argument(
         '-d',
-        '--debug',
+        '--dependency',
+        metavar='dependency',
+        nargs='+',
+        type=int,
+        help='job IDs for dependencies',
+    )
+    parser.add_argument(
+        '-v',
+        '--verbose',
         action='store_true',
-        help='Set logging level to debug'
+        help='Set logging level to debug/verbose'
     )
     parser.add_argument(
         '-f',
@@ -55,8 +63,13 @@ def parse_command_line(args) -> Tuple[Dict, Dict, Dict]:
     sim_input = read_yaml(args.sim_input_file)
 
     # Do some cleanup of arguments
-    if args.debug:
+    if args.verbose:
         sim_input['debug'] = True
+
+    if args.dependency:
+        dependency = args.dependency
+    else:
+        dependency = None
 
     calc_input = args.calc
     env_input = args.env
@@ -73,13 +86,13 @@ def parse_command_line(args) -> Tuple[Dict, Dict, Dict]:
         if workdir.resolve() != Path('./').resolve():
             shutil.rmtree(workdir)
 
-    return sim_input, env_input, calc_input
+    return sim_input, env_input, calc_input, dependency
 
 def main(args=None) -> None:
     """Execute a workflow given the sim_input.yaml and optionally,
     a calc_input.yaml and/or env_input.yaml. The called asimmodule will be run
     in the specified workdir and env_id """
-    sim_input, env_input, calc_input = parse_command_line(args)
+    sim_input, env_input, calc_input, dependency = parse_command_line(args)
     sim_input['workdir'] = sim_input.get('workdir', 'results')
 
     job = UnitJob(
@@ -91,7 +104,7 @@ def main(args=None) -> None:
     job.gen_input_files(write_calc_input=True, write_env_input=True)
     job.go_to_workdir()
     try:
-        job.submit()
+        job.submit(dependency=dependency)
     except:
         job.fail()
         raise

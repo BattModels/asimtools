@@ -1,0 +1,23 @@
+asimmodule: mlips.train_mace
+workdir: train_results
+args:
+  config:
+    model: "MACE"
+    num_channels: 32
+    max_L: 0
+    r_max: 4.0
+    name: "mace02_com1_gen1"
+    model_dir: "MACE_models"
+    log_dir: "MACE_models"
+    checkpoints_dir: "MACE_models"
+    results_dir: "MACE_models"
+    train_file: "data/solvent_xtb_train_23_gen1.xyz"
+    valid_file: "data/solvent_xtb_train_50.xyz"
+    test_file: "data/solvent_xtb_test.xyz"
+    energy_key: "energy_xtb"
+    forces_key: "forces_xtb"
+    device: cuda
+    batch_size: 10
+    max_num_epochs: 500
+    swa: True
+    seed: 1234

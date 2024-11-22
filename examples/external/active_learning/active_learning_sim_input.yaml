@@ -1,0 +1,85 @@
+asimmodule: workflows.chained
+workdir: active_learning_results
+args:
+  steps:
+    step-0:
+      asimmodule: workflows.sim_array
+      workdir: active_learning_results
+      args:
+        array_values: [1234, 45345, 34526]
+        key_sequence: [args, config, seed]
+        template_sim_input:
+          asimmodule: mace.train_mace
+          workdir: train_mace_results
+          args:
+            config:
+              "model": "MACE"
+              "num_channels": 8
+              "max_L": 0
+              "r_max": 4.0
+              "name": "mace_test"
+              "model_dir": "MACE_models"
+              "log_dir": "MACE_models"
+              "checkpoints_dir": "MACE_models"
+              "results_dir": "MACE_models"
+              "train_file": "../../../collect_images_results/train.xyz"
+              "valid_file": "../../../collect_images_results/val.xyz"
+              "test_file": "../../../collect_images_results/test.xyz"
+              "energy_key": "ref_energy"
+              "forces_key": "ref_forces"
+              "stress_key": "ref_stress"
+              "device": "cpu"
+              "E0s": "average"
+              "batch_size": 10
+              "max_num_epochs": 10
+              "swa": false
+              "seed": {}
+    step-1:
+      asimmodule: active_learning.ase_md
+      args:
+        calc_spec:
+          calc_params:
+            name: MACE
+            args:
+              model: ../step-0/id-0000__seed-1234__/MACE_models/mace_test_compiled.model
+              use_device: cpu
+        image:
+          name: Ar
+          cubic: True
+          repeat: [4,4,4]
+        timestep: 0.098
+        temp: 300
+        dynamics: nvt
+        nsteps: 400
+    step-2:
+      asimmodule: active_learning.compute_deviation
+      args:
+        images: 
+          image_file: ../step-1/output.traj
+          index: '::10'
+        template_calc_params:
+          name: MACE
+          args:
+            model: medium
+            use_device: cpu
+        model_weights_key_sequence: [args, model]
+        model_weights_pattern: ../step-0/id-*/MACE_models/mace_test_compiled.model
+    step-3:
+      asimmodule: active_learning.select_images
+      args:
+        image_file: ../step-2/images_input.xyz
+        deviation_csv: ../step-2/deviations.csv
+        column: energy_std
+        thresholds: [0.025, 0.075]
+        max_images: 20
+    step-4:
+      asimmodule: workflows.image_array
+      args:
+        images: 
+          image_file: ../step-3/selected_images.xyz
+        subsim_input:
+          asimmodule: singlepoint
+          args:
+            calc_id: lj_Ar
+            image:
+              image_file: {}

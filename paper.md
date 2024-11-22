@@ -204,7 +204,7 @@ The ASIMTools package is a powerful tool for building and executing atomic
 simulation protocols locally and at scale on slurm-based HPC infrastructure.
 The code is hosted on a public Github repository
 (https://github.com/BattModels/asimtools) with a number of examples.
-Asimmodules for common calculations are also implemeted with examples.
+Asimmodules for common calculations are also implemented with examples.
 Interested users are encouraged to submit issues, contact developers and make
 pull requests, particularly for adding new simulation protocols to the library.
 

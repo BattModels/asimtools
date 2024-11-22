@@ -1,0 +1,25 @@
+asimmodule: mlips.train_mace
+workdir: train_mace_results
+args:
+  config:
+    "model": "MACE"
+    "num_channels": 8
+    "max_L": 0
+    "r_max": 4.0
+    "name": "mace_test"
+    "model_dir": "MACE_models"
+    "log_dir": "MACE_models"
+    "checkpoints_dir": "MACE_models"
+    "results_dir": "MACE_models"
+    "train_file": "../data/train.xyz"
+    "valid_file": "../data/valid.xyz"
+    "test_file": "../data/test.xyz"
+    "energy_key": "energy"
+    "forces_key": "forces"
+    "stress_key": "stress"
+    "device": "cpu"
+    "E0s": "average"
+    "batch_size": 10
+    "max_num_epochs": 5
+    "swa": false
+    "seed": 1234

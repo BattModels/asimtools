@@ -34,6 +34,22 @@ def batch_env_input():
     return env_input
 
 @pytest.fixture
+def group_batch_env_input():
+    """Group Batch job env_input"""
+    env_input = {
+        'group': {
+            'mode': {
+                'use_slurm': True,
+                'interactive': False,
+            },
+            'slurm': {
+                'flags': ['-n 1', '-J test', '--mem=1G']
+            }
+        }
+    }
+    return env_input
+
+@pytest.fixture
 def batch_dict_env_input():
     """Batch job env_input"""
     env_input = {
@@ -292,6 +308,39 @@ def lj_distributed_batch_sim_input():
                 'id-0001': subsim_input,
                 'id-0002': subsim_input,
                 'id-0003': subsim_input,
+            }
+        }
+    }
+
+    return sim_input
+
+@pytest.fixture
+def lj_distributed_group_batch_sim_input():
+    ''' 
+    Sim input for a distributed job that does some lj calculations
+    '''
+    subsim_input = {
+        'asimmodule': 'singlepoint',
+        'env_id': 'inline', # This should be overwrriten by the group env
+        'args': {
+            'calc_id': 'lj',
+            'image': {
+                'name': 'Ar',
+            },
+            'properties': ['energy', 'forces'],
+        }
+    }
+    sim_input = {
+        'asimmodule': 'workflows.distributed',
+        'env_id': 'batch',
+        'args': {
+            'group_size': 2,
+            'subsim_inputs': {
+                'id-0000': subsim_input,
+                'id-0001': subsim_input,
+                'id-0002': subsim_input,
+                'id-0003': subsim_input,
+                'id-0004': subsim_input,
             }
         }
     }
