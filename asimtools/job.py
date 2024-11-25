@@ -632,28 +632,27 @@ class DistributedJob(Job):
         txt += '\necho "Job started on `hostname` at `date`"\n'
         txt += 'CUR_DIR=`pwd`\n'
         txt += 'echo "LAUNCHDIR: ${CUR_DIR}"\n'
-        txt += f'GROUP_SIZE={group_size}\n'
-        seqtxt = '$(seq $((${SLURM_ARRAY_TASK_ID}*${GROUP_SIZE})) '
-        seqtxt += '$(((${SLURM_ARRAY_TASK_ID}+1)*${GROUP_SIZE})))'
+        txt += f'G={group_size} #Group size\n'
+        txt += 'N=${SLURM_ARRAY_TASK_ID}\n'
         txt += f'WORKDIRS=($(ls -dv ./id-*))\n'
+        seqtxt = '$(seq $(($G*$N)) $(($G*$N+$G-1)) )'
         txt += f'for i in {seqtxt}; do\n'
-        txt += 'cd ${WORKDIRS[$i]};\n'
+        txt += '    WORKDIR=${WORKDIRS[$i]}\n'
+        txt += '    cd ${WORKDIR};\n'
         # else:
         #     txt += '\nif [[ ! -z ${SLURM_ARRAY_TASK_ID} ]]; then\n'
         #     txt += '    fls=( id-* )\n'
         #     txt += '    WORKDIR=${fls[${SLURM_ARRAY_TASK_ID}]}\n'
         #     txt += 'fi\n\n'
         # txt += 'cd ${WORKDIR}\n'
-        txt += '\n'
-        txt += '\n'.join(slurm_params.get('precommands', []))
-        txt += '\n'
-        txt += '\n'.join(self.unitjobs[0].calc_params.get('precommands', []))
-        txt += '\n'
-        txt += 'echo "WORKDIR: ${WORKDIRS[$i]}"\n'
-        txt += self.unitjobs[0].gen_run_command() + '\n'
-        txt += '\n'.join(slurm_params.get('postcommands', []))
-        txt += '\n'
-        txt += 'cd ${CUR_DIR}\n'
+        txt += '    ' + '\n'.join(slurm_params.get('precommands', []))
+        txt += '    ' + '\n'.join(
+            self.unitjobs[0].calc_params.get('precommands', [])
+        )
+        txt += '    echo "WORKDIR: ${WORKDIR}"\n'
+        txt += '    ' + self.unitjobs[0].gen_run_command() + '\n'
+        txt += '    ' + '\n'.join(slurm_params.get('postcommands', [])) + '\n'
+        txt += '    cd ${CUR_DIR}\n'
         txt += 'done\n'
         txt += 'echo "Job ended at `date`"'
 
@@ -771,6 +770,7 @@ class DistributedJob(Job):
         array_max=None,
         dependency: Union[List[str],None] = None,
         group_size: int = 1,
+        debug: bool = False,
         **kwargs,
     ) -> Union[None,List[int]]:
         '''
@@ -802,8 +802,6 @@ class DistributedJob(Job):
             nslurm_jobs = int(np.ceil(njobs / group_size))
         else:
             nslurm_jobs = njobs
-        
-        # self._gen_array_script(group_size=group_size)
 
         if dependency is not None:
             dependstr = None
@@ -826,6 +824,12 @@ class DistributedJob(Job):
                 'job_array.sh'
             ]
 
+        if debug:
+            # Only for testing purposes
+            print('SLURM command:', command)
+            os.environ['SLURM_ARRAY_TASK_ID'] = '0'
+            command = ['sh', 'job_array.sh']
+
         completed_process = subprocess.run(
             command, check=False, capture_output=True, text=True,
         )
@@ -842,7 +846,12 @@ class DistributedJob(Job):
             logger.error(err_msg)
             completed_process.check_returncode()
 
-        job_ids = [int(completed_process.stdout.split(' ')[-1])]
+        if debug:
+            # logging.error('STDOUT:'+f'{completed_process.stdout}')
+            logging.error('STDERR:'+f'{completed_process.stderr}')
+            job_ids = None
+        else:
+            job_ids = [int(completed_process.stdout.split(' ')[-1])]
         return job_ids
 
     def submit(self, **kwargs) -> None:
@@ -898,7 +907,7 @@ class ChainedJob(Job):
         ''' Returns the output of the last job in the chain '''
         return self.unitjobs[-1].get_output()
 
-    def submit(self, dependency: Union[List,None] = None) -> List:
+    def submit(self, dependency: Union[List,None] = None, debug: bool = False) -> List:
         ''' 
         Submit a job using slurm, interactively or in the terminal
         '''
@@ -997,7 +1006,7 @@ class ChainedJob(Job):
                         if i == 0:
                             write_image = True
 
-                        if only_write:
+                        if only_write or debug:
                             curjob.gen_input_files(write_image=write_image)
                         else:
                             dependency = curjob.submit(
@@ -1031,29 +1040,26 @@ class ChainedJob(Job):
         return job_ids
 
 
-def load_job_from_directory(workdir: str):
+def load_job_from_directory(workdir: os.PathLike) -> Job:
     ''' Loads a job from a given directory '''
     workdir = Path(workdir)
-    assert workdir.exists(), f'Work director {workdir} does not exist'
+    assert workdir.exists(), f'Work directory "{workdir}" does not exist'
     logger = get_logger()
-    sim_inputs = glob(str(workdir / 'sim_input.yaml'))
-    if len(sim_inputs) != 1:
-        logger.error('Multiple or no sim_input.yaml files in %s', {workdir})
     try:
-        sim_input = read_yaml(glob(str(workdir / 'sim_input.yaml'))[0])
+        sim_input = read_yaml(workdir / 'sim_input.yaml')
     except IndexError as exc:
         logger.error('sim_input.yaml not found in %s', {str(workdir)})
         raise exc
 
-    env_inputs = glob(str(workdir / 'env_input.yaml'))
-    if len(env_inputs) == 1:
-        env_input = read_yaml(env_inputs[0])
+    env_input_file = workdir / 'env_input.yaml'
+    if env_input_file.exists():
+        env_input = read_yaml(env_input_file)
     else:
         env_input = None
 
-    calc_inputs = glob(str(workdir / 'calc_input.yaml'))
-    if len(calc_inputs) == 1:
-        calc_input = read_yaml(calc_inputs[0])
+    calc_input_file = workdir / 'calc_input.yaml'
+    if calc_input_file.exists():
+        calc_input = read_yaml(calc_input_file)
     else:
         calc_input = None
 

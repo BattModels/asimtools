@@ -290,7 +290,7 @@ def lj_distributed_batch_sim_input():
     '''
     subsim_input = {
         'asimmodule': 'singlepoint',
-        'env_id': 'inline',
+        'env_id': 'batch',
         'args': {
             'calc_id': 'lj',
             'image': {
@@ -321,7 +321,7 @@ def lj_distributed_group_batch_sim_input():
     '''
     subsim_input = {
         'asimmodule': 'singlepoint',
-        'env_id': 'inline', # This should be overwrriten by the group env
+        'env_id': 'batch', # This should be overwrriten by the group env
         'args': {
             'calc_id': 'lj',
             'image': {
@@ -346,3 +346,4 @@ def lj_distributed_group_batch_sim_input():
     }
 
     return sim_input
+

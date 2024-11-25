@@ -221,6 +221,7 @@ def ase_md(
             friction=friction,
         )
     elif dynamics == 'npt':
+        assert pfactor is not None, 'Pressure factor must be provided'
         atoms, _ = npt(
             atoms,
             temp,
