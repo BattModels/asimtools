@@ -101,7 +101,11 @@ def main(args=None) -> None:
         calc_input=calc_input
     )
 
-    job.gen_input_files(write_calc_input=True, write_env_input=True)
+    job.gen_input_files(
+        write_calc_input=True,
+        write_env_input=True,
+        write_image=False,
+    )
     job.go_to_workdir()
     try:
         job.submit(dependency=dependency)

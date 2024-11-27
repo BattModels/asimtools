@@ -19,6 +19,7 @@ def distribution(
     images: Dict,
     unit: str = 'eV',
     bins: int = 50,
+    log: bool = True,
 ) -> Dict:
     unit_factors = {'meV': 1000, 'eV': 1, 'kcal/mol': 23.0621}
     unit_factor = unit_factors[unit]
@@ -67,10 +68,20 @@ def distribution(
         results[prop] = results[prop] * unit_factor
 
     for prop in unit_dict:
+        with open(f'summary.txt', 'a+') as f:
+            f.write(f'{prop} distribution\n')
+            f.write(f'Num. values: {len(results[prop])}\n')
+            f.write(f'Mean: {np.mean(results[prop])} {unit_dict[prop]}\n')
+            f.write(f'Std: {np.std(results[prop])} {unit_dict[prop]}\n')
+            f.write(f'Min: {np.min(results[prop])} {unit_dict[prop]}\n')
+            f.write(f'Max: {np.max(results[prop])} {unit_dict[prop]}\n')
+            f.write('+++++++++++++++++++++++++++++++++++++++++++++++\n')
         fig = plt.figure()
         plt.hist(results[prop], bins=bins, density=True)
         plt.xlabel(f'{prop} [{unit_dict[prop]}]')
         plt.ylabel('Frequency')
+        if log:
+            plt.yscale('log')
         plt.title(f'{prop} distribution')
         plt.savefig(f'{prop}_distribution.png')
         plt.close(fig)

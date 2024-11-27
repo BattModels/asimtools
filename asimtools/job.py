@@ -406,6 +406,7 @@ class UnitJob(Job):
         images = self.sim_input.get('args', {}).get('images', False)
         if images and write_image:
             if images.get('images', False) or images.get('image_file', False):
+                print(write_image, os.getcwd(), images)
                 images = get_images(**images)
                 input_images_file = 'images_input.xyz' # Relative to workdir
                 ase.io.write(
