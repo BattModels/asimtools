@@ -646,9 +646,9 @@ class DistributedJob(Job):
         #     txt += 'fi\n\n'
         # txt += 'cd ${WORKDIR}\n'
         txt += '    ' + '\n'.join(slurm_params.get('precommands', []))
-        txt += '    ' + '\n'.join(
+        txt += '    \n'.join(
             self.unitjobs[0].calc_params.get('precommands', [])
-        )
+        ) + '\n'
         txt += '    echo "WORKDIR: ${WORKDIR}"\n'
         txt += '    ' + self.unitjobs[0].gen_run_command() + '\n'
         txt += '    ' + '\n'.join(slurm_params.get('postcommands', [])) + '\n'
@@ -1000,7 +1000,7 @@ class ChainedJob(Job):
                         #     curjob.env['slurm']['postcommands'] = postcommands
                         # #####
                         #   submit the next job dependent on the current one   
-                        # Prvious working solution
+                        # Previous working solution
                         write_image = False
                         # Write image first step in chain being run/continued
                         if i == 0:
