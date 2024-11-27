@@ -646,7 +646,7 @@ class DistributedJob(Job):
         #     txt += 'fi\n\n'
         # txt += 'cd ${WORKDIR}\n'
         txt += '    ' + '\n'.join(slurm_params.get('precommands', []))
-        txt += '    \n'.join(
+        txt += '\n    '.join(
             self.unitjobs[0].calc_params.get('precommands', [])
         ) + '\n'
         txt += '    echo "WORKDIR: ${WORKDIR}"\n'
