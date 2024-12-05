@@ -77,7 +77,7 @@ def calc_parity_data(
         if 'stress' in properties:
             prop = 'stress'
             srvals = np.hstack(
-                [srvals, np.array(atoms.get_stress()).flatten()]
+                [srvals, np.array(atoms.get_stress(voigt=False)).flatten()]
             )
 
             spvals = np.hstack(
@@ -191,7 +191,7 @@ def parity(
             res[prop][source] = np.hstack(
                 [reses[jj][prop][source] for jj in range(len(reses))]
             ) * unit_factor
-
+        print(f'{prop.capitalize()} RMSE: {rmse(res[prop]["ref"], res[prop]["pred"])}')
         write_csv_from_dict(
             f'{prop}_parity.csv',
             res[prop],
