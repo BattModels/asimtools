@@ -92,13 +92,15 @@ def prepare_array_vals(
         labels = [label_prefix + '-' + label for label in labels]
 
     assert len(labels) == len(array_values), \
-        'Num. of array_values must match num. of labels'
+        f'Num. of array_values ({len(array_values)}) must match num.'\
+        f'of labels ({len(labels)})'
 
     if secondary_array_values is not None:
         nvals = len(secondary_array_values)
         nkeys = len(secondary_key_sequences)
         assert nvals == nkeys, \
-            f'{nvals} secondary values does not match {nkeys} secondary keys'
+            f'Num. of secondary values ({nvals}) does not match num. of '\
+            f'secondary keys ({nkeys})'
         for l in secondary_array_values:
             assert len(l) == len(labels), \
                 f"Secondary values ({len(l)}) not same length as array values"\

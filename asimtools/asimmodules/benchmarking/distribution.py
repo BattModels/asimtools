@@ -5,7 +5,7 @@ Plots the distribution of various properties in a dataset of structures
 Author: mkphuthi@github.com
 
 '''
-from typing import Dict, List, TypeVar, Sequence
+from typing import Dict, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 from ase.units import kg, m as meters
@@ -20,6 +20,8 @@ def distribution(
     unit: str = 'eV',
     bins: int = 50,
     log: bool = True,
+    remap_keys: Optional[Dict] = None,
+    skip_failed: bool = False,
 ) -> Dict:
     unit_factors = {'meV': 1000, 'eV': 1, 'kcal/mol': 23.0621}
     unit_factor = unit_factors[unit]
@@ -38,13 +40,30 @@ def distribution(
     images = get_images(**images)
     results = {prop: [] for prop in unit_dict}
     for i, atoms in enumerate(images):
+        include = True
         results['natoms'].append(len(atoms))
-        results['energy'].append(atoms.get_potential_energy())
+        if remap_keys.get('energy', False):
+            energy = atoms.info[remap_keys['energy']]
+        else:
+            energy = atoms.get_potential_energy()
+        results['energy'].append(energy)
+        if remap_keys.get('forces', False):
+            forces = atoms.arrays[remap_keys['forces']]
+        else:
+            forces = atoms.get_forces()
         results['forces'].extend(
-            list(np.array(atoms.get_forces()).flatten())
+            list(np.array(forces).flatten())
         )
         results['volume'].append(atoms.get_volume())
-        stress = atoms.get_stress(voigt=True)
+        if remap_keys.get('stress', False):
+            stress = atoms.arrays[remap_keys['stress']]
+        elif remap_keys.get('virial', False):
+            try:
+                stress = atoms.info[remap_keys['virial']] / atoms.get_volume()
+            except KeyError:
+                print('idx:', i, atoms.info, atoms.arrays)
+        else:
+            stress = atoms.get_stress(voigt=True)
         results['stress'].extend(
             list(np.array(stress)) * unit_factor
         )

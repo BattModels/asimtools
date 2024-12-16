@@ -13,10 +13,12 @@ warnings.filterwarnings("ignore")
 import json
 from numpy.random import randint
 from mace.cli.run_train import main as mace_run_train_main
+from mace.cli.create_lammps_model import main as create_lammps_model
 
 def train_mace(
     config: Union[Dict,str],
     randomize_seed: bool = False,
+    compile_lammps: bool = False,
 ) -> Dict:
     """Runs MACE training
 
@@ -42,4 +44,7 @@ def train_mace(
     logging.getLogger().handlers.clear()
     sys.argv = ["program", "--config", config_file_path]
     mace_run_train_main()
+
+    if compile_lammps:
+        create_lammps_model('mace_test_compiled.model')
     return {}

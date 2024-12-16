@@ -46,7 +46,7 @@ def full_qha(
     """
 
     if phonopy_save_path is None:
-        phonopy_save_path = str((Path('..') / 'phonopy_save.yaml').resolve())
+        phonopy_save_path = str((Path('./phonopy_save.yaml').resolve()))
     else:
         phonopy_save_path = str(Path(phonopy_save_path).resolve())
     ase_cubic_eos_args['image'] = image

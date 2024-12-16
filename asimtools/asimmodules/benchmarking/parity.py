@@ -174,15 +174,24 @@ def parity(
 
     subsets = _split_data(data, nprocs)
     reses = []
-    with Pool(nprocs) as pool:
-        reses = pool.map(partial(
-            calc_parity_data,
+    if nprocs > 1:
+        with Pool(nprocs) as pool:
+            reses = pool.map(partial(
+                calc_parity_data,
+                calc_id=calc_id,
+                properties=properties,
+                force_prob=force_prob,
+                ),
+            subsets,
+            )
+    else:
+        reses = [calc_parity_data(
+            subset,
             calc_id=calc_id,
             properties=properties,
             force_prob=force_prob,
-            ),
-        subsets,
-        )
+            ) for subset in subsets
+        ]
 
     res = {prop: {'ref': [], 'pred': []} for prop in properties}
     results = {}
