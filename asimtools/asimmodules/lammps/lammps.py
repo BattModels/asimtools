@@ -125,14 +125,14 @@ def lammps(
             command, check=False, capture_output=True, text=True,
         )
 
-    with open('lmp_stdout.txt', 'w', encoding='utf-8') as f:
+    with open('lmp_stdout.txt', 'a+', encoding='utf-8') as f:
         f.write(completed_process.stdout)
 
     if completed_process.returncode != 0:
         err_txt = f'Failed to run {lmp_inp_file}\n'
-        err_txt += 'See lmp.stderr.txt for details.'
+        err_txt += 'See lmp_stderr.txt for details.'
         logging.error(err_txt)
-        with open('lmp_stderr.txt', 'w', encoding='utf-8') as f:
+        with open('lmp_stderr.txt', 'a+', encoding='utf-8') as f:
             f.write(completed_process.stderr)
         completed_process.check_returncode()
         return {}

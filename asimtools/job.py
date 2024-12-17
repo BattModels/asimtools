@@ -406,7 +406,6 @@ class UnitJob(Job):
         images = self.sim_input.get('args', {}).get('images', False)
         if images and write_image:
             if images.get('images', False) or images.get('image_file', False):
-                print(write_image, os.getcwd(), images)
                 images = get_images(**images)
                 input_images_file = 'images_input.xyz' # Relative to workdir
                 ase.io.write(
@@ -948,7 +947,6 @@ class ChainedJob(Job):
                             descend=True
                         )
                     if not cur_step_complete:
-                        print(f'XXXX Step {step+i} not complete, submitting')
                         slurm_flags = curjob.env['slurm']['flags']
                         if isinstance(slurm_flags, list):
                             job_name = curjob.sim_input.get('job_name',False)
