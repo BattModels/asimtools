@@ -25,6 +25,8 @@ def distribution(
 ) -> Dict:
     unit_factors = {'meV': 1000, 'eV': 1, 'kcal/mol': 23.0621}
     unit_factor = unit_factors[unit]
+    if remap_keys is None:
+        remap_keys = {}
 
     unit_dict = {
         'energy': f'{unit}/atom',
