@@ -3,6 +3,7 @@ Tools for loading and returning ASE calculator objects for use in simulations
 '''
 import importlib
 import logging
+from copy import deepcopy
 from typing import Dict, Optional
 from asimtools.utils import get_calc_input
 
@@ -139,6 +140,7 @@ def load_chgnet(calc_params):
     """
     from chgnet.model.dynamics import CHGNetCalculator
     if calc_params['args'].get('from_file', False):
+        calc_params = deepcopy(calc_params)
         calc_params['args'].pop('from_file')
         try:
             calc = CHGNetCalculator.from_file(**calc_params['args'])
@@ -235,6 +237,7 @@ def load_espresso_profile(calc_params):
     from ase.calculators.espresso import Espresso, EspressoProfile
 
     if 'command' in calc_params['args']:
+        calc_params = deepcopy(calc_params)
         command = calc_params['args'].pop('command')
         command = command.split()
         progind = command.index('pw.x')
@@ -264,7 +267,7 @@ def load_m3gnet(calc_params):
     """
     from matgl.ext.ase import M3GNetCalculator
     import matgl
-
+    calc_params = deepcopy(calc_params)
     model = calc_params['args'].pop("model")
     try:
         pot = matgl.load_model(model)

@@ -23,6 +23,8 @@ def distribution(
     remap_keys: Optional[Dict] = None,
     skip_failed: bool = False,
 ) -> Dict:
+    if remap_keys is None:
+        remap_keys = {}
     unit_factors = {'meV': 1000, 'eV': 1, 'kcal/mol': 23.0621}
     unit_factor = unit_factors[unit]
 

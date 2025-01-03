@@ -77,7 +77,7 @@ def compute_deviation(
             if isinstance(calc_dict[calc_id], str):
                 calc = load_calc(calc_id=calc_dict[calc_id])
             else:
-                calc = load_calc(calc_params=calc_dict[calc_id])
+                calc = load_calc(calc_params=calc_dict[calc_id].copy())
 
             atoms.set_calculator(calc)
             energy = atoms.get_potential_energy(atoms)
