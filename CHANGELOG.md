@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [develop] - 2024-11-13
  
 ### Added
+- ASIMMODULE: vasp/vasp
 - ASIMMODULE: benchmarking/distribution
 - ASIMMODULE: data/collect_images asimmodule
 - CALCULATOR: OMAT24 calculator

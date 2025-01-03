@@ -28,19 +28,19 @@ def vasp(
     vaspinput_args: Optional[Dict] = None,
     command: str = 'vasp_std',
     mpset: Optional[str] = None,
-    write_image_output: bool = False,
+    write_image_output: bool = True,
 ) -> Dict:
     """Run VASP with given input files and specified image
 
     :param image: Initial image for VASP calculation. Image specification,
         see :func:`asimtools.utils.get_atoms`
     :type image: Dict
-    :param vaspinput_args: Dictionary of VASP input arguments. 
+    :param vaspinput_args: Dictionary of pymatgen's VASPInput arguments. 
         See :class:`pymatgen.io.vasp.inputs.VaspInput`
     :type vaspinput_args: Dict
     :param command: Command with which to run VASP, defaults to 'vasp_std'
     :type command: str, optional
-    :param mpset: Material Project VASP set to use, defaults to None
+    :param mpset: Materials Project VASP set to use, defaults to None
     :type mpset: str, optional
     :param write_image_output: Whether to write output image in standard 
         asimtools format to file, defaults to False
