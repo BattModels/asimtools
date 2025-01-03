@@ -63,7 +63,7 @@ class Job():
             self.sim_input['src_dir'] = self.launchdir
 
         self.env_id = self.sim_input.get('env_id', None)
-        if self.env_id is not None:
+        if self.env_id is not None and self.env_input is not None:
             self.env = self.env_input[self.env_id]
         else:
             self.env = {
@@ -1062,7 +1062,11 @@ def load_job_from_directory(workdir: os.PathLike) -> Job:
     else:
         calc_input = None
 
-    job = Job(sim_input, env_input, calc_input)
+    job = Job(
+        sim_input=sim_input,
+        env_input=env_input,
+        calc_input=calc_input,
+    )
 
     # This makes sure that wherever we may be loading the job from, we refer
     # to the correct input/output files. As of now, it does not seem necessary
