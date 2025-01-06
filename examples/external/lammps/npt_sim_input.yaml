@@ -16,6 +16,9 @@ args:
     PRES : 1.0
     TAU_T : 0.1
     TAU_P : 0.5
+  placeholders: # Convenient way to define things like force field parameters, see template
+    PAIR_STYLE: "pair_style      lj/cut 2.5"
+    PAIR_COEFF: "pair_coeff      * * 0.00802236 3.54"
 
 
 

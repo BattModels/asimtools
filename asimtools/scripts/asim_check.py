@@ -63,7 +63,8 @@ def get_subjobs(workdir):
         subsim_input = subdir / 'sim_input.yaml'
         if subsim_input.exists():
             subjob_dirs.append(subdir)
-    return subjob_dirs
+
+    return sorted(subjob_dirs)
 
 def load_job_tree(
     workdir: str = './',

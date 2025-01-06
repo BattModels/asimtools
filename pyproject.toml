@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "asimtools"
 description = "A lightweight python package for managing and running atomic simulation workflows"
-version = "0.0.2"
+version = "0.1.0"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
@@ -33,6 +33,7 @@ dependencies = [
     # Recommended to use the master branch of the ASE>=3.23 from gitlab but only 
     # required for lammps to handle masses correctly so far
     "colorama",
+    "natsort",
     "mp-api",
 ]
 

@@ -17,6 +17,7 @@ def atom_relax(
     optimizer: str = 'GPMin', #GPMin is fast in many cases according to ASE docs
     properties: Tuple[str] = ('energy', 'forces'),
     fmax: float = 0.02,
+    steps: int = 1000,
     prefix: Optional[str] = None,
 ) -> Dict:
     """Relaxes the given tomic structure using ASE's built-in structure
@@ -32,6 +33,8 @@ def atom_relax(
     :type optimizer: str, optional
     :param fmax: Force convergence threshold in optimizer, defaults to 0.02
     :type fmax: float, optional
+    :param steps: Maximum number of steps to run, defaults to 1000
+    :type steps: int, optional
     :return: Dictionary of results
     :rtype: Dict
     """
@@ -55,13 +58,18 @@ def atom_relax(
     )
     dyn.attach(traj)
     try:
-        dyn.run(fmax=fmax)
+        dyn.run(fmax=fmax, steps=steps)
     except Exception:
         logger.error('Failed to relax atoms')
         raise
 
     image_file = prefix + 'image_output.xyz'
-    atoms.write(image_file, format='extxyz')
+    atoms.write(
+        image_file,
+        format='extxyz',
+        write_info=False,
+        write_results=True,
+    )
 
     energy = float(atoms.get_potential_energy())
     final_fmax = float(np.sqrt((atoms.get_forces() ** 2).sum(axis=1).max()))

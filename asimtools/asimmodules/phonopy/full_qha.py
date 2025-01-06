@@ -5,7 +5,7 @@ from asimtools.job import UnitJob
 def full_qha(
     image: Dict,
     calc_id: str,
-    phonopy_save_path: str,
+    phonopy_save_path: Optional[str] = None,
     calc_env_id: Optional[str] = None,
     process_env_id: Optional[str] = None,
     ase_cubic_eos_args: Optional[Dict] = None,
@@ -14,15 +14,16 @@ def full_qha(
     pressure: Optional[float] = None,
 ) -> Dict:
     """Perform a full Quasiharmonic Approximation and predict thermal 
-    properties of a given structure. Calculated properties included 
-    vibrational free energy heat capacity, thermal expansion etc.
+    properties of a given structure. Calculated properties include
+    vibrational free energy, heat capacity, thermal expansion etc.
 
     :param image: Image specification, see :func:`asimtools.utils.get_atoms` 
     :type image: Dict
-    :param calc_id: calc_id
+    :param calc_id: calc_id specification
     :type calc_id: str
     :param phonopy_save_path: Path where phonopy save yaml is saved, this file
-        is important to keep for easier postprocess/analsyis
+        is important to keep for easier postprocessing/analsyis, we recommend 
+        keeping the default, defaults to None
     :type phonopy_save_path: str
     :param calc_env_id: env_id for running calculator, defaults to None
     :type calc_env_id: Optional[str], optional
@@ -30,7 +31,8 @@ def full_qha(
         defaults to None
     :type process_env_id: Optional[str], optional
     :param ase_cubic_eos_args: arguments to pass to 
-        :func:`asimtools.asimmodules.geometry_optimization.ase_cubic_eos.ase_cubic_eos` , defaults to None
+        :func:`asimtools.asimmodules.geometry_optimization.ase_cubic_eos.ase_cubic_eos` ,
+        defaults to None
     :type ase_cubic_eos_args: Optional[Dict], optional
     :param supercell: supercell to use for finite difference method, 
         defaults to [5,5,5]
@@ -43,7 +45,10 @@ def full_qha(
     :rtype: Dict
     """
 
-    phonopy_save_path = str(Path(phonopy_save_path).resolve())
+    if phonopy_save_path is None:
+        phonopy_save_path = str((Path('./phonopy_save.yaml').resolve()))
+    else:
+        phonopy_save_path = str(Path(phonopy_save_path).resolve())
     ase_cubic_eos_args['image'] = image
     ase_cubic_eos_args['calc_id'] = calc_id
     scales = ase_cubic_eos_args.get('scales', False)
@@ -85,13 +90,14 @@ def full_qha(
                                     },
                                     'step-1': {
                                         'asimmodule': 'phonopy.forces',
-                                        'env_id': calc_env_id,
+                                        'env_id': process_env_id,
                                         'args': {
                                             'images': {
                                                 'pattern': '../step-0/supercell-*',
                                                 'format': 'vasp',
                                             },
                                             'calc_id': calc_id,
+                                            'calc_env_id': calc_env_id,
                                         },
                                     },
                                     'step-2': {
@@ -127,7 +133,6 @@ def full_qha(
                     'env_id': process_env_id,
                     'args': {
                         'ev_csv': '../step-0/eos.csv',
-                        'phonopy_save_path': phonopy_save_path,
                         'thermal_properties_file_pattern': '../step-1/id-*/step-3/thermal_properties-*.yaml',
                         't_max': t_max - 10,
                         'pressure': pressure,

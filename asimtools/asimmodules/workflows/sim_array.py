@@ -30,6 +30,8 @@ def sim_array(
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
     array_max: Optional[int] = None,
+    skip_failed: Optional[bool] = False,
+    group_size: int = 1,
 ) -> Dict:
     """Runs the same asimmodule, iterating over multiple values of a specified
     argument based on a sim_input template provided by the user
@@ -74,6 +76,10 @@ def sim_array(
     :type calc_input: Optional[Dict], optional
     :param env_input: env_input to use, defaults to None
     :type env_input: Optional[Dict], optional
+    :param skip_failed: Skip failed jobs and move to next, defaults to False
+    :type skip_failed: Optional[bool], optional
+    :param group_size: Number of jobs to group together, defaults to 1
+    :type group_size: int, optional
     :return: Results
     :rtype: Dict
     """
@@ -126,7 +132,11 @@ def sim_array(
 
     # Create a distributed job object
     djob = DistributedJob(sim_inputs, env_input, calc_input)
-    job_ids = djob.submit(array_max=array_max)
+    job_ids = djob.submit(
+        array_max=array_max,
+        skip_failed=skip_failed,
+        group_size=group_size,
+    )
 
     results = {'job_ids': job_ids}
     return results

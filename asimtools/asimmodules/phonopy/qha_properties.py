@@ -13,14 +13,29 @@ from phonopy import PhonopyQHA
 
 def qha_properties(
     ev_csv: str,
-    phonopy_save_path: str,
     thermal_properties_file_pattern: str,
     pressure: Optional[float] = None,
     t_min: float = 0,
     t_step: float = 10,
     t_max: float = 1000,
 ) -> Dict:
+    """Calculate thermal properties after QHA calculations
 
+    :param ev_csv: path to the energy-volume csv file
+    :type ev_csv: str
+    :param thermal_properties_file_pattern: pattern to match the thermal properties files
+    :type thermal_properties_file_pattern: str
+    :param pressure: pressure to fix, defaults to None
+    :type pressure: Optional[float], optional
+    :param t_min: Min. temperature, defaults to 0
+    :type t_min: float, optional
+    :param t_step: Temperature step, defaults to 10
+    :type t_step: float, optional
+    :param t_max: Max. temperature, defaults to 1000
+    :type t_max: float, optional
+    :return: Results
+    :rtype: Dict
+    """
     ev_df = pd.read_csv(ev_csv)
     volumes = ev_df['volumes'].to_numpy()
     energies = ev_df['energies'].to_numpy()

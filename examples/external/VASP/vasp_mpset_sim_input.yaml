@@ -1,0 +1,9 @@
+asimmodule: vasp.vasp
+workdir: vasp_mpset_results
+env_id: inline
+args:
+  image:
+    name: Na
+    builder: bulk
+  mpset: MPStaticSet
+  command: vasp_std

@@ -17,6 +17,7 @@ def optimize(
     optimizer: str = 'BFGS',
     fmax: float = 0.003, #Roughly 0.48GPa
     optimizer_args: Optional[Dict] = None,
+    steps: int = 1000,
     expcellfilter_args: Optional[Dict] = None,
 ) -> Dict:
     """Relaxes cell (and atoms) using ase.constraints.ExpCellFilter while retaining symmetry
@@ -29,6 +30,10 @@ def optimize(
     :type optimizer: str, optional
     :param fmax: fmax in optimizer, defaults to 0.003 which is ~0.48GPa
     :type fmax: float, optional
+    :param optimizer_args: arguments for optimizer, defaults to None
+    :type optimizer_args: Optional[Dict], optional
+    :param steps: Max. number of steps to run, defaults to 1000
+    :type steps: int, optional
     :param expcellfilter_args: arguments for ase.constraints.ExpCellFilter, defaults to None
     :type expcellfilter_args: Optional[Dict], optional
     :return: Results including relaxed structure energy
@@ -55,13 +60,18 @@ def optimize(
     )
     dyn.attach(traj)
     try:
-        dyn.run(fmax=fmax)
+        dyn.run(fmax=fmax, steps=steps)
     except Exception:
         print('Failed to optimize atoms')
         raise
 
     image_file = 'image_output.xyz'
-    atoms.write(image_file, format='extxyz')
+    atoms.write(
+        image_file,
+        format='extxyz',
+        write_info=False,
+        write_results=True,
+    )
 
     energy = float(atoms.get_potential_energy())
     final_fmax = float(atoms.get_stress().max())

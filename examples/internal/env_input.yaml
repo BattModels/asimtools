@@ -8,6 +8,8 @@ batch:
       -N: 1
       -J: my_batch_job
       --mem: 1G
+      -A: venkvis
+      -p: venkvis-a100
     # You can do things like activate environments, set environment variables
     # etc. before running the asimmodule using precommands using bash commands
     precommands:
@@ -24,6 +26,10 @@ srun:
   slurm:
     flags:
       - -n 1
+bash:
+  mode:
+    use_bash: true
+    interactive: true
 inline:
   mode:
     use_slurm: false

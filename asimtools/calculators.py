@@ -3,6 +3,7 @@ Tools for loading and returning ASE calculator objects for use in simulations
 '''
 import importlib
 import logging
+from copy import deepcopy
 from typing import Dict, Optional
 from asimtools.utils import get_calc_input
 
@@ -10,20 +11,26 @@ from asimtools.utils import get_calc_input
 # pylint: disable=import-error
 
 def load_calc(
-    calc_id: str = None,
-    calc_input: Optional[Dict] = None
+    calc_id: Optional[str] = None,
+    calc_input: Optional[Dict] = None,
+    calc_params: Optional[Dict] = None,
 ):
-    """Loads a calculator using given calc_id or calc_input
+    """Loads a calculator using given calc_id or calc_input. Provide only one of
+    calc_id or calc_input and calc_id or calc_params
 
-    :param calc_id: ID/key to use to load calculator from the supplied/global\
-        calc_input file, defaults to None
+    :param calc_id: ID/key to use to load calculator from the supplied or \
+        global calc_input file, defaults to None
     :type calc_id: str, optional
-    :param calc_input: calc_input dictionary for a single calculator\
-        , defaults to None
+    :param calc_input: calc_input dictionary, same form as calc_input yaml \
     :type calc_input: Optional[Dict], optional
+    :param calc_params: calc_params dictionary for a single calculator \
+        calc_params, defaults to None
+    :type calc_params: Optional[Dict], optional
     :return: ASE calculator instance
     :rtype: :class:`ase.calculators.calculators.Calculator`
     """
+    assert calc_id is not None or calc_params is not None, \
+        'Provide one of calc_id or calc_id and calc_input or calc_params'
     if calc_id is not None:
         if calc_input is None:
             calc_input = get_calc_input()
@@ -35,6 +42,7 @@ def load_calc(
             raise KeyError(msg) from exc
         except AttributeError as exc:
             raise AttributeError('No calc_input found') from exc
+
     name = calc_params.get('name', None)
 
     if 'module' in calc_params:
@@ -132,6 +140,7 @@ def load_chgnet(calc_params):
     """
     from chgnet.model.dynamics import CHGNetCalculator
     if calc_params['args'].get('from_file', False):
+        calc_params = deepcopy(calc_params)
         calc_params['args'].pop('from_file')
         try:
             calc = CHGNetCalculator.from_file(**calc_params['args'])
@@ -149,7 +158,7 @@ def load_chgnet(calc_params):
 
     return calc
 
-def load_mace(calc_params):
+def load_mace_mp(calc_params):
     """Load MACE Calculator
 
     https://github.com/ACEsuit/mace?tab=readme-ov-file
@@ -165,6 +174,28 @@ def load_mace(calc_params):
         calc = mace_mp(**calc_params['args'])
     except Exception:
         logging.error("Failed to load MACE with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
+def load_mace(calc_params):
+    """Load MACE Calculator
+
+    https://github.com/ACEsuit/mace?tab=readme-ov-file
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: MACE calculator
+    :rtype: :class:`mace.calculators.mace_mp`
+    """
+    from mace.calculators import MACECalculator
+
+    try:
+        calc = MACECalculator(**calc_params['args'])
+    except Exception:
+        logging.error(
+            "Failed to load MACECalculator with parameters:\n %s", calc_params
+        )
         raise
 
     return calc
@@ -206,6 +237,7 @@ def load_espresso_profile(calc_params):
     from ase.calculators.espresso import Espresso, EspressoProfile
 
     if 'command' in calc_params['args']:
+        calc_params = deepcopy(calc_params)
         command = calc_params['args'].pop('command')
         command = command.split()
         progind = command.index('pw.x')
@@ -235,16 +267,35 @@ def load_m3gnet(calc_params):
     """
     from matgl.ext.ase import M3GNetCalculator
     import matgl
-
-    model = calc_params.pop("model")
+    calc_params = deepcopy(calc_params)
+    model = calc_params['args'].pop("model")
     try:
         pot = matgl.load_model(model)
         calc = M3GNetCalculator(
             pot,
-            **calc_params,
+            **calc_params['args'],
         )
     except Exception:
         logging.error("Failed to load M3GNet with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
+def load_omat24(calc_params):
+    """Load and OMAT24 calculator
+
+    :param calc_params: parameters to be passed to fairchem.core.OCPCalculator.
+        Must include a key "model" that points to the model used to instantiate the potential
+    :type calc_params: Dict
+    :return: OMAT24 calculator
+    :rtype: :class:`fairchem.core.OCPCalculator`
+    """
+    from fairchem.core import OCPCalculator
+
+    try:
+        calc = OCPCalculator(**calc_params['args'])
+    except Exception:
+        logging.error("Failed to load OMAT24 with parameters:\n %s", calc_params)
         raise
 
     return calc
@@ -254,7 +305,9 @@ external_calcs = {
     'Allegro': load_nequip,
     'DeepPotential': load_dp,
     'CHGNet': load_chgnet,
-    'MACE': load_mace,
+    'MACE': load_mace_mp,
+    'MACECalculator': load_mace,
     'EspressoProfile': load_espresso_profile,
     'M3GNet': load_m3gnet,
+    'OMAT24': load_omat24,
 }

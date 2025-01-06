@@ -1,0 +1,21 @@
+asimmodule: mlips.compute_deviation
+workdir: compute_deviation_results
+args:
+  images: 
+    image_file: /Users/keith/dev/asimtools/examples/external/active_learning/data/test.xyz
+  template_calc_params:
+    name: MACE
+    args:
+      model: medium
+      use_device: cpu
+      # default_dtype: float64
+  model_weights_key_sequence: [args, model]
+  model_weights_pattern: /Users/keith/dev/asimtools/examples/external/active_learning/active_learning_results/id-*/MACE_models/mace_test_compiled.model
+  # calc_ids: [lj-0, lj-1, lj-2]
+
+  # images: 
+  #   image_file: /Users/keith/dev/asimtools/examples/external/active_learning/training_data/Ar_unlabeled_data.xyz
+  # template_calc_input: null
+  # model_weights_key_sequence: null
+  # model_weights_pattern: null
+  # calc_ids: [lj-0, lj-1, lj-2]

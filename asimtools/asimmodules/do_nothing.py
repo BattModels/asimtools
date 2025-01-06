@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 '''
-asimmodule for unit tests and debugging, does nothing for specified duration
+asimmodule for unit tests and debugging, does nothing for specified duration,
+mostly used for tests
 '''
 from time import sleep
 from typing import Dict, Optional

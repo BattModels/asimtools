@@ -13,7 +13,9 @@ import argparse
 import subprocess
 from typing import Dict, Tuple
 from asimtools.utils import read_yaml, get_logger
-from asimtools.job import load_job_from_directory
+from asimtools.job import (
+    load_job_from_directory,
+)
 
 
 def parse_command_line(args) -> Tuple[Dict, str]:
@@ -63,9 +65,9 @@ def main(args=None) -> None:
     if calc_input_file is not None:
         assert Path(calc_input_file).exists(), 'Specify valid calc input file'
         os.environ["ASIMTOOLS_CALC_INPUT"] = calc_input_file
+
     asimmodule = sim_input['asimmodule']
     precommands = sim_input.get('precommands', [])
-
     for precommand in precommands:
         command = precommand.split()
         completed_process = subprocess.run(command, check=True)

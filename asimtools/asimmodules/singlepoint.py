@@ -64,7 +64,12 @@ def singlepoint(
             raise
 
     image_file = prefix + 'image_output.xyz'
-    atoms.write(image_file, format='extxyz')
+    atoms.write(
+        image_file,
+        format='extxyz',
+        write_info=False,
+        write_results=True,
+    )
 
     results = {
         'energy': float(energy),

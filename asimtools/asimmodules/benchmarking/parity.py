@@ -77,7 +77,7 @@ def calc_parity_data(
         if 'stress' in properties:
             prop = 'stress'
             srvals = np.hstack(
-                [srvals, np.array(atoms.get_stress()).flatten()]
+                [srvals, np.array(atoms.get_stress(voigt=False)).flatten()]
             )
 
             spvals = np.hstack(
@@ -136,7 +136,7 @@ def parity(
     """Generates a parity plot and collects evaluation statistics comparing energy
     and/or forces and/or stress to existing values in the provided dataset
 
-    :param images: Image specification, see :func:`asimtools.utils.get_images`
+    :param images: Images specification, see :func:`asimtools.utils.get_images`
     :type images: Dict
     :param calc_id: ID of calculator provided in calc_input or global file
     :type calc_id: str
@@ -174,15 +174,24 @@ def parity(
 
     subsets = _split_data(data, nprocs)
     reses = []
-    with Pool(nprocs) as pool:
-        reses = pool.map(partial(
-            calc_parity_data,
+    if nprocs > 1:
+        with Pool(nprocs) as pool:
+            reses = pool.map(partial(
+                calc_parity_data,
+                calc_id=calc_id,
+                properties=properties,
+                force_prob=force_prob,
+                ),
+            subsets,
+            )
+    else:
+        reses = [calc_parity_data(
+            subset,
             calc_id=calc_id,
             properties=properties,
             force_prob=force_prob,
-            ),
-        subsets,
-        )
+            ) for subset in subsets
+        ]
 
     res = {prop: {'ref': [], 'pred': []} for prop in properties}
     results = {}
@@ -191,7 +200,7 @@ def parity(
             res[prop][source] = np.hstack(
                 [reses[jj][prop][source] for jj in range(len(reses))]
             ) * unit_factor
-
+        print(f'{prop.capitalize()} RMSE: {rmse(res[prop]["ref"], res[prop]["pred"])}')
         write_csv_from_dict(
             f'{prop}_parity.csv',
             res[prop],

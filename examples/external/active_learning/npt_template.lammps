@@ -1,0 +1,23 @@
+units           metal
+atom_style      atomic
+
+neighbor        1.0 bin
+boundary        p p p
+NEWTON
+
+# We read in the initial structure from a file
+read_data       image_input.lmpdat
+
+PAIR_STYLE
+PAIR_COEFF
+
+thermo_style    custom step temp pe ke etotal press vol lx ly lz xy xz yz
+thermo          ${THERMO_FREQ}
+dump            1 all custom ${DUMP_FREQ} traj/dump.lammpstrj id type x y z
+DUMP_MODIFY_ELEMENT
+
+fix             1 all npt temp ${TEMP} ${TEMP} ${TAU_T} iso ${PRES} ${PRES} ${TAU_P}
+
+timestep        0.002000
+velocity        all create ${TEMP} 454883 mom yes rot yes dist gaussian
+run             ${NSTEPS} upto

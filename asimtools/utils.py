@@ -12,6 +12,7 @@ import logging
 import subprocess
 from pathlib import Path
 import yaml
+from natsort import natsorted
 import numpy as np
 import pandas as pd
 from ase.io import read
@@ -146,15 +147,15 @@ def get_atoms(
     :param interface: Whether to use "ase" or "pymatgen" to create the atoms 
         object
     :type interface: str, optional
-    :param builder: Builder to use from :mod:`ase.build`, defaults to 'bulk'. \
+    :param builder: Builder to use from :mod:`ase.build`, defaults to 'bulk'.
         Any extra keyword arguments specified are passed to the build
     :type builder: str, optional
     :param atoms: :class:`ase.Atoms` object, defaults to None
     :type atoms: Atoms, optional
-    :param repeat: Number of times to repeat input to create supercell, \
+    :param repeat: Number of times to repeat input to create supercell,
         defaults to None
     :type repeat: Tuple[int, int, int], optional
-    :param rattle_stdev: `stdev` to be provided to :meth:`ase.Atoms.rattle`, \
+    :param rattle_stdev: `stdev` to be provided to :meth:`ase.Atoms.rattle`,
         or as `distance` to :meth:`pymatgen.core.structure.Structure.perturb`
         defaults to None
     :type rattle_stdev: float, optional
@@ -310,7 +311,7 @@ def get_atoms(
     elif return_type == 'ase' and interface == 'pymatgen':
         return AseAtomsAdaptor.get_atoms(struct, msonable=False)
 
-def parse_slice(value: str) -> slice:
+def parse_slice(value: str, bash: bool = False) -> slice:
     """Parses a :func:`slice` from string, like `start:stop:step`.
 
     :param value: Slice string
@@ -318,6 +319,7 @@ def parse_slice(value: str) -> slice:
     :return: slice object
     :rtype: slice
     """
+    assert value.count(':') <= 2, 'Too many colons in slice'
     indices = str(value).split(':')
     parts = []
     for index in indices:
@@ -325,7 +327,16 @@ def parse_slice(value: str) -> slice:
             parts.append(False)
         else:
             parts.append(index)
-    return slice(*[int(p) if p else None for p in parts])
+    if not bash:
+        return slice(*[int(p) if p else None for p in parts])
+    else:
+        if not parts[0]:
+            parts[0] = '0'
+        if not parts[1]:
+            parts[1] = '$END'
+        if len(parts) == 2:
+            parts.append('1')
+        return f'$(seq {parts[0]} {parts[2]} {parts[1]})'
 
 def get_images(
     image_file: str = None,
@@ -336,27 +347,27 @@ def get_images(
     skip_failed: bool = False,
     **kwargs
 ) -> List[Atoms]:
-    """Return a list of atoms objects based on the input arguments. Options \
+    r"""Return a list of atoms objects based on the input arguments. Options
         to specify are:
         #. image_file
         #. pattern
         #. patterns
         #. images
 
-    :param image_file: Path to ASE-readable file with one or more images, \
+    :param image_file: Path to ASE-readable file with one or more images,
         defaults to None
     :type image_file: str, optional
-    :param pattern: String pattern of paths from which to search for images, \
-        defaults to None. This only gets the last image from each file as in \
+    :param pattern: String pattern of paths from which to search for images,
+        defaults to None. This only gets the last image from each file as in
         :func:`ase.io.read` if an index is not specified.
     :type pattern: str, optional
-    :param patterns: Sequence of string patterns/paths from which to search \
-        for images, defaults to None. This only gets one image from each file \
+    :param patterns: Sequence of string patterns/paths from which to search
+        for images, defaults to None. This only gets one image from each file
         as in :func:`ase.io.read` without specifying an index
     :type pattern: str, optional
     :param images: A list of atoms objects, defaults to None
     :type images: Iterable[Atoms], optional
-    :param index: Index to specify when using :func:`ase.io.read`, \ defaults
+    :param index: Index to specify when using :func:`ase.io.read`, defaults
         to ':'
     :type index: Union[str, int], optional
     :param skip_failed: Whether to raise an IO error if it fails to read any of
@@ -439,7 +450,7 @@ def get_images(
         if not isinstance(images, list):
             images = [images]
     elif pattern is not None:
-        image_files = sorted(glob(pattern))
+        image_files = natsorted(glob(pattern))
         assert len(image_files) > 0, \
             f'No images matching pattern "{pattern}" from "{os.getcwd()}"'
 
@@ -468,7 +479,7 @@ def get_images(
     elif patterns is not None:
         images = []
         for pattern in patterns:
-            image_files = sorted(glob(pattern))
+            image_files = natsorted(glob(pattern))
             assert len(image_files) > 0, \
                 f'Don\'t include pattern "{pattern}" if no files match'
             images += get_images(
@@ -689,10 +700,9 @@ def get_str_btn(
     :return: substring
     :rtype: _type_
     """
-
+    s = str(s)
     j = 0
     stop_index = len(s) + 1
-
     s = s[start_index:stop_index]
     while occurence - j >= 0:
         if s1 is not None:
@@ -719,10 +729,44 @@ def find_nth(haystack: str, needle: str, n: int) -> int:
     return start
 
 def get_nth_label(
-    s: str,
+    s: os.PathLike,
     n: int = 1,
 ):
     ''' Return nth label in a string potentially containing multiple labels,
     indexing starts from 0 '''
+    s = str(s)
     start = find_nth(s, '__', n=(n*2+1))
     return get_str_btn(s, '__', '__', start_index=start)
+
+def expand_wildcards(d: Dict, root_path: os.PathLike = None) -> Dict:
+    """Expands paths in a dictionary
+
+    :param d: Dictionary to expand paths in
+    :type d: Dict[str, Any]
+    :param root_path: Root path to expand paths from
+    :type root_path: os.PathLike
+    :return: Dictionary with expanded paths
+    :rtype: Dict[str, Any]
+    """
+    import os
+    def expand_value(value: str, root_path: os.PathLike = None) -> Union[str, list]:
+        if '*' in value:
+            if root_path is None:
+                root_path = Path('./')
+            else:
+                root_path = Path(root_path)
+            paths = glob(str(root_path / value))
+            assert len(paths) == 1, \
+                f'{len(paths)} matching paths found for {value}, must be only 1'
+            value = paths[0]
+            value = os.path.relpath(value, root_path)
+        return value
+
+    for key, value in d.items():
+        if isinstance(value, str):
+            d[key] = expand_value(value, root_path=root_path)
+        elif isinstance(value, dict):
+            d[key] = expand_wildcards(value, root_path=root_path)
+
+
+    return d

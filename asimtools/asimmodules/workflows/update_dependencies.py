@@ -11,6 +11,7 @@ from pathlib import Path
 import os
 import subprocess
 import logging
+import numpy as np
 from asimtools.utils import read_yaml
 
 def update_dependencies(
@@ -34,13 +35,17 @@ def update_dependencies(
     :rtype: Dict
     """
 
+    if os.environ.get('SLURM_JOB_ID', None) is None:
+        logging.warning('Not running on a SLURM job, skipping update_dependencies')
+        return {}
     prev_step_dir = Path(prev_step_dir)
-    next_step_dir = Path(next_step_dir)
     prev_output = read_yaml(prev_step_dir / 'output.yaml')
-    next_output = read_yaml(next_step_dir / 'output.yaml')
-    next_job_ids = next_output.get('job_ids', [])
     job_ids = prev_output.get('job_ids', None)
-    if job_ids is not None:
+    using_slurm = np.any([(job_id is not None) for job_id in job_ids])
+    if using_slurm:
+        next_step_dir = Path(next_step_dir)
+        next_output = read_yaml(next_step_dir / 'output.yaml')
+        next_job_ids = next_output.get('job_ids', [])
         job_ids = [str(job_id) for job_id in job_ids]
         start_cond = 'afterok'
         if skip_failed:
@@ -65,6 +70,5 @@ def update_dependencies(
                 with open('sbatch_stderr.txt', 'w', encoding='utf-8') as f:
                     f.write(completed_process.stderr)
                 completed_process.check_returncode()
-            return {}
 
     return {}

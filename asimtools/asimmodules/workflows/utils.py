@@ -1,5 +1,6 @@
 from typing import Dict, Sequence, Optional, Union
 from glob import glob
+from natsort import natsorted
 import numpy as np
 from asimtools.utils import get_str_btn
 
@@ -63,7 +64,7 @@ def prepare_array_vals(
         f'Provide only one of {[str(v) for v in possible_strs]}'
 
     if file_pattern is not None:
-        array_values = sorted(glob(str(file_pattern)))
+        array_values = natsorted(glob(str(file_pattern)))
     elif linspace_args is not None:
         array_values = np.linspace(*linspace_args)
         array_values = [float(v) for v in array_values]
@@ -91,13 +92,15 @@ def prepare_array_vals(
         labels = [label_prefix + '-' + label for label in labels]
 
     assert len(labels) == len(array_values), \
-        'Num. of array_values must match num. of labels'
+        f'Num. of array_values ({len(array_values)}) must match num.'\
+        f'of labels ({len(labels)})'
 
     if secondary_array_values is not None:
         nvals = len(secondary_array_values)
         nkeys = len(secondary_key_sequences)
         assert nvals == nkeys, \
-            f'{nvals} secondary values does not match {nkeys} secondary keys'
+            f'Num. of secondary values ({nvals}) does not match num. of '\
+            f'secondary keys ({nkeys})'
         for l in secondary_array_values:
             assert len(l) == len(labels), \
                 f"Secondary values ({len(l)}) not same length as array values"\
