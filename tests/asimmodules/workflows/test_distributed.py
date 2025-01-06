@@ -4,6 +4,7 @@ Tests for running asimmodules using asim_run.py
 from glob import glob
 import os
 import pytest
+from natsort import natsorted
 from asimtools.job import (
     create_unitjob,
     DistributedJob,
@@ -37,7 +38,7 @@ def test_distributed(env_input, calc_input, sim_input, tmp_path, request):
     unitjob.submit()
 
     assert load_job_from_directory(wdir).get_status()[1] == 'complete'
-    dirs = glob(str(wdir / 'id*'))
+    dirs = natsorted(glob(str(wdir / 'id*')))
     assert len(dirs) == len(sim_input['args']['subsim_inputs'])
 
     for d in dirs:
@@ -73,15 +74,17 @@ def test_batch_distributed(env_input, calc_input, sim_input, tmp_path, request):
         array_max=array_max,
         skip_failed=skip_failed,
     )
-    dirs = glob(str(wdir / 'id*'))
+    dirs = natsorted(glob(str(wdir / 'id*')))
     assert len(dirs) == len(sim_input['args']['subsim_inputs'])
 
+    # In debug mode for distjob, only the first group will be run
     statuses = ['complete'] * group_size + ['clean'] * (len(dirs) - 1)
+    print("XXXXXXX", statuses, dirs)
     for d_ind, d in enumerate(dirs):
         assert str(d).rsplit('/', maxsplit=1)[-1].startswith('id-')
 
         uj = load_job_from_directory(d)
-        print(uj.workdir, uj.get_status())
+        print('job_info:', uj.workdir, uj.get_status())
         assert uj.get_status()[1] == statuses[d_ind]
 
     # assert distjob.get_status(descend=False) == (True, 'complete')
