@@ -86,5 +86,3 @@ def test_batch_distributed(env_input, calc_input, sim_input, tmp_path, request):
         uj = load_job_from_directory(d)
         print('job_info:', uj.workdir, uj.get_status())
         assert uj.get_status()[1] == statuses[d_ind]
-
-    # assert distjob.get_status(descend=False) == (True, 'complete')

@@ -53,6 +53,8 @@ def calc_parity_data(
     spvals = []
     for i, atoms in enumerate(subset):
         calc = load_calc(calc_id)
+        patoms = atoms.copy()
+        patoms.calc = calc
         n_atoms = len(atoms)
         if 'energy' in properties:
             prop = 'energy'
@@ -60,7 +62,7 @@ def calc_parity_data(
                 [ervals, atoms.get_potential_energy()/n_atoms]
             )
             epvals = np.hstack(
-                [epvals, float(calc.get_potential_energy(atoms)/n_atoms)]
+                [epvals, float(patoms.get_potential_energy()/n_atoms)]
             )
 
         if 'forces' in properties:
@@ -71,17 +73,16 @@ def calc_parity_data(
                 )
 
                 fpvals = np.hstack(
-                    [fpvals, np.array(calc.get_forces(atoms)).flatten()]
+                    [fpvals, np.array(patoms.get_forces()).flatten()]
                 )
 
         if 'stress' in properties:
             prop = 'stress'
             srvals = np.hstack(
-                [srvals, np.array(atoms.get_stress(voigt=False)).flatten()]
+                [srvals, np.array(atoms.get_stress(voigt=True)).flatten()]
             )
-
             spvals = np.hstack(
-                [spvals, np.array(calc.get_stress(atoms)).flatten()]
+                [spvals, np.array(patoms.get_stress(voigt=True)).flatten()]
             )
             res[prop] = {'ref': srvals, 'pred': spvals}
 
