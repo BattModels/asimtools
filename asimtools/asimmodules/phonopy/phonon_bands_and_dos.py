@@ -4,13 +4,6 @@ from pathlib import Path
 import os
 import numpy as np
 from numpy.typing import ArrayLike
-# import matplotlib.pyplot as plt
-# from ase.io import read
-# import phonopy
-# from phonopy.phonon.band_structure import get_band_qpoints_and_path_connections
-# from asimtools.calculators import load_calc
-# from asimtools.asimmodules.workflows.image_array import image_array
-# from asimtools.utils import get_str_btn, get_images
 from asimtools.job import UnitJob
 
 def phonon_bands_and_dos(
@@ -26,6 +19,8 @@ def phonon_bands_and_dos(
     use_seekpath: Optional[bool] = True,
     npoints: Optional[int] = 51,
     mesh: Optional[Union[ArrayLike,float]] = [20, 20, 20],
+    refine_cell: bool = False,
+    symprec: float = 1e-4,
 ) -> Dict:
     """Workflow to calculate phonon bands and density of states using phonopy.
 
@@ -77,6 +72,8 @@ def phonon_bands_and_dos(
                         'supercell': supercell,
                         'distance': distance,
                         'phonopy_save_path': phonopy_save_path,
+                        'refine_cell': refine_cell,
+                        'symprec': symprec,
                     },
                 },
                 'step-1': {

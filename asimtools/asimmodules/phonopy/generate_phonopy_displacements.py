@@ -7,14 +7,19 @@ import numpy as np
 from phonopy import Phonopy
 from phonopy.interface.calculator import read_crystal_structure, write_crystal_structure
 from phonopy.structure.atoms import PhonopyAtoms
+from ase import Atoms
+from ase.spacegroup.symmetrize import check_symmetry
 from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms, get_logger
+import spglib
 
 def generate_phonopy_displacements(
     image: Dict,
     supercell: Sequence[int],
     distance: float = 0.01,
-    phonopy_save_path: str = 'phonopy_params.yaml'
+    phonopy_save_path: str = 'phonopy_params.yaml',
+    refine_cell: bool = False,
+    symprec: float = 1e-4,
 ) -> Dict:
     """Generates displacements for phonopy calculations
 
@@ -31,6 +36,26 @@ def generate_phonopy_displacements(
     """
 
     atoms = get_atoms(**image)
+    unrefined_sg = check_symmetry(atoms, symprec=symprec).international
+    if refine_cell:
+        cell = (
+            atoms.get_cell().array,
+            atoms.get_scaled_positions(),
+            atoms.get_atomic_numbers()
+        )
+
+        refined_cell = spglib.standardize_cell(cell, symprec=symprec)
+        atoms = Atoms(
+            cell=refined_cell[0],
+            scaled_positions=refined_cell[1],
+            numbers=refined_cell[2],
+            pbc=True,
+        )
+        atoms.write('refined_atoms.cif')
+        sg = check_symmetry(atoms, symprec=1e-6).international
+    else:
+        sg = None
+
     atoms.write('POSCAR-unitcell', format='vasp')
 
     unitcell, _ = read_crystal_structure(
@@ -61,4 +86,8 @@ def generate_phonopy_displacements(
 
     phonon.save(phonopy_save_path)
 
-    return {}
+    results = {
+        'unrefined_spacegroup': str(unrefined_sg),
+        'refined_spacegroup': str(sg),
+    }
+    return results
