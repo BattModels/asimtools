@@ -645,7 +645,7 @@ class DistributedJob(Job):
         #     txt += '    WORKDIR=${fls[${SLURM_ARRAY_TASK_ID}]}\n'
         #     txt += 'fi\n\n'
         # txt += 'cd ${WORKDIR}\n'
-        txt += '    ' + '\n'.join(slurm_params.get('precommands', []))
+        txt += '    ' + '\n'.join(slurm_params.get('precommands', [])) + '\n'
         txt += '\n    '.join(
             self.unitjobs[0].calc_params.get('precommands', [])
         ) + '\n'
@@ -961,44 +961,7 @@ class ChainedJob(Job):
                             curjob.env['slurm']['flags']['-J'] = \
                                 f'step-{step+i}'
 
-                        # if i < len(self.unitjobs)-1:
-                        #     nextjob = self.unitjobs[i+1]
-
-                        #     curworkdir = os.path.relpath(
-                        #         curjob.workdir,
-                        #         nextjob.workdir
-                        #     )
-                        #     nextjob.sim_input['dependent_dir'] = str(curworkdir)
-
-                        # #### dep in job script implementation
-                        # #if there is a following job
-                        # if i < len(self.unitjobs)-1:
-                        #     nextjob = self.unitjobs[i+1]
-
-                        #     nextworkdir = os.path.relpath(
-                        #         nextjob.workdir,
-                        #         curjob.workdir
-                        #     )
-                        #     curworkdir = os.path.relpath(
-                        #         curjob.workdir,
-                        #         nextjob.workdir
-                        #     )
-                        #     # Add postcommands to go into the next workdir
-                        #     postcommands = curjob.env['slurm'].get(
-                        #         'postcommands', []
-                        #     )
-                        #     postcommands += ['\n#Submitting next step:']
-                        #     postcommands += [f'cd {nextworkdir}']
-                        #     # submit the next job dependent in the current
-                        #     # sh script
-                        #     submit_txt = 'asim-execute sim_input.yaml '
-                        #     submit_txt += '-c calc_input.yaml '
-                        #     submit_txt += '-e env_input.yaml '
-                        #     postcommands += [submit_txt]
-                        #     postcommands += [f'cd {curworkdir}']
-                        #     curjob.env['slurm']['postcommands'] = postcommands
-                        # #####
-                        #   submit the next job dependent on the current one   
+                        # submit the next job dependent on the current one   
                         # Previous working solution
                         write_image = False
                         # Write image first step in chain being run/continued
