@@ -132,7 +132,7 @@ def main(args=None) -> None:
     sim_func = getattr(sim_module, func_name)
 
     cwd = Path('.').resolve()
-    job = load_job_from_directory(cwd)
+    job = load_job_from_directory(cwd, asimrun_mode=True)
     job.start()
 
     try:

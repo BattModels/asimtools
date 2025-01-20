@@ -44,6 +44,7 @@ class Job():
         sim_input: Dict,
         env_input: Union[Dict,None] = None,
         calc_input: Union[Dict,None] = None,
+        asimrun_mode: bool = False,
     ) -> None:
         if env_input is None:
             env_input = get_env_input()
@@ -63,7 +64,7 @@ class Job():
             self.sim_input['src_dir'] = self.launchdir
 
         self.env_id = self.sim_input.get('env_id', None)
-        if self.env_id is not None and self.env_input is not None:
+        if self.env_id is not None and not asimrun_mode:
             self.env = self.env_input[self.env_id]
         else:
             self.env = {
@@ -1002,7 +1003,7 @@ class ChainedJob(Job):
         return job_ids
 
 
-def load_job_from_directory(workdir: os.PathLike) -> Job:
+def load_job_from_directory(workdir: os.PathLike, asimrun_mode=False) -> Job:
     ''' Loads a job from a given directory '''
     workdir = Path(workdir)
     assert workdir.exists(), f'Work directory "{workdir}" does not exist'
@@ -1029,6 +1030,7 @@ def load_job_from_directory(workdir: os.PathLike) -> Job:
         sim_input=sim_input,
         env_input=env_input,
         calc_input=calc_input,
+        asimrun_mode=asimrun_mode,
     )
 
     # This makes sure that wherever we may be loading the job from, we refer
