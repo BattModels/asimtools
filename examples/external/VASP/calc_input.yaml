@@ -7,5 +7,9 @@ vasp_PBE:
     prec: Normal
     xc: PBE
     lreal: False
-    command: srun vasp_std
+    command: srun --mpi=pmi2 vasp_std
+    # See ASE vasp kpoints specification
+    kpts: [1,1,1]
+    # other parameters not specified through ASE can be set directly
+    NCORE: 4
 

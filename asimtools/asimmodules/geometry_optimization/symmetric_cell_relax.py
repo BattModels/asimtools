@@ -6,7 +6,7 @@ Author: mkphuthi@github.com
 '''
 from typing import Dict, Optional
 import ase.optimize
-from ase.constraints import ExpCellFilter
+from ase.filters import ExpCellFilter
 from ase.spacegroup.symmetrize import FixSymmetry
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc

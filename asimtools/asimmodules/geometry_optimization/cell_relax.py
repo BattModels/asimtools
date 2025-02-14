@@ -11,7 +11,7 @@ Author: mkphuthi@github.com
 
 from typing import Dict, Optional, Sequence
 import ase.optimize
-from ase.constraints import StrainFilter
+from ase.filters import StrainFilter
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms, join_names

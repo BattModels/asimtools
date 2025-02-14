@@ -1,0 +1,18 @@
+# This example shows how to use a mpset as a template then specify your own INCAR
+asimmodule: vasp.vasp
+workdir: vasp_mixed_results
+env_id: n24 # Specify your own env
+args:
+  image:
+    name: Na
+    builder: bulk
+  incar:
+    ENCUT: 480
+    KSPACING: 0.7
+    IBRION: -1 
+  kpoints:
+    kpts: [[1,1,1]]
+  potcar: 
+    Na: PBE
+
+  command: srun --mpi=pmi2 vasp_std

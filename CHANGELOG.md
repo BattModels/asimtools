@@ -3,7 +3,19 @@ All notable changes to this project will be documented in this file.
  
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+## [develop] - 2025-2-14
  
+### Added
+- Can now specify whether to write velocities in lammps
+ 
+### Changed
+- VASP interface changed to align more with pymatgen principles
+
+### Fixed
+- Minor bugs in geometry optimizations
+- Updated EspressoProfile calculator to match ASE 3.25.0b1
+
 ## [0.1.0] - 2024-12-27
  
 ### Added

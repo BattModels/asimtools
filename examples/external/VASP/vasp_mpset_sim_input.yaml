@@ -1,9 +1,9 @@
 asimmodule: vasp.vasp
 workdir: vasp_mpset_results
-env_id: inline
+env_id: n24 # Specify your own env
 args:
   image:
     name: Na
     builder: bulk
-  mpset: MPStaticSet
-  command: vasp_std
+  mpset: MatPESStaticSet
+  command: srun --mpi=pmi2 vasp_std

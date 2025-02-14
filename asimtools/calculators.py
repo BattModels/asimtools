@@ -239,19 +239,20 @@ def load_espresso_profile(calc_params):
     if 'command' in calc_params['args']:
         calc_params = deepcopy(calc_params)
         command = calc_params['args'].pop('command')
-        command = command.split()
-        progind = command.index('pw.x')
-        argv = command[:progind+1]
     else:
-        argv = ['pw.x']
+        command = 'pw.x'
+    if 'pseudo_dir' in calc_params['args']:
+        pseudo_dir = calc_params['args'].pop('pseudo_dir')
+    else:
+        pseudo_dir = None
 
     try:
         calc = Espresso(
             **calc_params['args'],
-            profile=EspressoProfile(argv=argv)
+            profile=EspressoProfile(command=command, pseudo_dir=pseudo_dir)
         )
     except Exception:
-        logging.error("Failed to load MACE-OFF with parameters:\n %s", calc_params)
+        logging.error("Failed to load Espresso with parameters:\n %s", calc_params)
         raise
 
     return calc

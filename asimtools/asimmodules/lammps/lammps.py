@@ -22,6 +22,7 @@ def lammps(
     placeholders: Optional[Dict] = None,
     lmp_cmd: str = 'lmp',
     masses: bool = True,
+    velocities: bool = False,
     seed: Optional[int] = None,
 ) -> Dict:
     """Runs a lammps script based on a specified template, variables can be 
@@ -46,7 +47,9 @@ def lammps(
     :type lmp_cmd: str, optional
     :param masses: Whether to specify atomic masses in LAMMPS data input, 
         requires ASE>3.23.0, defaults to True
-    :type masses: bool, optional
+    :param velocities: Whether to specify atomic velocities in LAMMPS data input, 
+        requires ASE>3.23.0, defaults to False
+    :type velocities: bool, optional
     :param seed: Random seed for anywhere necessary in the template. You will 
         need to put the 'SEED'  placeholder anywhere you want a random 
         seed to be placed, if seed=None, a random one is generated, 
@@ -62,15 +65,16 @@ def lammps(
     # in arbitrary image provided by asimtools
     if image is not None:
         atoms = get_atoms(**image)
-        if masses:
+        if masses or velocities:
             try:
                 atoms.write(
                     'image_input.lmpdat',
                     format='lammps-data',
                     atom_style=atom_style,
                     masses=masses,
+                    velocities=velocities,
                 )
-            except TypeError as te:
+            except ValueError as te:
                 err_txt = 'Need ASE version >=3.23 to support writing '
                 err_txt += 'masses to lammps input file. Add mass keyword to '
                 err_txt += 'lammps template instead'

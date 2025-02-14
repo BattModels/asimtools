@@ -1,8 +1,8 @@
 asimmodule: singlepoint
-workdir: vasp_results
-env_id: inline
+workdir: vasp_ase_results
+env_id: n24 # Specify your own env
 args:
-  calc_id: vasp
+  calc_id: vasp_PBE
   image:
     name: Na
     builder: bulk

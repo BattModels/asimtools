@@ -6,7 +6,7 @@ Author: mkphuthi@github.com
 '''
 from typing import Dict, Optional
 import ase.optimize
-from ase.constraints import ExpCellFilter
+from ase.filters import ExpCellFilter
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms
