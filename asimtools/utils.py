@@ -14,6 +14,7 @@ from pathlib import Path
 import yaml
 from natsort import natsorted
 import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
 from ase.io import read
 from ase.parallel import paropen
@@ -49,7 +50,7 @@ def write_yaml(yaml_path: str, yaml_Dict: Dict) -> None:
     """ 
     # Use paropen so that only the master process is updating outputs
     with paropen(yaml_path, 'w', encoding='utf-8') as f:
-        yaml.dump(yaml_Dict, f)
+        yaml.dump(yaml_Dict, f, sort_keys=False)
 
 def get_axis_lims(x: Sequence, y: Sequence, padding: float=0.1):
     """Get an estimate of good limits for a plot axis"""
@@ -58,6 +59,27 @@ def get_axis_lims(x: Sequence, y: Sequence, padding: float=0.1):
     diff = data_max - data_min
     lims = [data_min - padding * diff, data_max + padding * diff]
     return lims
+
+def improve_plot(ax=None, fontsize=14):
+    if ax is None:
+        ax = plt.gca()
+
+    ax.tick_params(labelsize=fontsize)
+    ax.set_xlabel(ax.get_xlabel(), fontsize=fontsize+2)
+    ax.set_ylabel(ax.get_ylabel(), fontsize=fontsize+2)
+    ax.set_title(ax.get_title(), fontsize=fontsize+4)
+
+    # Format Legends
+    if ax.get_legend() is not None:
+        plt.rc('legend', fontsize=fontsize)
+        leg = ax.get_legend()
+        leg.fontsize = fontsize
+        if leg.get_title() is not None:
+            leg.set_title(
+                leg.get_title().get_text(),
+                prop={'size': fontsize+2}
+            )
+    plt.tight_layout()
 
 def write_csv_from_dict(
     fname: str,
@@ -596,7 +618,8 @@ def change_dict_value(
     d: Dict,
     new_value,
     key_sequence: Sequence,
-    return_copy: bool  = True
+    return_copy: Optional[bool] = True,
+    placeholder: Optional[str] = None,
 ) -> Dict:
     """Changes a value in the specified dictionary given by following the 
     key sequence
@@ -605,9 +628,11 @@ def change_dict_value(
     :type d: Dict
     :param new_value: The new value that will replace the old one
     :type new_value: _type_
-    :param key_sequence: List of keys in the order in which they access the dictionary key
+    :param key_sequence: List of keys in the order in which they access the 
+        dictionary key
     :type key_sequence: Sequence
-    :param return_copy: Whether to return a copy only or to modify the dictionary in-place as well, defaults to True
+    :param return_copy: Whether to return a copy only or to modify the 
+        dictionary in-place as well, defaults to True
     :type return_copy: bool, optional
     :return: The changed dictionary
     :rtype: Dict
@@ -615,14 +640,20 @@ def change_dict_value(
     if return_copy:
         d = deepcopy(d)
     if len(key_sequence) == 1:
-        d[key_sequence[0]] = new_value
+        if placeholder is None:
+            d[key_sequence[0]] = new_value
+        else:
+            d[key_sequence[0]] = d[key_sequence[0]].replace(
+                placeholder, new_value
+            )
         return d
     else:
         new_d = change_dict_value(
             d[key_sequence[0]],
             new_value,
             key_sequence[1:],
-            return_copy=return_copy
+            return_copy=return_copy,
+            placeholder=placeholder,
         )
         d[key_sequence[0]] = new_d
         return d
@@ -640,9 +671,11 @@ def change_dict_values(
     :type d: Dict
     :param new_values: The new values that will replace the old one
     :type new_values: Sequence
-    :param key_sequence: List of list of keys in the order in which they access the dictionary key
+    :param key_sequence: List of list of keys in the order in which they 
+        access the dictionary key
     :type key_sequence: Sequence
-    :param return_copy: Whether to return a copy only or to modify the dictionary in-place as well, defaults to True
+    :param return_copy: Whether to return a copy only or to modify the 
+        dictionary in-place as well, defaults to True
     :type return_copy: bool, optional
     :return: The changed dictionary
     :rtype: Dict
@@ -749,7 +782,10 @@ def expand_wildcards(d: Dict, root_path: os.PathLike = None) -> Dict:
     :rtype: Dict[str, Any]
     """
     import os
-    def expand_value(value: str, root_path: os.PathLike = None) -> Union[str, list]:
+    def expand_value(
+        value: str,
+        root_path: os.PathLike = None
+    ) -> Union[str, list]:
         if '*' in value:
             if root_path is None:
                 root_path = Path('./')

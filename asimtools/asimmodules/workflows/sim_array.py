@@ -21,6 +21,7 @@ def sim_array(
     file_pattern: Optional[str] = None,
     linspace_args: Optional[Sequence] = None,
     arange_args: Optional[Sequence] = None,
+    placeholder: Optional[str] = None,
     env_ids: Optional[Union[Sequence[str],str]] = None,
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
@@ -29,6 +30,7 @@ def sim_array(
     str_btn_args: Optional[Dict] = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
+    secondary_placeholders: Optional[Sequence] = None,
     array_max: Optional[int] = None,
     skip_failed: Optional[bool] = False,
     group_size: int = 1,
@@ -53,6 +55,9 @@ def sim_array(
     :param arange_args: arguments to pass to :func:`numpy.arange` to be
         iterated over in each simulation, defaults to None
     :type arange_args: Optional[Sequence], optional
+    :param placeholder: placeholder is string dict value to replace with the 
+        array value
+    :type placeholder: Optional[str], optional
     :param labels: Custom labels to use for each simulation, defaults to None
     :type labels: Sequence, optional
     :param label_prefix: Prefix to add before labels which can make extracting 
@@ -70,6 +75,10 @@ def sim_array(
         over in tandem with array_values to allow changing multiple key-value
         pairs, defaults to None
     :type secondary_array_values: Sequence, optional
+    :param secondary_placeholders: list of other other placeholders to iterate
+        over in tandem with array_values to allow changing multiple key-value
+        pairs, defaults to None
+    :type secondary_placeholders: Sequence, optional
     :param array_max: Number of jobs to run at once in scheduler
     :type array_max: int, optional
     :param calc_input: calc_input file to use, defaults to None
@@ -113,17 +122,23 @@ def sim_array(
                 new_value=val,
                 key_sequence=key_sequence,
                 return_copy=True,
+                placeholder=placeholder,
             )
         else:
             new_sim_input = deepcopy(template_sim_input)
 
         if secondary_array_values is not None:
-            for k, vs in zip(secondary_key_sequences, secondary_array_values):
+            for j, (k, vs) in enumerate(
+                zip(secondary_key_sequences, secondary_array_values)
+            ):
+                if secondary_placeholders is not None:
+                    secondary_placeholder = secondary_placeholders[j]
                 new_sim_input = change_dict_value(
                     d=new_sim_input,
                     new_value=vs[i],
                     key_sequence=k,
                     return_copy=False,
+                    placeholder=secondary_placeholder,
                 )
 
         if env_ids is not None:

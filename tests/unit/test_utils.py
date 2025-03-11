@@ -123,6 +123,18 @@ def test_change_dict_value(test_input, expected):
     assert new_d != d
 
 @pytest.mark.parametrize("test_input, expected",[
+    (['l1', 'l2', 'l3'], {'l1': {'l2': {'l3': 'l3_NEW'}}}),
+])
+def test_change_dict_value_placeholder(test_input, expected):
+    ''' Test getting iterable of atoms from different inputs '''
+    d = {'l1': {'l2': {'l3': 'l3_PLACEHOLDER'}}}
+    new_d = change_dict_value(
+        d, 'NEW', test_input, return_copy=True, placeholder='PLACEHOLDER',
+    )
+    assert new_d == expected
+    assert new_d != d
+
+@pytest.mark.parametrize("test_input, expected",[
     ([['l1', 'l21', 'l31'], ['l1', 'l21', 'l32']],
     {'l1': {'l21': {'l31': 'v1', 'l32': 'v2'}, 'l22': 'l22v'}}),
     ([['l1', 'l21', 'l31'], ['l1', 'l22']],

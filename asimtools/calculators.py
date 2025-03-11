@@ -259,7 +259,7 @@ def load_espresso_profile(calc_params):
 
 
 def load_m3gnet(calc_params):
-    """Load and M3GNet calculator
+    """Load any M3GNet or MatGL calculator
 
     :param calc_params: parameters to be passed to matgl.ext.ase.M3GNetCalculator. Must include a key "model" that points to the model used to instantiate the potential
     :type calc_params: Dict
@@ -283,10 +283,11 @@ def load_m3gnet(calc_params):
     return calc
 
 def load_omat24(calc_params):
-    """Load and OMAT24 calculator
+    """Load any OMAT24 calculator
 
     :param calc_params: parameters to be passed to fairchem.core.OCPCalculator.
-        Must include a key "model" that points to the model used to instantiate the potential
+        Must include a key "model" that points to the model files used to 
+        instantiate the potential
     :type calc_params: Dict
     :return: OMAT24 calculator
     :rtype: :class:`fairchem.core.OCPCalculator`
@@ -296,7 +297,41 @@ def load_omat24(calc_params):
     try:
         calc = OCPCalculator(**calc_params['args'])
     except Exception:
-        logging.error("Failed to load OMAT24 with parameters:\n %s", calc_params)
+        logging.error(
+            "Failed to load OMAT24 with parameters:\n %s", calc_params
+        )
+        raise
+
+    return calc
+
+def load_ase_dftd3(calc_params):
+    """Load any calculator with DFTD3 correction as implemented in ASE
+
+    :param calc_params: Dictionary with 2 keys. First is `d3_args` which is 
+        passed to ase.calculators.dftd3.DFTD3 except for the dft argument. The
+        second is dft_calc_id or dft_calc_params which loads the calculator 
+        to be wrapped.
+    :type calc_params: Dict
+    :return: ASE calculator
+    :rtype: :class:`ase.calculators.calculators.Calculator`
+    """
+    from ase.calculators.dftd3 import DFTD3
+    d3_args = calc_params['args'].get('d3_args', {})
+    if 'dft' in d3_args:
+        raise ValueError('Do not specify dft arg for DFTD3, specify calc_id')
+    
+    dft_calc_id = calc_params['args'].get('dft_calc_id', None)
+    dft_calc_params = calc_params['args'].get('dft_calc_params', None)
+    if ( (dft_calc_id is not None) and (dft_calc_params is not None) ):
+        raise ValueError('Provide only one of dft_calc_id or dft_calc_params')
+    
+    dft = load_calc(calc_id=dft_calc_id, calc_params=dft_calc_params)
+    try:
+        calc = DFTD3(dft=dft, **d3_args)
+    except Exception:
+        logging.error(
+            "Failed to load d3 calculator with parameters:\n %s", calc_params
+        )
         raise
 
     return calc
@@ -311,4 +346,5 @@ external_calcs = {
     'EspressoProfile': load_espresso_profile,
     'M3GNet': load_m3gnet,
     'OMAT24': load_omat24,
+    'ASEDFTD3': load_ase_dftd3,
 }

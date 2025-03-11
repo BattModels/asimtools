@@ -7,10 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [develop] - 2025-2-14
  
 ### Added
+- Can now use placehodlers in sim_array where the array_values replace part of
+the string at the given key_sequence
 - Can now specify whether to write velocities in lammps
+- Calculator: Now added DFTD3 calculator using the ASE interface, works with any calculator. Two things of note: 1. You need to install DFTD3 from 
+https://www.chemie.uni-bonn.de/grimme/de/software/dft-d3/get_dft-d3. 2. Some
+calculators which return a 3x3 matrix for stress will break. One can modify
+ASE source for this as ASIMTools can't go into the calculator code.
  
 ### Changed
-- VASP interface changed to align more with pymatgen principles
+- VASP interface changed to align more with pymatgen
+- asimtools.utils.write_yaml now stops sorting keys to help with readability of 
+written yamls
 
 ### Fixed
 - Minor bugs in geometry optimizations

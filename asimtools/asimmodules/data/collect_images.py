@@ -6,6 +6,9 @@ author: mkphuthi@github.com
 
 from typing import Dict, Optional, Sequence
 import numpy as np
+from copy import deepcopy
+from pymatgen.io.ase import AseAtomsAdaptor as AAA
+from pymatgen.analysis.structure_matcher import StructureMatcher
 from ase.io import write
 from asimtools.utils import (
     get_atoms, get_images, new_db
@@ -18,6 +21,8 @@ def collect_images(
     fnames: Sequence[str] = ['output_images.xyz'],
     splits: Optional[Sequence[float]] = (1,),
     shuffle: bool = True,
+    sort_by_energy_per_atom: bool = False,
+    remove_duplicates: Optional[bool] = False,
     rename_keys: Optional[Dict] = None,
     energy_per_atom_limits: Optional[Sequence[float]] = None,
     force_max: Optional[float] = None,
@@ -36,9 +41,17 @@ def collect_images(
     :type splits: Optional[Sequence[float]], optional
     :param shuffle: shuffle images before splitting, defaults to True
     :type shuffle: bool, optional
-    :param rename_keys: keys to rename on writing to the output file, defaults to None
+    :param sort_by_energy_per_atom: sort images before splitting, defaults to 
+        False
+    :type sort_by_energy_per_atom: bool, optional
+    :param remove_duplicates: Whether to search for and remove duplicates with
+        :class:`pymatgen.analysis.structure_matcher.StructureMatcher`. This is
+        quite slow, defaults to False
+    :param rename_keys: keys to rename on writing to the output file, defaults 
+        to None
     :type rename_keys: Optional[Dict], optional
-    :param energy_per_atom_limits: energy limits for filtering images, defaults to None
+    :param energy_per_atom_limits: energy limits for filtering images, 
+        defaults to None
     :type energy_per_atom_limits: Optional[Sequence[float]], optional
     :param force_max: forces maximimum for filtering images, defaults to None
     :type force_max: Optional[float], optional
@@ -77,7 +90,6 @@ def collect_images(
             if (min_stress < stress_limits[0]):
                 if (max_stress > stress_limits[1]):
                     select = False
-        print(select)
 
         if select:
             if rename_keys is not None and out_format == 'extxyz':
@@ -93,9 +105,39 @@ def collect_images(
             nonselected_atoms.append(atoms)
 
     write('nonselected_images.xyz', nonselected_atoms, format='extxyz')
+
+    if remove_duplicates:
+        all_structs = [AAA.get_structure(atoms) for atoms in selected_atoms]
+        selected_inds = [0]
+        selected_structs = [all_structs[0]]
+        sm = StructureMatcher()
+        num_duplicates = 0
+        for i, struct in enumerate(all_structs):
+            is_duplicate = False
+            for j, selected_struct in enumerate(selected_structs):
+                is_duplicate = sm.fit(struct, selected_struct)
+                if is_duplicate:
+                    num_duplicates += 1
+                    break
+            if not is_duplicate:
+                selected_structs.append(struct)
+                selected_inds.append(i)
+        selected_atoms = [selected_atoms[i] for i in selected_inds]
+
     if shuffle:
         np.random.shuffle(selected_atoms)
-    datasets = []
+    elif sort_by_energy_per_atom:
+        assert not shuffle, 'Either sort or shuffle, not both'
+        e_per_atoms = [
+            atoms.get_potential_energy() / len(atoms) for atoms \
+                in selected_atoms
+            ]
+        sort_result = sorted(
+            zip(e_per_atoms, selected_atoms), key=lambda x: x[0]
+        )
+
+        selected_atoms = [x[1] for x in sort_result]
+
     start_index = 0
     index_ranges = []
     for i, split in enumerate(splits):

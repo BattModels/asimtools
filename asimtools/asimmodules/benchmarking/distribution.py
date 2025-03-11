@@ -5,7 +5,7 @@ Plots the distribution of various properties in a dataset of structures
 Author: mkphuthi@github.com
 
 '''
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
 import numpy as np
 import matplotlib.pyplot as plt
 from ase.units import kg, m as meters
@@ -20,8 +20,8 @@ def distribution(
     unit: str = 'eV',
     bins: int = 50,
     log: bool = True,
+    properties: Sequence[str] = ('energy', 'forces', 'stress', 'volume', 'pressure', 'enthalpy', 'density', 'mass', 'natoms'),
     remap_keys: Optional[Dict] = None,
-    skip_failed: bool = False,
 ) -> Dict:
     if remap_keys is None:
         remap_keys = {}
@@ -40,55 +40,71 @@ def distribution(
         'natoms': 'atoms',
     }
     images = get_images(**images)
-    results = {prop: [] for prop in unit_dict}
+    results = {prop: [] for prop in properties}
     for i, atoms in enumerate(images):
-        include = True
         results['natoms'].append(len(atoms))
-        if remap_keys.get('energy', False):
-            energy = atoms.info[remap_keys['energy']]
-        else:
-            energy = atoms.get_potential_energy()
-        results['energy'].append(energy)
-        if remap_keys.get('forces', False):
-            forces = atoms.arrays[remap_keys['forces']]
-        else:
-            forces = atoms.get_forces()
-        results['forces'].extend(
-            list(np.array(forces).flatten())
-        )
-        results['volume'].append(atoms.get_volume())
-        if remap_keys.get('stress', False):
-            stress = atoms.arrays[remap_keys['stress']]
-        elif remap_keys.get('virial', False):
-            try:
-                stress = atoms.info[remap_keys['virial']] / atoms.get_volume()
-            except KeyError:
-                print('idx:', i, atoms.info, atoms.arrays)
-        else:
-            stress = atoms.get_stress(voigt=True)
-        results['stress'].extend(
-            list(np.array(stress)) * unit_factor
-        )
-        results['pressure'].append(-np.sum(stress[:3])/3)
-        mass = np.sum(atoms.get_masses())
-        results['mass'].append(mass)
+        if 'energy' in properties:
+            if remap_keys.get('energy', False):
+                energy = atoms.info[remap_keys['energy']]
+            else:
+                energy = atoms.get_potential_energy()
+
+            results['energy'].append(energy)
+        if 'forces' in properties:
+            if remap_keys.get('forces', False):
+                forces = atoms.arrays[remap_keys['forces']]
+            else:
+                forces = atoms.get_forces()
+
+            results['forces'].extend(
+                list(np.array(forces).flatten())
+            )
+        if 'volume' in properties:
+            results['volume'].append(atoms.get_volume())
+        if 'stress' in properties:
+            if remap_keys.get('stress', False):
+                stress = atoms.arrays[remap_keys['stress']]
+            elif remap_keys.get('virial', False):
+                try:
+                    stress = atoms.info[remap_keys['virial']] / atoms.get_volume()
+                except KeyError:
+                    print('idx:', i, atoms.info, atoms.arrays)
+            else:
+                stress = atoms.get_stress(voigt=True)
+
+            results['stress'].extend(
+                list(np.array(stress))
+            )
+        if 'pressure' in properties:
+            results['pressure'].append(-np.sum(stress[:3])/3)
+        if 'mass' in properties:
+            mass = np.sum(atoms.get_masses())
+            results['mass'].append(mass)
     
-    for prop in unit_dict:
+    for prop in properties:
         results[prop] = np.array(results[prop])
 
-    results['density'] = (
-        (results['mass'] * kg * 1000) / (results['volume'] / cm3)
-    )
-    results['enthalpy'] = (
-        results['energy'] + results['pressure'] * results['volume']
-    )
+    if 'density' in properties:
+        assert 'mass' in properties and 'volume' in properties, \
+            'Mass and volume must be included to calculate density'
+        results['density'] = (
+            (results['mass'] * kg * 1000) / (results['volume'] / cm3)
+        )
+    if 'enthalpy' in properties:
+        assert 'energy' in properties and 'pressure' in properties and 'volume' in properties, \
+            'Energy, pressure and volume must be included to calculate enthalpy'
+        results['enthalpy'] = (
+            results['energy'] + results['pressure'] * results['volume']
+        )
     for prop in ['energy', 'volume', 'enthalpy']:
-        results[prop] = results[prop] / results['natoms']
+        if prop in properties:
+            results[prop] = results[prop] / results['natoms']
     
     for prop in ['forces', 'stress', 'pressure', 'energy', 'enthalpy']:
-        results[prop] = results[prop] * unit_factor
-
-    for prop in unit_dict:
+        if prop in properties:
+            results[prop] = results[prop] * unit_factor
+    print(results['energy'])
+    for prop in properties:
         with open(f'summary.txt', 'a+') as f:
             f.write(f'{prop} distribution\n')
             f.write(f'Num. values: {len(results[prop])}\n')
