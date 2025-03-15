@@ -1,5 +1,6 @@
 from typing import Dict, Sequence, Optional, Union
 from glob import glob
+from pathlib import Path
 from natsort import natsorted
 import numpy as np
 from asimtools.utils import get_str_btn
@@ -65,6 +66,7 @@ def prepare_array_vals(
 
     if file_pattern is not None:
         array_values = natsorted(glob(str(file_pattern)))
+        assert len(array_values) > 0, f'No file_pattern matching {file_pattern}'
     elif linspace_args is not None:
         array_values = np.linspace(*linspace_args)
         array_values = [float(v) for v in array_values]
@@ -72,7 +74,7 @@ def prepare_array_vals(
         array_values = np.arange(*arange_args)
         array_values = [float(v) for v in array_values]
 
-    assert len(array_values) > 0, 'No array values or files found'
+    assert len(array_values) > 0, f'No array_values found'
 
     if labels == 'str_btn':
         assert str_btn_args is not None, 'Provide str_btn_args for labels'
@@ -94,6 +96,10 @@ def prepare_array_vals(
     assert len(labels) == len(array_values), \
         f'Num. of array_values ({len(array_values)}) must match num.'\
         f'of labels ({len(labels)})'
+    
+    # File patterns should be resolved fully for placeholders to work
+    if file_pattern is not None:
+        array_values = [str(Path(v).resolve()) for v in array_values]
 
     if secondary_array_values is not None:
         nvals = len(secondary_array_values)

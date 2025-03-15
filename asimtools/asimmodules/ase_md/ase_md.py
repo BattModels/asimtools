@@ -172,6 +172,7 @@ def ase_md(
     pfactor: Optional[float] = None,
     externalstress: Optional[float] = 0,
     plot: Optional[bool] = True,
+    time_unit: Optional[str] = 'ase',
 ) -> Dict:
     """Runs ASE MD simulations. This is only recommended for small systems and
     for testing. For larger systems, use LAMMPS or more purpose-built code
@@ -206,6 +207,10 @@ def ase_md(
     calc = load_calc(**calc_spec)
     atoms = get_atoms(**image)
     atoms.set_calculator(calc)
+
+    if time_unit == 'fs':
+        timestep *= fs
+        ttime *= fs
 
     assert dynamics in ['nvt', 'langevin', 'npt'], 'Invalid dynamics'
     if dynamics == 'langevin':

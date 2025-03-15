@@ -516,7 +516,10 @@ def get_images(
         images = []
 
     if not skip_failed:
-        assert len(images) > 0, 'No images found'
+        addontxt = ''
+        if image_file:
+            addontxt = f' in image_file: {image_file}'
+        assert len(images) > 0, 'No images found' + addontxt
 
     return images
 

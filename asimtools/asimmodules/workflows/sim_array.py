@@ -133,6 +133,8 @@ def sim_array(
             ):
                 if secondary_placeholders is not None:
                     secondary_placeholder = secondary_placeholders[j]
+                else:
+                    secondary_placeholder = None
                 new_sim_input = change_dict_value(
                     d=new_sim_input,
                     new_value=vs[i],
