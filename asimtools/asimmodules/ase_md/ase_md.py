@@ -62,7 +62,7 @@ def langevin_nvt(
             traj_file,
             atoms=atoms,
             mode='w',
-            properties=['energy', 'forces', 'stress']
+            properties=['energy', 'forces']
         )
         dyn.attach(traj.write)
     dyn.run(nsteps)
@@ -77,6 +77,7 @@ def npt(
     traj_file: str = None,
     ttime: float = 25*fs,
     pfactor: Optional[float] = None, # (75*fs)**2 * 14*GPa, #Replace 14 with bulk modulus of material
+    properties: Optional[Sequence] = ('energy', 'forces', 'stress'),
 ):
     """Does NPT dynamics
 
@@ -107,12 +108,13 @@ def npt(
         pfactor=pfactor,
         # mask=np.diag([1, 1, 1]),
     )
+
     if traj_file is not None:
         traj = Trajectory(
             traj_file,
             atoms=atoms,
             mode='w',
-            properties=['energy', 'forces', 'stress'],
+            properties=properties,
         )
         dyn.attach(traj.write)
     dyn.run(nsteps)
@@ -173,6 +175,7 @@ def ase_md(
     externalstress: Optional[float] = 0,
     plot: Optional[bool] = True,
     time_unit: Optional[str] = 'ase',
+    plot_args: Optional[dict] = None,
 ) -> Dict:
     """Runs ASE MD simulations. This is only recommended for small systems and
     for testing. For larger systems, use LAMMPS or more purpose-built code
@@ -242,11 +245,15 @@ def ase_md(
             timestep=timestep,
             pfactor=None,
             ttime=ttime,
+            properties=['energy', 'forces'],
         )
     
 
     if plot:
-        plot_thermo(images={'image_file': 'output.traj'})
+        plot_thermo(
+            images={'image_file': 'output.traj'},
+            **plot_args
+        )
 
     results = {}
     return results
