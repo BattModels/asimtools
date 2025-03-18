@@ -13,16 +13,19 @@ from asimtools.utils import (
     get_images,
 )
 
-cm3 = (meters * 100)**3
+cm = (meters / 100)
 
 def distribution(
     images: Dict,
     unit: str = 'eV',
     bins: int = 50,
     log: bool = True,
-    properties: Sequence[str] = ('energy', 'forces', 'stress', 'volume', 'pressure', 'enthalpy', 'density', 'mass', 'natoms'),
+    properties: Sequence[str] = ('energy', 'forces', 'stress', 'pressure', 'enthalpy'),
     remap_keys: Optional[Dict] = None,
 ) -> Dict:
+    noncalc_properties = ['density', 'mass', 'natoms', 'volume']
+    properties = list(properties)
+    properties += noncalc_properties
     if remap_keys is None:
         remap_keys = {}
     unit_factors = {'meV': 1000, 'eV': 1, 'kcal/mol': 23.0621}
@@ -88,7 +91,7 @@ def distribution(
         assert 'mass' in properties and 'volume' in properties, \
             'Mass and volume must be included to calculate density'
         results['density'] = (
-            (results['mass'] * kg * 1000) / (results['volume'] / cm3)
+            (results['mass'] / results['volume']) / (kg * 0.001) * (cm**3)
         )
     if 'enthalpy' in properties:
         assert 'energy' in properties and 'pressure' in properties and 'volume' in properties, \
@@ -103,7 +106,7 @@ def distribution(
     for prop in ['forces', 'stress', 'pressure', 'energy', 'enthalpy']:
         if prop in properties:
             results[prop] = results[prop] * unit_factor
-    print(results['energy'])
+
     for prop in properties:
         with open(f'summary.txt', 'a+') as f:
             f.write(f'{prop} distribution\n')

@@ -109,8 +109,9 @@ def lammps(
                 seed = str(randint(0, 100000))
             line = line.replace('SEED', seed)
 
-        for placeholder in placeholders:
-            line = line.replace(placeholder, placeholders[placeholder])
+        if placeholders is not None:
+            for placeholder in placeholders:
+                line = line.replace(placeholder, placeholders[placeholder])
         lmp_txt += line
 
     if image is not None:
