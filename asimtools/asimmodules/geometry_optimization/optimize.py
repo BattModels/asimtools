@@ -46,7 +46,7 @@ def optimize(
 
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
-    atoms.set_calculator(calc)
+    atoms.calc = calc
 
     ecf = ExpCellFilter(atoms, **expcellfilter_args)
 

@@ -18,6 +18,7 @@ from ase.units import GPa, fs
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
 from ase.md.langevin import Langevin
 from ase.md.npt import NPT
+from ase.md import MDLogger
 from asimtools.calculators import load_calc
 from asimtools.utils import (
     get_atoms,
@@ -31,6 +32,9 @@ def langevin_nvt(
     traj_file: str = None,
     friction: float = 1e-2,
     timestep: float = 1*fs,
+    properties: Optional[Sequence] = ('energy', 'forces', 'stress'),
+    log_interval: int = 1,
+    traj_interval: Optional[int] = 1,
 ):
     """Does Langevin dynamics
 
@@ -64,7 +68,19 @@ def langevin_nvt(
             mode='w',
             properties=['energy', 'forces']
         )
-        dyn.attach(traj.write)
+        dyn.attach(traj.write, interval=traj_interval)
+    stress = False
+    if 'stress' in properties:
+        stress = True
+    dyn.attach(MDLogger(
+        dyn,
+        atoms,
+        'md.log',
+        header=True,
+        stress=stress,
+        peratom=True,
+        mode="a"
+    ), interval=log_interval)
     dyn.run(nsteps)
     return atoms, traj
 
@@ -78,6 +94,8 @@ def npt(
     ttime: float = 25*fs,
     pfactor: Optional[float] = None, # (75*fs)**2 * 14*GPa, #Replace 14 with bulk modulus of material
     properties: Optional[Sequence] = ('energy', 'forces', 'stress'),
+    log_interval: int = 1,
+    traj_interval: Optional[int] = 1,
 ):
     """Does NPT dynamics
 
@@ -116,7 +134,20 @@ def npt(
             mode='w',
             properties=properties,
         )
-        dyn.attach(traj.write)
+        dyn.attach(traj.write, interval=traj_interval)
+
+    stress = False
+    if 'stress' in properties:
+        stress = True
+    dyn.attach(MDLogger(
+        dyn,
+        atoms,
+        'md.log',
+        header=True,
+        stress=stress,
+        peratom=True,
+        mode="a"
+    ), interval=log_interval)
     dyn.run(nsteps)
     traj = Trajectory(traj_file, 'r')
     return atoms, traj
@@ -176,6 +207,9 @@ def ase_md(
     plot: Optional[bool] = True,
     time_unit: Optional[str] = 'ase',
     plot_args: Optional[dict] = None,
+    properties: Optional[Sequence] = ('energy', 'forces', 'stress'),
+    log_interval: Optional[int] = 1,
+    traj_interval: Optional[int] = 1,
 ) -> Dict:
     """Runs ASE MD simulations. This is only recommended for small systems and
     for testing. For larger systems, use LAMMPS or more purpose-built code
@@ -209,7 +243,7 @@ def ase_md(
 
     calc = load_calc(**calc_spec)
     atoms = get_atoms(**image)
-    atoms.set_calculator(calc)
+    atoms.calc = calc
 
     if time_unit == 'fs':
         timestep *= fs
@@ -224,6 +258,8 @@ def ase_md(
             traj_file='output.traj',
             timestep=timestep,
             friction=friction,
+            log_interval=log_interval,
+            traj_interval=traj_interval,
         )
     elif dynamics == 'npt':
         atoms, _ = npt(
@@ -235,6 +271,9 @@ def ase_md(
             pfactor=pfactor,
             externalstress=externalstress,
             ttime=ttime,
+            properties=properties,
+            log_interval=log_interval,
+            traj_interval=traj_interval,
         )
     elif dynamics == 'nvt':
         atoms, _ = npt(
@@ -245,7 +284,9 @@ def ase_md(
             timestep=timestep,
             pfactor=None,
             ttime=ttime,
-            properties=['energy', 'forces'],
+            properties=properties,
+            log_interval=log_interval,
+            traj_interval=traj_interval,
         )
     
 

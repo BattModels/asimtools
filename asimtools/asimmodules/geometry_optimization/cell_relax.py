@@ -46,7 +46,7 @@ def cell_relax(
     """
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
-    atoms.set_calculator(calc)
+    atoms.calc = calc
 
     if prefix is not None:
         prefix = prefix + '_'

@@ -47,7 +47,7 @@ def symmetric_cell_relax(
 
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
-    atoms.set_calculator(calc)
+    atoms.calc = calc
 
     atoms.set_constraint(FixSymmetry(atoms, **fixsymmetry_args))
     ecf = ExpCellFilter(atoms, **expcellfilter_args)

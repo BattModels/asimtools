@@ -16,7 +16,7 @@ from natsort import natsorted
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from ase.io import read
+from ase.io import read, write
 from ase.parallel import paropen
 import ase.db
 import ase.build
@@ -148,6 +148,52 @@ def join_names(substrs: Sequence[str]) -> str:
             final_substrs.append(substr)
     name = '__'.join(final_substrs) + '__'
     return name
+
+def write_atoms(
+    image_file: str,
+    atoms: Atoms,
+    fmt: str = 'extxyz',
+    write_info: bool = True,
+    columns: Optional[Sequence] = None,
+    **kwargs
+):
+    """
+    
+    """
+    if kwargs.get('format', False):
+        fmt = kwargs.pop('format')
+
+    if fmt in ['extxyz']:
+        if kwargs.get('write_info', False):
+            write_info = kwargs.pop('write_info')
+        if kwargs.get('columns', False):
+            write_info = kwargs.pop('columns')
+        else:
+            reserved_ks = ['symbols', 'positions', 'numbers', 'species', 'pos']
+            columns = ['symbols', 'positions'] + kwargs.get(
+                'columns',
+                [k for k in atoms.arrays.keys() if k not in reserved_ks]
+            )
+
+            if len(atoms.constraints) > 0:
+                columns.append('move_mask')
+
+        write(
+            image_file,
+            atoms,
+            format=fmt,
+            write_info=write_info,
+            columns=columns,
+            **kwargs
+        )
+    else:
+        write(
+            image_file,
+            atoms,
+            format=fmt,
+            **kwargs
+        )
+
 
 def get_atoms(
     image_file: Optional[str] = None,
@@ -742,11 +788,21 @@ def get_str_btn(
     s = s[start_index:stop_index]
     while occurence - j >= 0:
         if s1 is not None:
-            i1 = s.index(s1) + len(s1)
+            try:
+                i1 = s.index(s1) + len(s1)
+            except:
+                raise ValueError(
+                    f'substring {s1} not found in {s}'
+                )
         else:
             i1 = 0
         if s2 is not None:
-            i2 = s[i1:].index(s2) + i1
+            try:
+                i2 = s[i1:].index(s2) + i1
+            except:
+                raise ValueError(
+                    f'substring {s2} not found in {s}'
+                )
         else:
             i2 = len(s)
 

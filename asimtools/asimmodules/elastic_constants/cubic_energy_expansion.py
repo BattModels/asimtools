@@ -101,7 +101,7 @@ def cubic_energy_expansion(
     """
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
-    atoms.set_calculator(calc)
+    atoms.calc = calc
 
     # Start by getting the Bulk modulus and optimized cell from the EOS
     logging.info('Calculating EOS')

@@ -21,6 +21,7 @@ import numpy as np
 from asimtools.utils import (
     read_yaml,
     write_yaml,
+    write_atoms,
     join_names,
     get_atoms,
     get_images,
@@ -396,9 +397,9 @@ class UnitJob(Job):
         if image and write_image:
             atoms = get_atoms(**image)
             input_image_file = 'image_input.xyz' # Relative to workdir
-            atoms.write(
+            write_atoms(
                 self.workdir / input_image_file,
-                format='extxyz'
+                atoms,
             )
             sim_input['args']['image'] = {
                 'image_file': str(input_image_file),

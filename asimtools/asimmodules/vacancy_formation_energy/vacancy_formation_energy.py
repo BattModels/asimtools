@@ -49,7 +49,7 @@ def vacancy_formation_energy(
 
     calc = load_calc(calc_id)
     bulk = get_atoms(**image).repeat(repeat)
-    bulk.set_calculator(calc)
+    bulk.calc = calc
 
     vacant = bulk.copy()
     del vacant[vacancy_index]

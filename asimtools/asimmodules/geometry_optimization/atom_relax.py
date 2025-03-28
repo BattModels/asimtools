@@ -40,7 +40,7 @@ def atom_relax(
     """
     calc = load_calc(calc_id)
     atoms = get_atoms(**image)
-    atoms.set_calculator(calc)
+    atoms.calc = calc
     logger = get_logger()
 
     if prefix is not None:
