@@ -20,7 +20,7 @@ from ase.io import read, write
 from ase.parallel import paropen
 import ase.db
 import ase.build
-from pymatgen.core import Structure
+from pymatgen.core import Structure, Lattice
 from pymatgen.io.ase import AseAtomsAdaptor
 
 Atoms = TypeVar('Atoms')
@@ -151,17 +151,43 @@ def join_names(substrs: Sequence[str]) -> str:
 
 def write_atoms(
     image_file: str,
-    atoms: Atoms,
+    atoms: Union[Atoms,list[Atoms]],
     fmt: str = 'extxyz',
     write_info: bool = True,
     columns: Optional[Sequence] = None,
     **kwargs
 ):
     """
-    
+    Writes image/images to a file. The default format is extxyz
+    and the default columns are symbols and positions. 
+    All the images should have the same metadata
+
+    :param image_file: Path to file to write to
+    :type image_file: str
+    :param atoms: Atoms object or list of atoms objects to write
+    :type atoms: Atoms or list[Atoms]
+    :param fmt: Format to write, defaults to 'extxyz'
+    :type fmt: str
+    :param write_info: Whether to write info, defaults to True
+    :type write_info: bool
+    :param columns: Columns to write, defaults to None
+    :type columns: Sequence, optional
+    :param kwargs: Extra keyword arguments passed to :func:`ase.io.write`
+    :type kwargs: Any
+    :raises ValueError: If the format is not supported
+    :return: None
+    :rtype: None
     """
     if kwargs.get('format', False):
         fmt = kwargs.pop('format')
+
+    if isinstance(atoms, list):
+        if len(atoms) == 0:
+            raise ValueError('No images to write')
+        images = atoms
+        atoms = images[0]
+    else:
+        images = [atoms]
 
     if fmt in ['extxyz']:
         if kwargs.get('write_info', False):
@@ -180,7 +206,7 @@ def write_atoms(
 
         write(
             image_file,
-            atoms,
+            images,
             format=fmt,
             write_info=write_info,
             columns=columns,
@@ -189,7 +215,7 @@ def write_atoms(
     else:
         write(
             image_file,
-            atoms,
+            images,
             format=fmt,
             **kwargs
         )
@@ -318,6 +344,18 @@ def get_atoms(
     Lattice
     abc : 2.7718585822512662 2.7718585822512662 2.7718585822512662
     ...
+
+    You can also specify a builder from pymatgen.core.structure or 
+    pymatgen.core.molecule, for example pymatgen.core.surface.Structure. 
+    The lattice paramters are passed as an ArrayLike with shape [3,3] to 
+    :class:`pymatgen.core.lattice.Lattice` or dictionary to the
+    :func:`pymatgen.core.lattice.Lattice.from_parameters` function. 
+    >>> image = {'builder': 'pymatgen.core.surface.Structure', 'lattice': {'a': 2.7, 'b': 2.7, 'c': 2.7, 'alpha': 90, 'beta': 90, 'gamma': 90}}
+    >>> get_atoms(**image)
+    Structure Summary
+    Lattice
+    abc : 2.7 2.7 2.7
+    ...
     """
     if interface == 'ase':
         assert image_file is not None or \
@@ -347,7 +385,11 @@ def get_atoms(
             with MPRester(user_api_key) as mpr:
                 struct = mpr.get_structure_by_material_id(mp_id, **kwargs)   
         elif builder is not None:
-            builder_func = getattr(Structure, builder)
+            import pymatgen.core
+            builder_func = getattr(pymatgen.core, builder)
+            lattice = kwargs.get('lattice', False)
+            if isinstance(lattice, dict):
+                kwargs['lattice'] = Lattice.from_parameters(**lattice)
             try:
                 struct = builder_func(**kwargs)
             except ValueError:

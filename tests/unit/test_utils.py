@@ -5,6 +5,7 @@ from pathlib import Path
 import os
 import pytest
 from ase.io import read
+from pymatgen.core import Structure, Molecule, IStructure, IMolecule
 from asimtools.utils import (
     join_names,
     get_atoms,
@@ -62,6 +63,69 @@ def test_join_names(test_input, expected):
     ({'image_file': STRUCT_DIR / 'Ar', 'format': 'cfg'},
      ase.build.bulk('Ar')),
     ({'atoms': ase.build.bulk('Ar')}, ase.build.bulk('Ar')),
+    ({  
+        'interface': 'pymatgen',
+        'builder': 'Structure',
+        'lattice': [[3, 0, 0], [0, 3, 0], [0, 0, 3]],
+        'coords': [[0, 0, 0]],
+        'species': ['Ar'],
+        'return_type': 'pymatgen',
+    }, Structure(
+        lattice=[[3, 0, 0], [0, 3, 0], [0, 0, 3]],
+        coords=[[0, 0, 0]],
+        species=['Ar'],
+        coords_are_cartesian=False,
+    )),
+    ({  
+        'interface': 'pymatgen',
+        'builder': 'Structure',
+        'lattice': {'a': 3, 'b': 4, 'c': 5, 'alpha': 90, 'beta': 90, 'gamma': 90},
+        'coords': [[0, 0, 0]],
+        'species': ['Ar'],
+        'return_type': 'pymatgen',
+    }, Structure(
+        lattice=[[3, 0, 0], [0, 4, 0], [0, 0, 5]],
+        coords=[[0, 0, 0]],
+        species=['Ar'],
+        coords_are_cartesian=False,
+    )),
+    ({  
+        'interface': 'pymatgen',
+        'builder': 'IStructure',
+        'lattice': {'a': 3, 'b': 4, 'c': 5, 'alpha': 90, 'beta': 90, 'gamma': 90},
+        'coords': [[0, 0, 0]],
+        'species': ['Ar'],
+        'return_type': 'pymatgen',
+    }, IStructure(
+        lattice=[[3, 0, 0], [0, 4, 0], [0, 0, 5]],
+        coords=[[0, 0, 0]],
+        species=['Ar'],
+        coords_are_cartesian=False,
+    )),
+    ({
+        'interface': 'pymatgen',
+        'builder': 'Molecule',
+        'coords': [[0, 0, 0], [1.5, 1.5, 1.5], [1.5, -1.5, -1.5]],
+        'species': ['O', 'H', 'H'],
+        'spin_multiplicity': 1,
+        'return_type': 'pymatgen',
+    }, Molecule(
+        species=['O', 'H', 'H'],
+        coords=[[0, 0, 0], [1.5, 1.5, 1.5], [1.5, -1.5, -1.5]],
+        spin_multiplicity=1,
+    )),
+    ({
+        'interface': 'pymatgen',
+        'builder': 'IMolecule',
+        'coords': [[0, 0, 0], [1.5, 1.5, 1.5], [1.5, -1.5, -1.5]],
+        'species': ['O', 'H', 'H'],
+        'spin_multiplicity': 1,
+        'return_type': 'pymatgen',
+    }, IMolecule(
+        species=['O', 'H', 'H'],
+        coords=[[0, 0, 0], [1.5, 1.5, 1.5], [1.5, -1.5, -1.5]],
+        spin_multiplicity=1,
+    )),
 ])
 def test_get_atoms(test_input, expected):
     ''' Test getting atoms from different inputs '''
