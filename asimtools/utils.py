@@ -415,7 +415,10 @@ def get_atoms(
     if return_type == 'ase' and interface == 'ase':
         return atoms
     elif return_type == 'pymatgen' and interface == 'ase':
-        return AseAtomsAdaptor.get_structure(atoms)
+        if builder == 'molecule':
+            return AseAtomsAdaptor.get_molecule(atoms)
+        else:
+            return AseAtomsAdaptor.get_structure(atoms)
     elif return_type == 'pymatgen' and interface == 'pymatgen':
         return struct
     elif return_type == 'ase' and interface == 'pymatgen':
