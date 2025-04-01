@@ -14,6 +14,7 @@ from numpy.random import randint
 import subprocess
 import logging
 from ase.io import read
+from ase import Atoms
 from pymatgen.io.ase import AseAtomsAdaptor
 from pymatgen.io.vasp import Poscar, Incar, Potcar, Kpoints, VaspInput
 import pymatgen.io.vasp.sets
@@ -55,8 +56,7 @@ def vasp(
     if vaspinput_kwargs is None:
         vaspinput_kwargs = {}
 
-    atoms = get_atoms(**image)
-    struct = AseAtomsAdaptor.get_structure(atoms)
+    struct = get_atoms(**image, return_type='pymatgen')
     if mpset is not None:
         # if not ((incar is None) or (potcar is None) or (kpoints is None)):
         #     raise ValueError(
