@@ -10,7 +10,7 @@ from ase.filters import ExpCellFilter
 from ase.spacegroup.symmetrize import FixSymmetry
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
-from asimtools.utils import get_atoms
+from asimtools.utils import get_atoms, write_atoms
 
 def symmetric_cell_relax(
     calc_id: str,
@@ -68,11 +68,10 @@ def symmetric_cell_relax(
         raise
 
     image_file = 'image_output.xyz'
-    atoms.write(
+    write_atoms(
         image_file,
+        atoms,
         format='extxyz',
-        write_info=False,
-        write_results=True,
     )
 
     energy = float(atoms.get_potential_energy())

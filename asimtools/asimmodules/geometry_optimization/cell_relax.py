@@ -14,7 +14,7 @@ import ase.optimize
 from ase.filters import StrainFilter
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
-from asimtools.utils import get_atoms, join_names
+from asimtools.utils import get_atoms, join_names, write_atoms
 
 def cell_relax(
     calc_id: str,
@@ -70,11 +70,10 @@ def cell_relax(
         raise
 
     image_file = join_names([prefix, 'image_output.xyz'])[:-2]
-    atoms.write(
+    write_atoms(
         image_file,
+        atoms,
         format='extxyz',
-        write_info=False,
-        write_results=True,
     )
 
     energy = float(atoms.get_potential_energy())

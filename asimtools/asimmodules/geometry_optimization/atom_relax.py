@@ -9,7 +9,7 @@ import numpy as np
 import ase.optimize
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
-from asimtools.utils import get_atoms, get_logger
+from asimtools.utils import get_atoms, get_logger, write_atoms
 
 def atom_relax(
     calc_id: str,
@@ -64,11 +64,10 @@ def atom_relax(
         raise
 
     image_file = prefix + 'image_output.xyz'
-    atoms.write(
+    write_atoms(
         image_file,
+        atoms,
         format='extxyz',
-        write_info=False,
-        write_results=True,
     )
 
     energy = float(atoms.get_potential_energy())

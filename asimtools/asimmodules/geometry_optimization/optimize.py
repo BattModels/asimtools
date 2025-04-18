@@ -9,7 +9,7 @@ import ase.optimize
 from ase.filters import ExpCellFilter
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
-from asimtools.utils import get_atoms
+from asimtools.utils import get_atoms, write_atoms
 
 def optimize(
     calc_id: str,
@@ -66,11 +66,10 @@ def optimize(
         raise
 
     image_file = 'image_output.xyz'
-    atoms.write(
+    write_atoms(
         image_file,
+        atoms,
         format='extxyz',
-        write_info=False,
-        write_results=True,
     )
 
     energy = float(atoms.get_potential_energy())
