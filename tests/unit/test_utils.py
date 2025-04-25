@@ -4,6 +4,7 @@ Tests for utils.py
 from pathlib import Path
 import os
 import pytest
+import numpy as np
 from ase.io import read
 from pymatgen.core import Structure, Molecule, IStructure, IMolecule
 from asimtools.utils import (
@@ -60,7 +61,7 @@ def test_join_names(test_input, expected):
      ase.build.fcc111('Al', size=(2,2,3))),
     ({'image_file': STRUCT_DIR / 'Ar.xyz'},
      ase.build.bulk('Ar')),
-    ({'image_file': STRUCT_DIR / 'Ar', 'format': 'cfg'},
+    ({'image_file': STRUCT_DIR / 'Ar.xyz'},
      ase.build.bulk('Ar')),
     ({'atoms': ase.build.bulk('Ar')}, ase.build.bulk('Ar')),
     ({  
@@ -126,6 +127,7 @@ def test_join_names(test_input, expected):
         coords=[[0, 0, 0], [1.5, 1.5, 1.5], [1.5, -1.5, -1.5]],
         spin_multiplicity=1,
     )),
+
 ])
 def test_get_atoms(test_input, expected):
     ''' Test getting atoms from different inputs '''
@@ -172,6 +174,16 @@ def test_get_images(test_input, expected):
     assert len(input_images) == len(expected)
     for image in input_images:
         assert image in expected
+
+def test_write_atoms(tmp_path):
+    ''' Test write_atoms. 
+    Also test that when magmoms are provided by ASE which makes them nans
+    and kills jobs using VASP etc., we change them to zero '''
+    slab_ = read(STRUCT_DIR / 'adslab.xyz')
+    write_atoms(tmp_path / 'slab.xyz', slab_)
+    slab = read(tmp_path / 'slab.xyz')
+    assert not np.any(np.isnan(slab.arrays['initial_magmoms']))
+    assert 'surface_properties' in slab.arrays
 
 @pytest.mark.parametrize("test_input, expected",[
     (['l1', 'l2', 'l3'], {'l1': {'l2': {'l3': 'new_value'}}}),

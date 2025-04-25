@@ -204,6 +204,14 @@ def write_atoms(
             if len(atoms.constraints) > 0:
                 columns.append('move_mask')
 
+        if 'initial_magmoms' in columns:
+            for atoms in images:
+                atoms.arrays['initial_magmoms'] = np.where(
+                    np.isnan(atoms.arrays['initial_magmoms']),
+                    0,
+                    atoms.arrays['initial_magmoms'],
+                )
+
         write(
             image_file,
             images,
