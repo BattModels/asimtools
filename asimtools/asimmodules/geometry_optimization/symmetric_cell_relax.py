@@ -7,7 +7,7 @@ Author: mkphuthi@github.com
 from typing import Dict, Optional
 import ase.optimize
 from ase.filters import ExpCellFilter
-from ase.spacegroup.symmetrize import FixSymmetry
+from ase.constraints import FixSymmetry
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms, write_atoms
@@ -68,6 +68,7 @@ def symmetric_cell_relax(
         raise
 
     image_file = 'image_output.xyz'
+    atoms.constraints = [] # write doesn't work with FixSymmetry constraint
     write_atoms(
         image_file,
         atoms,
