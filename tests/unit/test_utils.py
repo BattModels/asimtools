@@ -6,6 +6,7 @@ import os
 import pytest
 import numpy as np
 from ase.io import read
+from ase.calculators.emt import EMT
 from pymatgen.core import Structure, Molecule, IStructure, IMolecule
 from asimtools.utils import (
     join_names,
@@ -168,14 +169,48 @@ def test_get_atoms(test_input, expected):
 ])
 def test_get_images(test_input, expected):
     ''' Test getting iterable of atoms from different inputs '''
-    print('++input:', get_images(**test_input))
-    print('++expected:', expected)
     input_images = get_images(**test_input)
     assert len(input_images) == len(expected)
     for image in input_images:
         assert image in expected
 
-def test_write_atoms(tmp_path):
+@pytest.mark.parametrize("test_input, expected",[
+    (
+        {'image_file': str(STRUCT_DIR / 'adslab.xyz')},
+        ('surface_properties', 'bulk_wyckoff'),
+    ),
+])
+def test_write_atoms(test_input, expected, tmp_path):
+    init_atoms = get_atoms(**test_input)
+    testfile = tmp_path / 'test.xyz'
+    write_atoms(testfile, init_atoms)
+
+    with open(testfile, 'r') as f:
+        lines = f.readlines()
+    
+    for prop in expected:
+        assert prop in lines[1], f'"{prop}" not in file header'
+
+@pytest.mark.parametrize("test_input, expected",[
+    (
+        {'name': 'Cu', 'interface': 'ase', 'builder': 'bulk'},
+        ('forces', 'energy', 'stress'),
+    ),
+])
+def test_write_atoms_calc(test_input, expected, tmp_path):
+    init_atoms = get_atoms(**test_input)
+    init_atoms.calc = EMT()
+    init_atoms.get_potential_energy()
+    testfile = tmp_path / 'test.xyz'
+    write_atoms(testfile, init_atoms)
+
+    with open(testfile, 'r') as f:
+        lines = f.readlines()
+    
+    for prop in expected:
+        assert prop in lines[1], f'"{prop}" not in file header'
+
+def test_write_atoms_magmoms(tmp_path):
     ''' Test write_atoms. 
     Also test that when magmoms are provided by ASE which makes them nans
     and kills jobs using VASP etc., we change them to zero '''
