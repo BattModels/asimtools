@@ -282,6 +282,30 @@ def load_m3gnet(calc_params):
 
     return calc
 
+def load_matgl(calc_params):
+    """Load any MatGL calculator
+
+    :param calc_params: parameters to be passed to matgl.ext.ase.PESCalculator. Must include a key "model" that points to the model used to instantiate the potential
+    :type calc_params: Dict
+    :return: MatGL calculator
+    :rtype: :class:`matgl.ext.ase.PESCalculator`
+    """
+    from matgl.ext.ase import PESCalculator
+    import matgl
+    calc_params = deepcopy(calc_params)
+    model = calc_params['args'].pop("model")
+    try:
+        pot = matgl.load_model(model)
+        calc = PESCalculator(
+            pot,
+            **calc_params['args'],
+        )
+    except Exception:
+        logging.error("Failed to load M3GNet with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
 def load_omat24(calc_params):
     """Load any OMAT24 calculator
 
@@ -345,6 +369,7 @@ external_calcs = {
     'MACECalculator': load_mace,
     'EspressoProfile': load_espresso_profile,
     'M3GNet': load_m3gnet,
+    'MatGL': load_matgl,
     'OMAT24': load_omat24,
     'ASEDFTD3': load_ase_dftd3,
 }
