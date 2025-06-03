@@ -17,6 +17,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from ase.io import read, write
+from ase.io.extxyz import save_calc_results
 from ase.parallel import paropen
 import ase.db
 import ase.build
@@ -170,7 +171,8 @@ def write_atoms(
     :type fmt: str
     :param write_info: Whether to write info, defaults to True
     :type write_info: bool
-    :param columns: Columns to write, defaults to None
+    :param columns: Columns to write, mostly for debugging, if used, specify
+        all columns including positions, symbols etc. defaults to None,
     :type columns: Sequence, optional
     :param kwargs: Extra keyword arguments passed to :func:`ase.io.write`
     :type kwargs: Any
@@ -192,23 +194,26 @@ def write_atoms(
     if fmt in ['extxyz']:
         if kwargs.get('write_info', False):
             write_info = kwargs.pop('write_info')
-        if kwargs.get('columns', False):
-            write_info = kwargs.pop('columns')
-        else:
-            reserved_ks = ['symbols', 'positions', 'numbers', 'species', 'pos']
-            columns = ['symbols', 'positions'] + kwargs.get(
-                'columns',
-                [k for k in atoms.arrays.keys() if k not in reserved_ks]
-            )
+        # if kwargs.get('columns', False):
+        #     columns = kwargs.pop('columns')
+        # else:
+        #     reserved_ks = ['symbols', 'positions', 'numbers', 'species', 'pos']
+        #     columns = ['symbols', 'positions'] + kwargs.get(
+        #         'columns',
+        #         [k for k in atoms.arrays.keys() if k not in reserved_ks]
+        #     )
+        #     if columns_append is not None:
+        #         columns += columns_append
 
-            if len(atoms.constraints) > 0:
-                columns.append('move_mask')
+        #     if len(atoms.constraints) > 0:
+        #         columns.append('move_mask')
 
-        if 'initial_magmoms' in columns:
-            for atoms in images:
+        for atoms in images:
+            # Current workaround magmoms being NaNs is to replace NaNs with 0.0
+            if 'initial_magmoms' in atoms.arrays:
                 atoms.arrays['initial_magmoms'] = np.where(
                     np.isnan(atoms.arrays['initial_magmoms']),
-                    0,
+                    0.0,
                     atoms.arrays['initial_magmoms'],
                 )
 
@@ -217,6 +222,7 @@ def write_atoms(
             images,
             format=fmt,
             write_info=write_info,
+            write_results=True,
             columns=columns,
             **kwargs
         )

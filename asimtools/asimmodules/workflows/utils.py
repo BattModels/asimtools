@@ -3,7 +3,7 @@ from glob import glob
 from pathlib import Path
 from natsort import natsorted
 import numpy as np
-from asimtools.utils import get_str_btn
+from asimtools.utils import get_str_btn, get_nth_label
 
 def prepare_array_vals(
     key_sequence: Optional[Sequence[str]] = None,
@@ -35,7 +35,10 @@ def prepare_array_vals(
     :param arange_args: arguments to pass to :func:`numpy.arange` to be
         iterated over in each simulation, defaults to None
     :type arange_args: Optional[Sequence], optional
-    :param labels: Custom labels to use for each simulation, defaults to None
+    :param labels: Custom labels to use for each simulation. If "str_btn" 
+        provide arguments to :func:`asimtools.utils.get_str_btn` as additional
+        str_btn_args keyword. If labels is an integer N, the Nth label in the 
+        file_pattern or array_values is used, defaults to None
     :type labels: Sequence, optional
     :param label_prefix: Prefix to add before labels which can make extracting 
         data from file paths easier, defaults to None
@@ -84,11 +87,14 @@ def prepare_array_vals(
             labels = [f'{key_sequence[-1]}-{val}' for val in array_values]
         else:
             labels = [f'value-{val}' for val in array_values]
+    elif isinstance(labels, int):
+        labels = [get_nth_label(s, labels) for s in array_values]
     elif labels is None:
         labels = [str(i) for i in range(len(array_values))]
 
-    # In case the label is a file path with / characters
+    # In case the label is a file path with /  or space characters
     labels = [label.replace('/', '+') for label in labels]
+    labels = [label.replace(' ', '+') for label in labels]
 
     if label_prefix is not None:
         labels = [label_prefix + '-' + label for label in labels]

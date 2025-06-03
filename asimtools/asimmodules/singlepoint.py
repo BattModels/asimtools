@@ -10,6 +10,7 @@ import logging
 from asimtools.calculators import load_calc
 from asimtools.utils import (
     get_atoms,
+    write_atoms,
 )
 
 def singlepoint(
@@ -38,7 +39,7 @@ def singlepoint(
         prefix = prefix + '_'
     else:
         prefix = ''
-    import time; time.sleep(20)
+    columns_append = []
     if 'energy' in properties:
         try:
             energy = atoms.get_potential_energy()
@@ -54,6 +55,7 @@ def singlepoint(
         except Exception:
             logging.error('Failed to calculate forces')
             raise
+        columns_append += ['forces']
 
     if 'stress' in properties:
         try:
@@ -64,11 +66,10 @@ def singlepoint(
             raise
 
     image_file = prefix + 'image_output.xyz'
-    atoms.write(
+    write_atoms(
         image_file,
+        atoms,
         format='extxyz',
-        write_info=False,
-        write_results=True,
     )
 
     results = {

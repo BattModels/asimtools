@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [develop] - 2025-2-14
  
 ### Added
+- Can now specify an integer N to labels keyword add will use the N-th label for array workflows
 - Can now use placehodlers in sim_array where the array_values replace part of
 the string at the given key_sequence
 - Can now specify whether to write velocities in lammps
@@ -19,10 +20,12 @@ ASE source for this as ASIMTools can't go into the calculator code.
 - VASP interface changed to align more with pymatgen
 - asimtools.utils.write_yaml now stops sorting keys to help with readability of 
 written yamls
+- write_atoms now more universally used and recommended in asimmodules
 
 ### Fixed
 - Minor bugs in geometry optimizations
 - Updated EspressoProfile calculator to match ASE 3.25.0b1
+- FixSymmetry now  imported from ase.constraints
 
 ## [0.1.0] - 2024-12-27
  
