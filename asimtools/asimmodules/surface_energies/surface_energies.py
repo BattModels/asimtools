@@ -14,6 +14,7 @@ from pymatgen.core.surface import generate_all_slabs
 from pymatgen.io.ase import AseAtomsAdaptor as AAA
 from asimtools.calculators import load_calc
 from asimtools.asimmodules.geometry_optimization.atom_relax import atom_relax
+from asimtools.asimmodules.singlepoint import singlepoint
 from asimtools.utils import (
     get_atoms,
 )
@@ -36,8 +37,8 @@ def get_surface_energy(slab, calc, bulk_e_per_atom):
     return converged, surf_en, slab_en, area
 
 def surface_energies(
-    calc_id: str,
     image: Dict,
+    calc_id: str = None,
     millers: Union[str,Sequence] = 'all',
     atom_relax_args: Optional[Dict] = None,
     generate_all_slabs_args: Optional[Dict] = None,
@@ -45,7 +46,8 @@ def surface_energies(
     """Calculates surface energies of slabs defined by args specified for
     pymatgen.core.surface.generate_all_slabs()
 
-    :param calc_id: calc_id specification
+    :param calc_id: Optional calc_id specification, See
+        :func:`asimtools.calculators.load_calc` 
     :type calc_id: str
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
@@ -65,10 +67,7 @@ def surface_energies(
 
     calc = load_calc(calc_id)
     bulk = get_atoms(**image)
-    bulk.set_calculator(calc)
-
-    if atom_relax_args is None:
-        atom_relax_args = {}
+    bulk.calc = calc
 
     default_pymatgen_kwargs = {
         'max_index': 3,
@@ -86,55 +85,61 @@ def surface_energies(
         bulk_struct,
         **pymargs
     )
-
+    print('Generated %s slabs', len(slabs))
     logging.info('Generated %s distinct slabs', len(slabs))
     n_bulk = len(bulk)
     bulk_e_per_atom = bulk.get_potential_energy() / n_bulk
     bulk.write('bulk.xyz')
 
     slab_dict = {}
-    for s, slab in enumerate(slabs):
+    for _, slab in enumerate(slabs):
         big_slab = slab.copy()
         mindex = slab.miller_index
         miller = f'{mindex[0]}{mindex[1]}{mindex[2]}'
         if millers == 'all' or miller in millers:
             logging.info('Calculating for %s', miller)
             atoms = AAA.get_atoms(big_slab)
-            atoms.write(f'{miller}.xyz')
-
-            relax_results = atom_relax(
-                calc_id=calc_id,
-                image={'atoms': atoms},
-                optimizer=atom_relax_args.get('optimizer', 'BFGS'),
-                properties=('energy','forces'),
-                fmax=atom_relax_args.get('fmax', 0.01),
-                prefix=f'{miller}_relaxed'
-            )
-            atoms = get_atoms(
-                image_file = relax_results.get('files', {}).get('image')
-            )
-
-            assert np.allclose(atoms.pbc, (True, True, True)), \
-                f'Check pbcs for {miller}: {atoms.pbc}'
-            assert atoms.cell[2][2] > pymargs['min_vacuum_size'] + \
-                pymargs['min_slab_size'], \
-                f'Check layer number and vacuum for {miller}'
-            assert miller not in slab_dict, \
-                f'Multiple terminations for {miller}'
-
+            atoms.write(f'miller-{miller}.xyz')
             slab_dict[miller] = {}
-            converged, surf_en, slab_en, area = get_surface_energy(
-                atoms, load_calc(calc_id), bulk_e_per_atom
-            )
 
-            if converged:
-                slab_dict[miller]['surf_energy'] = float(surf_en)
-                slab_dict[miller]['natoms'] = len(atoms)
-                slab_dict[miller]['slab_energy'] = float(slab_en)
-                slab_dict['bulk_energy_per_atom'] = float(bulk_e_per_atom)
-                slab_dict[miller]['area'] = float(area)
-                atoms.write(f'{miller}.xyz')
+            if atom_relax_args is not None:
+                relax_results = atom_relax(
+                    calc_id=calc_id,
+                    image={'atoms': atoms},
+                    optimizer=atom_relax_args.get('optimizer', 'BFGS'),
+                    properties=('energy','forces'),
+                    fmax=atom_relax_args.get('fmax', 0.01),
+                    prefix=f'{miller}_relaxed'
+                )
 
+                atoms = get_atoms(
+                    image_file = relax_results.get('files', {}).get('image')
+                )
+
+                assert np.allclose(atoms.pbc, (True, True, True)), \
+                    f'Check pbcs for {miller}: {atoms.pbc}'
+                assert atoms.cell[2][2] > pymargs['min_vacuum_size'] + \
+                    pymargs['min_slab_size'], \
+                    f'Check layer number and vacuum for {miller}'
+                assert miller not in slab_dict, \
+                    f'Multiple terminations for {miller}'
+
+                converged, surf_en, slab_en, area = get_surface_energy(
+                    atoms, load_calc(calc_id), bulk_e_per_atom
+                )
+
+                if converged:
+                    slab_dict[miller]['surf_energy'] = float(surf_en)
+                    slab_dict[miller]['natoms'] = len(atoms)
+                    slab_dict[miller]['slab_energy'] = float(slab_en)
+                    slab_dict['bulk_energy_per_atom'] = float(bulk_e_per_atom)
+                    slab_dict[miller]['area'] = float(area)
+                    atoms.write(f'{miller}.xyz')
+                else:
+                    logging.warning('Slab %s not converged', miller)
+
+    assert len(slab_dict) > 0, \
+        'No slabs generated. Check your args for miller indices'
     results = {
         'surface_energies': slab_dict,
     }
