@@ -133,8 +133,9 @@ def print_job_tree(
         workdir = job_tree['workdir_name']
         status, color = get_status_and_color(job_tree['job'])
         asimmodule = job_tree['job'].sim_input['asimmodule']
+        job_ids = job_tree['job'].get_output().get('job_ids', 'none')
         print(color + f'{indent_str}{workdir}, asimmodule: {asimmodule},' + \
-            f'status: {status}' + reset)
+            f'status: {status}, job_ids: {job_ids}' + reset)
         if level > 0:
             indent_str = '| ' + ' ' * level
         for subjob_id in subjobs:
@@ -149,9 +150,10 @@ def print_job_tree(
         subjob_dir = job_tree['workdir_name']
         subjob = job_tree['job']
         asimmodule = subjob.sim_input['asimmodule']
+        job_ids = job_tree['job'].get_output().get('job_ids', 'none')
         status, color = get_status_and_color(subjob)
         print(color + f'{indent_str}{subjob_dir}, asimmodule: {asimmodule}, '+\
-        f'status: {status}' + reset)
+        f'status: {status}, job_ids: {job_ids}' + reset)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

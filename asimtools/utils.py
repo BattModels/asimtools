@@ -21,6 +21,7 @@ from ase.io.extxyz import save_calc_results
 from ase.parallel import paropen
 import ase.db
 import ase.build
+from ase.constraints import FixAtoms
 from pymatgen.core import Structure, Lattice
 from pymatgen.io.ase import AseAtomsAdaptor
 
@@ -194,19 +195,22 @@ def write_atoms(
     if fmt in ['extxyz']:
         if kwargs.get('write_info', False):
             write_info = kwargs.pop('write_info')
-        # if kwargs.get('columns', False):
-        #     columns = kwargs.pop('columns')
-        # else:
-        #     reserved_ks = ['symbols', 'positions', 'numbers', 'species', 'pos']
-        #     columns = ['symbols', 'positions'] + kwargs.get(
-        #         'columns',
-        #         [k for k in atoms.arrays.keys() if k not in reserved_ks]
-        #     )
-        #     if columns_append is not None:
-        #         columns += columns_append
 
-        #     if len(atoms.constraints) > 0:
-        #         columns.append('move_mask')
+        reserved_ks = ['symbols', 'positions', 'numbers', 'species', 'pos']
+        columns = ['symbols', 'positions'] + [
+            k for k in atoms.arrays.keys() if k not in reserved_ks
+        ]
+
+        if len(atoms.constraints) > 0:
+            columns.append('move_mask')
+
+        if images[0].calc is not None:
+            if 'forces' in images[0].calc.results:
+                columns.append('forces')
+
+        user_columns = kwargs.get('columns', None)
+        if user_columns is not None:
+            columns = list(set(columns + user_columns))
 
         for atoms in images:
             # Current workaround magmoms being NaNs is to replace NaNs with 0.0
@@ -245,6 +249,7 @@ def get_atoms(
     mp_id: Optional[str] = None,
     user_api_key: Optional[str] = None,
     return_type: str = 'ase',
+    constraints: Sequence[dict] = None,
     **kwargs
 ) -> Union[Atoms, Structure]:
     """Return an ASE Atoms or pymatgen Structure object based on specified 
@@ -272,6 +277,9 @@ def get_atoms(
     :param user_api_key: Material Project API key, must be provided to get
         structures from Materials Project, defaults to None
     :type user_api_key: str, optional
+    :param constraints: List of constraints to apply to the atoms object,
+        currently only supports FixAtoms constraints, defaults to None
+    :type constraints: Sequence[dict], optional
     :param return_type: When set to `ase` returns a :class:`ase.Atoms` object,
         when set to `pymatgen` returns a 
         :class:`pymatgen.core.structure.Structure` object, defaults to 'ase'
@@ -298,8 +306,13 @@ def get_atoms(
     Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]])
     >>> get_atoms(builder='bulk', name='Ar', crystalstructure='fcc', a=3.4, cubic=True)
     Atoms(symbols='Ar4', pbc=True, cell=[3.4, 3.4, 3.4])
-    >>> get_atoms(builder='fcc100', symbol='Fe', vacuum=8, size=[4,4, 5])
+    >>> get_atoms(builder='fcc100', symbol='Fe', vacuum=8, size=[4,4,5])
     Atoms(symbols='Cu80', pbc=[True, True, False], cell=[10.210621920333747, 10.210621920333747, 23.22], tags=...)
+    
+    You can also specify constraints to fix atoms in place, for example
+    >>> get_atoms(builder='fcc100', symbol='Fe', vacuum=8, size=[4,4,5], constraints=[{'constraint': 'FixAtoms', 'indices': [0,1]}])
+    Atoms(symbols='Cu80', pbc=[True, True, False], cell=[10.210621920333747, 10.210621920333747, 23.22], tags=...)
+
 
     Some examples for reading an image from a file using :func:`ase.io.read`
     are given below. All ``**kwargs`` are passed to :func:`ase.io.read`
@@ -425,6 +438,19 @@ def get_atoms(
         atoms.rattle(stdev=rattle_stdev)
     elif rattle_stdev is not None and interface == 'pymatgen':
         struct.perturb(distance=rattle_stdev, min_distance=0)
+
+    if constraints is not None and interface == 'ase':
+        consts = []
+        for constraint_args in constraints:
+            name = constraint_args.pop('constraint')
+            assert name == 'FixAtoms', \
+                'Only FixAtoms constraints are supported for ASE interface'
+            constraint_cls = getattr(ase.constraints, name, None)
+            const = constraint_cls(**constraint_args)
+            consts.append(const)
+    
+        for const in consts:
+            atoms.set_constraint(const)
 
     if return_type == 'ase' and interface == 'ase':
         return atoms

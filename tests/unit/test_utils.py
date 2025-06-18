@@ -134,6 +134,14 @@ def test_get_atoms(test_input, expected):
     ''' Test getting atoms from different inputs '''
     assert get_atoms(**test_input) == expected
 
+def test_get_atoms_constraints(tmp_path):
+    atoms = ase.build.bulk('Cu').repeat((2,2,2))
+    constrained_atoms = get_atoms(
+        atoms=atoms, 
+        constraints=[{'constraint': 'FixAtoms', 'indices': [0, 1]}]
+    )
+    assert len(constrained_atoms.constraints) == 1
+
 @pytest.mark.parametrize("test_input, expected",[
     ({'image_file': str(STRUCT_DIR / 'images.xyz')},
      [ase.build.bulk('Ar'), ase.build.bulk('Cu'), ase.build.bulk('Fe')]),
@@ -190,6 +198,13 @@ def test_write_atoms(test_input, expected, tmp_path):
     
     for prop in expected:
         assert prop in lines[1], f'"{prop}" not in file header'
+
+def test_write_atoms_constraints(tmp_path):
+    atoms = ase.build.bulk('Cu').repeat((2,2,2))
+    atoms.set_constraint(ase.constraints.FixAtoms(indices=[0, 1]))
+    write_atoms(tmp_path / 'test_constraints.xyz', atoms)
+    read_atoms = read(tmp_path / 'test_constraints.xyz')
+    assert len(read_atoms.constraints) > 0
 
 @pytest.mark.parametrize("test_input, expected",[
     (
