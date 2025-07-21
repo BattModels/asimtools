@@ -306,14 +306,14 @@ def load_matgl(calc_params):
 
     return calc
 
-def load_omat24(calc_params):
-    """Load any OMAT24 calculator
+def load_fairchemV1(calc_params):
+    """Load any fairchemV1 calculator
 
     :param calc_params: parameters to be passed to fairchem.core.OCPCalculator.
         Must include a key "model" that points to the model files used to 
         instantiate the potential
     :type calc_params: Dict
-    :return: OMAT24 calculator
+    :return: fairchem calculator
     :rtype: :class:`fairchem.core.OCPCalculator`
     """
     from fairchem.core import OCPCalculator
@@ -323,6 +323,46 @@ def load_omat24(calc_params):
     except Exception:
         logging.error(
             "Failed to load OMAT24 with parameters:\n %s", calc_params
+        )
+        raise
+
+    return calc
+
+def load_fairchemV2(calc_params):
+    """Load any fairchemV1 calculator
+
+    :param calc_params: parameters to be passed to fairchem.core.FAIRChemCalculator.
+        Must include a key "model" that points to the model files used to 
+        instantiate the potential
+    :type calc_params: Dict
+    :return: fairchem calculator
+    :rtype: :class:`fairchem.core.FAIRChemCalculator`
+
+    Examples
+    --------
+    >>> from asimtools.calculators import load_calc
+    >>> calc_params = {
+    ...     'name': 'fairchem',
+    ...     'args': {
+    ...         'model_name': 'uma-s-1',
+    ...         'device': 'cuda',
+    ...         'task_name': 'oc20' # Also 'omol','omat','oc20','odac' or 'omc'
+    ...     }
+    ... }
+    >>> calc = load_calc(calc_params=calc_params)
+
+    """
+    from fairchem.core import pretrained_mlip, FAIRChemCalculator
+    og_calc_params = deepcopy(calc_params)
+    task_name = calc_params['args'].pop('task_name', None)
+    predictor = pretrained_mlip.get_predict_unit(**calc_params['args'])
+
+    try:
+        calc = FAIRChemCalculator(predictor, task_name=task_name)
+    except Exception:
+        logging.error(
+            "Failed to load FAIRChemCalculator with parameters:\n %s", \
+                og_calc_params
         )
         raise
 
@@ -370,6 +410,9 @@ external_calcs = {
     'EspressoProfile': load_espresso_profile,
     'M3GNet': load_m3gnet,
     'MatGL': load_matgl,
-    'OMAT24': load_omat24,
+    'OMAT24': load_fairchemV1,
+    'fairchemV1': load_fairchemV1,
+    'fairchemV2': load_fairchemV2,
+    'fairchem': load_fairchemV2,
     'ASEDFTD3': load_ase_dftd3,
 }
