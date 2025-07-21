@@ -17,6 +17,7 @@ calculators which return a 3x3 matrix for stress will break. One can modify
 ASE source for this as ASIMTools can't go into the calculator code.
 - asim_check now also reports the job_ids
 - get_atoms now allows addition of FixAtoms constraint
+- output.yaml now includes hostname
  
 ### Changed
 - VASP interface changed to align more with pymatgen

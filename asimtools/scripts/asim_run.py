@@ -8,6 +8,7 @@ directory and environment
 import importlib
 import sys
 import os
+import socket
 from pathlib import Path
 import argparse
 import subprocess
@@ -164,6 +165,8 @@ def main(args=None) -> None:
     if not job_ids:
         job_ids = os.getenv('SLURM_JOB_ID')
         results['job_ids'] = job_ids
+
+    results['hostname'] = socket.gethostname()
 
     job.update_output(results)
     job.complete()
