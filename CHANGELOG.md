@@ -23,6 +23,7 @@ ASE source for this as ASIMTools can't go into the calculator code.
 - asimtools.utils.write_yaml now stops sorting keys to help with readability of 
 written yamls
 - write_atoms now more universally used and recommended in asimmodules
+- VASP calculation now fails if the max number of iterations is reached for ibrion=1,2,3
 
 ### Fixed
 - Minor bugs in geometry optimizations
