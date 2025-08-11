@@ -14,7 +14,8 @@ from asimtools.asimmodules.workflows.utils import prepare_array_vals
 
 def image_array(
     images: Dict,
-    subsim_input: Dict,
+    subsim_input: Optional[Dict] = None,
+    template_sim_input: Optional[Dict] = None, 
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
     array_max: Optional[int] = None,
@@ -33,8 +34,14 @@ def image_array(
 
     :param images: Images specification, see :func:`asimtools.utils.get_images`
     :type images: Dict
-    :param subsim_input: sim_input of asimmodule to be run
-    :type subsim_input: Dict
+    :param subsim_input: sim_input of asimmodule to be run, included for backward
+        compatibility, please use template_sim_input instead,
+        defaults to None
+    :type subsim_input: Optional[Dict], optional
+    :param template_sim_input: sim_input of asimmodule to be run, defaults to None
+    :type template_sim_input: Optional[Dict], optional
+    :param str_btn_args: args to pass to :func:`asimtools.utils.get_str_btn`
+    :type str_btn_args: Optional[Sequence], optional
     :param calc_input: calc_input to override global file, defaults to None
     :type calc_input: Optional[Dict], optional
     :param env_input: env_input to override global file, defaults to None
