@@ -90,6 +90,8 @@ def image_array(
         secondary_array_values=secondary_array_values,
     )
 
+    if template_sim_input is not None:
+        subsim_input = template_sim_input
     if key_sequence is None:
         key_sequence = ['args', 'image']
         # For backwards compatibility where we don't have to specify image
