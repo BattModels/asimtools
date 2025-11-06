@@ -73,9 +73,24 @@ def vasp(
     :param image: Initial image for VASP calculation. Image specification,
         see :func:`asimtools.utils.get_atoms`
     :type image: Dict
-    :param vaspinput_args: Dictionary of pymatgen's VaspInput arguments. 
+    :param user_incar_settings: Dictionary of INCAR settings to override
+        defaults or MP settings, defaults to None
+    :type user_incar_settings: Dict, optional
+    :param user_kpoints_settings: Dictionary of KPOINTS settings to override
+        defaults or MP settings, defaults to None
+    :type user_kpoints_settings: Dict, optional
+    :param user_potcar_functional: Potcar functional to use in case of MP
+        settings, defaults to 'PBE_64'
+    :type user_potcar_functional: str, optional
+    :param potcar: Dictionary specifying Potcar settings, see
+        :class:`pymatgen.io.vasp.inputs.Potcar`, defaults to None
+    :type potcar: Dict, optional
+    :param prev_calc: Path to previous VASP calculation to use as starting
+        point for MP settings, defaults to None
+    :type prev_calc: os.PathLike, optional
+    :param vaspinput_kwargs: Dictionary of pymatgen's VaspInput arguments. 
         See :class:`pymatgen.io.vasp.inputs.VaspInput`
-    :type vaspinput_args: Dict
+    :type vaspinput_kwargs: Dict
     :param command: Command with which to run VASP, defaults to 'vasp_std'
     :type command: str, optional
     :param mpset: Materials Project VASP set to use see 
@@ -84,6 +99,9 @@ def vasp(
     :param write_image_output: Whether to write output image in standard 
         asimtools format to file, defaults to False
     :type write_image_output: bool, optional
+    :param run_vasp: Whether to run VASP after writing input files,
+        defaults to True
+    :type run_vasp: bool, optional
     """
 
     if vaspinput_kwargs is None:
