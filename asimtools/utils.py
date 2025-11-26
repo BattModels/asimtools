@@ -245,6 +245,7 @@ def get_atoms(
     builder: Optional[str] = 'bulk',
     atoms: Optional[Atoms] = None,
     repeat: Optional[Tuple[int, int, int]] = None,
+    repeat_to_N_args: Optional[Dict] = None,
     rattle_stdev: Optional[float] = None,
     mp_id: Optional[str] = None,
     user_api_key: Optional[str] = None,
@@ -329,7 +330,7 @@ def get_atoms(
     >>> get_atoms(image_file='molecules.xyz', index=0) # Pick out one structure using indexing
     Atoms(symbols='OH2', pbc=False)
 
-    You can also make supercells and rattle the atoms
+    You can also make supercells and rattle the atoms or repeat to a target
 
     >>> li_bulk = get_atoms(name='Li')
     >>> li_bulk.write('POSCAR', format='vasp')
@@ -337,6 +338,8 @@ def get_atoms(
     Atoms(symbols='Li27', pbc=True, cell=[[-5.235, 5.235, 5.235], [5.235, -5.235, 5.235], [5.235, 5.235, -5.235]])
     >>> get_atoms(builder='bulk', name='Li', repeat=[2,2,2], rattle_stdev=0.01)
     Atoms(symbols='Li8', pbc=True, cell=[[-3.49, 3.49, 3.49], [3.49, -3.49, 3.49], [3.49, 3.49, -3.49]])
+    >>> get_atoms(builder='bulk', name='Li', repeat_to_N_args={'N': 16, 'max_dim': 10.0})
+    Atoms(symbols='Li16', pbc=True, cell=[[-6.98, 6.98, 6.98], [6.98, -6.98, 6.98], [6.98, 6.98, -6.98]])
 
     Mostly for internal use and use in asimmodules, one can specify atoms
     directly
@@ -439,6 +442,13 @@ def get_atoms(
     elif rattle_stdev is not None and interface == 'pymatgen':
         struct.perturb(distance=rattle_stdev, min_distance=0)
 
+    if repeat_to_N_args is not None and interface == 'ase':
+        atoms = repeat_to_N(atoms, **repeat_to_N_args)
+    elif repeat_to_N_args is not None and interface == 'pymatgen':
+        raise NotImplementedError(
+            'repeat_to_N_args is only implemented for ASE interface'
+        )
+
     if constraints is not None and interface == 'ase':
         consts = []
         for constraint_args in constraints:
@@ -490,6 +500,47 @@ def parse_slice(value: str, bash: bool = False) -> slice:
         if len(parts) == 2:
             parts.append('1')
         return f'$(seq {parts[0]} {parts[2]} {parts[1]})'
+
+def repeat_to_N(
+    atoms: Atoms,
+    N: int,
+    max_dim: float = 50.0,
+) -> Atoms:
+    """Scale a structure to have approximately N atoms in the unit cell.
+    The function repeats the shortest axis of the unit cell until the
+    number of atoms >= N or the longest axis of the unit cell is > max_dim.
+
+    :param atoms: Input atoms object
+    :type atoms: Atoms
+    :param N: Target number of atoms
+    :type N: int
+    :param max_dim: Maximum length of the longest axis of the unit cell,
+        defaults to 50.0
+    :type max_dim: float, optional
+    :raises ValueError: If it fails to scale the structure to N atoms
+    :return: Scaled atoms object
+    :rtype: Atoms
+    """
+    cell = atoms.get_cell()
+    lengths = [np.linalg.norm(vec) for vec in cell]
+    num_atoms = len(atoms)
+    new_atoms = atoms.copy()
+
+    while num_atoms < N and np.max(lengths) < max_dim:
+        shortest_axis = np.argmin(lengths)
+        repeat_vec = [1, 1, 1]
+        repeat_vec[shortest_axis] += 1
+        new_atoms = new_atoms.repeat(repeat_vec)
+        cell = new_atoms.get_cell()
+        lengths = [np.linalg.norm(vec) for vec in cell]
+        num_atoms = len(new_atoms)
+
+    if num_atoms < N:
+        raise ValueError(
+            f'Failed to scale structure to {N} atoms without exceeding \
+                max_dim of {max_dim} Angstroms'
+        )
+    return new_atoms
 
 def get_images(
     image_file: str = None,

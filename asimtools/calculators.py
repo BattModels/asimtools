@@ -38,7 +38,7 @@ def load_calc(
             calc_params = calc_input[calc_id]
         except KeyError as exc:
             msg = f'Calculator with calc_id: {calc_id} not found in'
-            msg += f'calc_input {calc_input}'
+            msg += f'calc_input {[c for c in calc_input]}'
             raise KeyError(msg) from exc
         except AttributeError as exc:
             raise AttributeError('No calc_input found') from exc
@@ -400,6 +400,28 @@ def load_ase_dftd3(calc_params):
 
     return calc
 
+def load_aqcat(calc_params):
+    """Load AQCat Calculator
+    :param calc_params: args to pass to loader, including checkpoint_path
+    :type calc_params: Dict
+    :return: AQCat calculator
+    :rtype: :class:`fairchem.core.common.relaxation.ase_utils.patched_calc`
+    """
+    from fairchem.core.common.relaxation.ase_utils import patched_calc
+
+    CHECKPOINT_PATH = "aqcat25/checkpoints_aqcat_ev2/ev2-in+midFiLM-AQCat25+OC20-20M_20251008_223220.pt"
+
+    try:
+        calc = patched_calc(**calc_params)
+    except Exception:
+        logging.error(
+            "Failed to load AQCat FAIRChemCalculator with parameters:\n %s", \
+                calc_params
+        )
+        raise
+
+    return calc
+
 external_calcs = {
     'NequIP': load_nequip,
     'Allegro': load_nequip,
@@ -415,4 +437,5 @@ external_calcs = {
     'fairchemV2': load_fairchemV2,
     'fairchem': load_fairchemV2,
     'ASEDFTD3': load_ase_dftd3,
+    'AQCat': load_aqcat
 }

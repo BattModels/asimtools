@@ -290,6 +290,8 @@ def ase_md(
         )
     
 
+    if plot_args is None:
+        plot_args = {}
     if plot:
         plot_thermo(
             images={'image_file': 'output.traj'},

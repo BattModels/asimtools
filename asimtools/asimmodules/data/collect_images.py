@@ -61,6 +61,7 @@ def collect_images(
     :rtype: Dict
     
     """
+
     write_kwargs = {}
     if fnames == (1):
         fnames = [f'{fnames}-{i:03d}' for i in range(len(splits))]
@@ -125,6 +126,7 @@ def collect_images(
         selected_atoms = [selected_atoms[i] for i in selected_inds]
 
     if shuffle:
+        assert not sort_by_energy_per_atom, 'Either sort or shuffle, not both'
         np.random.shuffle(selected_atoms)
     elif sort_by_energy_per_atom:
         assert not shuffle, 'Either sort or shuffle, not both'

@@ -4,7 +4,7 @@ Runs a user defined lammps script or template. LAMMPS must be installed
 
 Author: mkphuthi@github.com
 '''
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
 import sys
 from pathlib import Path
 from numpy.random import randint
@@ -24,6 +24,8 @@ def lammps(
     masses: bool = True,
     velocities: bool = False,
     seed: Optional[int] = None,
+    restart_template: Optional[str] = None,
+    specorder: Sequence[str] = None,
 ) -> Dict:
     """Runs a lammps script based on a specified template, variables can be 
     specified as arguments to be defined in the final LAMMPS input file if 
@@ -55,6 +57,12 @@ def lammps(
         seed to be placed, if seed=None, a random one is generated, 
         defaults to None
     :type seed: int, optional
+    :param restart_template: Optional lammps input template to be used to
+        generate a restart.lammps file, defaults to None
+    :type restart_template: str, optional
+    :param specorder: Optional list of atomic species in the order they
+        should appear in the LAMMPS data input file, defaults to None
+    :type specorder: Sequence[str], optional
     :return: LAMMPS out file names
     :rtype: Dict
     """
@@ -73,6 +81,7 @@ def lammps(
                     atom_style=atom_style,
                     masses=masses,
                     velocities=velocities,
+                    specorder=specorder,
                 )
             except ValueError as te:
                 err_txt = 'Need ASE version >=3.23 to support writing '
@@ -92,6 +101,7 @@ def lammps(
         variables['IMAGE_FILE'] = 'image_input.lmpdat'
 
     lmp_txt = ''
+    
     for variable, value in variables.items():
         lmp_txt += f'variable {variable} equal {value}\n'
 
@@ -102,6 +112,18 @@ def lammps(
 
     if placeholders is None:
         placeholders = {}
+
+    if restart_template is not None:
+        restart_txt = lmp_txt
+        with open(restart_template, 'r', encoding='utf-8') as f:
+            restart_lines = f.readlines()
+        for rline in restart_lines:
+            if placeholders is not None:
+                for placeholder in placeholders:
+                    rline = rline.replace(placeholder, str(placeholders[placeholder]))
+            restart_txt += rline
+        with open('restart.lammps', 'w', encoding='utf-8') as f:
+            f.write(restart_txt)
 
     for line in lines:
         if 'SEED' in line and 'SEED' not in placeholders:

@@ -24,6 +24,7 @@ from asimtools.utils import (
     get_str_btn,
     expand_wildcards,
     write_atoms,
+    repeat_to_N,
 )
 import ase.build
 
@@ -132,6 +133,7 @@ def test_join_names(test_input, expected):
 ])
 def test_get_atoms(test_input, expected):
     ''' Test getting atoms from different inputs '''
+    print('e', expected)
     assert get_atoms(**test_input) == expected
 
 def test_get_atoms_constraints(tmp_path):
@@ -374,3 +376,15 @@ def test_expand_wildcards(test_input, expected, tmp_path):
     print(f'Found paths in {os.getcwd()}: {[f for f in Path(tmp_path).glob("*")]}')
     
     assert expand_wildcards(test_input, root_path=tmp_path) == expected
+
+def test_repeat_to_N():
+    ''' Test repeating unit cell to at least N atoms '''
+    atoms = ase.build.bulk('Cu', crystalstructure='fcc', cubic=True, a=2.0)
+    repeated_atoms = repeat_to_N(atoms, 16)
+    assert len(repeated_atoms) == 16
+    assert np.abs(repeated_atoms.get_cell()[0][0] - 2*2.0) < 1e-6
+    assert np.abs(repeated_atoms.get_cell()[1][1] - 2*2.0) < 1e-6
+    assert np.abs(repeated_atoms.get_cell()[2][2] - 1*2.0) < 1e-6
+    assert len(repeat_to_N(atoms, 15)) == 16
+    with pytest.raises(ValueError):
+        repeat_to_N(atoms, 16, max_dim=4)
