@@ -86,7 +86,7 @@ def load_job_tree(
     else:
         subjob_dict = None
 
-    job = load_job_from_directory(workdir)
+    job = load_job_from_directory(workdir, asimrun_mode=True)
     job_dict = {
         'workdir_name': workdir.name,
         'job': job,

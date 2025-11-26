@@ -135,7 +135,6 @@ def collect_images(
         sort_result = sorted(
             zip(e_per_atoms, selected_atoms), key=lambda x: x[0]
         )
-
         selected_atoms = [x[1] for x in sort_result]
 
     start_index = 0

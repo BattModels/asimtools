@@ -95,6 +95,7 @@ def prepare_array_vals(
     # In case the label is a file path with /  or space characters
     labels = [label.replace('/', '+') for label in labels]
     labels = [label.replace(' ', '+') for label in labels]
+    labels = [label.replace('*', '') for label in labels]
 
     if label_prefix is not None:
         labels = [label_prefix + '-' + label for label in labels]
