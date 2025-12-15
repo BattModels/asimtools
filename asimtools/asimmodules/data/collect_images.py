@@ -6,12 +6,11 @@ author: mkphuthi@github.com
 
 from typing import Dict, Optional, Sequence
 import numpy as np
-from copy import deepcopy
 from pymatgen.io.ase import AseAtomsAdaptor as AAA
 from pymatgen.analysis.structure_matcher import StructureMatcher
 from ase.io import write
 from asimtools.utils import (
-    get_atoms, get_images, new_db
+    get_images, new_db
 )
 
 
@@ -27,6 +26,7 @@ def collect_images(
     energy_per_atom_limits: Optional[Sequence[float]] = None,
     force_max: Optional[float] = None,
     stress_limits: Optional[Sequence[float]] = None,
+    properties: Optional[tuple] = ('energy', 'forces', 'stress'),
 ) -> Dict:
     """Collects images into one file/database and can split them into 
     multiple files/databases for ML tasks
@@ -57,6 +57,8 @@ def collect_images(
     :type force_max: Optional[float], optional
     :param stress_limits: stress limits for filtering images, defaults to None
     :type stress_limits: Optional[Sequence[float]], optional
+    :param properties: which of energy, force, stress to consider
+    :type Sequence, optional
     :return: results
     :rtype: Dict
     
@@ -72,34 +74,36 @@ def collect_images(
     selected_atoms = []
     nonselected_atoms = []
     for atoms in images:
-        energy = atoms.get_potential_energy()
-        forces = atoms.get_forces()
-        stress = atoms.get_stress()
-
         select = True
-        if energy_per_atom_limits is not None:
-            if (energy < energy_per_atom_limits[0]):
-                if (energy > energy_per_atom_limits[1]):
+        if 'energy' in properties:
+            energy = atoms.get_potential_energy()
+            if energy_per_atom_limits is not None:
+                if (energy < energy_per_atom_limits[0]):
+                    if (energy > energy_per_atom_limits[1]):
+                        select = False
+        if 'forces' in properties:
+            forces = atoms.get_forces()
+            if force_max is not None:
+                max_force = np.max(np.linalg.norm(forces, axis=1))
+                if (max_force > force_max):
                     select = False
-        if force_max is not None:
-            max_force = np.max(np.linalg.norm(forces, axis=1))
-            if (max_force > force_max):
-                select = False
-        if stress_limits is not None:
-            max_stress = np.max(stress)
-            min_stress = np.min(stress)
-            if (min_stress < stress_limits[0]):
-                if (max_stress > stress_limits[1]):
-                    select = False
+        if 'stress' in properties:
+            stress = atoms.get_stress()
+            if stress_limits is not None:
+                max_stress = np.max(stress)
+                min_stress = np.min(stress)
+                if (min_stress < stress_limits[0]):
+                    if (max_stress > stress_limits[1]):
+                        select = False
 
         if select:
             if rename_keys is not None and out_format == 'extxyz':
                 write_kwargs['write_info'] = True
-                if 'energy' in rename_keys:
+                if 'energy' in rename_keys and 'energy' in properties:
                     atoms.info[rename_keys['energy']] = energy
-                if 'forces' in rename_keys:
+                if 'forces' in rename_keys and 'forces' in properties:
                     atoms.arrays[rename_keys['forces']] = forces
-                if 'stress' in rename_keys:
+                if 'stress' in rename_keys and 'stress' in properties:
                     atoms.info[rename_keys['stress']] = stress
             selected_atoms.append(atoms)
         else:
