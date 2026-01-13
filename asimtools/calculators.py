@@ -389,7 +389,10 @@ def load_ase_dftd3(calc_params):
     if ( (dft_calc_id is not None) and (dft_calc_params is not None) ):
         raise ValueError('Provide only one of dft_calc_id or dft_calc_params')
     
-    dft = load_calc(calc_id=dft_calc_id, calc_params=dft_calc_params)
+    if ( (dft_calc_id is not None) or (dft_calc_params is not None) ):
+        dft = load_calc(calc_id=dft_calc_id, calc_params=dft_calc_params)
+    else:
+        dft = None
     try:
         calc = DFTD3(dft=dft, **d3_args)
     except Exception:
@@ -409,14 +412,12 @@ def load_aqcat(calc_params):
     """
     from fairchem.core.common.relaxation.ase_utils import patched_calc
 
-    CHECKPOINT_PATH = "aqcat25/checkpoints_aqcat_ev2/ev2-in+midFiLM-AQCat25+OC20-20M_20251008_223220.pt"
-
     try:
-        calc = patched_calc(**calc_params)
+        calc = patched_calc(**calc_params['args'])
     except Exception:
         logging.error(
             "Failed to load AQCat FAIRChemCalculator with parameters:\n %s", \
-                calc_params
+                calc_params['args']
         )
         raise
 
