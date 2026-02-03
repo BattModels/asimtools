@@ -11,6 +11,7 @@ from typing import Dict, List, TypeVar, Sequence
 from functools import partial
 from multiprocessing import Pool
 import numpy as np
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 from asimtools.calculators import load_calc
 from asimtools.utils import (
@@ -51,7 +52,7 @@ def calc_parity_data(
     fpvals = []
     srvals = []
     spvals = []
-    for i, atoms in enumerate(subset):
+    for i, atoms in enumerate(tqdm(subset)):
         calc = load_calc(calc_id)
         patoms = atoms.copy()
         patoms.calc = calc

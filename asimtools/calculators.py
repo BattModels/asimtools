@@ -294,6 +294,7 @@ def load_matgl(calc_params):
     import matgl
     calc_params = deepcopy(calc_params)
     model = calc_params['args'].pop("model")
+
     try:
         pot = matgl.load_model(model)
         calc = PESCalculator(
@@ -352,10 +353,24 @@ def load_fairchemV2(calc_params):
     >>> calc = load_calc(calc_params=calc_params)
 
     """
+    from fairchem.core.units.mlip_unit import load_predict_unit
     from fairchem.core import pretrained_mlip, FAIRChemCalculator
     og_calc_params = deepcopy(calc_params)
     task_name = calc_params['args'].pop('task_name', None)
-    predictor = pretrained_mlip.get_predict_unit(**calc_params['args'])
+    try:
+        predictor = pretrained_mlip.get_predict_unit(**calc_params['args'])
+    except Exception as exc:
+        logging.error(
+            "Failed to load pretrained model trying predict unit"
+        )
+        try:
+            predictor = load_predict_unit(**calc_params['args'])
+        except Exception:
+            logging.error(
+                "Failed to load predictor unit with parameters:\n %s", \
+                    og_calc_params
+            )
+            raise exc from exc
 
     try:
         calc = FAIRChemCalculator(predictor, task_name=task_name)
