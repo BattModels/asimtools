@@ -161,6 +161,7 @@ def lammps(
         logging.error(err_txt)
         with open('lmp_stderr.txt', 'a+', encoding='utf-8') as f:
             f.write(completed_process.stderr)
+
         completed_process.check_returncode()
         return {}
 

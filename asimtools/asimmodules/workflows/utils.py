@@ -17,6 +17,7 @@ def prepare_array_vals(
     str_btn_args: Optional[Dict] = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
+    as_integers: Optional[bool] = False,
 ):
     """Helper function for preparing things needed for the different arrays
 
@@ -55,6 +56,9 @@ def prepare_array_vals(
         over in tandem with array_values to allow changing multiple key-value
         pairs, defaults to None
     :type secondary_array_values: Sequence, optional
+    :param as_integers: Whether to return the values as integers, useful for 
+        indexing
+    :type as_integers: bool, False
     :return: Results
     :rtype: Dict
     """
@@ -75,7 +79,10 @@ def prepare_array_vals(
         array_values = [float(v) for v in array_values]
     elif arange_args is not None:
         array_values = np.arange(*arange_args)
-        array_values = [float(v) for v in array_values]
+        if as_integers:
+            array_values = [int(v) for v in array_values]
+        else:
+            array_values = [float(v) for v in array_values]
 
     assert len(array_values) > 0, f'No array_values found'
 

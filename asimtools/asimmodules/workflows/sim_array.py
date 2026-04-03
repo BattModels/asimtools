@@ -33,6 +33,7 @@ def sim_array(
     secondary_placeholders: Optional[Sequence] = None,
     array_max: Optional[int] = None,
     skip_failed: Optional[bool] = False,
+    as_integers: Optional[bool] = False,
     group_size: int = 1,
 ) -> Dict:
     """Runs the same asimmodule, iterating over multiple values of a specified
@@ -89,6 +90,9 @@ def sim_array(
     :type skip_failed: Optional[bool], optional
     :param group_size: Number of jobs to group together, defaults to 1
     :type group_size: int, optional
+    :param as_integers: Whether to return the values as integers, useful for 
+        indexing
+    :type as_integers: bool, False
     :return: Results
     :rtype: Dict
     """
@@ -105,6 +109,7 @@ def sim_array(
         str_btn_args=str_btn_args,
         secondary_key_sequences=secondary_key_sequences,
         secondary_array_values=secondary_array_values,
+        as_integers=as_integers,
     )
     array_values = results['array_values']
     labels = results['labels']

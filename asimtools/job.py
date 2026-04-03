@@ -34,8 +34,8 @@ from asimtools.utils import (
 
 Atoms = TypeVar('Atoms')
 
-START_MESSAGE = '+' * 15 + ' ASIMTOOLS START' + '+' * 15 + '\n'
-STOP_MESSAGE = '+' * 15 + ' ASIMTOOLS STOP' + '+' * 15 + '\n'
+START_MESSAGE = '+' * 15 + ' ASIMTOOLS START ' + '+' * 15 + '\n'
+STOP_MESSAGE = '+' * 15 + ' ASIMTOOLS STOP ' + '+' * 16 + '\n'
 
 class Job():
     ''' Abstract class for the job object '''
@@ -272,6 +272,9 @@ class UnitJob(Job):
         # get precommands, postcommands, run_prefixes and run_suffixes
         self.calc_id = self.sim_input.get('args', {}).get('calc_id', None)
         if self.calc_id is not None:
+            if isinstance(self.calc_id, dict):
+                self.calc_input = {'custom': self.calc_id}
+                self.calc_id = 'custom'
             self.calc_params = self.calc_input[self.calc_id]
         else:
             self.calc_params = {}

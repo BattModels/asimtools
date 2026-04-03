@@ -27,12 +27,9 @@ def iterative(
     env_ids: Optional[Union[Sequence[str],str]] = None,
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
-    # labels: Optional[Union[Sequence,str]] = 'values',
-    # label_prefix: Optional[str] = None,
     str_btn_args: Optional[Dict] = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
-    # array_max: Optional[int] = None,
 ) -> Dict:
     """Runs the same asimmodule, iterating over multiple values of a specified
     argument based on a sim_input template provided by the user

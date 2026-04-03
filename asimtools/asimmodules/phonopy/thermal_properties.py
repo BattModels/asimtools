@@ -22,8 +22,11 @@ def thermal_properties(
     if run_thermal_properties_kwargs is None:
         run_thermal_properties_kwargs = {}
 
+    print('Loading phonopy save...')
     phonon = phonopy.load(phonopy_save_path)
+    print('Running mesh...')
     phonon.run_mesh(mesh, **run_mesh_kwargs)
+    print('Running thermal properties...')
     phonon.run_thermal_properties(
         t_step=t_step,
         t_max=t_max,
@@ -33,6 +36,7 @@ def thermal_properties(
     phonon.save(phonopy_save_path)
 
     # Write and plot thermal properties
+    print('Write and plot thermal properties...')
     if suffix != '':
         suffix = '-' + suffix
     tp_label = 'thermal_properties' + suffix

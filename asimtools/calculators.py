@@ -32,8 +32,12 @@ def load_calc(
     assert calc_id is not None or calc_params is not None, \
         'Provide one of calc_id or calc_id and calc_input or calc_params'
     if calc_id is not None:
-        if calc_input is None:
-            calc_input = get_calc_input()
+        if isinstance(calc_id, dict):
+            calc_input = {'custom': calc_id}
+            calc_id = 'custom'
+        else:
+            if calc_input is None:
+                calc_input = get_calc_input()
         try:
             calc_params = calc_input[calc_id]
         except KeyError as exc:
