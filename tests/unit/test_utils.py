@@ -2,9 +2,14 @@
 Tests for utils.py
 '''
 from pathlib import Path
+from unittest.mock import patch, MagicMock
 import os
 import pytest
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import pandas as pd
 from ase.io import read
 from ase.calculators.emt import EMT
 from pymatgen.core import Structure, Molecule, IStructure, IMolecule
@@ -25,6 +30,12 @@ from asimtools.utils import (
     expand_wildcards,
     write_atoms,
     repeat_to_n,
+    strip_symbols,
+    get_axis_lims,
+    improve_plot,
+    write_csv_from_dict,
+    new_db,
+    check_if_slurm_job_is_running,
 )
 import ase.build
 
@@ -388,3 +399,104 @@ def test_repeat_to_n():
     assert len(repeat_to_n(atoms, 15)) == 16
     with pytest.raises(ValueError):
         repeat_to_n(atoms, 16, max_dim=4)
+
+
+@pytest.mark.parametrize("test_input, expected", [
+    ('hello', 'hello'),
+    ('_hello_', 'hello'),
+    ('-hello-', 'hello'),
+    ('.hello.', 'hello'),
+    (' hello ', 'hello'),
+    ('_-hello-_', 'hello'),
+    ('', ''),
+])
+def test_strip_symbols(test_input, expected):
+    ''' Test stripping leading/trailing bad symbols from a string '''
+    assert strip_symbols(test_input) == expected
+
+
+@pytest.mark.parametrize("x, y, padding, expected_min, expected_max", [
+    ([0, 1], [0, 1], 0.1, -0.1, 1.1),
+    ([0, 2], [1, 3], 0.0, 0.0, 3.0),
+    ([-1, 1], [-1, 1], 0.5, -2.0, 2.0),
+])
+def test_get_axis_lims(x, y, padding, expected_min, expected_max):
+    ''' Test axis limit computation with padding '''
+    lims = get_axis_lims(x, y, padding=padding)
+    assert np.isclose(lims[0], expected_min)
+    assert np.isclose(lims[1], expected_max)
+
+
+def test_improve_plot():
+    ''' Test that improve_plot sets label and tick fontsizes '''
+    fig, ax = plt.subplots()
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_title('Title')
+    fontsize = 16
+    improve_plot(ax=ax, fontsize=fontsize)
+    assert ax.xaxis.label.get_fontsize() == fontsize + 2
+    assert ax.yaxis.label.get_fontsize() == fontsize + 2
+    assert ax.title.get_fontsize() == fontsize + 4
+    plt.close(fig)
+
+
+def test_improve_plot_with_legend():
+    ''' Test that improve_plot handles legends '''
+    fig, ax = plt.subplots()
+    ax.plot([0, 1], [0, 1], label='line')
+    ax.legend(title='legend_title')
+    improve_plot(ax=ax, fontsize=12)
+    leg = ax.get_legend()
+    assert leg is not None
+    plt.close(fig)
+
+
+@pytest.mark.parametrize("data, columns, header", [
+    ({'a': [1, 2, 3], 'b': [4, 5, 6]}, None, ''),
+    ({'a': [1, 2], 'b': [3, 4], 'c': [5, 6]}, ['a', 'c'], 'my header'),
+])
+def test_write_csv_from_dict(data, columns, header, tmp_path):
+    ''' Test writing a dict to CSV and reading it back '''
+    fpath = tmp_path / 'test.csv'
+    result_df = write_csv_from_dict(fpath, data, columns=columns, header=header)
+
+    used_columns = columns if columns is not None else list(data.keys())
+    assert list(result_df.columns) == used_columns
+
+    read_df = pd.read_csv(fpath, comment='#')
+    assert list(read_df.columns) == used_columns
+    for col in used_columns:
+        assert list(read_df[col]) == data[col]
+
+    if header:
+        with open(fpath, 'r', encoding='utf-8') as f:
+            first_line = f.readline()
+        assert header in first_line
+
+
+def test_new_db(tmp_path):
+    ''' Test creating a new ASE database '''
+    import ase.db
+    dbpath = tmp_path / 'test.db'
+    db = new_db(str(dbpath))
+    assert dbpath.exists()
+    atoms = ase.build.bulk('Cu')
+    db.write(atoms)
+    assert db.count() == 1
+
+
+def test_check_if_slurm_job_is_running_true():
+    ''' Test that a job ID found in squeue stdout returns True '''
+    mock_result = MagicMock()
+    mock_result.stdout = ' 12345 some other text'
+    with patch('asimtools.utils.subprocess.run', return_value=mock_result):
+        assert check_if_slurm_job_is_running(12345) is True
+
+
+def test_check_if_slurm_job_is_running_false():
+    ''' Test that a job ID not in squeue stdout returns False '''
+    mock_result = MagicMock()
+    mock_result.stdout = ' 99999 some other text'
+    with patch('asimtools.utils.subprocess.run', return_value=mock_result):
+        assert check_if_slurm_job_is_running(12345) is False
