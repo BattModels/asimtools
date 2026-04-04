@@ -42,7 +42,7 @@ def load_calc(
             calc_params = calc_input[calc_id]
         except KeyError as exc:
             msg = f'Calculator with calc_id: {calc_id} not found in'
-            msg += f'calc_input {[c for c in calc_input]}'
+            msg += f'calc_input {list(calc_input)}'
             raise KeyError(msg) from exc
         except AttributeError as exc:
             raise AttributeError('No calc_input found') from exc
@@ -265,7 +265,8 @@ def load_espresso_profile(calc_params):
 def load_m3gnet(calc_params):
     """Load any M3GNet or MatGL calculator
 
-    :param calc_params: parameters to be passed to matgl.ext.ase.M3GNetCalculator. Must include a key "model" that points to the model used to instantiate the potential
+    :param calc_params: parameters to be passed to matgl.ext.ase.M3GNetCalculator.
+        Must include a key "model" that points to the model used to instantiate the potential
     :type calc_params: Dict
     :return: M3GNet calculator
     :rtype: :class:`matgl.ext.ase.M3GNetCalculator`
@@ -289,7 +290,8 @@ def load_m3gnet(calc_params):
 def load_matgl(calc_params):
     """Load any MatGL calculator
 
-    :param calc_params: parameters to be passed to matgl.ext.ase.PESCalculator. Must include a key "model" that points to the model used to instantiate the potential
+    :param calc_params: parameters to be passed to matgl.ext.ase.PESCalculator.
+        Must include a key "model" that points to the model used to instantiate the potential
     :type calc_params: Dict
     :return: MatGL calculator
     :rtype: :class:`matgl.ext.ase.PESCalculator`
@@ -311,7 +313,7 @@ def load_matgl(calc_params):
 
     return calc
 
-def load_fairchemV1(calc_params):
+def load_fairchem_v1(calc_params):
     """Load any fairchemV1 calculator
 
     :param calc_params: parameters to be passed to fairchem.core.OCPCalculator.
@@ -333,7 +335,7 @@ def load_fairchemV1(calc_params):
 
     return calc
 
-def load_fairchemV2(calc_params):
+def load_fairchem_v2(calc_params):
     """Load any fairchemV1 calculator
 
     :param calc_params: parameters to be passed to fairchem.core.FAIRChemCalculator.
@@ -363,7 +365,7 @@ def load_fairchemV2(calc_params):
     task_name = calc_params['args'].pop('task_name', None)
     try:
         predictor = pretrained_mlip.get_predict_unit(**calc_params['args'])
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         logging.error(
             "Failed to load pretrained model trying predict unit"
         )
@@ -402,12 +404,12 @@ def load_ase_dftd3(calc_params):
     d3_args = calc_params['args'].get('d3_args', {})
     if 'dft' in d3_args:
         raise ValueError('Do not specify dft arg for DFTD3, specify calc_id')
-    
+
     dft_calc_id = calc_params['args'].get('dft_calc_id', None)
     dft_calc_params = calc_params['args'].get('dft_calc_params', None)
     if ( (dft_calc_id is not None) and (dft_calc_params is not None) ):
         raise ValueError('Provide only one of dft_calc_id or dft_calc_params')
-    
+
     if ( (dft_calc_id is not None) or (dft_calc_params is not None) ):
         dft = load_calc(calc_id=dft_calc_id, calc_params=dft_calc_params)
     else:
@@ -452,10 +454,10 @@ external_calcs = {
     'EspressoProfile': load_espresso_profile,
     'M3GNet': load_m3gnet,
     'MatGL': load_matgl,
-    'OMAT24': load_fairchemV1,
-    'fairchemV1': load_fairchemV1,
-    'fairchemV2': load_fairchemV2,
-    'fairchem': load_fairchemV2,
+    'OMAT24': load_fairchem_v1,
+    'fairchemV1': load_fairchem_v1,
+    'fairchemV2': load_fairchem_v2,
+    'fairchem': load_fairchem_v2,
     'ASEDFTD3': load_ase_dftd3,
     'AQCat': load_aqcat
 }
