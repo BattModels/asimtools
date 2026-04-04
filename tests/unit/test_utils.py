@@ -24,7 +24,7 @@ from asimtools.utils import (
     get_str_btn,
     expand_wildcards,
     write_atoms,
-    repeat_to_N,
+    repeat_to_n,
 )
 import ase.build
 
@@ -377,14 +377,14 @@ def test_expand_wildcards(test_input, expected, tmp_path):
     
     assert expand_wildcards(test_input, root_path=tmp_path) == expected
 
-def test_repeat_to_N():
+def test_repeat_to_n():
     ''' Test repeating unit cell to at least N atoms '''
     atoms = ase.build.bulk('Cu', crystalstructure='fcc', cubic=True, a=2.0)
-    repeated_atoms = repeat_to_N(atoms, 16)
+    repeated_atoms = repeat_to_n(atoms, 16)
     assert len(repeated_atoms) == 16
     assert np.abs(repeated_atoms.get_cell()[0][0] - 2*2.0) < 1e-6
     assert np.abs(repeated_atoms.get_cell()[1][1] - 2*2.0) < 1e-6
     assert np.abs(repeated_atoms.get_cell()[2][2] - 1*2.0) < 1e-6
-    assert len(repeat_to_N(atoms, 15)) == 16
+    assert len(repeat_to_n(atoms, 15)) == 16
     with pytest.raises(ValueError):
-        repeat_to_N(atoms, 16, max_dim=4)
+        repeat_to_n(atoms, 16, max_dim=4)
