@@ -38,10 +38,10 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
+where = ["src"]
 include = [
   "asimtools",
   "asimtools.*",
-  "asimtools.scripts.*.*",
 ]
 
 [project.optional-dependencies]
@@ -69,5 +69,5 @@ documentation = "https://battmodels.github.io/asimtools/"
 
 [tool.pytest.ini_options]
 log_cli_level = "warn"
-pythonpath = "asimtools"
+pythonpath = ["src"]
 testpaths = ["tests"]

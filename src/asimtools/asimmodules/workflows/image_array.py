@@ -109,7 +109,7 @@ def image_array(
     array_sim_input = {}
     for i, val in enumerate(array_values):
         new_sim_input = change_dict_value(
-            d=subsim_input,
+            dct=subsim_input,
             new_value=val,
             key_sequence=key_sequence,
             return_copy=True,
@@ -118,7 +118,7 @@ def image_array(
         if secondary_array_values is not None:
             for k, vs in zip(secondary_key_sequences, secondary_array_values):
                 new_sim_input = change_dict_value(
-                    d=new_sim_input,
+                    dct=new_sim_input,
                     new_value=vs[i],
                     key_sequence=k,
                     return_copy=False,

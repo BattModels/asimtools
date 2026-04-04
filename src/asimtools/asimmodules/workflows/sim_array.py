@@ -123,7 +123,7 @@ def sim_array(
     for i, val in enumerate(array_values):
         if key_sequence is not None:
             new_sim_input = change_dict_value(
-                d=template_sim_input,
+                dct=template_sim_input,
                 new_value=val,
                 key_sequence=key_sequence,
                 return_copy=True,
@@ -141,7 +141,7 @@ def sim_array(
                 else:
                     secondary_placeholder = None
                 new_sim_input = change_dict_value(
-                    d=new_sim_input,
+                    dct=new_sim_input,
                     new_value=vs[i],
                     key_sequence=k,
                     return_copy=False,

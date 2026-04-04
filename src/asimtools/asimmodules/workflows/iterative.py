@@ -104,7 +104,7 @@ def iterative(
     for i, val in enumerate(array_values):
         if key_sequence is not None:
             new_sim_input = change_dict_value(
-                d=template_sim_input,
+                dct=template_sim_input,
                 new_value=val,
                 key_sequence=key_sequence,
                 return_copy=True,
@@ -115,7 +115,7 @@ def iterative(
         if dependent_file_key_sequence is not None and i > 0:
             dep_arg = str(Path(f'../step-{i-1}') / dependent_file)
             new_sim_input = change_dict_value(
-                d=new_sim_input,
+                dct=new_sim_input,
                 new_value=dep_arg,
                 key_sequence=dependent_file_key_sequence,
                 return_copy=False,
@@ -126,7 +126,7 @@ def iterative(
         if secondary_array_values is not None:
             for k, vs in zip(secondary_key_sequences, secondary_array_values):
                 new_sim_input = change_dict_value(
-                    d=new_sim_input,
+                    dct=new_sim_input,
                     new_value=vs[i],
                     key_sequence=k,
                     return_copy=False,

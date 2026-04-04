@@ -126,7 +126,7 @@ def calc_array(
 
         for i, val in enumerate(array_values):
             new_calc_params = change_dict_value(
-                d=calc_params,
+                dct=calc_params,
                 new_value=val,
                 key_sequence=key_sequence,
                 return_copy=True,
@@ -134,7 +134,7 @@ def calc_array(
             if secondary_array_values is not None:
                 for k, vs in zip(secondary_key_sequences, secondary_array_values):
                     new_calc_params = change_dict_value(
-                        d=new_calc_params,
+                        dct=new_calc_params,
                         new_value=vs[i],
                         key_sequence=k,
                         return_copy=False,
