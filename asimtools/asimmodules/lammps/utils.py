@@ -1,13 +1,11 @@
-import os
-from glob import glob
-import pickle
+'''Utility functions for reading and processing LAMMPS output files.'''
 from pathlib import Path
-import pandas as pd
-from ase.units import bar
 import numpy as np
 
+
 def read_lammps_log(logfile, skip_failed=False):
-    with open(logfile, 'r') as f:
+    '''Read a LAMMPS log file and return thermodynamic data and metadata.'''
+    with open(logfile, 'r', encoding='utf-8') as f:
         logtxt = f.readlines()
 
     starts = []
@@ -24,14 +22,14 @@ def read_lammps_log(logfile, skip_failed=False):
             if len(atoms_line) == 2:
                 try:
                     natoms = int(atoms_line[0])
-                except:
+                except ValueError:
                     pass
 
         if natoms is None:
             if 'Loop time' in line:
                 try:
                     natoms = int(line.split()[-2])
-                except:
+                except ValueError:
                     pass
 
     if skip_failed and (len(starts) != len(stops) or len(starts) == 0):
