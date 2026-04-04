@@ -51,7 +51,7 @@ def parse_command_line(args) -> Tuple[Dict, str]:
     return sim_input, calc_input_file
 
 
-def main(args=None) -> None:
+def main(args=None) -> None:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
     ''' Main '''
     sim_input, calc_input_file = parse_command_line(args)
 
@@ -123,12 +123,12 @@ def main(args=None) -> None:
         try:
             spec.loader.exec_module(sim_module)
         except Exception as exc:
-            t = f'Failed to load asimmodule "{asimmodule}". Possible causes:\n'
-            t += '* The asimmodule has a bug, see traceback above\n'
-            t += '* ASIMTOOLS_ASIMMODULE_DIR variable not set properly.\n'
-            t += '* You can provide the full path to the asimmodule'
-            logger.error(t)
-            raise FileNotFoundError(t) from exc
+            txt = f'Failed to load asimmodule "{asimmodule}". Possible causes:\n'
+            txt += '* The asimmodule has a bug, see traceback above\n'
+            txt += '* ASIMTOOLS_ASIMMODULE_DIR variable not set properly.\n'
+            txt += '* You can provide the full path to the asimmodule'
+            logger.error(txt)
+            raise FileNotFoundError(txt) from exc
 
     sim_func = getattr(sim_module, func_name)
 

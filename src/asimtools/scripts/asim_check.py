@@ -41,7 +41,7 @@ def main(args=None) -> None:
 
     :param args: cmdline args, defaults to None
     :type args: _type_, optional
-    """    
+    """
     sim_input, rootdir, max_level = parse_command_line(args)
     workdir = sim_input.get('workdir', 'results')
     if not workdir.startswith('/'):
