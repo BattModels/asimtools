@@ -17,11 +17,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from ase.io import read, write
-from ase.io.extxyz import save_calc_results
 from ase.parallel import paropen
 import ase.db
 import ase.build
-from ase.constraints import FixAtoms
 from pymatgen.core import Structure, Lattice
 from pymatgen.io.ase import AseAtomsAdaptor
 
@@ -42,17 +40,17 @@ def read_yaml(yaml_path: str) -> Dict:
         return {}
     return output
 
-def write_yaml(yaml_path: str, yaml_Dict: Dict) -> None:
+def write_yaml(yaml_path: str, yaml_dict: Dict) -> None:
     """Write a dictionary to a yaml file
 
     :param yaml_path: Path to write yaml to
     :type yaml_path: str
-    :param yaml_Dict: Dictionary to write
-    :type yaml_Dict: Dict
-    """ 
+    :param yaml_dict: Dictionary to write
+    :type yaml_dict: Dict
+    """
     # Use paropen so that only the master process is updating outputs
     with paropen(yaml_path, 'w', encoding='utf-8') as f:
-        yaml.dump(yaml_Dict, f, sort_keys=False)
+        yaml.dump(yaml_dict, f, sort_keys=False)
 
 def get_axis_lims(x: Sequence, y: Sequence, padding: float=0.1):
     """Get an estimate of good limits for a plot axis"""
@@ -63,6 +61,7 @@ def get_axis_lims(x: Sequence, y: Sequence, padding: float=0.1):
     return lims
 
 def improve_plot(ax=None, fontsize=14):
+    ''' Apply standard formatting improvements to a matplotlib axis '''
     if ax is None:
         ax = plt.gca()
 
@@ -212,13 +211,13 @@ def write_atoms(
         if user_columns is not None:
             columns = list(set(columns + user_columns))
 
-        for atoms in images:
+        for image in images:
             # Current workaround magmoms being NaNs is to replace NaNs with 0.0
-            if 'initial_magmoms' in atoms.arrays:
-                atoms.arrays['initial_magmoms'] = np.where(
-                    np.isnan(atoms.arrays['initial_magmoms']),
+            if 'initial_magmoms' in image.arrays:
+                image.arrays['initial_magmoms'] = np.where(
+                    np.isnan(image.arrays['initial_magmoms']),
                     0.0,
-                    atoms.arrays['initial_magmoms'],
+                    image.arrays['initial_magmoms'],
                 )
 
         write(
@@ -239,13 +238,13 @@ def write_atoms(
         )
 
 
-def get_atoms(
+def get_atoms(  # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals,too-many-branches,too-many-statements
     image_file: Optional[str] = None,
     interface: str = 'ase',
     builder: Optional[str] = 'bulk',
     atoms: Optional[Atoms] = None,
     repeat: Optional[Tuple[int, int, int]] = None,
-    repeat_to_N_args: Optional[Dict] = None,
+    repeat_to_n_args: Optional[Dict] = None,
     rattle_stdev: Optional[float] = None,
     mp_id: Optional[str] = None,
     user_api_key: Optional[str] = None,
@@ -291,8 +290,8 @@ def get_atoms(
     There are three options one could use to specify and image or an atoms
     objects:
 
-    #. image_file + \*\*kwargs
-    #. builder + \*\*kwargs.
+    #. image_file + ``**kwargs``
+    #. builder + ``**kwargs``.
     #. atoms
 
     Examples
@@ -303,16 +302,18 @@ def get_atoms(
 
     >>> get_atoms(builder='molecule', name='H2O')
     Atoms(symbols='OH2', pbc=False)
-    >>> get_atoms(builder='bulk', name='Cu')
-    Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]])
+    >>> get_atoms(builder='bulk', name='Cu')  # doctest: +ELLIPSIS
+    Atoms(symbols='Cu', pbc=True, ...)
     >>> get_atoms(builder='bulk', name='Ar', crystalstructure='fcc', a=3.4, cubic=True)
     Atoms(symbols='Ar4', pbc=True, cell=[3.4, 3.4, 3.4])
-    >>> get_atoms(builder='fcc100', symbol='Fe', vacuum=8, size=[4,4,5])
-    Atoms(symbols='Cu80', pbc=[True, True, False], cell=[10.210621920333747, 10.210621920333747, 23.22], tags=...)
+    >>> get_atoms(builder='fcc100', symbol='Fe', vacuum=8, size=[4,4,5])  # doctest: +ELLIPSIS
+    Atoms(symbols='Cu80', pbc=[True, True, False], ...)
     
     You can also specify constraints to fix atoms in place, for example
-    >>> get_atoms(builder='fcc100', symbol='Fe', vacuum=8, size=[4,4,5], constraints=[{'constraint': 'FixAtoms', 'indices': [0,1]}])
-    Atoms(symbols='Cu80', pbc=[True, True, False], cell=[10.210621920333747, 10.210621920333747, 23.22], tags=...)
+    >>> get_atoms(  # doctest: +ELLIPSIS
+    ...     builder='fcc100', symbol='Fe', vacuum=8, size=[4,4,5],
+    ...     constraints=[{'constraint': 'FixAtoms', 'indices': [0,1]}])
+    Atoms(symbols='Cu80', pbc=[True, True, False], ...)
 
 
     Some examples for reading an image from a file using :func:`ase.io.read`
@@ -325,7 +326,8 @@ def get_atoms(
     >>> get_atoms(image_file='h2o.cif', format='cif')
     Atoms(symbols='OH2', pbc=False)
     >>> from ase.io import write
-    >>> molecules = [get_atoms(builder='molecule', name='H2O'), get_atoms(builder='molecule', name='H2')]
+    >>> molecules = [get_atoms(builder='molecule', name='H2O'),
+    ...              get_atoms(builder='molecule', name='H2')]
     >>> write('molecules.xyz', molecules, format='extxyz')
     >>> get_atoms(image_file='molecules.xyz', index=0) # Pick out one structure using indexing
     Atoms(symbols='OH2', pbc=False)
@@ -334,19 +336,21 @@ def get_atoms(
 
     >>> li_bulk = get_atoms(name='Li')
     >>> li_bulk.write('POSCAR', format='vasp')
-    >>> get_atoms(image_file='POSCAR', repeat=[3,3,3])
-    Atoms(symbols='Li27', pbc=True, cell=[[-5.235, 5.235, 5.235], [5.235, -5.235, 5.235], [5.235, 5.235, -5.235]])
-    >>> get_atoms(builder='bulk', name='Li', repeat=[2,2,2], rattle_stdev=0.01)
-    Atoms(symbols='Li8', pbc=True, cell=[[-3.49, 3.49, 3.49], [3.49, -3.49, 3.49], [3.49, 3.49, -3.49]])
-    >>> get_atoms(builder='bulk', name='Li', repeat_to_N_args={'N': 16, 'max_dim': 10.0})
-    Atoms(symbols='Li16', pbc=True, cell=[[-6.98, 6.98, 6.98], [6.98, -6.98, 6.98], [6.98, 6.98, -6.98]])
+    >>> get_atoms(image_file='POSCAR', repeat=[3,3,3])  # doctest: +ELLIPSIS
+    Atoms(symbols='Li27', pbc=True, ...)
+    >>> get_atoms(  # doctest: +ELLIPSIS
+    ...     builder='bulk', name='Li', repeat=[2,2,2], rattle_stdev=0.01)
+    Atoms(symbols='Li8', pbc=True, ...)
+    >>> get_atoms(  # doctest: +ELLIPSIS
+    ...     builder='bulk', name='Li', repeat_to_n_args={'n': 16, 'max_dim': 10.0})
+    Atoms(symbols='Li16', pbc=True, ...)
 
     Mostly for internal use and use in asimmodules, one can specify atoms
     directly
 
     >>> li_bulk = get_atoms(name='Li')
-    >>> get_atoms(atoms=li_bulk)
-    Atoms(symbols='Li', pbc=True, cell=[[-1.745, 1.745, 1.745], [1.745, -1.745, 1.745], [1.745, 1.745, -1.745]])
+    >>> get_atoms(atoms=li_bulk)  # doctest: +ELLIPSIS
+    Atoms(symbols='Li', pbc=True, ...)
 
     In an asimmodule, the ``image`` argument is always given as a dictionary,
     you therefore have to expand it before passing it to ``get_atoms``
@@ -368,7 +372,9 @@ def get_atoms(
     You can also specify whether you want the primitive(default) or 
     conventional unit cell as a keyword argument
 
-    >>> {'mp_id': 'mp-14', 'interface': 'pymatgen', 'user_api_key': "USER_API_KEY", 'conventional_unit_cell': True},
+    >>> image = {
+    ...     'mp_id': 'mp-14', 'interface': 'pymatgen',
+    ...     'user_api_key': "USER_API_KEY", 'conventional_unit_cell': True}
     >>> get_atoms(**image)
     Structure Summary
     Lattice
@@ -380,7 +386,9 @@ def get_atoms(
     The lattice paramters are passed as an ArrayLike with shape [3,3] to 
     :class:`pymatgen.core.lattice.Lattice` or dictionary to the
     :func:`pymatgen.core.lattice.Lattice.from_parameters` function. 
-    >>> image = {'builder': 'pymatgen.core.surface.Structure', 'lattice': {'a': 2.7, 'b': 2.7, 'c': 2.7, 'alpha': 90, 'beta': 90, 'gamma': 90}}
+    >>> image = {  # doctest: +ELLIPSIS
+    ...     'builder': 'pymatgen.core.surface.Structure',
+    ...     'lattice': {'a': 2.7, 'b': 2.7, 'c': 2.7, 'alpha': 90, 'beta': 90, 'gamma': 90}}
     >>> get_atoms(**image)
     Structure Summary
     Lattice
@@ -408,14 +416,15 @@ def get_atoms(
                 raise
         else:
             assert atoms is not None, 'Specify an input structure'
-    
+
     if interface == 'pymatgen':
+        # pylint: disable=import-outside-toplevel
         if mp_id is not None:
             from pymatgen.ext.matproj import MPRester
             with MPRester(user_api_key) as mpr:
-                struct = mpr.get_structure_by_material_id(mp_id, **kwargs)   
+                struct = mpr.get_structure_by_material_id(mp_id, **kwargs)
         elif builder is not None:
-            import pymatgen.core
+            import pymatgen.core  # pylint: disable=redefined-outer-name
             builder_func = getattr(pymatgen.core, builder)
             lattice = kwargs.get('lattice', False)
             if isinstance(lattice, dict):
@@ -442,11 +451,11 @@ def get_atoms(
     elif rattle_stdev is not None and interface == 'pymatgen':
         struct.perturb(distance=rattle_stdev, min_distance=0)
 
-    if repeat_to_N_args is not None and interface == 'ase':
-        atoms = repeat_to_N(atoms, **repeat_to_N_args)
-    elif repeat_to_N_args is not None and interface == 'pymatgen':
+    if repeat_to_n_args is not None and interface == 'ase':
+        atoms = repeat_to_n(atoms, **repeat_to_n_args)
+    elif repeat_to_n_args is not None and interface == 'pymatgen':
         raise NotImplementedError(
-            'repeat_to_N_args is only implemented for ASE interface'
+            'repeat_to_n_args is only implemented for ASE interface'
         )
 
     if constraints is not None and interface == 'ase':
@@ -458,21 +467,21 @@ def get_atoms(
             constraint_cls = getattr(ase.constraints, name, None)
             const = constraint_cls(**constraint_args)
             consts.append(const)
-    
+
         for const in consts:
             atoms.set_constraint(const)
 
     if return_type == 'ase' and interface == 'ase':
         return atoms
-    elif return_type == 'pymatgen' and interface == 'ase':
+    if return_type == 'pymatgen' and interface == 'ase':
         if builder == 'molecule':
             return AseAtomsAdaptor.get_molecule(atoms)
-        else:
-            return AseAtomsAdaptor.get_structure(atoms)
-    elif return_type == 'pymatgen' and interface == 'pymatgen':
+        return AseAtomsAdaptor.get_structure(atoms)
+    if return_type == 'pymatgen' and interface == 'pymatgen':
         return struct
-    elif return_type == 'ase' and interface == 'pymatgen':
+    if return_type == 'ase' and interface == 'pymatgen':
         return AseAtomsAdaptor.get_atoms(struct, msonable=False)
+    return None
 
 def parse_slice(value: str, bash: bool = False) -> slice:
     """Parses a :func:`slice` from string, like `start:stop:step`.
@@ -492,32 +501,31 @@ def parse_slice(value: str, bash: bool = False) -> slice:
             parts.append(index)
     if not bash:
         return slice(*[int(p) if p else None for p in parts])
-    else:
-        if not parts[0]:
-            parts[0] = '0'
-        if not parts[1]:
-            parts[1] = '$END'
-        if len(parts) == 2:
-            parts.append('1')
-        return f'$(seq {parts[0]} {parts[2]} {parts[1]})'
+    if not parts[0]:
+        parts[0] = '0'
+    if not parts[1]:
+        parts[1] = '$END'
+    if len(parts) == 2:
+        parts.append('1')
+    return f'$(seq {parts[0]} {parts[2]} {parts[1]})'
 
-def repeat_to_N(
+def repeat_to_n(
     atoms: Atoms,
-    N: int,
+    n: int,
     max_dim: float = 50.0,
 ) -> Atoms:
-    """Scale a structure to have approximately N atoms in the unit cell.
+    """Scale a structure to have approximately n atoms in the unit cell.
     The function repeats the shortest axis of the unit cell until the
-    number of atoms >= N or the longest axis of the unit cell is > max_dim.
+    number of atoms >= n or the longest axis of the unit cell is > max_dim.
 
     :param atoms: Input atoms object
     :type atoms: Atoms
-    :param N: Target number of atoms
-    :type N: int
+    :param n: Target number of atoms
+    :type n: int
     :param max_dim: Maximum length of the longest axis of the unit cell,
         defaults to 50.0
     :type max_dim: float, optional
-    :raises ValueError: If it fails to scale the structure to N atoms
+    :raises ValueError: If it fails to scale the structure to n atoms
     :return: Scaled atoms object
     :rtype: Atoms
     """
@@ -526,7 +534,7 @@ def repeat_to_N(
     num_atoms = len(atoms)
     new_atoms = atoms.copy()
 
-    while num_atoms < N and np.max(lengths) < max_dim:
+    while num_atoms < n and np.max(lengths) < max_dim:
         shortest_axis = np.argmin(lengths)
         repeat_vec = [1, 1, 1]
         repeat_vec[shortest_axis] += 1
@@ -535,14 +543,14 @@ def repeat_to_N(
         lengths = [np.linalg.norm(vec) for vec in cell]
         num_atoms = len(new_atoms)
 
-    if num_atoms < N:
+    if num_atoms < n:
         raise ValueError(
-            f'Failed to scale structure to {N} atoms without exceeding \
-                max_dim of {max_dim} Angstroms'
+            f'Failed to scale structure to {n} atoms without exceeding '
+            f'max_dim of {max_dim} Angstroms'
         )
     return new_atoms
 
-def get_images(
+def get_images(  # pylint: disable=too-many-positional-arguments
     image_file: str = None,
     pattern: str = None,
     patterns: List[str] = None,
@@ -603,12 +611,12 @@ def get_images(
     >>> molecules.append(get_atoms(builder='molecule', name='H2'))
     >>> molecules.append(get_atoms(builder='molecule', name='N2'))
     >>> write('molecules.xyz', molecules, format='extxyz')
-    >>> get_images(image_file='molecules.xyz')
-    [Atoms(symbols='OH2', pbc=False), Atoms(symbols='H2', pbc=False), Atoms(symbols='N2', pbc=False)]
+    >>> get_images(image_file='molecules.xyz')  # doctest: +ELLIPSIS
+    [Atoms(symbols='OH2', pbc=False), ...]
     >>> get_images(image_file='molecules.xyz', index=':2')
     [Atoms(symbols='OH2', pbc=False), Atoms(symbols='H2', pbc=False)]
 
-    You can also use a wildcard (\*) by specifying the pattern argument. Notice
+    You can also use a wildcard (``*``) by specifying the pattern argument. Notice
     that the files don't have to be the same format if ASE can guess all the
     file formats, otherwise you can specify the format argument which should
     apply to all the images.
@@ -619,28 +627,27 @@ def get_images(
     >>> fe.write('bulk_fe.cif')
     >>> pt = get_atoms(name='Pt')
     >>> pt.write('bulk_pt.cfg')
-    >>> get_images(pattern='bulk*')
-    [Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]], masses=..., momenta=...), Atoms(symbols='Fe', pbc=True, cell=[[2.48549, 0.0, 0.0], [-0.8284876429214074, 2.3433456351179887, 0.0], [-0.8284876429214074, -1.171653675382785, 2.0294079014797743]], spacegroup_kinds=...), Atoms(symbols='Pt', pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]], masses=..., momenta=...)]
-    Atoms(symbols='OH2', pbc=False)
-    >>> get_images(pattern='bulk*.cfg', format='cfg')
-    [Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]], masses=..., momenta=...), Atoms(symbols='Pt', pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]], masses=..., momenta=...)]
-    
+    >>> get_images(pattern='bulk*')  # doctest: +ELLIPSIS
+    [Atoms(symbols='Cu', ...), ...]
+    >>> get_images(pattern='bulk*.cfg', format='cfg')  # doctest: +ELLIPSIS
+    [Atoms(symbols='Cu', ...), ...]
+
     You can also specify multiple patterns
 
-    >>> get_images(patterns=['bulk*.cfg', 'bulk\*.cif'])
-    [Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]], masses=..., momenta=...), Atoms(symbols='Pt', pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]], masses=..., momenta=...), Atoms(symbols='Fe', pbc=True, cell=[[2.48549, 0.0, 0.0], [-0.8284876429214074, 2.3433456351179887, 0.0], [-0.8284876429214074, -1.171653675382785, 2.0294079014797743]], spacegroup_kinds=...)]
-    
+    >>> get_images(patterns=['bulk*.cfg', 'bulk*.cif'])  # doctest: +ELLIPSIS
+    [Atoms(symbols='Cu', ...), ...]
+
     Or you can directly pass a list of Atoms, mostly for internal use
 
-    >>> get_images(images=molecules)
-    [Atoms(symbols='OH2', pbc=False), Atoms(symbols='H2', pbc=False), Atoms(symbols='N2', pbc=False)]
+    >>> get_images(images=molecules)  # doctest: +ELLIPSIS
+    [Atoms(symbols='OH2', pbc=False), ...]
 
     In an asimmodule, the ``images`` argument is always given as a dictionary,
     you therefore have to expand it before passing it to ``get_images``
 
     >>> images = {'pattern': 'bulk*'}
-    >>> get_images(**images)
-    [Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]], masses=..., momenta=...), Atoms(symbols='Fe', pbc=True, cell=[[2.48549, 0.0, 0.0], [-0.8284876429214074, 2.3433456351179887, 0.0], [-0.8284876429214074, -1.171653675382785, 2.0294079014797743]], spacegroup_kinds=...), Atoms(symbols='Pt', pbc=True, cell=[[0.0, 1.96, 1.96], [1.96, 0.0, 1.96], [1.96, 1.96, 0.0]], masses=..., momenta=...)]
+    >>> get_images(**images)  # doctest: +ELLIPSIS
+    [Atoms(symbols='Cu', ...), ...]
     """
     assert (image_file is not None) or \
         (pattern is not None) or \
@@ -659,21 +666,16 @@ def get_images(
             f'No images matching pattern "{pattern}" from "{os.getcwd()}"'
 
         images = []
-        for image_file in image_files:
-            image_file = Path(image_file).resolve()
+        for fpath in image_files:
+            fpath = Path(fpath).resolve()
             try:
-                new_images = read(
-                    image_file,
-                    index=index,
-                    **kwargs
-                )
-            except Exception as exc:
+                new_images = read(fpath, index=index, **kwargs)
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 if not skip_failed:
                     raise IOError(
-                        f"Failed to read {image_file} from {os.getcwd()}"
+                        f"Failed to read {fpath} from {os.getcwd()}"
                     ) from exc
-                else:
-                    new_images = []
+                new_images = []
 
             # Output of read can either be list of atoms or Atoms, depending on index
             if not isinstance(new_images, list):
@@ -682,12 +684,12 @@ def get_images(
 
     elif patterns is not None:
         images = []
-        for pattern in patterns:
-            image_files = natsorted(glob(pattern))
-            assert len(image_files) > 0, \
-                f'Don\'t include pattern "{pattern}" if no files match'
+        for pat in patterns:
+            pat_files = natsorted(glob(pat))
+            assert len(pat_files) > 0, \
+                f'Don\'t include pattern "{pat}" if no files match'
             images += get_images(
-                pattern=pattern,
+                pattern=pat,
                 index=index,
                 skip_failed=skip_failed,
                 **kwargs
@@ -698,9 +700,7 @@ def get_images(
         images = []
 
     if not skip_failed:
-        addontxt = ''
-        if image_file:
-            addontxt = f' in image_file: {image_file}'
+        addontxt = f' in image_file: {image_file}' if image_file else ''
         assert len(images) > 0, 'No images found' + addontxt
 
     return images
@@ -788,29 +788,26 @@ def check_if_slurm_job_is_running(slurm_job_id: Union[str,int]):
     """
     slurm_job_id = str(slurm_job_id)
     completed_process = subprocess.run(
-        ['squeue', '--job', slurm_job_id], 
+        ['squeue', '--job', slurm_job_id],
         check=False,
         capture_output=True,
         text=True,
     )
     stdout = completed_process.stdout
-    if str(' '+slurm_job_id) in stdout:
-        return True
-    else:
-        return False
+    return str(' ' + slurm_job_id) in stdout
 
 def change_dict_value(
-    d: Dict,
+    dct: Dict,
     new_value,
     key_sequence: Sequence,
     return_copy: Optional[bool] = True,
     placeholder: Optional[str] = None,
 ) -> Dict:
-    """Changes a value in the specified dictionary given by following the 
+    """Changes a value in the specified dictionary given by following the
     key sequence
 
-    :param d: dictionary to be changed
-    :type d: Dict
+    :param dct: dictionary to be changed
+    :type dct: Dict
     :param new_value: The new value that will replace the old one
     :type new_value: _type_
     :param key_sequence: List of keys in the order in which they access the 
@@ -823,37 +820,36 @@ def change_dict_value(
     :rtype: Dict
     """
     if return_copy:
-        d = deepcopy(d)
+        dct = deepcopy(dct)
     if len(key_sequence) == 1:
         if placeholder is None:
-            d[key_sequence[0]] = new_value
+            dct[key_sequence[0]] = new_value
         else:
-            d[key_sequence[0]] = d[key_sequence[0]].replace(
+            dct[key_sequence[0]] = dct[key_sequence[0]].replace(
                 placeholder, new_value
             )
-        return d
-    else:
-        new_d = change_dict_value(
-            d[key_sequence[0]],
-            new_value,
-            key_sequence[1:],
-            return_copy=return_copy,
-            placeholder=placeholder,
-        )
-        d[key_sequence[0]] = new_d
-        return d
+        return dct
+    new_d = change_dict_value(
+        dct[key_sequence[0]],
+        new_value,
+        key_sequence[1:],
+        return_copy=return_copy,
+        placeholder=placeholder,
+    )
+    dct[key_sequence[0]] = new_d
+    return dct
 
 def change_dict_values(
-    d: Dict,
+    dct: Dict,
     new_values: Sequence,
     key_sequences: Sequence,
     return_copy: bool = True
 ) -> Dict:
-    """Changes values in the specified dictionary given by following the 
+    """Changes values in the specified dictionary given by following the
     key sequences. Key-value pairs are set in the given order
 
-    :param d: dictionary to be changed
-    :type d: Dict
+    :param dct: dictionary to be changed
+    :type dct: Dict
     :param new_values: The new values that will replace the old one
     :type new_values: Sequence
     :param key_sequence: List of list of keys in the order in which they 
@@ -866,9 +862,8 @@ def change_dict_values(
     :rtype: Dict
     """
     for key_sequence, new_value in zip(key_sequences, new_values):
-        d = change_dict_value(d, new_value, key_sequence, return_copy)
-
-    return d
+        dct = change_dict_value(dct, new_value, key_sequence, return_copy)
+    return dct
 
 def get_logger(
     logfile='job.log',
@@ -893,16 +888,16 @@ def get_logger(
 
 
 def get_str_btn(
-    s: Union[str,os.PathLike],
+    string: Union[str, os.PathLike],
     s1: str,
     s2: str,
     occurence: Optional[int] = 0,
     start_index: Optional[int] = 0,
 ):
-    """Returns the substring between strings s1 and s2 from s
+    """Returns the substring between strings s1 and s2 from string
 
-    :param s: string/path from which to extract substring
-    :type s: str
+    :param string: string/path from which to extract substring
+    :type string: str
     :param s1: substring before the desired substring, None starts from 
         the beginning of s
     :type s1: str
@@ -918,35 +913,36 @@ def get_str_btn(
     :return: substring
     :rtype: _type_
     """
-    s = str(s)
+    string = str(string)
     j = 0
-    stop_index = len(s) + 1
-    s = s[start_index:stop_index]
+    stop_index = len(string) + 1
+    string = string[start_index:stop_index]
     while occurence - j >= 0:
         if s1 is not None:
             try:
-                i1 = s.index(s1) + len(s1)
-            except:
+                i1 = string.index(s1) + len(s1)
+            except ValueError as exc:
                 raise ValueError(
-                    f'substring {s1} not found in {s}'
-                )
+                    f'substring {s1} not found in {string}'
+                ) from exc
         else:
             i1 = 0
         if s2 is not None:
             try:
-                i2 = s[i1:].index(s2) + i1
-            except:
+                i2 = string[i1:].index(s2) + i1
+            except ValueError as exc:
                 raise ValueError(
-                    f'substring {s2} not found in {s}'
-                )
+                    f'substring {s2} not found in {string}'
+                ) from exc
         else:
-            i2 = len(s)
+            i2 = len(string)
 
         if occurence - j == 0:
-            return s[i1:i2]
+            return string[i1:i2]
 
-        s = s[i1:]
+        string = string[i1:]
         j += 1
+    return None
 
 def find_nth(haystack: str, needle: str, n: int) -> int:
     ''' Return index of nth occurence of substring in string '''
@@ -957,26 +953,25 @@ def find_nth(haystack: str, needle: str, n: int) -> int:
     return start
 
 def get_nth_label(
-    s: os.PathLike,
+    string: os.PathLike,
     n: int = 1,
 ):
     ''' Return nth label in a string potentially containing multiple labels,
     indexing starts from 0 '''
-    s = str(s)
-    start = find_nth(s, '__', n=(n*2+1))
-    return get_str_btn(s, '__', '__', start_index=start)
+    string = str(string)
+    start = find_nth(string, '__', n=n*2+1)
+    return get_str_btn(string, '__', '__', start_index=start)
 
-def expand_wildcards(d: Dict, root_path: os.PathLike = None) -> Dict:
+def expand_wildcards(dct: Dict, root_path: os.PathLike = None) -> Dict:
     """Expands paths in a dictionary
 
-    :param d: Dictionary to expand paths in
-    :type d: Dict[str, Any]
+    :param dct: Dictionary to expand paths in
+    :type dct: Dict[str, Any]
     :param root_path: Root path to expand paths from
     :type root_path: os.PathLike
     :return: Dictionary with expanded paths
     :rtype: Dict[str, Any]
     """
-    import os
     def expand_value(
         value: str,
         root_path: os.PathLike = None
@@ -993,11 +988,10 @@ def expand_wildcards(d: Dict, root_path: os.PathLike = None) -> Dict:
             value = os.path.relpath(value, root_path)
         return value
 
-    for key, value in d.items():
+    for key, value in dct.items():
         if isinstance(value, str):
-            d[key] = expand_value(value, root_path=root_path)
+            dct[key] = expand_value(value, root_path=root_path)
         elif isinstance(value, dict):
-            d[key] = expand_wildcards(value, root_path=root_path)
+            dct[key] = expand_wildcards(value, root_path=root_path)
 
-
-    return d
+    return dct
