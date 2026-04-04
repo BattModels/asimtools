@@ -11,8 +11,7 @@ import pkgutil
 from pathlib import Path
 from datetime import datetime
 import logging
-from glob import glob
-from typing import List, TypeVar, Dict, Tuple, Union, Sequence
+from typing import List, TypeVar, Dict, Tuple, Union
 from copy import deepcopy
 from colorama import Fore
 import ase.io
@@ -29,7 +28,6 @@ from asimtools.utils import (
     get_calc_input,
     get_logger,
     check_if_slurm_job_is_running,
-    parse_slice,
 )
 
 Atoms = TypeVar('Atoms')
@@ -40,13 +38,14 @@ STOP_MESSAGE = '+' * 15 + ' ASIMTOOLS STOP ' + '+' * 16 + '\n'
 class Job():
     ''' Abstract class for the job object '''
     # pylint: disable=too-many-instance-attributes
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         sim_input: Dict,
         env_input: Union[Dict,None] = None,
         calc_input: Union[Dict,None] = None,
         asimrun_mode: bool = False,
     ) -> None:
+        ''' Initialise Job with simulation, environment and calculator inputs '''
         if env_input is None:
             env_input = get_env_input()
         if calc_input is None:
@@ -149,8 +148,7 @@ class Job():
         output_yaml = self.get_output_yaml()
         if output_yaml.exists():
             return read_yaml(output_yaml)
-        else:
-            return {}
+        return {}
 
     def update_sim_input(self, new_params) -> None:
         ''' Update simulation parameters '''
@@ -433,7 +431,7 @@ class UnitJob(Job):
             self._gen_slurm_script()
         return None
 
-    def submit(
+    def submit(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         self,
         dependency: Union[List,None,str] = None,
         write_image: bool = True,
@@ -603,7 +601,7 @@ class DistributedJob(Job):
             self.use_slurm = True
         else:
             self.use_slurm = False
-        
+
         if all_sh:
             self.use_sh = True
         else:
@@ -639,7 +637,7 @@ class DistributedJob(Job):
         txt += 'echo "LAUNCHDIR: ${CUR_DIR}"\n'
         txt += f'G={group_size} #Group size\n'
         txt += 'N=${SLURM_ARRAY_TASK_ID}\n'
-        txt += f'WORKDIRS=($(ls -dv ./id-*))\n'
+        txt += 'WORKDIRS=($(ls -dv ./id-*))\n'
         seqtxt = '$(seq $(($G*$N)) $(($G*$N+$G-1)) )'
         txt += f'for i in {seqtxt}; do\n'
         txt += '    WORKDIR=${WORKDIRS[$i]}\n'
@@ -676,13 +674,13 @@ class DistributedJob(Job):
         '''
 
         txt = '#!/usr/bin/env sh\n\n'
-        txt += f'for WORKDIR in id-*; do\n'
+        txt += 'for WORKDIR in id-*; do\n'
         txt += '    cd ${WORKDIR};\n'
         txt += '\n'.join(self.unitjobs[0].calc_params.get('precommands', []))
         txt += '\n    asim-run sim_input.yaml -c calc_input.yaml '
         txt += '>stdout.txt 2>stderr.txt\n'
         txt += '\n'.join(self.unitjobs[0].calc_params.get('precommands', []))
-        txt += f'\n    cd ../;\n'
+        txt += '\n    cd ../;\n'
         txt += 'done'
 
         if write:
@@ -714,9 +712,9 @@ class DistributedJob(Job):
                     write_image=kwargs.get('write_image', True)
                 )
                 job_ids.append(job_id)
-            except Exception as exc:
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 logger = self.get_logger()
-                logger.error(f'Error submitting job in {unitjob.workdir}')
+                logger.error('Error submitting job in %s', unitjob.workdir)
                 logger.error(exc)
                 if not kwargs.get('skip_failed', False):
                     raise exc
@@ -724,7 +722,7 @@ class DistributedJob(Job):
 
     def submit_sh_array(
         self,
-        **kwargs,
+        **_kwargs,
     ) -> Union[None,List[int]]:
         '''
         Submits jobs using a sh script. Proceeds even if some jobs fail
@@ -757,7 +755,7 @@ class DistributedJob(Job):
         if completed_process.stderr is not None:
             with paropen('stderr.txt', 'a+', encoding='utf-8') as err_file:
                 err_file.write(completed_process.stderr)
-            print(completed_process.stderr)    
+            print(completed_process.stderr)
 
         if completed_process.returncode != 0:
             err_msg = f'See {self.workdir / "stderr.txt"} for traceback.'
@@ -770,13 +768,13 @@ class DistributedJob(Job):
             job_ids = None
         return job_ids
 
-    def submit_slurm_array(
+    def submit_slurm_array(  # pylint: disable=too-many-locals,too-many-branches
         self,
         array_max=None,
         dependency: Union[List[str],None] = None,
         group_size: int = 1,
         debug: bool = False,
-        **kwargs,
+        **_kwargs,
     ) -> Union[None,List[int]]:
         '''
         Submits a job array if all the jobs have the same env and use slurm
@@ -844,7 +842,7 @@ class DistributedJob(Job):
 
         if completed_process.stderr is not None:
             with paropen('stderr.txt', 'a+', encoding='utf-8') as err_file:
-                    err_file.write(completed_process.stderr)
+                err_file.write(completed_process.stderr)
 
         if completed_process.returncode != 0:
             err_msg = f'See {self.workdir / "stderr.txt"} for traceback.'
@@ -852,8 +850,7 @@ class DistributedJob(Job):
             completed_process.check_returncode()
 
         if debug:
-            # logging.error('STDOUT:'+f'{completed_process.stdout}')
-            logging.error('STDERR:'+f'{completed_process.stderr}')
+            logging.error('STDERR: %s', completed_process.stderr)
             job_ids = None
         else:
             job_ids = [int(completed_process.stdout.split(' ')[-1])]
@@ -912,14 +909,16 @@ class ChainedJob(Job):
         ''' Returns the output of the last job in the chain '''
         return self.unitjobs[-1].get_output()
 
-    def submit(self, dependency: Union[List,None] = None, debug: bool = False) -> List:
+    def submit(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements,too-many-nested-blocks
+        self, dependency: Union[List,None] = None, debug: bool = False) -> List:
         ''' 
         Submit a job using slurm, interactively or in the terminal
         '''
         cur_dir = Path('.').resolve()
         os.chdir(self.workdir)
         logger = self.get_logger()
-        step = 0 #self.get_current_step() TODO: This feature is not used yet
+        step = 0  # self.get_current_step() TODO: This feature is not used yet
+        status = 'unknown'
         are_interactive_jobs = [
             uj.env['mode'].get('interactive', False) \
                 for uj in self.unitjobs
@@ -966,7 +965,7 @@ class ChainedJob(Job):
                             curjob.env['slurm']['flags']['-J'] = \
                                 f'step-{step+i}'
 
-                        # submit the next job dependent on the current one   
+                        # submit the next job dependent on the current one
                         # Previous working solution
                         write_image = False
                         # Write image first step in chain being run/continued
@@ -990,16 +989,12 @@ class ChainedJob(Job):
             job_ids = dependency
 
         # Otherwise just submit them one after the other
-        # We only write the image if it's the first job, otherwise we refer to 
+        # We only write the image if it's the first job, otherwise we refer to
         # wherever the image comes from in case it has to come from a previous
         # step
         else:
             for i, unitjob in enumerate(self.unitjobs[step:]):
-                if i == 0:
-                    write_image = True
-                else:
-                    write_image = False
-
+                write_image = i == 0
                 job_ids = unitjob.submit(write_image=write_image)
 
         os.chdir(cur_dir)
@@ -1103,21 +1098,20 @@ def load_job_tree(
     return job_dict
 
 def check_job_tree_complete(job_tree: Dict, skip_failed: bool=False) -> bool:
+    ''' Recursively check if all jobs in a job tree are complete '''
     if job_tree['subjobs'] is None:
         status = job_tree['job'].get_status()[1]
-        if status == 'complete' or status =='discard' or skip_failed:
+        if status == 'complete' or status == 'discard' or skip_failed:
             return True, status
-        else:
+        return False, status
+    complete_so_far = True
+    for subjob_id in job_tree['subjobs']:
+        subjob = job_tree['subjobs'][subjob_id]
+        complete, status = check_job_tree_complete(
+            subjob,
+            skip_failed=skip_failed
+        )
+        complete_so_far = complete_so_far and complete
+        if not complete_so_far:
             return False, status
-    else:
-        complete_so_far = True
-        for subjob_id in job_tree['subjobs']:
-            subjob = job_tree['subjobs'][subjob_id]
-            complete, status = check_job_tree_complete(
-                subjob,
-                skip_failed=skip_failed
-            )
-            complete_so_far = complete_so_far and complete
-            if not complete_so_far:
-                return False, status
-        return True, status
+    return True, status
