@@ -12,6 +12,7 @@ def full_qha(
     supercell: Sequence = [5,5,5],
     t_max: float = 1000,
     pressure: Optional[float] = None,
+    distance: Optional[float] = 0.02,
 ) -> Dict:
     """Perform a full Quasiharmonic Approximation and predict thermal 
     properties of a given structure. Calculated properties include
@@ -41,6 +42,8 @@ def full_qha(
     :type t_max: float, optional
     :param pressure: Pressure to optimize to, defaults to None
     :type pressure: Optional[float], optional
+    :param distance: Dispacement distance for phonons, defaults to 0.02
+    :type distance: Optional[float], optional
     :return: Nothing
     :rtype: Dict
     """
@@ -84,7 +87,7 @@ def full_qha(
                                                 'index': {}
                                             },
                                             'supercell': supercell,
-                                            'distance': 0.02,
+                                            'distance': distance,
                                             'phonopy_save_path': phonopy_save_path,
                                         },
                                     },
