@@ -71,7 +71,6 @@ def main(args=None) -> None:  # pylint: disable=too-many-locals,too-many-branche
     precommands = sim_input.get('precommands', [])
     for precommand in precommands:
         command = precommand.split()
-        completed_process = subprocess.run(command, check=True)
         completed_process = subprocess.run(
             command, check=False, capture_output=True, text=True,
         )

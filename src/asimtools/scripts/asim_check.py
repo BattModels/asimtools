@@ -94,18 +94,21 @@ def load_job_tree(
     }
     return job_dict
 
-def get_status_and_color(job):
-    ''' Helper to get printing colors '''
-    status = job.get_status()[1]
+def _status_color(status):
+    ''' Map a status string to a colorama color '''
     if status == 'complete':
-        color = Fore.GREEN
-    elif status == 'failed':
-        color = Fore.RED
-    elif status == 'started':
-        color = Fore.BLUE
-    else:
-        color = Fore.WHITE
-    return status, color
+        return Fore.GREEN
+    if status == 'failed':
+        return Fore.RED
+    if status == 'started':
+        return Fore.BLUE
+    return Fore.WHITE
+
+def get_status_and_color(job):
+    ''' Helper to get printing colors — reads output.yaml once '''
+    output = job.get_output()
+    status = output.get('status', 'clean')
+    return status, _status_color(status)
 
 def print_job_tree(
     job_tree: Dict,
@@ -131,9 +134,12 @@ def print_job_tree(
         pass
     elif subjobs is not None:
         workdir = job_tree['workdir_name']
-        status, color = get_status_and_color(job_tree['job'])
-        asimmodule = job_tree['job'].sim_input['asimmodule']
-        job_ids = job_tree['job'].get_output().get('job_ids', 'none')
+        job = job_tree['job']
+        output = job.get_output()           # single read per node
+        status = output.get('status', 'clean')
+        color = _status_color(status)
+        asimmodule = job.sim_input['asimmodule']
+        job_ids = output.get('job_ids', 'none')
         print(color + f'{indent_str}{workdir}, asimmodule: {asimmodule},' + \
             f'status: {status}, job_ids: {job_ids}' + reset)
         if level > 0:
@@ -145,13 +151,14 @@ def print_job_tree(
                 level=level+1,
                 max_level=max_level,
             )
-            subjob = job_tree['job']
     else:
         subjob_dir = job_tree['workdir_name']
         subjob = job_tree['job']
+        output = subjob.get_output()        # single read per node
+        status = output.get('status', 'clean')
+        color = _status_color(status)
         asimmodule = subjob.sim_input['asimmodule']
-        job_ids = job_tree['job'].get_output().get('job_ids', 'none')
-        status, color = get_status_and_color(subjob)
+        job_ids = output.get('job_ids', 'none')
         print(color + f'{indent_str}{subjob_dir}, asimmodule: {asimmodule}, '+\
         f'status: {status}, job_ids: {job_ids}' + reset)
 

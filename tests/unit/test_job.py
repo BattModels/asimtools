@@ -444,29 +444,21 @@ def test_check_job_tree_complete(tmp_path, test_input, expected):
 # Job getter / updater methods
 # ---------------------------------------------------------------------------
 
-def test_get_sim_input_is_deepcopy(inline_env_input, do_nothing_sim_input, tmp_path):
+def test_get_sim_input_returns_internal(inline_env_input, do_nothing_sim_input, tmp_path):
     unitjob = create_unitjob(do_nothing_sim_input, inline_env_input, tmp_path / 'wdir')
-    sim_input = unitjob.get_sim_input()
-    sim_input['asimmodule'] = 'mutated'
-    assert unitjob.sim_input['asimmodule'] != 'mutated'
+    assert unitjob.get_sim_input() is unitjob.sim_input
 
 
-def test_get_calc_input_is_deepcopy(inline_env_input, do_nothing_sim_input, lj_argon_calc_input, tmp_path):
+def test_get_calc_input_returns_internal(inline_env_input, do_nothing_sim_input, lj_argon_calc_input, tmp_path):
     unitjob = create_unitjob(
         do_nothing_sim_input, inline_env_input, tmp_path / 'wdir', calc_input=lj_argon_calc_input
     )
-    calc_input = unitjob.get_calc_input()
-    calc_id = list(lj_argon_calc_input.keys())[0]
-    calc_input[calc_id]['name'] = 'mutated'
-    assert unitjob.calc_input[calc_id]['name'] != 'mutated'
+    assert unitjob.get_calc_input() is unitjob.calc_input
 
 
-def test_get_env_input_is_deepcopy(inline_env_input, do_nothing_sim_input, tmp_path):
+def test_get_env_input_returns_internal(inline_env_input, do_nothing_sim_input, tmp_path):
     unitjob = create_unitjob(do_nothing_sim_input, inline_env_input, tmp_path / 'wdir')
-    env_input = unitjob.get_env_input()
-    env_id = list(inline_env_input.keys())[0]
-    env_input[env_id]['mode']['use_slurm'] = True
-    assert unitjob.env_input[env_id]['mode']['use_slurm'] is False
+    assert unitjob.get_env_input() is unitjob.env_input
 
 
 def test_update_sim_input(inline_env_input, do_nothing_sim_input, tmp_path):

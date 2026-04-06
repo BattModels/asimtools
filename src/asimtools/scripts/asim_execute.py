@@ -71,7 +71,6 @@ def parse_command_line(args) -> Tuple[Dict, Dict, Dict]:
     else:
         dependency = None
 
-    calc_input = args.calc
     env_input = args.env
     if env_input is not None:
         env_input = read_yaml(env_input)

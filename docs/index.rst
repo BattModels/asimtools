@@ -10,6 +10,7 @@
    Custom asimmodules <asimplify>
    Workflows <workflows>
    API Docs <modules>
+   Changelog <include_changelog>
    Contributing <include_contributing>
 
 

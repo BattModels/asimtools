@@ -86,16 +86,16 @@ class Job():
     def start(self) -> None:
         ''' Updates the output to signal that the job was started '''
         self.update_output({
-            'start_time': datetime.now().strftime('%H:%M:%S, %m/%d/%y')
+            'start_time': datetime.now().strftime('%H:%M:%S, %m/%d/%y'),
+            'status': 'started',
         })
-        self.set_status('started')
 
     def complete(self) -> None:
-        ''' Updates the output to signal that the job was started '''
+        ''' Updates the output to signal that the job completed '''
         self.update_output({
-            'end_time': datetime.now().strftime('%H:%M:%S, %m/%d/%y')
+            'end_time': datetime.now().strftime('%H:%M:%S, %m/%d/%y'),
+            'status': 'complete',
         })
-        self.set_status('complete')
 
     def fail(self) -> None:
         ''' Updates status to failed '''
@@ -123,15 +123,15 @@ class Job():
 
     def get_sim_input(self) -> Dict:
         ''' Get simulation input '''
-        return deepcopy(self.sim_input)
+        return self.sim_input
 
     def get_calc_input(self) -> Dict:
         ''' Get calculator input '''
-        return deepcopy(self.calc_input)
+        return self.calc_input
 
     def get_env_input(self) -> Dict:
         ''' Get environment input '''
-        return deepcopy(self.env_input)
+        return self.env_input
 
     def get_output_yaml(self) -> Dict:
         ''' Get current output file '''
@@ -180,7 +180,9 @@ class Job():
             running = check_if_slurm_job_is_running(job_id)
         if running:
             status = 'started'
-            self.set_status(status)
+            # Write status without re-reading output.yaml
+            output['status'] = status
+            write_yaml(self.get_output_yaml(), output)
             complete = False
         else:
             if not descend:
@@ -538,7 +540,7 @@ class UnitJob(Job):
 
 class DistributedJob(Job):
     ''' Array job object with ability to submit simultaneous jobs '''
-    def __init__(
+    def __init__(  # pylint: disable=too-many-locals
         self,
         sim_input: Dict,
         env_input: Union[None,Dict] = None,
@@ -553,7 +555,7 @@ class DistributedJob(Job):
         assert njobs < 1000, \
             f'ASIMTools id_nums are limited to {num_digits} digits, found \
             {njobs} jobs! Having that many jobs is not very efficient. Try \
-            grouping jobs together.'
+            grouping jobs together using the group_size argument to workflows.'
 
         sim_id_changed = False
         for i, (sim_id, subsim_input) in enumerate(sim_input.items()):
@@ -584,28 +586,22 @@ class DistributedJob(Job):
             unitjobs.append(unitjob)
 
         # If all the jobs have the same config and use slurm, use a job array
-        env_id = unitjobs[0].env_id
-        same_env = np.all(
-            [(uj.env_id == env_id) for uj in unitjobs]
-        )
+        first_env_id = unitjobs[0].env_id
+        same_env = True
+        all_slurm = True
+        all_sh = True
+        for uj in unitjobs:
+            if uj.env_id != first_env_id:
+                same_env = False
+            if not uj.env['mode'].get('use_slurm', False):
+                all_slurm = False
+            if not uj.env['mode'].get('use_sh', False):
+                all_sh = False
+            if not same_env and not all_slurm and not all_sh:
+                break
 
-        all_slurm = np.all(
-            [uj.env['mode'].get('use_slurm', False) for uj in unitjobs]
-        )
-
-        all_sh = np.all(
-            [uj.env['mode'].get('use_sh', False) for uj in unitjobs]
-        )
-
-        if same_env and all_slurm:
-            self.use_slurm = True
-        else:
-            self.use_slurm = False
-
-        if all_sh:
-            self.use_sh = True
-        else:
-            self.use_sh = False
+        self.use_slurm = same_env and all_slurm
+        self.use_sh = all_sh
 
         self.unitjobs = unitjobs
 
@@ -1013,16 +1009,14 @@ def load_job_from_directory(workdir: os.PathLike, asimrun_mode=False) -> Job:
         logger.error('sim_input.yaml not found in %s', {str(workdir)})
         raise exc
 
-    env_input_file = workdir / 'env_input.yaml'
-    if env_input_file.exists():
-        env_input = read_yaml(env_input_file)
-    else:
+    try:
+        env_input = read_yaml(workdir / 'env_input.yaml')
+    except FileNotFoundError:
         env_input = None
 
-    calc_input_file = workdir / 'calc_input.yaml'
-    if calc_input_file.exists():
-        calc_input = read_yaml(calc_input_file)
-    else:
+    try:
+        calc_input = read_yaml(workdir / 'calc_input.yaml')
+    except FileNotFoundError:
         calc_input = None
 
     job = Job(
