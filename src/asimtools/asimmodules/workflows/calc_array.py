@@ -19,6 +19,8 @@ def calc_array(
     subsim_input: Dict,
     calc_ids: Sequence[str] = None,
     template_calc_id: Optional[str] = None,
+    calculators: Sequence[Dict] = None,
+    template_calculator: Optional[Dict] = None,
     key_sequence: Optional[Sequence[str]] = None,
     array_values: Optional[Sequence] = None,
     file_pattern: Optional[str] = None,
@@ -39,8 +41,20 @@ def calc_array(
     """Apply the same asimmodule using different calculators and if necessary
     different environments
 
-    :param calc_ids: Iterable with calc_ids, defaults to None
+    :param calc_ids: Deprecated. Use calculators instead. Iterable with
+        calc_ids, defaults to None
     :type calc_ids: Sequence, optional
+    :param template_calc_id: Deprecated. Use template_calculator instead.
+        calc_id of the template calculator, defaults to None
+    :type template_calc_id: str, optional
+    :param calculators: Sequence of calculator dicts, each with a 'calc_id'
+        or 'calc_params' key, see :func:`asimtools.calculators.load_calc`,
+        defaults to None
+    :type calculators: Sequence[Dict], optional
+    :param template_calculator: Calculator dict with 'calc_id' or 'calc_params'
+        key used as template when iterating over key_sequence values, see
+        :func:`asimtools.calculators.load_calc`, defaults to None
+    :type template_calculator: Optional[Dict], optional
     :param calc_input: Dictionary of calculator inputs
     :type calc_input: Dictionary, optional
     :param labels: Iterable with custom labels for each calc, defaults to None
@@ -82,28 +96,36 @@ def calc_array(
     :return: Dictionary of results
     :rtype: Dict
     """
+    # Backward compatibility: convert old-style params to new interface
+    if calculators is None and calc_ids is not None:
+        calculators = [{'calc_id': cid} for cid in calc_ids]
+    if template_calculator is None and template_calc_id is not None:
+        template_calculator = {'calc_id': template_calc_id}
+
     print([
             array_values, linspace_args, arange_args, file_pattern
         ])
     using_array_values = key_sequence is not None\
-        and template_calc_id is not None\
+        and template_calculator is not None\
         and [
             array_values, linspace_args, arange_args, file_pattern
         ].count(None) == 3
-    err_txt = 'Specify either a sequence of "calc_ids" or all of '
-    err_txt += '"key_sequence", "template_calc_id" and one of ['
+    err_txt = 'Specify either a sequence of "calculators" or all of '
+    err_txt += '"key_sequence", "template_calculator" and one of ['
     err_txt += '"array_values", "linspace_args", "arange_args", "file_pattern"'
     err_txt += '] to iterate over'
-    assert calc_ids is not None or using_array_values, err_txt
+    assert calculators is not None or using_array_values, err_txt
 
     if using_array_values:
-        if calc_input is None:
-            calc_input = get_calc_input()
-        calc_params = calc_input[template_calc_id]
-        new_calc_input = {}
+        if template_calculator.get('calc_params') is not None:
+            calc_params = template_calculator['calc_params']
+        else:
+            if calc_input is None:
+                calc_input = get_calc_input()
+            calc_params = calc_input[template_calculator['calc_id']]
 
-        if calc_ids is not None and labels is None:
-            labels = calc_ids
+        if calculators is not None and labels is None:
+            labels = [c.get('calc_id', f'calc-{i}') for i, c in enumerate(calculators)]
 
         results = prepare_array_vals(
             key_sequence=key_sequence,
@@ -124,6 +146,7 @@ def calc_array(
         secondary_array_values = results['secondary_array_values']
         secondary_key_sequences = results['secondary_key_sequences']
 
+        calculators = []
         for i, val in enumerate(array_values):
             new_calc_params = change_dict_value(
                 dct=calc_params,
@@ -139,31 +162,27 @@ def calc_array(
                         key_sequence=k,
                         return_copy=False,
                     )
+            calculators.append({'calc_params': new_calc_params})
 
-            new_calc_input[labels[i]] = new_calc_params
-
-        calc_input = new_calc_input
-        calc_ids = labels
-
-    elif calc_ids is not None:
+    elif calculators is not None:
         assert labels != 'get_str_btn', \
             'get_str_btn only works when using the key_sequence argument.'
         if labels is None or labels == 'values':
-            labels = calc_ids
+            labels = [c.get('calc_id', f'calc-{i}') for i, c in enumerate(calculators)]
 
-    assert len(labels) == len(calc_ids), \
-        'Num. of calc_ids or array_values must match num. of labels'
+    assert len(labels) == len(calculators), \
+        'Num. of calculators or array_values must match num. of labels'
 
     if env_ids is not None:
-        assert len(env_ids) == len(calc_ids) or isinstance(env_ids, str), \
-            'Provide one env_id or as many as there are calc_ids/array_values'
+        assert len(env_ids) == len(calculators) or isinstance(env_ids, str), \
+            'Provide one env_id or as many as there are calculators/array_values'
 
     array_sim_input = {}
 
     # Make individual sim_inputs for each calc
-    for i, calc_id in enumerate(calc_ids):
+    for i, calculator in enumerate(calculators):
         new_subsim_input = deepcopy(subsim_input)
-        new_subsim_input['args']['calc_id'] = calc_id
+        new_subsim_input['args']['calculator'] = calculator
         array_sim_input[f'{labels[i]}'] = new_subsim_input
 
         if env_ids is not None:
