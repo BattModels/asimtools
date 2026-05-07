@@ -14,7 +14,7 @@ from asimtools.utils import (
 )
 
 def singlepoint(
-    calc_id: str,
+    calculator: Dict,
     image: Dict,
     properties: Tuple[str] = ('energy', 'forces'),
     prefix: Optional[str] = None,
@@ -22,8 +22,10 @@ def singlepoint(
     """Evaluates the properties of a single image, currently implemented
     properties are energy, forces and stress
 
-    :param calc_id: calc_id specification
-    :type calc_id: str
+    :param calculator: Calculator specification with either a ``calc_id`` key
+        to look up from the global calc_input or a ``calc_params`` key to use
+        directly, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param properties: properties to evaluate, defaults to ('energy', 'forces')
@@ -31,7 +33,7 @@ def singlepoint(
     :return: Dictionary of results
     :rtype: Dict
     """
-    calc = load_calc(calc_id)
+    calc = load_calc(calculator=calculator)
     atoms = get_atoms(**image)
     atoms.calc = calc
 
