@@ -21,7 +21,7 @@ args:
         calculator:
           calc_id: lj_Ar
         image:
-          image_file: step-0/image_output.xyz
+          image_file: ../step-0/image_output.xyz
         fmax: 0.006
     step-2:
       asimmodule: geometry_optimization.ase_cubic_eos_optimization
@@ -29,4 +29,4 @@ args:
         calculator:
           calc_id: lj_Ar
         image:
-          image_file: step-1/image_output.xyz
+          image_file: ../step-1/image_output.xyz
