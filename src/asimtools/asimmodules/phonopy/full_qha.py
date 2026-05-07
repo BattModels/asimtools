@@ -4,7 +4,7 @@ from asimtools.job import UnitJob
 
 def full_qha(
     image: Dict,
-    calc_id: str,
+    calculator: Dict,
     phonopy_save_path: Optional[str] = None,
     calc_env_id: Optional[str] = None,
     process_env_id: Optional[str] = None,
@@ -20,8 +20,8 @@ def full_qha(
 
     :param image: Image specification, see :func:`asimtools.utils.get_atoms` 
     :type image: Dict
-    :param calc_id: calc_id specification
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param phonopy_save_path: Path where phonopy save yaml is saved, this file
         is important to keep for easier postprocessing/analsyis, we recommend 
         keeping the default, defaults to None
@@ -53,7 +53,7 @@ def full_qha(
     else:
         phonopy_save_path = str(Path(phonopy_save_path).resolve())
     ase_cubic_eos_args['image'] = image
-    ase_cubic_eos_args['calc_id'] = calc_id
+    ase_cubic_eos_args['calculator'] = calculator
     scales = ase_cubic_eos_args.get('scales', False)
     if scales:
         npoints = len(scales)
@@ -99,7 +99,7 @@ def full_qha(
                                                 'pattern': '../step-0/supercell-*',
                                                 'format': 'vasp',
                                             },
-                                            'calc_id': calc_id,
+                                            'calculator': calculator,
                                             'calc_env_id': calc_env_id,
                                         },
                                     },
