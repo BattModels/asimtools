@@ -1047,9 +1047,6 @@ def create_unitjob(sim_input, env_input, workdir, calc_input=None):
     """Helper for making a generic UnitJob object, mostly for testing"""
     env_id = list(env_input.keys())[0]
     sim_input['env_id'] = env_id
-    if calc_input is not None:
-        calc_id = list(calc_input.keys())[0]
-        sim_input['calc_id'] = calc_id
     sim_input['workdir'] = workdir
     unitjob = UnitJob(
         sim_input,
