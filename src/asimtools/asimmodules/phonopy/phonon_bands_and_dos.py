@@ -8,7 +8,7 @@ from asimtools.job import UnitJob
 
 def phonon_bands_and_dos(
     image: Dict,
-    calc_id: str,
+    calculator: Dict,
     calc_env_id: str,
     process_env_id: str,
     supercell: ArrayLike = [10,10,10],
@@ -26,8 +26,8 @@ def phonon_bands_and_dos(
 
     :param image: Image specification. See :ref:`asimtools.utils.get_image`.
     :type image: Dict
-    :param calc_id: calc_id of the calculator to use.
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param calc_env_id: env_id of the calculator to use.
     :type calc_env_id: str
     :param process_env_id: env_id for pre- and post-processing.
@@ -84,7 +84,7 @@ def phonon_bands_and_dos(
                             'pattern': '../step-0/supercell-*',
                             'format': 'vasp',
                         },
-                        'calc_id': calc_id,
+                        'calculator': calculator,
                     },
                 },
                 'step-2': {
