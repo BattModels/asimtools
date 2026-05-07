@@ -12,7 +12,7 @@ from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms, write_atoms
 
 def optimize(
-    calc_id: str,
+    calculator: Dict,
     image: Dict,
     optimizer: str = 'BFGS',
     fmax: float = 0.003, #Roughly 0.48GPa
@@ -22,8 +22,8 @@ def optimize(
 ) -> Dict:
     """Relaxes cell (and atoms) using ase.constraints.ExpCellFilter while retaining symmetry
 
-    :param calc_id: calc_id specification
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param optimizer: Any optimizer from ase.optimize, defaults to 'BFGS'
@@ -44,7 +44,7 @@ def optimize(
     if optimizer_args is None:
         optimizer_args = {}
 
-    calc = load_calc(calc_id)
+    calc = load_calc(calculator=calculator)
     atoms = get_atoms(**image)
     atoms.calc = calc
 
