@@ -37,7 +37,7 @@ args:
     step-1:
       asimmodule: active_learning.ase_md
       args:
-        calc_spec:
+        calculator:
           calc_params:
             name: MACE
             args:

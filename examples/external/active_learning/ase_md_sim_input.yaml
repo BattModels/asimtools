@@ -1,12 +1,13 @@
 asimmodule: ase_md.ase_md.py
 workdir: ase_md_results
 args:
-  calc_spec:
+  calculator:
     calc_id: lj_Ar
-      # name: MACE
-      # args:
-      #   model: /Users/keith/dev/asimtools/examples/external/active_learning/train_mace_results/MACE_models/mace_test_compiled.model
-      #   use_device: cpu
+    # calc_params:
+    #   name: MACE
+    #   args:
+    #     model: /Users/keith/dev/asimtools/examples/external/active_learning/train_mace_results/MACE_models/mace_test_compiled.model
+    #     use_device: cpu
   image:
     name: Ar
     cubic: True
