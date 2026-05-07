@@ -17,7 +17,7 @@ def compute_deviation(
     template_calc_params: Optional[Dict] = None,
     model_weights_key_sequence: Optional[Sequence] = None,
     model_weights_pattern: Optional[os.PathLike] = None,
-    calc_ids: Optional[Sequence] = None,
+    calculators: Optional[Sequence] = None,
 ) -> Dict:
     """Computes variance of properties from a trajectory file
 
@@ -31,13 +31,14 @@ def compute_deviation(
     :param model_weights_pattern: Pattern of model weights files, defaults to
         None
     :type model_weights_pattern: Optional[os.PathLike]
-    :param calc_ids: List of calc_ids to use, if provided, all other arguments
-        are ignored, defaults to None
-    :type calc_ids: Optional[Sequence]
+    :param calculators: List of calculator dicts, each with 'calc_id' or
+        'calc_params' key. If provided, all other arguments are ignored,
+        defaults to None
+    :type calculators: Optional[Sequence]
 
     """
     properties = ['energy', 'forces', 'stress', 'energy_per_atom']
-    if calc_ids is None:
+    if calculators is None:
         model_weights_files = natsorted(glob(model_weights_pattern))
 
         calc_dict = {}
@@ -49,9 +50,12 @@ def compute_deviation(
                 return_copy=True
             )
 
-            calc_dict[f'calc-{i}'] = new_calc_params
+            calc_dict[f'calc-{i}'] = {'calc_params': new_calc_params}
     else:
-        calc_dict = {calc_id: calc_id for calc_id in calc_ids}
+        calc_dict = {}
+        for i, calculator in enumerate(calculators):
+            label = calculator.get('calc_id', f'calc-{i}')
+            calc_dict[label] = calculator
 
     variances = {prop: {} for prop in properties}
 
@@ -74,10 +78,7 @@ def compute_deviation(
         atom_results = {prop: [] for prop in properties}
         for calc_id in calc_dict:
             # Some calculators behave badly if not reloaded unfortunately
-            if isinstance(calc_dict[calc_id], str):
-                calc = load_calc(calc_id=calc_dict[calc_id])
-            else:
-                calc = load_calc(calc_params=calc_dict[calc_id].copy())
+            calc = load_calc(calculator=calc_dict[calc_id])
 
             atoms.set_calculator(calc)
             energy = atoms.get_potential_energy(atoms)
