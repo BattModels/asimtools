@@ -17,7 +17,7 @@ from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms
 
 def ase_cubic_eos_optimization(
-    calc_id: str,
+    calculator: Dict,
     image: Dict,
     npoints: Optional[int] = 5,
     eos_string: Optional[str] = 'sj',
@@ -27,8 +27,8 @@ def ase_cubic_eos_optimization(
 ) -> Dict:
     """Generate the energy-volume equation of state (energy calculations not parallelized)
 
-    :param calc_id: calc_id specification
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param npoints: Number of energy points to calculate, must be >5, defaults to 5
@@ -44,7 +44,7 @@ def ase_cubic_eos_optimization(
     :return: Equilibrium energy, volume, bulk modulus and factor by which to scale lattice parameter to get equilibrium  structure
     :rtype: Dict
     """
-    calc = load_calc(calc_id)
+    calc = load_calc(calculator=calculator)
     atoms = get_atoms(**image)
     atoms.calc = calc
     v_init = atoms.get_volume()
