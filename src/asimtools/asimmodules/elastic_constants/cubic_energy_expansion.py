@@ -80,16 +80,16 @@ def get_strained_atoms(atoms, strain: str, delta: float):
     return strained_atoms
 
 def cubic_energy_expansion(
-    calc_id: str,
+    calculator: Dict,
     image: Dict,
     deltas: Sequence[float] = (-0.01,-0.0075,-0.005,0.00,0.005,0.0075,0.01),
     ase_cubic_eos_args: Optional[Dict] = None,
 ) -> Dict:
-    """Calculates B (Bulk modulus), C11, C12 and C44 elastic constants of 
+    """Calculates B (Bulk modulus), C11, C12 and C44 elastic constants of
     a structure with cubic symmetry
 
-    :param calc_id: calc_id specification
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param deltas: strains to apply in each direction, defaults to (-0.01,-0.0075,-0.005,0.00,0.005,0.0075,0.01)
@@ -99,13 +99,13 @@ def cubic_energy_expansion(
     :return: Elastic constant results
     :rtype: Dict
     """
-    calc = load_calc(calc_id)
+    calc = load_calc(calculator=calculator)
     atoms = get_atoms(**image)
     atoms.calc = calc
 
     # Start by getting the Bulk modulus and optimized cell from the EOS
     logging.info('Calculating EOS')
-    eos_kwargs = {'image': image, 'calc_id': calc_id}
+    eos_kwargs = {'image': image, 'calculator': calculator}
     if ase_cubic_eos_args is not None:
         eos_kwargs.update(ase_cubic_eos_args)
     eos_results = eos(**eos_kwargs)
@@ -122,7 +122,7 @@ def cubic_energy_expansion(
         c44_atoms = get_strained_atoms(
             atoms.copy(), 'mono_vol_cons', delta
         )
-        calc = load_calc(calc_id)
+        calc = load_calc(calculator=calculator)
         c44_atoms.calc = calc
         c44_en = c44_atoms.get_potential_energy()
         c44_ens.append(c44_en)
@@ -134,7 +134,7 @@ def cubic_energy_expansion(
         c11min12_atoms = get_strained_atoms(
             atoms.copy(), 'orth_vol_cons', delta
         )
-        calc = load_calc(calc_id)
+        calc = load_calc(calculator=calculator)
         c11min12_atoms.calc = calc
         c11min12_en = c11min12_atoms.get_potential_energy()
         c11min12_ens.append(c11min12_en)
