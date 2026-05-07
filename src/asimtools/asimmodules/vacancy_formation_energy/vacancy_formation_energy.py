@@ -15,7 +15,7 @@ from asimtools.utils import (
 )
 
 def vacancy_formation_energy(
-    calc_id: str,
+    calculator: Dict,
     image: Dict,
     vacancy_index: int = 0,
     atom_relax_args: Optional[Dict] = None,
@@ -24,8 +24,8 @@ def vacancy_formation_energy(
 ) -> Dict:
     """Calculates the monovacancy formation energy from a bulk structure
 
-    :param calc_id: calc_id specification
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param vacancy_index: Index of atom to remove, defaults to 0
@@ -47,7 +47,7 @@ def vacancy_formation_energy(
     :rtype: Dict
     """    
 
-    calc = load_calc(calc_id)
+    calc = load_calc(calculator=calculator)
     bulk = get_atoms(**image).repeat(repeat)
     bulk.calc = calc
 
@@ -67,7 +67,7 @@ def vacancy_formation_energy(
     if atom_relax_args is not None:
         try:
             relax_results = atom_relax(
-                    calc_id=calc_id,
+                    calculator=calculator,
                     image={'atoms': vacant},
                     optimizer=atom_relax_args.get('optimizer', 'BFGS'),
                     properties=('energy','forces'),
@@ -82,7 +82,7 @@ def vacancy_formation_energy(
     else:
         try:
             relax_results = optimize(
-                    calc_id=calc_id,
+                    calculator=calculator,
                     image={'atoms': vacant},
                     # optimizer=optimize_args.get('optimizer', 'BFGS'),
                     # fmax=atom_relax_args.get('fmax', 0.003),
