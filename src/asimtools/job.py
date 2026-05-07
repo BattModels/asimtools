@@ -11,7 +11,7 @@ import pkgutil
 from pathlib import Path
 from datetime import datetime
 import logging
-from typing import List, TypeVar, Dict, Tuple, Union
+from typing import TypeVar
 from copy import deepcopy
 from colorama import Fore
 import ase.io
@@ -40,9 +40,9 @@ class Job():
     # pylint: disable=too-many-instance-attributes
     def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
-        sim_input: Dict,
-        env_input: Union[Dict,None] = None,
-        calc_input: Union[Dict,None] = None,
+        sim_input: dict,
+        env_input: dict | None = None,
+        calc_input: dict | None = None,
         asimrun_mode: bool = False,
     ) -> None:
         ''' Initialise Job with simulation, environment and calculator inputs '''
@@ -115,25 +115,25 @@ class Job():
         ''' goes to directory from which job was launched '''
         os.chdir(self.launchdir)
 
-    def add_output_files(self, file_dict: Dict) -> None:
+    def add_output_files(self, file_dict: dict) -> None:
         ''' Adds a file to the output file list '''
         files = self.get_output().get('files', {})
         files.update(file_dict)
         self.update_output({'files': file_dict})
 
-    def get_sim_input(self) -> Dict:
+    def get_sim_input(self) -> dict:
         ''' Get simulation input '''
         return self.sim_input
 
-    def get_calc_input(self) -> Dict:
+    def get_calc_input(self) -> dict:
         ''' Get calculator input '''
         return self.calc_input
 
-    def get_env_input(self) -> Dict:
+    def get_env_input(self) -> dict:
         ''' Get environment input '''
         return self.env_input
 
-    def get_output_yaml(self) -> Dict:
+    def get_output_yaml(self) -> Path:
         ''' Get current output file '''
         out_fname = 'output.yaml'
         output_yaml = self.workdir / out_fname
@@ -143,35 +143,35 @@ class Job():
         ''' Get working directory '''
         return self.workdir
 
-    def get_output(self) -> Dict:
+    def get_output(self) -> dict:
         ''' Get values in output.yaml '''
         output_yaml = self.get_output_yaml()
         if output_yaml.exists():
             return read_yaml(output_yaml)
         return {}
 
-    def update_sim_input(self, new_params) -> None:
+    def update_sim_input(self, new_params: dict) -> None:
         ''' Update simulation parameters '''
         self.sim_input.update(new_params)
 
-    def update_calc_input(self, new_params) -> None:
+    def update_calc_input(self, new_params: dict) -> None:
         ''' Update calculator parameters '''
         self.calc_input.update(new_params)
 
-    def update_env_input(self, new_params) -> None:
+    def update_env_input(self, new_params: dict) -> None:
         ''' Update calculator parameters '''
         self.env_input.update(new_params)
         self.env_id = self.sim_input.get('env_id', None)
         if self.env_id is not None:
             self.env = self.env_input[self.env_id]
 
-    def set_workdir(self, workdir) -> None:
+    def set_workdir(self, workdir: str | Path) -> None:
         ''' Set working directory both in sim_input and instance '''
         workdir = Path(workdir)
         self.sim_input['workdir'] = str(workdir.resolve())
         self.workdir = workdir
 
-    def get_status(self, descend=False, display=False) -> Tuple[bool,str]:
+    def get_status(self, descend: bool = False, display: bool = False) -> tuple[bool, str]:
         ''' Check job status '''
         output = self.get_output()
         job_id = output.get('job_id', False)
@@ -196,13 +196,13 @@ class Job():
             print(f'Status: {status}')
         return complete, status
 
-    def update_output(self, output_update: Dict) -> None:
+    def update_output(self, output_update: dict) -> None:
         ''' Update output.yaml if it exists or write a new one '''
         output = self.get_output()
         output.update(output_update)
         write_yaml(self.get_output_yaml(), output)
 
-    def get_logger(self, logfilename='stdout.txt', level='info'):
+    def get_logger(self, logfilename: str = 'stdout.txt', level: str = 'info') -> logging.Logger:
         ''' Get the logger '''
         assert self.workdir.exists(), 'Work directory does not exist yet'
         logger = get_logger(logfile=self.workdir / logfilename, level=level)
@@ -210,9 +210,9 @@ class Job():
 
     def _gen_slurm_batch_preamble(
         self,
-        slurm_params=None,
-        extra_flags=None
-    ) -> None:
+        slurm_params: dict | None = None,
+        extra_flags: list | None = None,
+    ) -> str:
         ''' Generate the txt with job configuration but no run commands '''
         if slurm_params is None:
             slurm_params = self.env.get('slurm', {})
@@ -254,17 +254,17 @@ class Job():
         return txt
 
 class UnitJob(Job):
-    ''' 
+    '''
     Unit job object with ability to submit a slurm/interactive job.
-    Unit jobs run in a specific environment and if required, run a 
+    Unit jobs run in a specific environment and if required, run a
     specific calculator. More complex workflows are built up of unit
     jobs
     '''
     def __init__(
         self,
-        sim_input: Dict,
-        env_input: Union[Dict,None] = None,
-        calc_input: Union[Dict,None] = None,
+        sim_input: dict,
+        env_input: dict | None = None,
+        calc_input: dict | None = None,
     ) -> None:
         super().__init__(sim_input, env_input, calc_input)
 
@@ -446,9 +446,9 @@ class UnitJob(Job):
 
     def submit(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         self,
-        dependency: Union[List,None,str] = None,
+        dependency: list | str | None = None,
         write_image: bool = True,
-    ) -> Union[None,List[str]]:
+    ) -> list[str] | None:
         '''
         Submit a job using slurm, interactively or in the terminal
         '''
@@ -553,9 +553,9 @@ class DistributedJob(Job):
     ''' Array job object with ability to submit simultaneous jobs '''
     def __init__(  # pylint: disable=too-many-locals
         self,
-        sim_input: Dict,
-        env_input: Union[None,Dict] = None,
-        calc_input: Union[None,Dict] = None,
+        sim_input: dict,
+        env_input: dict | None = None,
+        calc_input: dict | None = None,
     ) -> None:
         super().__init__(sim_input, env_input, calc_input)
         # Set a standard for all subdirectories to start
@@ -707,7 +707,7 @@ class DistributedJob(Job):
     def submit_jobs(
         self,
         **kwargs,
-    ) -> Union[None,List[int]]:
+    ) -> list[int] | None:
         '''
         Submits the jobs. If submitting lots of batch jobs, we 
         recommend using DistributedJob.submit_slurm_array
@@ -730,7 +730,7 @@ class DistributedJob(Job):
     def submit_sh_array(
         self,
         **_kwargs,
-    ) -> Union[None,List[int]]:
+    ) -> list[int] | None:
         '''
         Submits jobs using a sh script. Proceeds even if some jobs fail
         '''
@@ -777,12 +777,12 @@ class DistributedJob(Job):
 
     def submit_slurm_array(  # pylint: disable=too-many-locals,too-many-branches
         self,
-        array_max=None,
-        dependency: Union[List[str],None] = None,
+        array_max: int | None = None,
+        dependency: list[str] | None = None,
         group_size: int = 1,
         debug: bool = False,
         **_kwargs,
-    ) -> Union[None,List[int]]:
+    ) -> list[int] | None:
         '''
         Submits a job array if all the jobs have the same env and use slurm
         '''
@@ -863,8 +863,8 @@ class DistributedJob(Job):
             job_ids = [int(completed_process.stdout.split(' ')[-1])]
         return job_ids
 
-    def submit(self, **kwargs) -> None:
-        ''' 
+    def submit(self, **kwargs) -> list[int] | None:
+        '''
         Submit a job using slurm, interactively or in the current console
         '''
 
@@ -890,9 +890,9 @@ class ChainedJob(Job):
     '''
     def __init__(
         self,
-        sim_input: Dict,
-        env_input: Union[None,Dict] = None,
-        calc_input: Union[None,Dict] = None,
+        sim_input: dict,
+        env_input: dict | None = None,
+        calc_input: dict | None = None,
     ) -> None:
         super().__init__(sim_input, env_input, calc_input)
 
@@ -912,12 +912,12 @@ class ChainedJob(Job):
 
         self.unitjobs = unitjobs
 
-    def get_last_output(self) -> Dict:
+    def get_last_output(self) -> dict:
         ''' Returns the output of the last job in the chain '''
         return self.unitjobs[-1].get_output()
 
     def submit(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements,too-many-nested-blocks
-        self, dependency: Union[List,None] = None, debug: bool = False) -> List:
+        self, dependency: list | None = None, debug: bool = False) -> list:
         ''' 
         Submit a job using slurm, interactively or in the terminal
         '''
@@ -1009,7 +1009,7 @@ class ChainedJob(Job):
         return job_ids
 
 
-def load_job_from_directory(workdir: os.PathLike, asimrun_mode=False) -> Job:
+def load_job_from_directory(workdir: str | Path, asimrun_mode: bool = False) -> Job:
     ''' Loads a job from a given directory '''
     workdir = Path(workdir)
     assert workdir.exists(), f'Work directory "{workdir}" does not exist'
@@ -1043,7 +1043,12 @@ def load_job_from_directory(workdir: os.PathLike, asimrun_mode=False) -> Job:
     job.workdir = Path(workdir)
     return job
 
-def create_unitjob(sim_input, env_input, workdir, calc_input=None):
+def create_unitjob(
+    sim_input: dict,
+    env_input: dict,
+    workdir: str | Path,
+    calc_input: dict | None = None,
+) -> UnitJob:
     """Helper for making a generic UnitJob object, mostly for testing"""
     env_id = list(env_input.keys())[0]
     sim_input['env_id'] = env_id
@@ -1055,13 +1060,13 @@ def create_unitjob(sim_input, env_input, workdir, calc_input=None):
     )
     return unitjob
 
-def get_subjobs(workdir):
+def get_subjobs(workdir: Path) -> list[Path]:
     """Get all the directories with jobs in them
 
-    :param workdir: _description_
-    :type workdir: _type_
-    :return: _description_
-    :rtype: _type_
+    :param workdir: directory to search for subjobs
+    :type workdir: Path
+    :return: sorted list of subdirectory paths containing sim_input.yaml
+    :rtype: list[Path]
     """
     subjob_dirs = []
     for subdir in workdir.iterdir():
@@ -1072,14 +1077,14 @@ def get_subjobs(workdir):
     return sorted(subjob_dirs)
 
 def load_job_tree(
-    workdir: str = './',
-) -> Dict:
+    workdir: str | Path = './',
+) -> dict:
     """Loads all the jobs in a directory in a tree format using recursion
 
     :param workdir: root directory from which to recursively find jobs, defaults to './'
     :type workdir: str, optional
     :return: dictionary mimicking the job tree
-    :rtype: Dict
+    :rtype: dict
     """
     workdir = Path(workdir).resolve()
 
@@ -1099,7 +1104,7 @@ def load_job_tree(
     }
     return job_dict
 
-def check_job_tree_complete(job_tree: Dict, skip_failed: bool=False) -> bool:
+def check_job_tree_complete(job_tree: dict, skip_failed: bool = False) -> tuple[bool, str]:
     ''' Recursively check if all jobs in a job tree are complete '''
     if job_tree['subjobs'] is None:
         status = job_tree['job'].get_status()[1]
