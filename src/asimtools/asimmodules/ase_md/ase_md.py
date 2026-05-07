@@ -194,7 +194,7 @@ def plot_thermo(
     plt.close(fig='all')
 
 def ase_md(
-    calc_spec: Dict,
+    calculator: Dict,
     image: Dict,
     timestep: float,
     nsteps: int = 100,
@@ -214,8 +214,8 @@ def ase_md(
     """Runs ASE MD simulations. This is only recommended for small systems and
     for testing. For larger systems, use LAMMPS or more purpose-built code
 
-    :param calc_spec: calc specification
-    :type calc_spec: Dict
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param timestep: Timestep in ASE time units
@@ -241,7 +241,7 @@ def ase_md(
     :rtype: Dict
     """
 
-    calc = load_calc(**calc_spec)
+    calc = load_calc(calculator=calculator)
     atoms = get_atoms(**image)
     atoms.calc = calc
 
