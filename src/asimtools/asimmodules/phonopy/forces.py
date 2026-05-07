@@ -8,7 +8,7 @@ from asimtools.utils import get_str_btn, get_images
 
 def forces(
     images: Dict,
-    calc_id: str,
+    calculator: Dict,
     calc_env_id: Optional[str] = None,
     **kwargs,
 ) -> Dict:
@@ -16,8 +16,8 @@ def forces(
 
     :param images: Images specification, see :func:`asimtools.utils.get_images`
     :type images: Dict
-    :param calc_id: calc_id specification, see :func:`asimtools.utils.get_calc`
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param calc_env_id: env_id to use for the calculator, defaults to None
     :type calc_env_id: Optional[str], optional
     :param kwargs: Additional keyword arguments to pass to image_array
@@ -29,7 +29,7 @@ def forces(
     singlepoint_input={
         'asimmodule': 'singlepoint',
         'args': {
-            'calc_id': calc_id,
+            'calculator': calculator,
             'properties': ['energy', 'forces']
         },
     }
