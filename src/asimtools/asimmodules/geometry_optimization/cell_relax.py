@@ -17,7 +17,7 @@ from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms, join_names, write_atoms
 
 def cell_relax(
-    calc_id: str,
+    calculator: Dict,
     image: Dict,
     optimizer: str = 'BFGS',
     fmax: float = 0.002,
@@ -27,8 +27,8 @@ def cell_relax(
 ) -> Dict:
     """Relax cell using ASE Optimizer
 
-    :param calc_id: calc_id specification
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param prefix: Prefix to output files, defaults to ''
@@ -44,7 +44,7 @@ def cell_relax(
     :return: Dictionary of results including, final energy, stress and output files
     :rtype: Dict
     """
-    calc = load_calc(calc_id)
+    calc = load_calc(calculator=calculator)
     atoms = get_atoms(**image)
     atoms.calc = calc
 
