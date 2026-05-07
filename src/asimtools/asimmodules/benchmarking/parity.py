@@ -24,7 +24,7 @@ from asimtools.utils import (
 Calculator = TypeVar('Calculator')
 def calc_parity_data(
     subset: List,
-    calc_id: str,
+    calculator: Dict,
     properties: Sequence = ('energy', 'forces', 'stress'),
     force_prob: float = 1.0,
 ) -> Dict:
@@ -32,8 +32,8 @@ def calc_parity_data(
 
     :param subset: List of atoms instances
     :type subset: List
-    :param calc_id: calc_id specification
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param properties: Properties to evaluate, choose from "energy", \
         "forces" and "stress", defaults to ('energy', 'forces', 'stress')
     :type properties: List, optional
@@ -53,7 +53,7 @@ def calc_parity_data(
     srvals = []
     spvals = []
     for i, atoms in enumerate(tqdm(subset)):
-        calc = load_calc(calc_id)
+        calc = load_calc(calculator=calculator)
         patoms = atoms.copy()
         patoms.calc = calc
         n_atoms = len(atoms)
@@ -128,7 +128,7 @@ def rmse(yhat: Sequence, y: Sequence) -> float:
 
 def parity(
     images: Dict,
-    calc_id: str,
+    calculator: Dict,
     force_prob: float = 1.0,
     nprocs: int = 1,
     unit: str = 'meV',
@@ -140,8 +140,8 @@ def parity(
 
     :param images: Images specification, see :func:`asimtools.utils.get_images`
     :type images: Dict
-    :param calc_id: ID of calculator provided in calc_input or global file
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param force_prob: Fraction of forces to consider in force parity, \
         can be used for speeding up large structures by only subsampling\
         randomly, defaults to 1.0
@@ -180,7 +180,7 @@ def parity(
         with Pool(nprocs) as pool:
             reses = pool.map(partial(
                 calc_parity_data,
-                calc_id=calc_id,
+                calculator=calculator,
                 properties=properties,
                 force_prob=force_prob,
                 ),
@@ -189,7 +189,7 @@ def parity(
     else:
         reses = [calc_parity_data(
             subset,
-            calc_id=calc_id,
+            calculator=calculator,
             properties=properties,
             force_prob=force_prob,
             ) for subset in subsets
