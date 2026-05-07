@@ -12,7 +12,7 @@ from asimtools.calculators import load_calc
 from asimtools.utils import get_atoms, get_logger, write_atoms
 
 def atom_relax(
-    calc_id: str,
+    calculator: Dict,
     image: Dict,
     optimizer: str = 'GPMin', #GPMin is fast in many cases according to ASE docs
     properties: Tuple[str] = ('energy', 'forces'),
@@ -23,8 +23,8 @@ def atom_relax(
     """Relaxes the given tomic structure using ASE's built-in structure
     optimizers
 
-    :param calc_id: calc_id specification
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param prefix: Prefix of output files, defaults to ''
@@ -38,7 +38,7 @@ def atom_relax(
     :return: Dictionary of results
     :rtype: Dict
     """
-    calc = load_calc(calc_id)
+    calc = load_calc(calculator=calculator)
     atoms = get_atoms(**image)
     atoms.calc = calc
     logger = get_logger()
