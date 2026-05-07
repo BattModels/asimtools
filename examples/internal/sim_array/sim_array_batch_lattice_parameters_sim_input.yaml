@@ -7,7 +7,8 @@ args:
   template_sim_input:
     asimmodule: singlepoint
     args:
-      calc_id: lj_Cu
+      calculator:
+        calc_id: lj_Cu
       image:
         builder: bulk
         name: Cu

@@ -1,7 +1,8 @@
 asimmodule: surface_energies.surface_energies
 workdir: surface_energies_results
 args:
-  calc_id: emt
+  calculator:
+    calc_id: emt
   image:
     name: Cu
     cubic: true # This is really important! You must use the conventional cell!

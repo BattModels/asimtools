@@ -3,7 +3,8 @@ env_id: batch
 workdir: gpaw_results
 overwrite: true
 args:
-  calc_id: gpaw
+  calculator:
+    calc_id: gpaw
   image:
     name: Ar
     builder: bulk

@@ -6,7 +6,8 @@ args:
     id-0000:
       asimmodule: singlepoint
       args:
-        calc_id: lj_Ar
+        calculator:
+          calc_id: lj_Ar
         image:
           name: Ar
         properties: [bad_property]
@@ -14,7 +15,8 @@ args:
       # Doesn't have to be same asimmodule
       asimmodule: geometry_optimization.atom_relax
       args:
-        calc_id: lj_Ar
+        calculator:
+          calc_id: lj_Ar
         image:
           name: Ar
         optimizer: BFGS
@@ -22,12 +24,15 @@ args:
       # This is just the calc_array example copied and pasted!
       asimmodule: workflows.calc_array
       args:
-        calc_ids: [emt, lj_Cu]
-        env_ids: [inline, inline] # Must correspond to calc_id if list is given
+        calculators:
+          - calc_id: emt
+          - calc_id: lj_Cu
+        env_ids: [inline, inline] # Must correspond to calculator if list is given
         subsim_input:
           asimmodule: elastic_constants.cubic_energy_expansion
           args:
-            calc_id: emt
+            calculator:
+              calc_id: emt
             image:
               name: Cu
               a: 3.6

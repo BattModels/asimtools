@@ -7,6 +7,7 @@ args:
   subsim_input:
     asimmodule: singlepoint
     args:
-      calc_id: lj_Ar
+      calculator:
+        calc_id: lj_Ar
       properties: ['energy', 'forces']
 

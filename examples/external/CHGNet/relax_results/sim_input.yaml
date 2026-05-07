@@ -1,5 +1,6 @@
 args:
-  calc_id: CHGNet
+  calculator:
+    calc_id: CHGNet
   fmax: 0.01
   image:
     image_file: image_input.xyz

@@ -7,7 +7,8 @@ args:
   distance: 0.02
   phonopy_save_path: phonopy.save
   calc_env_id: inline
-  calc_id: emt
+  calculator:
+    calc_id: emt
   process_env_id: inline
   # paths: ['GAMMA', 'X', 'GAMMA', 'L']
   # labels: Optional[Sequence] = None,

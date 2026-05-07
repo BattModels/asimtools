@@ -1,5 +1,6 @@
 args:
-  calc_id: M3GNet
+  calculator:
+    calc_id: M3GNet
   fmax: 0.01
   image:
     image_file: image_input.xyz

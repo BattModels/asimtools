@@ -1,7 +1,8 @@
 asimmodule: geometry_optimization.atom_relax
 workdir: nacl_results
 args:
-  calc_id: OMAT24_eqV2_153M
+  calculator:
+    calc_id: OMAT24_eqV2_153M
   image:
     name: NaCl
     builder: bulk

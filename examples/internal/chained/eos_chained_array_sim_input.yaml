@@ -20,7 +20,8 @@ args:
           asimmodule: singlepoint
           env_id: batch
           args:
-            calc_id: emt
+            calculator:
+              calc_id: emt
     # This step is introduced to connect step 1 and 3 since step
     # one submits jobs internally
     step-2:

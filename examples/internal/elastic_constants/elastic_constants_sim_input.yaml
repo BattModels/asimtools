@@ -1,7 +1,8 @@
 asimmodule: elastic_constants.cubic_energy_expansion
 workdir: elastic_constant_results
 args:
-  calc_id: emt
+  calculator:
+    calc_id: emt
   image: # Does not need to be relaxed, will use energy minimum volume from eos
     name: Cu
     a: 3.59

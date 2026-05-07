@@ -2,7 +2,8 @@ asimmodule: geometry_optimization.atom_relax
 env_id: 
 workdir: relax_results
 args:
-  calc_id: CHGNet
+  calculator:
+    calc_id: CHGNet
   image:
     name: NaCl
     builder: bulk

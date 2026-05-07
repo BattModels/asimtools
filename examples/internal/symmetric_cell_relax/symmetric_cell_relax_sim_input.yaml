@@ -1,7 +1,8 @@
 asimmodule: geometry_optimization.symmetric_cell_relax
 workdir: symmetric_cell_relax_results
 args:
-  calc_id: lj_Ar
+  calculator:
+    calc_id: lj_Ar
   image:
     name: Ar
     crystalstructure: sc

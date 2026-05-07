@@ -2,7 +2,8 @@ asimmodule: singlepoint
 workdir: batch_results
 env_id: batch
 args:
-  calc_id: lj_Ar
+  calculator:
+    calc_id: lj_Ar
   image:
     name: Ar
     builder: bulk

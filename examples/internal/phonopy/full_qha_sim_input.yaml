@@ -3,7 +3,8 @@ workdir: full_qha_results
 args:
   image: 
     name: Cu
-  calc_id: emt
+  calculator:
+    calc_id: emt
   calc_env_id: inline
   process_env_id: inline
   phonopy_save_path: phonopy_save.yaml # Specify path relative to this asimmodule's workdir
