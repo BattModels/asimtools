@@ -268,10 +268,21 @@ class UnitJob(Job):
     ) -> None:
         super().__init__(sim_input, env_input, calc_input)
 
-        # Check if the asimmodule being called uses a calc_id to
+        # Check if the asimmodule being called uses a calculator/calc_id to
         # get precommands, postcommands, run_prefixes and run_suffixes
-        self.calc_id = self.sim_input.get('args', {}).get('calc_id', None)
-        if self.calc_id is not None:
+        args = self.sim_input.get('args', {})
+        calculator = args.get('calculator', None)
+        self.calc_id = args.get('calc_id', None)
+
+        if calculator is not None:
+            self.calc_id = calculator.get('calc_id', self.calc_id)
+            calc_params_direct = calculator.get('calc_params', None)
+        else:
+            calc_params_direct = None
+
+        if calc_params_direct is not None:
+            self.calc_params = calc_params_direct
+        elif self.calc_id is not None:
             if isinstance(self.calc_id, dict):
                 self.calc_input = {'custom': self.calc_id}
                 self.calc_id = 'custom'
