@@ -25,7 +25,7 @@ def create_unitjob(sim_input, env_input, workdir, calc_input=None, status=None):
     sim_input['env_id'] = env_id
     if calc_input is not None:
         calc_id = list(calc_input.keys())[0]
-        sim_input['calc_id'] = calc_id
+        sim_input.setdefault('args', {})['calculator'] = {'calc_id': calc_id}
     sim_input['workdir'] = workdir
     unitjob = UnitJob(
         sim_input,
@@ -217,7 +217,7 @@ def test_slurm_asimmodule(flags, tmp_path):
         'env_id': 'test_batch',
         'workdir': wdir,
         'job_name': jobname,
-        'args': {'calc_id': 'test_calc_id'},
+        'args': {'calculator': {'calc_id': 'test_calc_id'}},
     }
 
     env_input = {
@@ -509,12 +509,11 @@ def test_gen_run_command_prefix_suffix(tmp_path):
             'args': {},
         }
     }
-    # calc_id must live in sim_input['args'] for UnitJob to pick up calc_params
     sim_input = {
         'asimmodule': 'do_nothing',
         'env_id': 'inline',
         'workdir': str(tmp_path / 'wdir'),
-        'args': {'calc_id': 'lj'},
+        'args': {'calculator': {'calc_id': 'lj'}},
     }
     unitjob = UnitJob(sim_input, env_input=env_input, calc_input=calc_input)
     cmd = unitjob.gen_run_command()

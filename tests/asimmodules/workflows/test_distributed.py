@@ -17,7 +17,7 @@ def create_distjob(sim_input, env_input, workdir, calc_input=None):
     sim_input['env_id'] = env_id
     if calc_input is not None:
         calc_id = list(calc_input.keys())[0]
-        sim_input['calc_id'] = calc_id
+        sim_input.setdefault('args', {})['calculator'] = {'calc_id': calc_id}
     sim_input['workdir'] = workdir
     distjob = DistributedJob(
         sim_input['args']['subsim_inputs'],

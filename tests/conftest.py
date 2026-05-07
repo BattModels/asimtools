@@ -189,14 +189,14 @@ def do_nothing_sim_input():
 
 @pytest.fixture
 def lj_distributed_sim_input():
-    ''' 
+    '''
     Sim input for a distributed job that does some lj calculations
     '''
     subsim_input = {
         'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
-            'calc_id': 'lj',
+            'calculator': {'calc_id': 'lj'},
             'image': {
                 'name': 'Ar',
             },
@@ -219,7 +219,7 @@ def lj_distributed_sim_input():
 
 @pytest.fixture
 def lj_distributed_skip_failed_sim_input():
-    ''' 
+    '''
     Sim input for a distributed job that does some lj calculations but
     the first job fails
     '''
@@ -227,7 +227,7 @@ def lj_distributed_skip_failed_sim_input():
         'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
-            'calc_id': 'lj',
+            'calculator': {'calc_id': 'lj'},
             'image': {
                 'name': 'Ar',
             },
@@ -254,14 +254,14 @@ def lj_distributed_skip_failed_sim_input():
 
 @pytest.fixture
 def lj_distributed_custom_name_sim_input():
-    ''' 
+    '''
     Sim input for a distributed job that does some lj calculations
     '''
     subsim_input = {
         'asimmodule': 'singlepoint',
         'env_id': 'inline',
         'args': {
-            'calc_id': 'lj',
+            'calculator': {'calc_id': 'lj'},
             'image': {
                 'name': 'Ar',
             },
@@ -285,14 +285,14 @@ def lj_distributed_custom_name_sim_input():
 
 @pytest.fixture
 def lj_distributed_batch_sim_input():
-    ''' 
+    '''
     Sim input for a distributed job that does some lj calculations
     '''
     subsim_input = {
         'asimmodule': 'singlepoint',
         'env_id': 'batch',
         'args': {
-            'calc_id': 'lj',
+            'calculator': {'calc_id': 'lj'},
             'image': {
                 'name': 'Ar',
             },
@@ -316,14 +316,14 @@ def lj_distributed_batch_sim_input():
 
 @pytest.fixture
 def lj_distributed_group_batch_sim_input():
-    ''' 
+    '''
     Sim input for a distributed job that does some lj calculations
     '''
     subsim_input = {
         'asimmodule': 'singlepoint',
         'env_id': 'batch', # This should be overwrriten by the group env
         'args': {
-            'calc_id': 'lj',
+            'calculator': {'calc_id': 'lj'},
             'image': {
                 'name': 'Ar',
             },
