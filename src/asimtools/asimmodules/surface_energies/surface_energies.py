@@ -38,7 +38,7 @@ def get_surface_energy(slab, calc, bulk_e_per_atom):
 
 def surface_energies(
     image: Dict,
-    calc_id: str = None,
+    calculator: Dict = None,
     millers: Union[str,Sequence] = 'all',
     atom_relax_args: Optional[Dict] = None,
     generate_all_slabs_args: Optional[Dict] = None,
@@ -46,9 +46,8 @@ def surface_energies(
     """Calculates surface energies of slabs defined by args specified for
     pymatgen.core.surface.generate_all_slabs()
 
-    :param calc_id: Optional calc_id specification, See
-        :func:`asimtools.calculators.load_calc` 
-    :type calc_id: str
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
     :param millers: List of miller indices to consider in the form 'xyz',
@@ -65,7 +64,7 @@ def surface_energies(
     :rtype: Dict
     """
 
-    calc = load_calc(calc_id)
+    calc = load_calc(calculator=calculator)
     bulk = get_atoms(**image)
     bulk.calc = calc
 
@@ -104,7 +103,7 @@ def surface_energies(
 
             if atom_relax_args is not None:
                 relax_results = atom_relax(
-                    calc_id=calc_id,
+                    calculator=calculator,
                     image={'atoms': atoms},
                     optimizer=atom_relax_args.get('optimizer', 'BFGS'),
                     properties=('energy','forces'),
@@ -125,7 +124,7 @@ def surface_energies(
                     f'Multiple terminations for {miller}'
 
                 converged, surf_en, slab_en, area = get_surface_energy(
-                    atoms, load_calc(calc_id), bulk_e_per_atom
+                    atoms, load_calc(calculator=calculator), bulk_e_per_atom
                 )
 
                 if converged:
