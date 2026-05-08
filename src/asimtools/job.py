@@ -377,6 +377,7 @@ class UnitJob(Job):
         # This is the sim_input that will be written to disk so it will have
         # slightly different paths and the image(s) will be image_files
         sim_input = deepcopy(self.sim_input)
+        sim_input.pop('dry_run', None)
         # The sim_input file will already be in the work directory
         sim_input['workdir'] = '.'
         # Collect useful variables
@@ -476,6 +477,13 @@ class UnitJob(Job):
         if not self.sim_input.get('submit', True):
             logger.warning('Keyword submit=False, skipping submission in \
                 %s', self.workdir)
+            return None
+
+        if self.sim_input.get('dry_run', False):
+            logger.warning(
+                'dry_run=True: input files written but job not submitted in %s',
+                self.workdir
+            )
             return None
 
         cur_dir = Path('.').resolve()
