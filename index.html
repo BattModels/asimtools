@@ -1,0 +1,854 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>README &mdash; asimtools 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Running an Existing Asimmodule" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Running asimmodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asimplify.html">Custom asimmodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflows.html">Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="include_changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="include_contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">asimtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">README</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="readme">
+<h1>README<a class="headerlink" href="#readme" title="Link to this heading"></a></h1>
+<!-- <img src="../figures/logo.png" alt="drawing" width="150"/> -->
+<!-- [![code coverage](https://img.shields.io/codecov/c/gh/materialsproject/jobflow/main)](https://codecov.io/gh/materialsproject/jobflow/) -->
+<!-- [![pypi version](https://img.shields.io/pypi/v/jobflow?color=blue)](https://pypi.org/project/jobflow/) -->
+<!-- ![supported python versions](https://img.shields.io/pypi/pyversions/jobflow) -->
+<!-- [![DOI](https://joss.theoj.org/papers/10.21105/joss.05995/status.svg)](https://doi.org/10.21105/joss.05995) -->
+<p><a class="reference external" href="https://battmodels.github.io/asimtools/">Documentation</a> | <a class="reference external" href="https://github.com/BattModels/asimtools">GitHub</a></p>
+<section id="atomic-simulation-tools">
+<h2>Atomic SIMulation Tools<a class="headerlink" href="#atomic-simulation-tools" title="Link to this heading"></a></h2>
+<p>This package is a lightweight workflow and simulation manager for reproducible
+atomistic simulations that can be transferred across environments, calculators
+and structures on Unix systems. By using in-built or user-defined asimmodules
+and utilities, users can run/build their own simulation recipes and
+automagically scale them locally or on slurm based clusters. The core idea is
+to separate the dependence of the atomistic potential/calculator and the
+simulations steps thereby allowing the same simulation to be run with multiple
+calculators/codes and the same calculator to be used for multiple simulation
+parameters without altering simulation code. Input and output files follow a
+simple consistent file structure and format so that consistent analysis
+pipelines can be used across users. For a concrete example of how ASIMTools
+achieves this, see the <a class="reference external" href="https://eeg.engin.umich.edu/asimtools/asimplify.html">Developing Custom Asimmodules</a> page.</p>
+<section id="developer-philosophy">
+<h3>Developer philosophy<a class="headerlink" href="#developer-philosophy" title="Link to this heading"></a></h3>
+<p>The goal of asimtools is to push all the complexity of workflow management,
+best-practices, file management etc. into the backend such that the everyday
+user only has to handle input files for existing workflows and asimmodule files
+for workflows they want to implement.This allows the user to focus on doing the
+science and designing experiments. The following are the guiding principles for
+how asimtools should work:</p>
+<ul class="simple">
+<li><p>Asimmodules should resemble boilerplate ASE code as much as possible.</p></li>
+<li><p>Asimmodules should avoid explicitly depending on a calculator</p></li>
+<li><p>Asimmodules should not explicitly depend on the context/environment in which
+they run</p></li>
+<li><p>It should be easy to debug individual asimmodules/parts in large workflows.
+In addition, it should always be possible to debug/resubmit jobs without
+using asimtools.</p></li>
+<li><p>Input file structure and format should be standard across all asimmodules. In
+addition all input parameters should match how they would like without
+asimtools i.e. do not provide an API!</p></li>
+<li><p>Job progress tracking must be incorporated for easy debugging</p></li>
+<li><p>Best practices should be built-in e.g. if multiple jobs of the same slurm
+context are submitted simulataneously, it must be a job array.</p></li>
+</ul>
+</section>
+<section id="philosophy-on-user-experience">
+<h3>Philosophy on User Experience<a class="headerlink" href="#philosophy-on-user-experience" title="Link to this heading"></a></h3>
+<p>The philosophy is to build “simulations” using building blocks of asimmodules.
+Asimmodules are nothing but Python functions that return a dictionary, anything
+can be done in the function code. These asimmodules can be as
+complicated/efficient as you make them using any external packages you want and
+can be optimized with time but can still be run within the framework. This
+allows a test friendly way to transition from say a tutorial on the
+ASE/pymatgen website to an asimtools asimmodule. So while complicated wrappers
+are discouraged, they would still work as long as the asimmodule works. The
+benefit out of the box is that you can make your asimmodule independent of
+calculator or input structures and submit them easily.</p>
+<p>We also aim to provide a standard set of robust and efficient simulation
+protocols as we develop. You can see all the implemented workflows provided
+with the package in the examples directory and modify them to your application.
+If you have suggestions for improvements in methodology or code, please bring
+up an issue on github!</p>
+</section>
+<section id="getting-started">
+<h3>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h3>
+<p>These instructions will give you a copy of the project up and running.</p>
+<section id="installing-asimtools">
+<h4>Installing ASIMTools<a class="headerlink" href="#installing-asimtools" title="Link to this heading"></a></h4>
+<p>If you prefer to use a conda a environment, you can create and activate one
+using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">asimtools</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.9</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">asimtools</span>
+</pre></div>
+</div>
+<p>Then you can install asimtools either using pip or by cloning the source code
+from github. Note that the cloned version might have some minor bug fixes that
+are not included in the official PyPI release. It is also easier to go through
+the examples if you clone the repository.</p>
+<p>To install the latest asimtools release from PyPI, you can simply use</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">asimtools</span>
+</pre></div>
+</div>
+<p>To install from source use</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span>
+<span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">gitlab</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ase</span><span class="o">/</span><span class="n">ase</span><span class="o">.</span><span class="n">git</span> <span class="o">&amp;&amp;</span> <span class="n">cd</span> <span class="n">ase</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">.</span> <span class="n">cd</span> <span class="o">../</span>
+
+<span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">BattModels</span><span class="o">/</span><span class="n">asimtools</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">asimtools</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>We recommend you use the latest version of ASE since the ones on PyPI and
+conda are quite outdated.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">gitlab</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ase</span><span class="o">/</span><span class="n">ase</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">ase</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>You can optionally install the dependencies used for development using</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;.[dev]&quot;</span>
+</pre></div>
+</div>
+<p>Or install some popular Universal Machine Learning Interactomic Potentials
+(matgl, mace-torh, chgnet) using</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;.[mlip]&quot;</span>
+</pre></div>
+</div>
+<p>Making sure the correct versions and dependencies are installed correctly is
+probably more stable if you follow their individual installation instructions.</p>
+<p>Other individual calculators may need external packages for running them. For
+example if you want to use Quantum Espresso or CASTEP, you will have to install
+them. Similarly some asimmodules e.g. <code class="docutils literal notranslate"><span class="pre">lammps.py</span></code> might also need external
+packages to be used. It is up to the user to make sure those are installed.</p>
+<p>You will also need to setup some environment variables, these variables point
+to global <code class="docutils literal notranslate"><span class="pre">env_input.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">calc_input.yaml</span></code> files with your favorite
+configurations since these are commonly shared among simulations. You can also
+directly specify them when running <code class="docutils literal notranslate"><span class="pre">asim-execute</span></code> (See <code class="docutils literal notranslate"><span class="pre">asim-execute</span> <span class="pre">-h</span></code>). You
+can also provide a directory for ASIMTools to search for your custom
+asimmodules. Examples of these files can be found in the examples.</p>
+<p>Add the following to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">ASIMTOOLS_ENV_INPUT</span><span class="o">=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">my</span><span class="o">/</span><span class="k">global</span><span class="o">/</span><span class="n">env_input</span><span class="o">.</span><span class="n">yaml</span>
+<span class="n">export</span> <span class="n">ASIMTOOLS_CALC_INPUT</span><span class="o">=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">my</span><span class="o">/</span><span class="k">global</span><span class="o">/</span><span class="n">calc_input</span><span class="o">.</span><span class="n">yaml</span>
+<span class="n">export</span> <span class="n">ASIMTOOLS_ASIMMODULE_DIR</span><span class="o">=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">my</span><span class="o">/</span><span class="n">asimmodule</span><span class="o">/</span><span class="nb">dir</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="running-the-tests">
+<h3>Running the tests<a class="headerlink" href="#running-the-tests" title="Link to this heading"></a></h3>
+<p>To run tests for the workflow tools, from the tests directory, call:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pytest
+</pre></div>
+</div>
+<p>To run the test suite on a component <code class="docutils literal notranslate"><span class="pre">component.py</span></code> , call:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pytest test_component.py
+</pre></div>
+</div>
+<p>To run all tests for the provided asimmodules, <code class="docutils literal notranslate"><span class="pre">cd</span></code> into the examples directory
+and call:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>source run_all.sh
+</pre></div>
+</div>
+<p>Or you can run a test for each individual example in its directory using:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>source run.sh
+</pre></div>
+</div>
+<p>If no errors are reported, the tests have passed. These tests simply test the
+functionality of the code, not the scientific validity of the simulations!</p>
+<p>To run tests for the provided asimmodules using slurm, you can similarly run
+the bash scripts ending with <code class="docutils literal notranslate"><span class="pre">_slurm.sh</span></code>. This will submit a number of jobs,
+none longer than 1 minute.</p>
+</section>
+<section id="contributing">
+<h3>Contributing<a class="headerlink" href="#contributing" title="Link to this heading"></a></h3>
+<p>Please read <a class="reference internal" href="#CONTRIBUTING.md"><span class="xref myst">CONTRIBUTING.md</span></a> for details on our code
+of conduct, and the process for submitting pull requests to us.</p>
+</section>
+<section id="authors">
+<h3>Authors<a class="headerlink" href="#authors" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Keith Phuthi</strong>
+<a class="reference external" href="https://github.com/mkphuthi">mkphuthi</a></p></li>
+<li><p><strong>Emil Annevelink</strong>
+<a class="reference external" href="https://github.com/emilannevelink">emilannevelink</a></p></li>
+</ul>
+<p>See also the list of
+<a class="reference external" href="https://github.com/BattModels/asimtools.git/contributors">contributors</a>
+who participated in this project.</p>
+</section>
+<section id="license">
+<h3>License<a class="headerlink" href="#license" title="Link to this heading"></a></h3>
+<p>This project is licensed under the MIT License</p>
+<!-- ## Acknowledgments
+
+  - Hat tip to anyone whose code is used --></section>
+</section>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Running asimmodules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#input-files">Input files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#env-input-yaml">env_input.yaml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#calc-input-yaml">calc_input.yaml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#specifying-calculators">Specifying Calculators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#sim-input-yaml">sim_input.yaml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#specifying-images-atoms">Specifying Images/Atoms</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#usage-of-asim-execute-and-asim-run">Usage of asim-execute and asim-run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#output-files">Output files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#checking-job-status-and-restarting-failed-jobs">Checking job status and Restarting failed jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#importing-functions-from-asimmodules-and-the-api">Importing functions from asimmodules and the API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="asimplify.html">Custom asimmodules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="asimplify.html#build-and-test-with-a-cheap-calculator">1. Build and test with a cheap calculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="asimplify.html#wrap-in-a-function">2. Wrap in a function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="asimplify.html#make-the-asimmodule-use-any-calculator">3. Make the asimmodule use any calculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="asimplify.html#make-the-asimmodule-use-any-structure">4. Make the asimmodule use any structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="asimplify.html#final-cleanup">5. Final cleanup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="asimplify.html#running-multiple-simulations-in-a-workflow">6. Running multiple simulations in a workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="workflows.html">Workflows</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html#sim-array">sim_array</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#when-to-use">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#key-parameters">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#example-sweep-lattice-constants">Example — sweep lattice constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#example-sweep-over-a-set-of-structure-files">Example — sweep over a set of structure files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#example-sweep-two-parameters-simultaneously">Example — sweep two parameters simultaneously</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html#image-array">image_array</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#id1">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#id2">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#example-single-point-energy-on-a-dataset">Example — single-point energy on a dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#example-relax-all-structures-in-an-xyz-file">Example — relax all structures in an xyz file</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html#calc-array">calc_array</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#id3">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#id4">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#example-benchmark-multiple-calculators">Example — benchmark multiple calculators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#example-converge-dft-cutoff-energy">Example — converge DFT cutoff energy</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html#distributed">distributed</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#id5">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#id6">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html#chained">chained</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#id7">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#id8">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#example-relax-then-compute-phonons">Example — relax then compute phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#example-three-step-pipeline-with-a-parallel-middle-step">Example — three-step pipeline with a parallel middle step</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html#iterative">iterative</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#id9">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#id10">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html#example-sequential-geometry-relaxations-at-increasing-pressures">Example — sequential geometry relaxations at increasing pressures</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html#update-dependencies">update_dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html#api-reference">API reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.asimmodules.workflows.html">asimtools.asimmodules.workflows package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.calc_array">asimtools.asimmodules.workflows.calc_array module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.calc_array.calc_array"><code class="docutils literal notranslate"><span class="pre">calc_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.chained">asimtools.asimmodules.workflows.chained module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.chained.chained"><code class="docutils literal notranslate"><span class="pre">chained()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.distributed">asimtools.asimmodules.workflows.distributed module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.distributed.distributed"><code class="docutils literal notranslate"><span class="pre">distributed()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.image_array">asimtools.asimmodules.workflows.image_array module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.image_array.image_array"><code class="docutils literal notranslate"><span class="pre">image_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.iterative">asimtools.asimmodules.workflows.iterative module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.iterative.iterative"><code class="docutils literal notranslate"><span class="pre">iterative()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.sim_array">asimtools.asimmodules.workflows.sim_array module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.sim_array.sim_array"><code class="docutils literal notranslate"><span class="pre">sim_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.update_dependencies">asimtools.asimmodules.workflows.update_dependencies module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.update_dependencies.update_dependencies"><code class="docutils literal notranslate"><span class="pre">update_dependencies()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.utils">asimtools.asimmodules.workflows.utils module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.utils.prepare_array_vals"><code class="docutils literal notranslate"><span class="pre">prepare_array_vals()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API Docs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="asimtools.html">asimtools package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.asimmodules.html">asimtools.asimmodules package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.active_learning.html">asimtools.asimmodules.active_learning package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#module-asimtools.asimmodules.active_learning.ase_md">asimtools.asimmodules.active_learning.ase_md module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#asimtools.asimmodules.active_learning.ase_md.ase_md"><code class="docutils literal notranslate"><span class="pre">ase_md()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#asimtools.asimmodules.active_learning.ase_md.langevin_nvt"><code class="docutils literal notranslate"><span class="pre">langevin_nvt()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#asimtools.asimmodules.active_learning.ase_md.npt"><code class="docutils literal notranslate"><span class="pre">npt()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#asimtools.asimmodules.active_learning.ase_md.plot_thermo"><code class="docutils literal notranslate"><span class="pre">plot_thermo()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#module-asimtools.asimmodules.active_learning.compute_deviation">asimtools.asimmodules.active_learning.compute_deviation module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#asimtools.asimmodules.active_learning.compute_deviation.compute_deviation"><code class="docutils literal notranslate"><span class="pre">compute_deviation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#module-asimtools.asimmodules.active_learning.direct_sample">asimtools.asimmodules.active_learning.direct_sample module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#asimtools.asimmodules.active_learning.direct_sample.direct_sample"><code class="docutils literal notranslate"><span class="pre">direct_sample()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#asimtools.asimmodules.active_learning.direct_sample.plot_PCAfeature_coverage"><code class="docutils literal notranslate"><span class="pre">plot_PCAfeature_coverage()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#module-asimtools.asimmodules.active_learning.select_images">asimtools.asimmodules.active_learning.select_images module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#asimtools.asimmodules.active_learning.select_images.select_images"><code class="docutils literal notranslate"><span class="pre">select_images()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.active_learning.html#module-asimtools.asimmodules.active_learning">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.ase_md.html">asimtools.asimmodules.ase_md package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.ase_md.html#module-asimtools.asimmodules.ase_md.ase_md">asimtools.asimmodules.ase_md.ase_md module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.ase_md.html#asimtools.asimmodules.ase_md.ase_md.ase_md"><code class="docutils literal notranslate"><span class="pre">ase_md()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.ase_md.html#asimtools.asimmodules.ase_md.ase_md.langevin_nvt"><code class="docutils literal notranslate"><span class="pre">langevin_nvt()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.ase_md.html#asimtools.asimmodules.ase_md.ase_md.npt"><code class="docutils literal notranslate"><span class="pre">npt()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.ase_md.html#asimtools.asimmodules.ase_md.ase_md.plot_thermo"><code class="docutils literal notranslate"><span class="pre">plot_thermo()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.ase_md.html#module-asimtools.asimmodules.ase_md">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.benchmarking.html">asimtools.asimmodules.benchmarking package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.benchmarking.html#module-asimtools.asimmodules.benchmarking.parity">asimtools.asimmodules.benchmarking.parity module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.benchmarking.html#asimtools.asimmodules.benchmarking.parity.calc_parity_data"><code class="docutils literal notranslate"><span class="pre">calc_parity_data()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.benchmarking.html#asimtools.asimmodules.benchmarking.parity.parity"><code class="docutils literal notranslate"><span class="pre">parity()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.benchmarking.html#asimtools.asimmodules.benchmarking.parity.rmse"><code class="docutils literal notranslate"><span class="pre">rmse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.benchmarking.html#module-asimtools.asimmodules.benchmarking">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.data.html">asimtools.asimmodules.data package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.data.html#module-asimtools.asimmodules.data.collect_images">asimtools.asimmodules.data.collect_images module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.data.html#asimtools.asimmodules.data.collect_images.collect_images"><code class="docutils literal notranslate"><span class="pre">collect_images()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.data.html#module-asimtools.asimmodules.data">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.elastic_constants.html">asimtools.asimmodules.elastic_constants package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.elastic_constants.html#module-asimtools.asimmodules.elastic_constants.cubic_energy_expansion">asimtools.asimmodules.elastic_constants.cubic_energy_expansion module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.elastic_constants.html#asimtools.asimmodules.elastic_constants.cubic_energy_expansion.cubic_energy_expansion"><code class="docutils literal notranslate"><span class="pre">cubic_energy_expansion()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.elastic_constants.html#asimtools.asimmodules.elastic_constants.cubic_energy_expansion.get_strained_atoms"><code class="docutils literal notranslate"><span class="pre">get_strained_atoms()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.elastic_constants.html#module-asimtools.asimmodules.elastic_constants">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.eos.html">asimtools.asimmodules.eos package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.eos.html#module-asimtools.asimmodules.eos.postprocess">asimtools.asimmodules.eos.postprocess module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.eos.html#asimtools.asimmodules.eos.postprocess.postprocess"><code class="docutils literal notranslate"><span class="pre">postprocess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.eos.html#module-asimtools.asimmodules.eos">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html">asimtools.asimmodules.geometry_optimization package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html#module-asimtools.asimmodules.geometry_optimization.ase_cubic_eos_optimization">asimtools.asimmodules.geometry_optimization.ase_cubic_eos_optimization module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html#asimtools.asimmodules.geometry_optimization.ase_cubic_eos_optimization.ase_cubic_eos_optimization"><code class="docutils literal notranslate"><span class="pre">ase_cubic_eos_optimization()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html#module-asimtools.asimmodules.geometry_optimization.atom_relax">asimtools.asimmodules.geometry_optimization.atom_relax module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html#asimtools.asimmodules.geometry_optimization.atom_relax.atom_relax"><code class="docutils literal notranslate"><span class="pre">atom_relax()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html#module-asimtools.asimmodules.geometry_optimization.cell_relax">asimtools.asimmodules.geometry_optimization.cell_relax module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html#asimtools.asimmodules.geometry_optimization.cell_relax.cell_relax"><code class="docutils literal notranslate"><span class="pre">cell_relax()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html#module-asimtools.asimmodules.geometry_optimization.optimize">asimtools.asimmodules.geometry_optimization.optimize module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html#asimtools.asimmodules.geometry_optimization.optimize.optimize"><code class="docutils literal notranslate"><span class="pre">optimize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html#module-asimtools.asimmodules.geometry_optimization.symmetric_cell_relax">asimtools.asimmodules.geometry_optimization.symmetric_cell_relax module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html#asimtools.asimmodules.geometry_optimization.symmetric_cell_relax.symmetric_cell_relax"><code class="docutils literal notranslate"><span class="pre">symmetric_cell_relax()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.geometry_optimization.html#module-asimtools.asimmodules.geometry_optimization">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.lammps.html">asimtools.asimmodules.lammps package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.lammps.html#module-asimtools.asimmodules.lammps.lammps">asimtools.asimmodules.lammps.lammps module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.lammps.html#asimtools.asimmodules.lammps.lammps.lammps"><code class="docutils literal notranslate"><span class="pre">lammps()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.lammps.html#module-asimtools.asimmodules.lammps">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.mace.html">asimtools.asimmodules.mace package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.mace.html#module-asimtools.asimmodules.mace.train_mace">asimtools.asimmodules.mace.train_mace module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.mace.html#asimtools.asimmodules.mace.train_mace.train_mace"><code class="docutils literal notranslate"><span class="pre">train_mace()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.mace.html#module-asimtools.asimmodules.mace">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.phonons.html">asimtools.asimmodules.phonons package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.phonons.html#module-asimtools.asimmodules.phonons.ase_phonons">asimtools.asimmodules.phonons.ase_phonons module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.phonons.html#asimtools.asimmodules.phonons.ase_phonons.ase_phonons"><code class="docutils literal notranslate"><span class="pre">ase_phonons()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.phonons.html#module-asimtools.asimmodules.phonons">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.phonopy.html">asimtools.asimmodules.phonopy package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#module-asimtools.asimmodules.phonopy.forces">asimtools.asimmodules.phonopy.forces module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#asimtools.asimmodules.phonopy.forces.forces"><code class="docutils literal notranslate"><span class="pre">forces()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#module-asimtools.asimmodules.phonopy.full_qha">asimtools.asimmodules.phonopy.full_qha module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#asimtools.asimmodules.phonopy.full_qha.full_qha"><code class="docutils literal notranslate"><span class="pre">full_qha()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#module-asimtools.asimmodules.phonopy.generate_phonopy_displacements">asimtools.asimmodules.phonopy.generate_phonopy_displacements module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#asimtools.asimmodules.phonopy.generate_phonopy_displacements.generate_phonopy_displacements"><code class="docutils literal notranslate"><span class="pre">generate_phonopy_displacements()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#module-asimtools.asimmodules.phonopy.phonon_bands_and_dos">asimtools.asimmodules.phonopy.phonon_bands_and_dos module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#asimtools.asimmodules.phonopy.phonon_bands_and_dos.phonon_bands_and_dos"><code class="docutils literal notranslate"><span class="pre">phonon_bands_and_dos()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#module-asimtools.asimmodules.phonopy.phonon_bands_and_dos_from_forces">asimtools.asimmodules.phonopy.phonon_bands_and_dos_from_forces module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#asimtools.asimmodules.phonopy.phonon_bands_and_dos_from_forces.phonon_bands_and_dos_from_forces"><code class="docutils literal notranslate"><span class="pre">phonon_bands_and_dos_from_forces()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#module-asimtools.asimmodules.phonopy.qha_properties">asimtools.asimmodules.phonopy.qha_properties module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#asimtools.asimmodules.phonopy.qha_properties.qha_properties"><code class="docutils literal notranslate"><span class="pre">qha_properties()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#module-asimtools.asimmodules.phonopy.read_force_constants">asimtools.asimmodules.phonopy.read_force_constants module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#asimtools.asimmodules.phonopy.read_force_constants.generate_phonopy_displacements"><code class="docutils literal notranslate"><span class="pre">generate_phonopy_displacements()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#module-asimtools.asimmodules.phonopy.thermal_properties">asimtools.asimmodules.phonopy.thermal_properties module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#asimtools.asimmodules.phonopy.thermal_properties.thermal_properties"><code class="docutils literal notranslate"><span class="pre">thermal_properties()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.phonopy.html#module-asimtools.asimmodules.phonopy">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.surface_energies.html">asimtools.asimmodules.surface_energies package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.surface_energies.html#module-asimtools.asimmodules.surface_energies.surface_energies">asimtools.asimmodules.surface_energies.surface_energies module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.surface_energies.html#asimtools.asimmodules.surface_energies.surface_energies.get_surface_energy"><code class="docutils literal notranslate"><span class="pre">get_surface_energy()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.surface_energies.html#asimtools.asimmodules.surface_energies.surface_energies.surface_energies"><code class="docutils literal notranslate"><span class="pre">surface_energies()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.surface_energies.html#module-asimtools.asimmodules.surface_energies">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.transformations.html">asimtools.asimmodules.transformations package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.transformations.html#module-asimtools.asimmodules.transformations.scale_unit_cells">asimtools.asimmodules.transformations.scale_unit_cells module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.transformations.html#asimtools.asimmodules.transformations.scale_unit_cells.apply_scale"><code class="docutils literal notranslate"><span class="pre">apply_scale()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.transformations.html#asimtools.asimmodules.transformations.scale_unit_cells.scale_unit_cells"><code class="docutils literal notranslate"><span class="pre">scale_unit_cells()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.transformations.html#module-asimtools.asimmodules.transformations">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.vacancy_formation_energy.html">asimtools.asimmodules.vacancy_formation_energy package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.vacancy_formation_energy.html#module-asimtools.asimmodules.vacancy_formation_energy.vacancy_formation_energy">asimtools.asimmodules.vacancy_formation_energy.vacancy_formation_energy module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.vacancy_formation_energy.html#asimtools.asimmodules.vacancy_formation_energy.vacancy_formation_energy.vacancy_formation_energy"><code class="docutils literal notranslate"><span class="pre">vacancy_formation_energy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.vacancy_formation_energy.html#module-asimtools.asimmodules.vacancy_formation_energy">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.vasp.html">asimtools.asimmodules.vasp package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.vasp.html#module-asimtools.asimmodules.vasp.vasp">asimtools.asimmodules.vasp.vasp module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.vasp.html#asimtools.asimmodules.vasp.vasp.execute_vasp_run_command"><code class="docutils literal notranslate"><span class="pre">execute_vasp_run_command()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.vasp.html#asimtools.asimmodules.vasp.vasp.vasp"><code class="docutils literal notranslate"><span class="pre">vasp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.vasp.html#module-asimtools.asimmodules.vasp">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.workflows.html">asimtools.asimmodules.workflows package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.calc_array">asimtools.asimmodules.workflows.calc_array module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.calc_array.calc_array"><code class="docutils literal notranslate"><span class="pre">calc_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.chained">asimtools.asimmodules.workflows.chained module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.chained.chained"><code class="docutils literal notranslate"><span class="pre">chained()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.distributed">asimtools.asimmodules.workflows.distributed module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.distributed.distributed"><code class="docutils literal notranslate"><span class="pre">distributed()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.image_array">asimtools.asimmodules.workflows.image_array module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.image_array.image_array"><code class="docutils literal notranslate"><span class="pre">image_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.iterative">asimtools.asimmodules.workflows.iterative module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.iterative.iterative"><code class="docutils literal notranslate"><span class="pre">iterative()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.sim_array">asimtools.asimmodules.workflows.sim_array module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.sim_array.sim_array"><code class="docutils literal notranslate"><span class="pre">sim_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.update_dependencies">asimtools.asimmodules.workflows.update_dependencies module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.update_dependencies.update_dependencies"><code class="docutils literal notranslate"><span class="pre">update_dependencies()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows.utils">asimtools.asimmodules.workflows.utils module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.utils.prepare_array_vals"><code class="docutils literal notranslate"><span class="pre">prepare_array_vals()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.workflows.html#module-asimtools.asimmodules.workflows">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.html#module-asimtools.asimmodules.do_nothing">asimtools.asimmodules.do_nothing module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.html#asimtools.asimmodules.do_nothing.do_nothing"><code class="docutils literal notranslate"><span class="pre">do_nothing()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.html#module-asimtools.asimmodules.singlepoint">asimtools.asimmodules.singlepoint module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.asimmodules.html#asimtools.asimmodules.singlepoint.singlepoint"><code class="docutils literal notranslate"><span class="pre">singlepoint()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.asimmodules.html#module-asimtools.asimmodules">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools.calculators">asimtools.calculators module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_aqcat"><code class="docutils literal notranslate"><span class="pre">load_aqcat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_ase_calc"><code class="docutils literal notranslate"><span class="pre">load_ase_calc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_ase_dftd3"><code class="docutils literal notranslate"><span class="pre">load_ase_dftd3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_calc"><code class="docutils literal notranslate"><span class="pre">load_calc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_chgnet"><code class="docutils literal notranslate"><span class="pre">load_chgnet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_dp"><code class="docutils literal notranslate"><span class="pre">load_dp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_espresso_profile"><code class="docutils literal notranslate"><span class="pre">load_espresso_profile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_fairchem_v1"><code class="docutils literal notranslate"><span class="pre">load_fairchem_v1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_fairchem_v2"><code class="docutils literal notranslate"><span class="pre">load_fairchem_v2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_m3gnet"><code class="docutils literal notranslate"><span class="pre">load_m3gnet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_mace"><code class="docutils literal notranslate"><span class="pre">load_mace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_mace_mp"><code class="docutils literal notranslate"><span class="pre">load_mace_mp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_mace_off"><code class="docutils literal notranslate"><span class="pre">load_mace_off()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_matgl"><code class="docutils literal notranslate"><span class="pre">load_matgl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.calculators.load_nequip"><code class="docutils literal notranslate"><span class="pre">load_nequip()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools.job">asimtools.job module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.job.ChainedJob"><code class="docutils literal notranslate"><span class="pre">ChainedJob</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.ChainedJob.get_last_output"><code class="docutils literal notranslate"><span class="pre">ChainedJob.get_last_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.ChainedJob.submit"><code class="docutils literal notranslate"><span class="pre">ChainedJob.submit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.job.DistributedJob"><code class="docutils literal notranslate"><span class="pre">DistributedJob</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.DistributedJob.gen_input_files"><code class="docutils literal notranslate"><span class="pre">DistributedJob.gen_input_files()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.DistributedJob.submit"><code class="docutils literal notranslate"><span class="pre">DistributedJob.submit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.DistributedJob.submit_jobs"><code class="docutils literal notranslate"><span class="pre">DistributedJob.submit_jobs()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.DistributedJob.submit_sh_array"><code class="docutils literal notranslate"><span class="pre">DistributedJob.submit_sh_array()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.DistributedJob.submit_slurm_array"><code class="docutils literal notranslate"><span class="pre">DistributedJob.submit_slurm_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.job.Job"><code class="docutils literal notranslate"><span class="pre">Job</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.add_output_files"><code class="docutils literal notranslate"><span class="pre">Job.add_output_files()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.complete"><code class="docutils literal notranslate"><span class="pre">Job.complete()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.discard"><code class="docutils literal notranslate"><span class="pre">Job.discard()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.fail"><code class="docutils literal notranslate"><span class="pre">Job.fail()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.get_calc_input"><code class="docutils literal notranslate"><span class="pre">Job.get_calc_input()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.get_env_input"><code class="docutils literal notranslate"><span class="pre">Job.get_env_input()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.get_logger"><code class="docutils literal notranslate"><span class="pre">Job.get_logger()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.get_output"><code class="docutils literal notranslate"><span class="pre">Job.get_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.get_output_yaml"><code class="docutils literal notranslate"><span class="pre">Job.get_output_yaml()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.get_sim_input"><code class="docutils literal notranslate"><span class="pre">Job.get_sim_input()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.get_status"><code class="docutils literal notranslate"><span class="pre">Job.get_status()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.get_workdir"><code class="docutils literal notranslate"><span class="pre">Job.get_workdir()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.go_to_workdir"><code class="docutils literal notranslate"><span class="pre">Job.go_to_workdir()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.leave_workdir"><code class="docutils literal notranslate"><span class="pre">Job.leave_workdir()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.mkworkdir"><code class="docutils literal notranslate"><span class="pre">Job.mkworkdir()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.set_status"><code class="docutils literal notranslate"><span class="pre">Job.set_status()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.set_workdir"><code class="docutils literal notranslate"><span class="pre">Job.set_workdir()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.start"><code class="docutils literal notranslate"><span class="pre">Job.start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.update_calc_input"><code class="docutils literal notranslate"><span class="pre">Job.update_calc_input()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.update_env_input"><code class="docutils literal notranslate"><span class="pre">Job.update_env_input()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.update_output"><code class="docutils literal notranslate"><span class="pre">Job.update_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.Job.update_sim_input"><code class="docutils literal notranslate"><span class="pre">Job.update_sim_input()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.job.UnitJob"><code class="docutils literal notranslate"><span class="pre">UnitJob</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.UnitJob.gen_input_files"><code class="docutils literal notranslate"><span class="pre">UnitJob.gen_input_files()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.UnitJob.gen_run_command"><code class="docutils literal notranslate"><span class="pre">UnitJob.gen_run_command()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.job.UnitJob.submit"><code class="docutils literal notranslate"><span class="pre">UnitJob.submit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.job.check_job_tree_complete"><code class="docutils literal notranslate"><span class="pre">check_job_tree_complete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.job.create_unitjob"><code class="docutils literal notranslate"><span class="pre">create_unitjob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.job.get_subjobs"><code class="docutils literal notranslate"><span class="pre">get_subjobs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.job.load_job_from_directory"><code class="docutils literal notranslate"><span class="pre">load_job_from_directory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.job.load_job_tree"><code class="docutils literal notranslate"><span class="pre">load_job_tree()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools.utils">asimtools.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.change_dict_value"><code class="docutils literal notranslate"><span class="pre">change_dict_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.change_dict_values"><code class="docutils literal notranslate"><span class="pre">change_dict_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.check_if_slurm_job_is_running"><code class="docutils literal notranslate"><span class="pre">check_if_slurm_job_is_running()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.expand_wildcards"><code class="docutils literal notranslate"><span class="pre">expand_wildcards()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.find_nth"><code class="docutils literal notranslate"><span class="pre">find_nth()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.get_atoms"><code class="docutils literal notranslate"><span class="pre">get_atoms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.get_axis_lims"><code class="docutils literal notranslate"><span class="pre">get_axis_lims()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.get_calc_input"><code class="docutils literal notranslate"><span class="pre">get_calc_input()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.get_env_input"><code class="docutils literal notranslate"><span class="pre">get_env_input()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.get_images"><code class="docutils literal notranslate"><span class="pre">get_images()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.get_logger"><code class="docutils literal notranslate"><span class="pre">get_logger()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.get_nth_label"><code class="docutils literal notranslate"><span class="pre">get_nth_label()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.get_str_btn"><code class="docutils literal notranslate"><span class="pre">get_str_btn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.improve_plot"><code class="docutils literal notranslate"><span class="pre">improve_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.join_names"><code class="docutils literal notranslate"><span class="pre">join_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.new_db"><code class="docutils literal notranslate"><span class="pre">new_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.parse_slice"><code class="docutils literal notranslate"><span class="pre">parse_slice()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.read_yaml"><code class="docutils literal notranslate"><span class="pre">read_yaml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.repeat_to_n"><code class="docutils literal notranslate"><span class="pre">repeat_to_n()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.strip_symbols"><code class="docutils literal notranslate"><span class="pre">strip_symbols()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.write_atoms"><code class="docutils literal notranslate"><span class="pre">write_atoms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.write_csv_from_dict"><code class="docutils literal notranslate"><span class="pre">write_csv_from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.utils.write_yaml"><code class="docutils literal notranslate"><span class="pre">write_yaml()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.html#module-asimtools">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.ChainedJob"><code class="docutils literal notranslate"><span class="pre">ChainedJob</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.ChainedJob.get_last_output"><code class="docutils literal notranslate"><span class="pre">ChainedJob.get_last_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.ChainedJob.submit"><code class="docutils literal notranslate"><span class="pre">ChainedJob.submit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.DistributedJob"><code class="docutils literal notranslate"><span class="pre">DistributedJob</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.DistributedJob.gen_input_files"><code class="docutils literal notranslate"><span class="pre">DistributedJob.gen_input_files()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.DistributedJob.submit"><code class="docutils literal notranslate"><span class="pre">DistributedJob.submit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.DistributedJob.submit_jobs"><code class="docutils literal notranslate"><span class="pre">DistributedJob.submit_jobs()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.DistributedJob.submit_sh_array"><code class="docutils literal notranslate"><span class="pre">DistributedJob.submit_sh_array()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.DistributedJob.submit_slurm_array"><code class="docutils literal notranslate"><span class="pre">DistributedJob.submit_slurm_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.Job"><code class="docutils literal notranslate"><span class="pre">Job</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.add_output_files"><code class="docutils literal notranslate"><span class="pre">Job.add_output_files()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.complete"><code class="docutils literal notranslate"><span class="pre">Job.complete()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.discard"><code class="docutils literal notranslate"><span class="pre">Job.discard()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.fail"><code class="docutils literal notranslate"><span class="pre">Job.fail()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.get_calc_input"><code class="docutils literal notranslate"><span class="pre">Job.get_calc_input()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.get_env_input"><code class="docutils literal notranslate"><span class="pre">Job.get_env_input()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.get_logger"><code class="docutils literal notranslate"><span class="pre">Job.get_logger()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.get_output"><code class="docutils literal notranslate"><span class="pre">Job.get_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.get_output_yaml"><code class="docutils literal notranslate"><span class="pre">Job.get_output_yaml()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.get_sim_input"><code class="docutils literal notranslate"><span class="pre">Job.get_sim_input()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.get_status"><code class="docutils literal notranslate"><span class="pre">Job.get_status()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.get_workdir"><code class="docutils literal notranslate"><span class="pre">Job.get_workdir()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.go_to_workdir"><code class="docutils literal notranslate"><span class="pre">Job.go_to_workdir()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.leave_workdir"><code class="docutils literal notranslate"><span class="pre">Job.leave_workdir()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.mkworkdir"><code class="docutils literal notranslate"><span class="pre">Job.mkworkdir()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.set_status"><code class="docutils literal notranslate"><span class="pre">Job.set_status()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.set_workdir"><code class="docutils literal notranslate"><span class="pre">Job.set_workdir()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.start"><code class="docutils literal notranslate"><span class="pre">Job.start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.update_calc_input"><code class="docutils literal notranslate"><span class="pre">Job.update_calc_input()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.update_env_input"><code class="docutils literal notranslate"><span class="pre">Job.update_env_input()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.update_output"><code class="docutils literal notranslate"><span class="pre">Job.update_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.Job.update_sim_input"><code class="docutils literal notranslate"><span class="pre">Job.update_sim_input()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.UnitJob"><code class="docutils literal notranslate"><span class="pre">UnitJob</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.UnitJob.gen_input_files"><code class="docutils literal notranslate"><span class="pre">UnitJob.gen_input_files()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.UnitJob.gen_run_command"><code class="docutils literal notranslate"><span class="pre">UnitJob.gen_run_command()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="asimtools.html#asimtools.UnitJob.submit"><code class="docutils literal notranslate"><span class="pre">UnitJob.submit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.change_dict_value"><code class="docutils literal notranslate"><span class="pre">change_dict_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.change_dict_values"><code class="docutils literal notranslate"><span class="pre">change_dict_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.expand_wildcards"><code class="docutils literal notranslate"><span class="pre">expand_wildcards()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.get_atoms"><code class="docutils literal notranslate"><span class="pre">get_atoms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.get_images"><code class="docutils literal notranslate"><span class="pre">get_images()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.get_str_btn"><code class="docutils literal notranslate"><span class="pre">get_str_btn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.join_names"><code class="docutils literal notranslate"><span class="pre">join_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.load_calc"><code class="docutils literal notranslate"><span class="pre">load_calc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.read_yaml"><code class="docutils literal notranslate"><span class="pre">read_yaml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.repeat_to_n"><code class="docutils literal notranslate"><span class="pre">repeat_to_n()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.write_atoms"><code class="docutils literal notranslate"><span class="pre">write_atoms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="asimtools.html#asimtools.write_yaml"><code class="docutils literal notranslate"><span class="pre">write_yaml()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="include_changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="include_changelog.html#change-log">Change Log</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="include_changelog.html#id1">[0.3.0] - 2026-05-07</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#breaking-changes">Breaking changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#added">Added</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#changed">Changed</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="include_changelog.html#id2">[0.2.0] - 2026-04-06</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#id3">Breaking changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#id4">Added</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#id5">Changed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#fixed">Fixed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#performance">Performance</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="include_changelog.html#develop-2025-2-14">[develop] - 2025-2-14</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#id6">Added</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#id7">Changed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#id8">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="include_changelog.html#id9">[0.1.0] - 2024-12-27</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#id10">Added</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#id11">Changed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_changelog.html#id12">Fixed</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="include_contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="include_contributing.html#contributing">Contributing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="include_contributing.html#pull-request-process">Pull Request Process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="include_contributing.html#code-of-conduct">Code of Conduct</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="include_contributing.html#our-pledge">Our Pledge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_contributing.html#our-standards">Our Standards</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_contributing.html#our-responsibilities">Our Responsibilities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_contributing.html#scope">Scope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_contributing.html#enforcement">Enforcement</a></li>
+<li class="toctree-l4"><a class="reference internal" href="include_contributing.html#attribution">Attribution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-right" title="Running an Existing Asimmodule" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

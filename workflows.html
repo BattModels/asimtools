@@ -1,0 +1,760 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using built-in workflow tools &mdash; asimtools 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asimtools.asimmodules.workflows package" href="asimtools.asimmodules.workflows.html" />
+    <link rel="prev" title="Developing Custom Asimmodules" href="asimplify.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Running asimmodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asimplify.html">Custom asimmodules</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Workflows</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sim-array">sim_array</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#when-to-use">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#key-parameters">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-sweep-lattice-constants">Example — sweep lattice constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-sweep-over-a-set-of-structure-files">Example — sweep over a set of structure files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-sweep-two-parameters-simultaneously">Example — sweep two parameters simultaneously</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#image-array">image_array</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-single-point-energy-on-a-dataset">Example — single-point energy on a dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-relax-all-structures-in-an-xyz-file">Example — relax all structures in an xyz file</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#calc-array">calc_array</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-benchmark-multiple-calculators">Example — benchmark multiple calculators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-converge-dft-cutoff-energy">Example — converge DFT cutoff energy</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#distributed">distributed</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id5">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#chained">chained</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id7">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-relax-then-compute-phonons">Example — relax then compute phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-three-step-pipeline-with-a-parallel-middle-step">Example — three-step pipeline with a parallel middle step</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#iterative">iterative</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id9">When to use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id10">Key parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-sequential-geometry-relaxations-at-increasing-pressures">Example — sequential geometry relaxations at increasing pressures</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#update-dependencies">update_dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-reference">API reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asimtools.asimmodules.workflows.html">asimtools.asimmodules.workflows package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="include_changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="include_contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asimtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Using built-in workflow tools</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/workflows.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="using-built-in-workflow-tools">
+<h1>Using built-in workflow tools<a class="headerlink" href="#using-built-in-workflow-tools" title="Link to this heading"></a></h1>
+<p>ASIMTools provides six built-in workflow asimmodules for the most common
+simulation patterns. They are all wrappers around the
+<a class="reference internal" href="asimtools.html#asimtools.job.DistributedJob" title="asimtools.job.DistributedJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistributedJob</span></code></a> and <a class="reference internal" href="asimtools.html#asimtools.job.ChainedJob" title="asimtools.job.ChainedJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChainedJob</span></code></a>
+classes and can be nested arbitrarily.</p>
+<nav class="contents local" id="workflows">
+<p class="topic-title">Workflows</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#sim-array" id="id11">sim_array</a></p></li>
+<li><p><a class="reference internal" href="#image-array" id="id12">image_array</a></p></li>
+<li><p><a class="reference internal" href="#calc-array" id="id13">calc_array</a></p></li>
+<li><p><a class="reference internal" href="#distributed" id="id14">distributed</a></p></li>
+<li><p><a class="reference internal" href="#chained" id="id15">chained</a></p></li>
+<li><p><a class="reference internal" href="#iterative" id="id16">iterative</a></p></li>
+<li><p><a class="reference internal" href="#update-dependencies" id="id17">update_dependencies</a></p></li>
+<li><p><a class="reference internal" href="#api-reference" id="id18">API reference</a></p></li>
+</ul>
+</nav>
+<hr class="docutils" />
+<section id="sim-array">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">sim_array</a><a class="headerlink" href="#sim-array" title="Link to this heading"></a></h2>
+<p><strong>Module:</strong> <a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.sim_array.sim_array" title="asimtools.asimmodules.workflows.sim_array.sim_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.asimmodules.workflows.sim_array.sim_array()</span></code></a></p>
+<p>Run the <strong>same asimmodule in parallel</strong> over a sweep of values for a single
+argument (or a paired set of arguments). This is the most generally useful
+workflow and covers parameter sweeps, convergence tests, and ensemble runs.</p>
+<section id="when-to-use">
+<h3>When to use<a class="headerlink" href="#when-to-use" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Sweep a lattice constant, cutoff energy, temperature, etc.</p></li>
+<li><p>Vary an integer index (e.g. run the same relaxation on structures 0-99).</p></li>
+<li><p>Sweep multiple parameters simultaneously (<code class="docutils literal notranslate"><span class="pre">secondary_key_sequences</span></code>).</p></li>
+</ul>
+</section>
+<section id="key-parameters">
+<h3>Key parameters<a class="headerlink" href="#key-parameters" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">template_sim_input</span></code></p></td>
+<td><p>Base sim_input copied for every job.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">key_sequence</span></code></p></td>
+<td><p>Dot-path into the nested dict being swept,
+e.g. <code class="docutils literal notranslate"><span class="pre">[args,</span> <span class="pre">a]</span></code> to change <code class="docutils literal notranslate"><span class="pre">args.a</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">array_values</span></code></p></td>
+<td><p>Explicit list of values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">linspace_args</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[start,</span> <span class="pre">stop,</span> <span class="pre">n]</span></code> — passed to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.linspace()</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">arange_args</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[start,</span> <span class="pre">stop,</span> <span class="pre">step]</span></code> — passed to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.arange()</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">file_pattern</span></code></p></td>
+<td><p>Glob pattern; files matching it become values.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">labels</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;values&quot;</span></code> (default) uses the value itself;
+<code class="docutils literal notranslate"><span class="pre">&quot;files&quot;</span></code> extracts a label from the file path;
+a list provides explicit directory names.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">placeholder</span></code></p></td>
+<td><p>Replace this sentinel string inside the value
+rather than the whole value.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">secondary_key_sequences</span></code></p></td>
+<td><p>Additional keys to sweep in lock-step.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">group_size</span></code></p></td>
+<td><p>Pack N jobs into each Slurm array task.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="example-sweep-lattice-constants">
+<h3>Example — sweep lattice constants<a class="headerlink" href="#example-sweep-lattice-constants" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># sim_input.yaml</span>
+<span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.sim_array</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/lc_sweep</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">image</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">a</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">linspace_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">3.4</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4.2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">9</span><span class="p p-Indicator">]</span><span class="w">   </span><span class="c1"># 9 values from 3.4 to 4.2 Å</span>
+<span class="w">  </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">singlepoint</span>
+<span class="w">    </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+<span class="w">      </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Cu</span>
+<span class="w">        </span><span class="nt">crystalstructure</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fcc</span>
+<span class="w">        </span><span class="nt">a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PLACEHOLDER</span>
+<span class="w">      </span><span class="nt">properties</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">energy</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">forces</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">stress</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+<section id="example-sweep-over-a-set-of-structure-files">
+<h3>Example — sweep over a set of structure files<a class="headerlink" href="#example-sweep-over-a-set-of-structure-files" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.sim_array</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/structure_sweep</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">image</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">image_file</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">file_pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/structures/*.xyz</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">files</span><span class="w">             </span><span class="c1"># label taken from the filename</span>
+<span class="w">  </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">geometry_optimization.cell_relax</span>
+<span class="w">    </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+<span class="w">      </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">image_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PLACEHOLDER</span>
+</pre></div>
+</div>
+</section>
+<section id="example-sweep-two-parameters-simultaneously">
+<h3>Example — sweep two parameters simultaneously<a class="headerlink" href="#example-sweep-two-parameters-simultaneously" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.sim_array</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/dual_sweep</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">temperature</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">array_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">300</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">600</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">900</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1200</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">secondary_key_sequences</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">pressure</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">secondary_array_values</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4.0</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ase_md.ase_md</span>
+<span class="w">    </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+<span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">Fe</span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="nt">temperature</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300</span>
+<span class="w">      </span><span class="nt">pressure</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="image-array">
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">image_array</a><a class="headerlink" href="#image-array" title="Link to this heading"></a></h2>
+<p><strong>Module:</strong> <a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.image_array.image_array" title="asimtools.asimmodules.workflows.image_array.image_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.asimmodules.workflows.image_array.image_array()</span></code></a></p>
+<p>Run the <strong>same asimmodule in parallel on multiple structures</strong>. The image
+input specification for each job is taken from
+<a class="reference internal" href="asimtools.html#asimtools.utils.get_images" title="asimtools.utils.get_images"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.utils.get_images()</span></code></a>, so any combination of file patterns,
+explicit lists, or ASE database queries is supported.</p>
+<section id="id1">
+<h3>When to use<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Relaxation or single-point calculation across a database of structures.</p></li>
+<li><p>Benchmark a force field against a set of reference structures.</p></li>
+<li><p>Compute phonons for every structure in a dataset.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Key parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">images</span></code></p></td>
+<td><p>Dict for <a class="reference internal" href="asimtools.html#asimtools.utils.get_images" title="asimtools.utils.get_images"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_images()</span></code></a>;
+can use <code class="docutils literal notranslate"><span class="pre">image_file</span></code>, <code class="docutils literal notranslate"><span class="pre">pattern</span></code>,
+<code class="docutils literal notranslate"><span class="pre">patterns</span></code>, or <code class="docutils literal notranslate"><span class="pre">images</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">template_sim_input</span></code></p></td>
+<td><p>Base sim_input; image key is injected per job.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">key_sequence</span></code></p></td>
+<td><p>Where in <code class="docutils literal notranslate"><span class="pre">template_sim_input</span></code> to inject the
+image path (default <code class="docutils literal notranslate"><span class="pre">[args,</span> <span class="pre">image,</span>
+<span class="pre">image_file]</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">labels</span></code></p></td>
+<td><p>Source of directory name for each job.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">env_ids</span></code></p></td>
+<td><p>Per-image environments (or a single string).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="example-single-point-energy-on-a-dataset">
+<h3>Example — single-point energy on a dataset<a class="headerlink" href="#example-single-point-energy-on-a-dataset" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.image_array</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/dataset_sp</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">images</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/structures/*.xyz</span>
+<span class="w">  </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">singlepoint</span>
+<span class="w">    </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+<span class="w">      </span><span class="nt">properties</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">energy</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">forces</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">stress</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">files</span>
+</pre></div>
+</div>
+</section>
+<section id="example-relax-all-structures-in-an-xyz-file">
+<h3>Example — relax all structures in an xyz file<a class="headerlink" href="#example-relax-all-structures-in-an-xyz-file" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.image_array</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/relax_all</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">images</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/structures.xyz</span>
+<span class="w">  </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">geometry_optimization.atom_relax</span>
+<span class="w">    </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="calc-array">
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">calc_array</a><a class="headerlink" href="#calc-array" title="Link to this heading"></a></h2>
+<p><strong>Module:</strong> <a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.calc_array.calc_array" title="asimtools.asimmodules.workflows.calc_array.calc_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.asimmodules.workflows.calc_array.calc_array()</span></code></a></p>
+<p>Run the <strong>same asimmodule in parallel with different calculators</strong> (or
+different calculator hyperparameters). Useful for benchmarking, convergence
+studies, or comparing multiple potentials.</p>
+<section id="id3">
+<h3>When to use<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Compare DFT, ML potentials, and empirical force fields on the same system.</p></li>
+<li><p>Converge a DFT parameter (cutoff energy, k-point density) across many values.</p></li>
+<li><p>Benchmark a new potential against a reference.</p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>Key parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">subsim_input</span></code></p></td>
+<td><p>The sim_input for the asimmodule to run.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">calculators</span></code></p></td>
+<td><p>Explicit list of calculator dicts, each with
+a <code class="docutils literal notranslate"><span class="pre">calc_id</span></code> or <code class="docutils literal notranslate"><span class="pre">calc_params</span></code> key.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">template_calculator</span></code></p></td>
+<td><p>Base calculator dict; <code class="docutils literal notranslate"><span class="pre">key_sequence</span></code> is swept
+inside its parameters.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">key_sequence</span></code></p></td>
+<td><p>Path into the calculator dict to sweep.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">array_values</span></code> /
+<code class="docutils literal notranslate"><span class="pre">linspace_args</span></code> /
+<code class="docutils literal notranslate"><span class="pre">arange_args</span></code></p></td>
+<td><p>Values to sweep (same semantics as
+<code class="docutils literal notranslate"><span class="pre">sim_array</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">calc_ids</span></code></p></td>
+<td><p><em>Deprecated</em> — list of calc_id strings.
+Auto-converted to <code class="docutils literal notranslate"><span class="pre">calculators</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">template_calc_id</span></code></p></td>
+<td><p><em>Deprecated</em> — base calc_id string.
+Auto-converted to <code class="docutils literal notranslate"><span class="pre">template_calculator</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="example-benchmark-multiple-calculators">
+<h3>Example — benchmark multiple calculators<a class="headerlink" href="#example-benchmark-multiple-calculators" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.calc_array</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/calc_benchmark</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">calculators</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emt</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lj_argon</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mace_mp</span>
+<span class="w">  </span><span class="nt">subsim_input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">singlepoint</span>
+<span class="w">    </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">Ar</span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="nt">properties</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">energy</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">forces</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+<section id="example-converge-dft-cutoff-energy">
+<h3>Example — converge DFT cutoff energy<a class="headerlink" href="#example-converge-dft-cutoff-energy" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.calc_array</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/ecut_convergence</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">template_calculator</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vasp_base</span>
+<span class="w">  </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">encut</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">linspace_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">200</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">600</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">9</span><span class="p p-Indicator">]</span><span class="w">   </span><span class="c1"># 200, 250, …, 600 eV</span>
+<span class="w">  </span><span class="nt">subsim_input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">singlepoint</span>
+<span class="w">    </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">Fe</span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="nt">properties</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">energy</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="distributed">
+<h2><a class="toc-backref" href="#id14" role="doc-backlink">distributed</a><a class="headerlink" href="#distributed" title="Link to this heading"></a></h2>
+<p><strong>Module:</strong> <a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.distributed.distributed" title="asimtools.asimmodules.workflows.distributed.distributed"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.asimmodules.workflows.distributed.distributed()</span></code></a></p>
+<p>Submit an <strong>arbitrary collection of heterogeneous sim_inputs in parallel</strong>.
+Unlike <code class="docutils literal notranslate"><span class="pre">sim_array</span></code> / <code class="docutils literal notranslate"><span class="pre">image_array</span></code> / <code class="docutils literal notranslate"><span class="pre">calc_array</span></code>, each sub-job can be
+a completely different asimmodule with different parameters.</p>
+<section id="id5">
+<h3>When to use<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Run a heterogeneous set of jobs that do not share a common template.</p></li>
+<li><p>Fan out to many independent calculations and collect results later.</p></li>
+<li><p>Use as the parallel layer in a custom workflow script.</p></li>
+</ul>
+</section>
+<section id="id6">
+<h3>Key parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">subsim_inputs</span></code></p></td>
+<td><p>Dict mapping job IDs to individual sim_inputs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">array_max</span></code></p></td>
+<td><p>Max concurrent jobs in Slurm array.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">group_size</span></code></p></td>
+<td><p>Pack N jobs per Slurm array task.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">skip_failed</span></code></p></td>
+<td><p>Continue even if some sub-jobs fail.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.distributed</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/mixed_jobs</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">subsim_inputs</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">eos_fe</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eos.postprocess</span>
+<span class="w">      </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">Fe</span><span class="p p-Indicator">}</span>
+<span class="w">        </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+<span class="w">    </span><span class="nt">relax_cu</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">geometry_optimization.cell_relax</span>
+<span class="w">      </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">Cu</span><span class="p p-Indicator">}</span>
+<span class="w">        </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+<span class="w">    </span><span class="nt">sp_ar</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">singlepoint</span>
+<span class="w">      </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">Ar</span><span class="p p-Indicator">}</span>
+<span class="w">        </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emt</span>
+<span class="w">        </span><span class="nt">properties</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">energy</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="chained">
+<h2><a class="toc-backref" href="#id15" role="doc-backlink">chained</a><a class="headerlink" href="#chained" title="Link to this heading"></a></h2>
+<p><strong>Module:</strong> <a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.chained.chained" title="asimtools.asimmodules.workflows.chained.chained"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.asimmodules.workflows.chained.chained()</span></code></a></p>
+<p>Run asimmodules <strong>one after the other</strong>, where each step can depend on files
+produced by the previous step. When Slurm is used, job dependencies are set
+automatically via <code class="docutils literal notranslate"><span class="pre">sbatch</span> <span class="pre">--dependency</span></code>.</p>
+<section id="id7">
+<h3>When to use<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Multi-step workflows: relax → single-point → post-process.</p></li>
+<li><p>Any workflow where step N reads output files from step N-1.</p></li>
+<li><p>Chain a <code class="docutils literal notranslate"><span class="pre">sim_array</span></code> with a post-processing script.</p></li>
+</ul>
+</section>
+<section id="id8">
+<h3>Key parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">steps</span></code></p></td>
+<td><p>Ordered dict (<code class="docutils literal notranslate"><span class="pre">step-0</span></code>, <code class="docutils literal notranslate"><span class="pre">step-1</span></code>, …) of
+sim_inputs to execute in sequence.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Keys must follow the pattern <code class="docutils literal notranslate"><span class="pre">step-N</span></code> (zero-indexed integers). If a step
+internally launches additional Slurm jobs (e.g. via <code class="docutils literal notranslate"><span class="pre">sim_array</span></code>), use
+<code class="docutils literal notranslate"><span class="pre">update_dependencies</span></code> as an intermediate step to wire up the Slurm
+dependency chain correctly.</p>
+</div>
+</section>
+<section id="example-relax-then-compute-phonons">
+<h3>Example — relax then compute phonons<a class="headerlink" href="#example-relax-then-compute-phonons" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.chained</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/relax_then_phonons</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">step-0</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">geometry_optimization.cell_relax</span>
+<span class="w">      </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">Cu</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">step-1</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">phonons.ase_phonons</span>
+<span class="w">      </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">image_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../step-0/final.xyz</span>
+</pre></div>
+</div>
+</section>
+<section id="example-three-step-pipeline-with-a-parallel-middle-step">
+<h3>Example — three-step pipeline with a parallel middle step<a class="headerlink" href="#example-three-step-pipeline-with-a-parallel-middle-step" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.chained</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/pipeline</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">step-0</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">geometry_optimization.cell_relax</span>
+<span class="w">      </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">Al</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">step-1</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.sim_array</span>
+<span class="w">      </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">image</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">a</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">linspace_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">3.9</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4.1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">singlepoint</span>
+<span class="w">          </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">          </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+<span class="w">            </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Al</span>
+<span class="w">              </span><span class="nt">a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PLACEHOLDER</span>
+<span class="w">    </span><span class="nt">step-2</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eos.postprocess</span>
+<span class="w">      </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../step-1</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="iterative">
+<h2><a class="toc-backref" href="#id16" role="doc-backlink">iterative</a><a class="headerlink" href="#iterative" title="Link to this heading"></a></h2>
+<p><strong>Module:</strong> <a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.iterative.iterative" title="asimtools.asimmodules.workflows.iterative.iterative"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.asimmodules.workflows.iterative.iterative()</span></code></a></p>
+<p>Run the <strong>same asimmodule sequentially</strong> over a sweep of values where each
+job must complete before the next begins. Unlike <code class="docutils literal notranslate"><span class="pre">sim_array</span></code>, jobs run
+one at a time. Optionally, a file produced by each step can be fed as input
+to the next (<code class="docutils literal notranslate"><span class="pre">dependent_file</span></code>).</p>
+<section id="id9">
+<h3>When to use<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Each step’s output is input to the next (e.g. active-learning loops).</p></li>
+<li><p>A sequential sweep where order matters.</p></li>
+<li><p>Iterative fitting or refinement workflows.</p></li>
+</ul>
+</section>
+<section id="id10">
+<h3>Key parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">template_sim_input</span></code></p></td>
+<td><p>Base sim_input for each step.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">key_sequence</span></code></p></td>
+<td><p>Key path swept across steps.</p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p><code class="docutils literal notranslate"><span class="pre">array_values</span></code> / <code class="docutils literal notranslate"><span class="pre">linspace_args</span></code> | Values to iterate over.
+/ <code class="docutils literal notranslate"><span class="pre">arange_args</span></code>                 |</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dependent_file</span></code></p></td>
+<td><p>Filename (relative to each step’s workdir)
+to pass as input to the next step.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependent_file_key_sequence</span></code></p></td>
+<td><p>Key path in the next step’s sim_input where
+the file path is injected.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="example-sequential-geometry-relaxations-at-increasing-pressures">
+<h3>Example — sequential geometry relaxations at increasing pressures<a class="headerlink" href="#example-sequential-geometry-relaxations-at-increasing-pressures" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.iterative</span>
+<span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/pressure_series</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">pressure</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">array_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">10</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">dependent_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">final.xyz</span>
+<span class="w">  </span><span class="nt">dependent_file_key_sequence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">image</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">image_file</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">template_sim_input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">geometry_optimization.cell_relax</span>
+<span class="w">    </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">calculator</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">calc_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_mlip</span>
+<span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">Fe</span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="nt">pressure</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="update-dependencies">
+<h2><a class="toc-backref" href="#id17" role="doc-backlink">update_dependencies</a><a class="headerlink" href="#update-dependencies" title="Link to this heading"></a></h2>
+<p><strong>Module:</strong>
+<a class="reference internal" href="asimtools.asimmodules.workflows.html#asimtools.asimmodules.workflows.update_dependencies.update_dependencies" title="asimtools.asimmodules.workflows.update_dependencies.update_dependencies"><code class="xref py py-func docutils literal notranslate"><span class="pre">asimtools.asimmodules.workflows.update_dependencies.update_dependencies()</span></code></a></p>
+<p>An <strong>internal helper</strong> used by <code class="docutils literal notranslate"><span class="pre">chained</span></code> to wire up Slurm job dependencies
+when one step internally launches additional Slurm jobs (e.g. via
+<code class="docutils literal notranslate"><span class="pre">sim_array</span></code>). It reads the job IDs written by the previous step and calls
+<code class="docutils literal notranslate"><span class="pre">scontrol</span> <span class="pre">update</span></code> to add the correct <code class="docutils literal notranslate"><span class="pre">afterok</span></code> dependency on the next
+step’s jobs.</p>
+<p>Most users will not need to call this directly; it is inserted automatically
+by <code class="docutils literal notranslate"><span class="pre">chained</span></code> when needed. It has no effect outside of a Slurm environment.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example use inside a chained workflow (advanced)</span>
+<span class="nt">step-1</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">asimmodule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workflows.update_dependencies</span>
+<span class="w">  </span><span class="nt">env_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">batch</span>
+<span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">prev_step_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../step-0</span>
+<span class="w">    </span><span class="nt">next_step_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../step-2</span>
+<span class="w">    </span><span class="nt">skip_failed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="api-reference">
+<h2><a class="toc-backref" href="#id18" role="doc-backlink">API reference</a><a class="headerlink" href="#api-reference" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="asimtools.asimmodules.workflows.html">asimtools.asimmodules.workflows package</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="asimplify.html" class="btn btn-neutral float-left" title="Developing Custom Asimmodules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="asimtools.asimmodules.workflows.html" class="btn btn-neutral float-right" title="asimtools.asimmodules.workflows package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

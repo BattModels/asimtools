@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>asimtools.asimmodules.vasp.vasp &mdash; asimtools 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Running asimmodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../asimplify.html">Custom asimmodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../workflows.html">Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../include_changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../include_contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">asimtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">asimtools.asimmodules.vasp.vasp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for asimtools.asimmodules.vasp.vasp</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Runs VASP based on input files and optionally MP settings. </span>
+<span class="sd">Heavily uses pymatgen for IO and MP settings.</span>
+<span class="sd">VASP must be installed </span>
+
+<span class="sd">Author: mkphuthi@github.com</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">randint</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase</span><span class="w"> </span><span class="kn">import</span> <span class="n">Atoms</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pymatgen.io.ase</span><span class="w"> </span><span class="kn">import</span> <span class="n">AseAtomsAdaptor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pymatgen.io.vasp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Poscar</span><span class="p">,</span> <span class="n">Incar</span><span class="p">,</span> <span class="n">Potcar</span><span class="p">,</span> <span class="n">Kpoints</span><span class="p">,</span> <span class="n">VaspInput</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pymatgen.io.vasp.sets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">asimtools.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_atoms</span><span class="p">,</span>
+    <span class="n">get_str_btn</span><span class="p">,</span>
+<span class="p">)</span>
+
+<div class="viewcode-block" id="execute_vasp_run_command">
+<a class="viewcode-back" href="../../../../asimtools.asimmodules.vasp.html#asimtools.asimmodules.vasp.vasp.execute_vasp_run_command">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">execute_vasp_run_command</span><span class="p">(</span>
+    <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">completed_process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">command</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;vasp_stdout.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">completed_process</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">completed_process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">err_txt</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;VASP failed with error code: </span><span class="si">{</span><span class="n">completed_process</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">err_txt</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">See vasp_stderr.txt for details.&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_txt</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;vasp_stderr.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">completed_process</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">completed_process</span><span class="o">.</span><span class="n">check_returncode</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;ZBRENT: fatal error in bracketing&quot;</span> <span class="ow">in</span> <span class="n">completed_process</span><span class="o">.</span><span class="n">stderr</span><span class="p">:</span>
+            <span class="n">filenum</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;OUTCAR.</span><span class="si">{</span><span class="n">filenum</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
+                <span class="n">filenum</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s1">&#39;OUTCAR&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;OUTCAR.</span><span class="si">{</span><span class="n">filenum</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s1">&#39;POSCAR&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;POSCAR.</span><span class="si">{</span><span class="n">filenum</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s1">&#39;CONTCAR&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;POSCAR&#39;</span><span class="p">)</span>
+            <span class="n">execute_vasp_run_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;VASP run completed with code </span><span class="si">{</span><span class="n">completed_process</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s1">.&#39;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="vasp">
+<a class="viewcode-back" href="../../../../asimtools.asimmodules.vasp.html#asimtools.asimmodules.vasp.vasp.vasp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">vasp</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span>
+    <span class="n">user_incar_settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">user_kpoints_settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">user_potcar_functional</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;PBE_64&#39;</span><span class="p">,</span>
+    <span class="n">potcar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">vaspinput_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">command</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;srun vasp_std&#39;</span><span class="p">,</span>
+    <span class="n">mpset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">prev_calc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">write_image_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">run_vasp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run VASP with given input files and specified image</span>
+
+<span class="sd">    :param image: Initial image for VASP calculation. Image specification,</span>
+<span class="sd">        see :func:`asimtools.utils.get_atoms`</span>
+<span class="sd">    :type image: Dict</span>
+<span class="sd">    :param user_incar_settings: Dictionary of INCAR settings to override</span>
+<span class="sd">        defaults or MP settings, defaults to None</span>
+<span class="sd">    :type user_incar_settings: Dict, optional</span>
+<span class="sd">    :param user_kpoints_settings: Dictionary of KPOINTS settings to override</span>
+<span class="sd">        defaults or MP settings, defaults to None</span>
+<span class="sd">    :type user_kpoints_settings: Dict, optional</span>
+<span class="sd">    :param user_potcar_functional: Potcar functional to use in case of MP</span>
+<span class="sd">        settings, defaults to &#39;PBE_64&#39;</span>
+<span class="sd">    :type user_potcar_functional: str, optional</span>
+<span class="sd">    :param potcar: Dictionary specifying Potcar settings, see</span>
+<span class="sd">        :class:`pymatgen.io.vasp.inputs.Potcar`, defaults to None</span>
+<span class="sd">    :type potcar: Dict, optional</span>
+<span class="sd">    :param prev_calc: Path to previous VASP calculation to use as starting</span>
+<span class="sd">        point for MP settings, defaults to None</span>
+<span class="sd">    :type prev_calc: os.PathLike, optional</span>
+<span class="sd">    :param vaspinput_kwargs: Dictionary of pymatgen&#39;s VaspInput arguments. </span>
+<span class="sd">        See :class:`pymatgen.io.vasp.inputs.VaspInput`</span>
+<span class="sd">    :type vaspinput_kwargs: Dict</span>
+<span class="sd">    :param command: Command with which to run VASP, defaults to &#39;vasp_std&#39;</span>
+<span class="sd">    :type command: str, optional</span>
+<span class="sd">    :param mpset: Materials Project VASP set to use see </span>
+<span class="sd">        :mod:`pymatgen.io.vasp.sets`, defaults to None</span>
+<span class="sd">    :type mpset: str, optional</span>
+<span class="sd">    :param write_image_output: Whether to write output image in standard </span>
+<span class="sd">        asimtools format to file, defaults to False</span>
+<span class="sd">    :type write_image_output: bool, optional</span>
+<span class="sd">    :param run_vasp: Whether to run VASP after writing input files,</span>
+<span class="sd">        defaults to True</span>
+<span class="sd">    :type run_vasp: bool, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">vaspinput_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">vaspinput_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">struct</span> <span class="o">=</span> <span class="n">get_atoms</span><span class="p">(</span><span class="o">**</span><span class="n">image</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;pymatgen&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mpset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">set_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pymatgen</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">vasp</span><span class="o">.</span><span class="n">sets</span><span class="p">,</span> <span class="n">mpset</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Unknown mpset: </span><span class="si">{</span><span class="n">mpset</span><span class="si">}</span><span class="s1">. See available sets in pymatgen.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">prev_calc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vasp_input</span> <span class="o">=</span> <span class="n">set_</span><span class="o">.</span><span class="n">from_prev_calc</span><span class="p">(</span>
+                <span class="n">prev_calc</span><span class="p">,</span>
+                <span class="n">user_incar_settings</span><span class="o">=</span><span class="n">user_incar_settings</span><span class="p">,</span>
+                <span class="n">user_kpoints_settings</span><span class="o">=</span><span class="n">user_kpoints_settings</span><span class="p">,</span>
+                <span class="n">user_potcar_functional</span><span class="o">=</span><span class="n">user_potcar_functional</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">vaspinput_kwargs</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vasp_input</span> <span class="o">=</span> <span class="n">set_</span><span class="p">(</span>
+                <span class="n">struct</span><span class="p">,</span>
+                <span class="n">user_incar_settings</span><span class="o">=</span><span class="n">user_incar_settings</span><span class="p">,</span>
+                <span class="n">user_kpoints_settings</span><span class="o">=</span><span class="n">user_kpoints_settings</span><span class="p">,</span>
+                <span class="n">user_potcar_functional</span><span class="o">=</span><span class="n">user_potcar_functional</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">vaspinput_kwargs</span>
+            <span class="p">)</span>
+        
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="n">incar</span> <span class="o">=</span> <span class="n">Incar</span><span class="p">(</span><span class="n">user_incar_settings</span><span class="p">)</span>
+        <span class="n">incar</span><span class="o">.</span><span class="n">check_params</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">potcar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">potcar</span> <span class="o">=</span> <span class="n">Potcar</span><span class="p">(</span><span class="n">potcar</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">user_kpoints_settings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kpoints</span> <span class="o">=</span> <span class="n">Kpoints</span><span class="p">(</span><span class="n">user_kpoints_settings</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kpoints</span><span class="o">=</span><span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">vaspinput_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vaspinput_args</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">vasp_input</span> <span class="o">=</span> <span class="n">VaspInput</span><span class="p">(</span>
+            <span class="n">incar</span><span class="o">=</span><span class="n">incar</span><span class="p">,</span>
+            <span class="n">kpoints</span><span class="o">=</span><span class="n">kpoints</span><span class="p">,</span>
+            <span class="n">poscar</span><span class="o">=</span><span class="n">Poscar</span><span class="p">(</span><span class="n">struct</span><span class="p">),</span>
+            <span class="n">potcar</span><span class="o">=</span><span class="n">potcar</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">vaspinput_kwargs</span>
+        <span class="p">)</span>
+
+    <span class="n">vasp_input</span><span class="o">.</span><span class="n">write_input</span><span class="p">(</span><span class="s2">&quot;./&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">run_vasp</span><span class="p">:</span>
+        <span class="n">optimization_failed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">execute_vasp_run_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="n">incar</span> <span class="o">=</span> <span class="n">vasp_input</span><span class="o">.</span><span class="n">incar</span>
+        <span class="n">ibrion</span> <span class="o">=</span> <span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IBRION&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">nsw</span> <span class="o">=</span> <span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;NSW&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># Don&#39;t write result if running a relaxation that didn&#39;t finish</span>
+        <span class="k">if</span> <span class="n">ibrion</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">nsw</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;OUTCAR&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;Ionic step&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                        <span class="n">last_step</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">get_str_btn</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s1">&#39;Ionic step&#39;</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">last_step</span> <span class="o">==</span> <span class="n">nsw</span><span class="p">:</span>
+                            <span class="n">optimization_failed</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                                <span class="s1">&#39;VASP relaxation did not complete. &#39;</span>
+                                <span class="s1">&#39;Check OUTCAR for details.&#39;</span>
+                            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">write_image_output</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">optimization_failed</span><span class="p">:</span>
+            <span class="n">atoms_output</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="s1">&#39;OUTCAR&#39;</span><span class="p">)</span>
+            <span class="n">atoms_output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="s1">&#39;image_output.xyz&#39;</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;extxyz&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

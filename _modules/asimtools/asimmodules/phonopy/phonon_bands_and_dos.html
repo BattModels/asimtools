@@ -1,0 +1,218 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>asimtools.asimmodules.phonopy.phonon_bands_and_dos &mdash; asimtools 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            asimtools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Running asimmodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../asimplify.html">Custom asimmodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../workflows.html">Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../include_changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../include_contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">asimtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">asimtools.asimmodules.phonopy.phonon_bands_and_dos</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for asimtools.asimmodules.phonopy.phonon_bands_and_dos</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">glob</span><span class="w"> </span><span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayLike</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">asimtools.job</span><span class="w"> </span><span class="kn">import</span> <span class="n">UnitJob</span>
+
+<div class="viewcode-block" id="phonon_bands_and_dos">
+<a class="viewcode-back" href="../../../../asimtools.asimmodules.phonopy.html#asimtools.asimmodules.phonopy.phonon_bands_and_dos.phonon_bands_and_dos">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">phonon_bands_and_dos</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">calculator</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">calc_env_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">process_env_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">supercell</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">],</span>
+    <span class="n">distance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span>
+    <span class="n">phonopy_save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;phonopy_save.yaml&#39;</span><span class="p">,</span>
+    <span class="n">paths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+    <span class="n">labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">use_seekpath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">npoints</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">51</span><span class="p">,</span>
+    <span class="n">mesh</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">,</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
+    <span class="n">refine_cell</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">symprec</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Workflow to calculate phonon bands and density of states using phonopy.</span>
+
+<span class="sd">    :param image: Image specification. See :ref:`asimtools.utils.get_image`.</span>
+<span class="sd">    :type image: Dict</span>
+<span class="sd">    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`</span>
+<span class="sd">    :type calculator: Dict</span>
+<span class="sd">    :param calc_env_id: env_id of the calculator to use.</span>
+<span class="sd">    :type calc_env_id: str</span>
+<span class="sd">    :param process_env_id: env_id for pre- and post-processing.</span>
+<span class="sd">    :type process_env_id: str</span>
+<span class="sd">    :param supercell: supercell of specified image, defaults to [10,10,10]</span>
+<span class="sd">    :type supercell: ArrayLike, optional</span>
+<span class="sd">    :param distance: Distance in phonopy, defaults to 0.02</span>
+<span class="sd">    :type distance: float, optional</span>
+<span class="sd">    :param phonopy_save_path: Where to put the phonopy yaml, defaults to </span>
+<span class="sd">        &#39;phonopy_save.yaml&#39;</span>
+<span class="sd">    :type phonopy_save_path: str, optional</span>
+<span class="sd">    :param paths: Path through BZ for bands plot. Has shape Np*Nik*3 where Np </span>
+<span class="sd">        is the number of disconnected paths, Nik is the number of points in</span>
+<span class="sd">        the i-th path and the last dimension is the coordinates in kspace,</span>
+<span class="sd">        e.g. [[(0,0,0),(0,0,1)],[(0,0,0),(0.5,0.5,0.0),(0.25,0.25,0.25)]],</span>
+<span class="sd">        has two disconnected paths with 2 and 3 points respectively,</span>
+<span class="sd">        defaults to None</span>
+<span class="sd">    :type paths: Optional[Sequence[Sequence[Sequence]]], optional</span>
+<span class="sd">    :param labels: Labels for each point provided in paths, defaults to None</span>
+<span class="sd">    :type labels: Optional[ArrayLike], optional</span>
+<span class="sd">    :param use_seekpath: Automatically generate a suggested path, defaults to </span>
+<span class="sd">        True</span>
+<span class="sd">    :type use_seekpath: Optional[bool], optional</span>
+<span class="sd">    :param npoints: Number of points for band path, defaults to 51</span>
+<span class="sd">    :type npoints: int, optional</span>
+<span class="sd">    :param mesh: Size of kpoint mesh for DOS either as integer or array of </span>
+<span class="sd">        length 3, defaults to [20, 20, 20]</span>
+<span class="sd">    :type mesh: Union[ArrayLike,float], optional</span>
+<span class="sd">    :return: result</span>
+<span class="sd">    :rtype: Dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">phonopy_save_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">phonopy_save_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
+    <span class="n">sim_input</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;asimmodule&#39;</span><span class="p">:</span> <span class="s1">&#39;workflows.chained&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;steps&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;step-0&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;asimmodule&#39;</span><span class="p">:</span> <span class="s1">&#39;phonopy.generate_phonopy_displacements&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;env_id&#39;</span><span class="p">:</span> <span class="n">process_env_id</span><span class="p">,</span>
+                    <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="n">image</span><span class="p">,</span>
+                        <span class="s1">&#39;supercell&#39;</span><span class="p">:</span> <span class="n">supercell</span><span class="p">,</span>
+                        <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="n">distance</span><span class="p">,</span>
+                        <span class="s1">&#39;phonopy_save_path&#39;</span><span class="p">:</span> <span class="n">phonopy_save_path</span><span class="p">,</span>
+                        <span class="s1">&#39;refine_cell&#39;</span><span class="p">:</span> <span class="n">refine_cell</span><span class="p">,</span>
+                        <span class="s1">&#39;symprec&#39;</span><span class="p">:</span> <span class="n">symprec</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;step-1&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;asimmodule&#39;</span><span class="p">:</span> <span class="s1">&#39;phonopy.forces&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;env_id&#39;</span><span class="p">:</span> <span class="n">calc_env_id</span><span class="p">,</span>
+                    <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;images&#39;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s1">&#39;pattern&#39;</span><span class="p">:</span> <span class="s1">&#39;../step-0/supercell-*&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;vasp&#39;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="s1">&#39;calculator&#39;</span><span class="p">:</span> <span class="n">calculator</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;step-2&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;asimmodule&#39;</span><span class="p">:</span> <span class="s1">&#39;phonopy.phonon_bands_and_dos_from_forces&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;env_id&#39;</span><span class="p">:</span> <span class="n">process_env_id</span><span class="p">,</span>
+                    <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;supercell_image_file_pattern&#39;</span><span class="p">:</span> <span class="s1">&#39;../step-1/id-*/image_output.xyz&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;phonopy_save_path&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;../step-0&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">phonopy_save_path</span><span class="p">),</span>
+                        <span class="s1">&#39;paths&#39;</span><span class="p">:</span> <span class="n">paths</span><span class="p">,</span>
+                        <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span>
+                        <span class="s1">&#39;use_seekpath&#39;</span><span class="p">:</span> <span class="n">use_seekpath</span><span class="p">,</span>
+                        <span class="s1">&#39;npoints&#39;</span><span class="p">:</span> <span class="n">npoints</span><span class="p">,</span>
+                        <span class="s1">&#39;mesh&#39;</span><span class="p">:</span> <span class="n">mesh</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+    <span class="n">uj</span> <span class="o">=</span> <span class="n">UnitJob</span><span class="p">(</span><span class="n">sim_input</span><span class="p">)</span>
+    <span class="n">uj</span><span class="o">.</span><span class="n">submit</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="p">{}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mgcini Keith Phuthi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
