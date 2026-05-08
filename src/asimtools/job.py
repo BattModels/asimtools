@@ -217,7 +217,7 @@ class Job():
         if slurm_params is None:
             slurm_params = self.env.get('slurm', {})
 
-        txt = '#!/usr/bin/sh\n\n'
+        txt = '#!/usr/bin/env bash\n\n'
         flags = slurm_params.get('flags', [])
         if isinstance(flags, dict):
             flag_list = []
@@ -846,7 +846,7 @@ class DistributedJob(Job):
             # Only for testing purposes
             print('SLURM command:', command)
             os.environ['SLURM_ARRAY_TASK_ID'] = '0'
-            command = ['sh', 'job_array.sh']
+            command = ['bash', 'job_array.sh']
 
         completed_process = subprocess.run(
             command, check=False, capture_output=True, text=True,
