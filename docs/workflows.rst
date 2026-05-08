@@ -77,7 +77,8 @@ Example — sweep lattice constants
        asimmodule: singlepoint
        env_id: batch
        args:
-         calc_id: my_mlip
+         calculator:
+           calc_id: my_mlip
          image:
            name: Cu
            crystalstructure: fcc
@@ -100,7 +101,8 @@ Example — sweep over a set of structure files
        asimmodule: geometry_optimization.cell_relax
        env_id: batch
        args:
-         calc_id: my_mlip
+         calculator:
+           calc_id: my_mlip
          image:
            image_file: PLACEHOLDER
 
@@ -123,7 +125,8 @@ Example — sweep two parameters simultaneously
        asimmodule: ase_md.ase_md
        env_id: batch
        args:
-         calc_id: my_mlip
+         calculator:
+           calc_id: my_mlip
          image: {name: Fe}
          temperature: 300
          pressure: 1.0
@@ -183,7 +186,8 @@ Example — single-point energy on a dataset
        asimmodule: singlepoint
        env_id: batch
        args:
-         calc_id: my_mlip
+         calculator:
+           calc_id: my_mlip
          properties: [energy, forces, stress]
      labels: files
 
@@ -202,7 +206,8 @@ Example — relax all structures in an xyz file
        asimmodule: geometry_optimization.atom_relax
        env_id: batch
        args:
-         calc_id: my_mlip
+         calculator:
+           calc_id: my_mlip
 
 ----
 
@@ -230,16 +235,23 @@ Key parameters
 +=============================+==================================================+
 | ``subsim_input``            | The sim_input for the asimmodule to run.         |
 +-----------------------------+--------------------------------------------------+
-| ``calc_ids``                | Explicit list of calculator IDs.                 |
+| ``calculators``             | Explicit list of calculator dicts, each with     |
+|                             | a ``calc_id`` or ``calc_params`` key.            |
 +-----------------------------+--------------------------------------------------+
-| ``template_calc_id``        | Base calc_id; ``key_sequence`` is swept inside   |
-|                             | its parameters.                                  |
+| ``template_calculator``     | Base calculator dict; ``key_sequence`` is swept  |
+|                             | inside its parameters.                           |
 +-----------------------------+--------------------------------------------------+
 | ``key_sequence``            | Path into the calculator dict to sweep.          |
 +-----------------------------+--------------------------------------------------+
 | ``array_values`` /          | Values to sweep (same semantics as               |
 | ``linspace_args`` /         | ``sim_array``).                                  |
 | ``arange_args``             |                                                  |
++-----------------------------+--------------------------------------------------+
+| ``calc_ids``                | *Deprecated* — list of calc_id strings.          |
+|                             | Auto-converted to ``calculators``.               |
++-----------------------------+--------------------------------------------------+
+| ``template_calc_id``        | *Deprecated* — base calc_id string.              |
+|                             | Auto-converted to ``template_calculator``.       |
 +-----------------------------+--------------------------------------------------+
 
 Example — benchmark multiple calculators
@@ -251,7 +263,10 @@ Example — benchmark multiple calculators
    env_id: batch
    workdir: results/calc_benchmark
    args:
-     calc_ids: [emt, lj_argon, mace_mp]
+     calculators:
+       - calc_id: emt
+       - calc_id: lj_argon
+       - calc_id: mace_mp
      subsim_input:
        asimmodule: singlepoint
        env_id: batch
@@ -268,7 +283,8 @@ Example — converge DFT cutoff energy
    env_id: batch
    workdir: results/ecut_convergence
    args:
-     template_calc_id: vasp_base
+     template_calculator:
+       calc_id: vasp_base
      key_sequence: [args, encut]
      linspace_args: [200, 600, 9]   # 200, 250, …, 600 eV
      subsim_input:
@@ -326,19 +342,22 @@ Example
          env_id: batch
          args:
            image: {name: Fe}
-           calc_id: my_mlip
+           calculator:
+             calc_id: my_mlip
        relax_cu:
          asimmodule: geometry_optimization.cell_relax
          env_id: batch
          args:
            image: {name: Cu}
-           calc_id: my_mlip
+           calculator:
+             calc_id: my_mlip
        sp_ar:
          asimmodule: singlepoint
          env_id: batch
          args:
            image: {name: Ar}
-           calc_id: emt
+           calculator:
+             calc_id: emt
            properties: [energy]
 
 ----
@@ -390,13 +409,15 @@ Example — relax then compute phonons
          asimmodule: geometry_optimization.cell_relax
          env_id: batch
          args:
-           calc_id: my_mlip
+           calculator:
+             calc_id: my_mlip
            image: {name: Cu}
        step-1:
          asimmodule: phonons.ase_phonons
          env_id: batch
          args:
-           calc_id: my_mlip
+           calculator:
+             calc_id: my_mlip
            image:
              image_file: ../step-0/final.xyz
 
@@ -414,7 +435,8 @@ Example — three-step pipeline with a parallel middle step
          asimmodule: geometry_optimization.cell_relax
          env_id: batch
          args:
-           calc_id: my_mlip
+           calculator:
+             calc_id: my_mlip
            image: {name: Al}
        step-1:
          asimmodule: workflows.sim_array
@@ -426,7 +448,8 @@ Example — three-step pipeline with a parallel middle step
              asimmodule: singlepoint
              env_id: batch
              args:
-               calc_id: my_mlip
+               calculator:
+                 calc_id: my_mlip
                image:
                  name: Al
                  a: PLACEHOLDER
@@ -492,7 +515,8 @@ Example — sequential geometry relaxations at increasing pressures
        asimmodule: geometry_optimization.cell_relax
        env_id: batch
        args:
-         calc_id: my_mlip
+         calculator:
+           calc_id: my_mlip
          image: {name: Fe}
          pressure: 0
 

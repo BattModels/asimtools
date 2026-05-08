@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.0] - 2026-05-07
+
+### Breaking changes
+- All asimmodules: `calc_id: str` parameter replaced by `calculator: Dict` with
+  keys `calc_id` (reference into `calc_input.yaml`) or `calc_params` (inline
+  calculator specification). Mirrors the existing `image`/`get_atoms` pattern.
+- `ase_md.ase_md`: `calc_spec` parameter renamed to `calculator`
+- All YAML example files updated to use the new `calculator:` interface
+
+### Added
+- `dry_run` option in `sim_input.yaml`: writes input files to the work directory
+  without submitting the job. Unlike `submit: false`, the flag is stripped from
+  the written `sim_input.yaml` so subsequent runs execute normally without
+  manual cleanup.
+- `calc_array`: new `calculators` and `template_calculator` parameters accepting
+  dicts instead of plain strings. Old `calc_ids` / `template_calc_id` string
+  parameters are retained for backward compatibility and auto-converted.
+
+### Changed
+- `job.py`: type annotations modernized to use built-in `dict/list/tuple` and
+  `X | Y` union syntax (Python 3.10+) throughout, removing most `typing` imports
+
 ## [0.2.0] - 2026-04-06
 
 ### Breaking changes

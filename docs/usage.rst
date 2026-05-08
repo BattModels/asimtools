@@ -250,6 +250,39 @@ and M3GNet force fields are implemented.
   the arguments are passed as ``calc = LennardJones(**{'sigma':3.2,
   'epsilon':3})``
 
+.. _specifyingcalculators:
+
+Specifying Calculators
+----------------------
+
+Asimmodules that require a calculator accept a ``calculator`` dictionary as part
+of their ``args`` section. There are two ways to specify a calculator:
+
+**By reference** — look up a named entry from ``calc_input.yaml``:
+
+.. code-block:: yaml
+
+  args:
+    calculator:
+      calc_id: lj_argon
+
+**Inline** — provide the full calculator specification directly:
+
+.. code-block:: yaml
+
+  args:
+    calculator:
+      calc_params:
+        name: MACE
+        args:
+          model: medium
+          use_device: cpu
+
+The ``calc_id`` form is preferred for production workflows because the same
+calculator can be shared across many sim_inputs and updated in one place. The
+``calc_params`` form is useful for one-off jobs or when the calculator should
+travel with the sim_input (e.g. in active-learning workflows).
+
 .. _siminput:
 
 sim_input.yaml
@@ -288,7 +321,10 @@ The parameters are:
 - **submit**: (bool, optional) whether to run the asimmodule. If set to false
   it will just write the input files which is very useful for testing before
   submitting large workflows. You can go in and test one example before
-  resubmitting with ``submit=True``, defaults to true 
+  resubmitting with ``submit=True``, defaults to true
+- **dry_run**: (bool, optional) like ``submit: false`` but the flag is stripped
+  from the written ``sim_input.yaml``, so the next ``asim-execute`` call runs
+  normally without any manual cleanup, defaults to false
 - **workdir**: (str, optional) The directory in which the asimmodule will be
   run, `asim-execute` will create the directory whereas `asim-run` ignores this
   parameter entirely, defaults to './results'
@@ -511,17 +547,25 @@ import them and use them in any other code for example, you can import
 :func:`asimtools.asimmodules.singlepoint` and use it as below.
 
 .. code-block:: python
-  
+
   from asimtools.asimmodules.singlepoint import singlepoint
 
-  results = singlepoint(image={'name': 'Ar'}, calc_id='lj')
+  results = singlepoint(
+      image={'name': 'Ar'},
+      calculator={'calc_id': 'lj'},
+  )
   print(results)
 
-You can also use the utils and tools e.g. to load a calculator using just a
-``calc_id``
+You can also use the utils and tools e.g. to load a calculator:
 
 .. code-block:: python
 
   from asimtools.calculators import load_calc
 
-  calc = load_calc('lj')
+  # By reference to calc_input.yaml
+  calc = load_calc(calculator={'calc_id': 'lj'})
+
+  # Inline specification
+  calc = load_calc(calculator={'calc_params': {'name': 'LennardJones',
+                                                'module': 'ase.calculators.lj',
+                                                'args': {'sigma': 3.54}}})
