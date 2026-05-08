@@ -6,7 +6,8 @@ args:
   template_sim_input:
     asimmodule: ../../ase_eos.py
     args:
-      calc_id: emt
+      calculator:
+        calc_id: emt
       image:
         builder: bulk
         crystalstructure: fcc

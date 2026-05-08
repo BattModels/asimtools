@@ -1,7 +1,8 @@
 asimmodule: geometry_optimization.atom_relax
 workdir: nacl_results
 args:
-  calc_id: MACE_cpu
+  calculator:
+    calc_id: MACE_cpu
   image:
     name: NaCl
     builder: bulk

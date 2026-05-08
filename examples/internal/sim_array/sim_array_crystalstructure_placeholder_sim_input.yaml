@@ -1,0 +1,19 @@
+asimmodule: workflows.sim_array
+workdir: crystalstructure_placeholder_results
+args:
+  key_sequence: ['args', 'image', 'crystalstructure']
+  labels: [fcc, bcc] # Check what happens in the results dir if you don't specify labels
+  placeholder: PLACEHOLDER
+  array_values: [f,b]
+  env_ids: inline
+  template_sim_input:
+    asimmodule: singlepoint
+    args:
+      calculator:
+        calc_id: lj_Cu
+      image:
+        builder: bulk
+        name: Cu
+        crystalstructure: PLACEHOLDERcc
+        a: 3.655
+   

@@ -4,10 +4,20 @@ Test Job class
 #pylint: disable=missing-function-docstring
 #pylint: disable=redefined-outer-name
 
+import logging
+import os
 from pathlib import Path
 import pytest
-from asimtools.job import UnitJob, check_job_tree_complete
-from asimtools.utils import read_yaml
+from asimtools.job import (
+    UnitJob,
+    DistributedJob,
+    ChainedJob,
+    check_job_tree_complete,
+    load_job_from_directory,
+    get_subjobs,
+    load_job_tree,
+)
+from asimtools.utils import read_yaml, write_yaml
 
 def create_unitjob(sim_input, env_input, workdir, calc_input=None, status=None):
     """Helper for making a generic UnitJob object"""
@@ -15,7 +25,7 @@ def create_unitjob(sim_input, env_input, workdir, calc_input=None, status=None):
     sim_input['env_id'] = env_id
     if calc_input is not None:
         calc_id = list(calc_input.keys())[0]
-        sim_input['calc_id'] = calc_id
+        sim_input.setdefault('args', {})['calculator'] = {'calc_id': calc_id}
     sim_input['workdir'] = workdir
     unitjob = UnitJob(
         sim_input,
@@ -207,7 +217,7 @@ def test_slurm_asimmodule(flags, tmp_path):
         'env_id': 'test_batch',
         'workdir': wdir,
         'job_name': jobname,
-        'args': {'calc_id': 'test_calc_id'},
+        'args': {'calculator': {'calc_id': 'test_calc_id'}},
     }
 
     env_input = {
@@ -427,5 +437,237 @@ def test_check_job_tree_complete(tmp_path, test_input, expected):
     ''' Test check_job_tree_complete '''
 
     assert check_job_tree_complete(test_input) == expected
-    assert check_job_tree_complete(test_input, skip_failed=True)[0] == True
-    
+    assert check_job_tree_complete(test_input, skip_failed=True)[0] is True
+
+
+# ---------------------------------------------------------------------------
+# Job getter / updater methods
+# ---------------------------------------------------------------------------
+
+def test_get_sim_input_returns_internal(inline_env_input, do_nothing_sim_input, tmp_path):
+    unitjob = create_unitjob(do_nothing_sim_input, inline_env_input, tmp_path / 'wdir')
+    assert unitjob.get_sim_input() is unitjob.sim_input
+
+
+def test_get_calc_input_returns_internal(inline_env_input, do_nothing_sim_input, lj_argon_calc_input, tmp_path):
+    unitjob = create_unitjob(
+        do_nothing_sim_input, inline_env_input, tmp_path / 'wdir', calc_input=lj_argon_calc_input
+    )
+    assert unitjob.get_calc_input() is unitjob.calc_input
+
+
+def test_get_env_input_returns_internal(inline_env_input, do_nothing_sim_input, tmp_path):
+    unitjob = create_unitjob(do_nothing_sim_input, inline_env_input, tmp_path / 'wdir')
+    assert unitjob.get_env_input() is unitjob.env_input
+
+
+def test_update_sim_input(inline_env_input, do_nothing_sim_input, tmp_path):
+    unitjob = create_unitjob(do_nothing_sim_input, inline_env_input, tmp_path / 'wdir')
+    unitjob.update_sim_input({'new_key': 'new_value'})
+    assert unitjob.get_sim_input()['new_key'] == 'new_value'
+
+
+def test_add_output_files(inline_env_input, do_nothing_sim_input, tmp_path):
+    wdir = tmp_path / 'wdir'
+    unitjob = create_unitjob(do_nothing_sim_input, inline_env_input, wdir)
+    unitjob.gen_input_files()
+    unitjob.add_output_files({'result': 'out.xyz'})
+    assert unitjob.get_output().get('files', {}).get('result') == 'out.xyz'
+
+
+def test_get_logger(inline_env_input, do_nothing_sim_input, tmp_path):
+    wdir = tmp_path / 'wdir'
+    unitjob = create_unitjob(do_nothing_sim_input, inline_env_input, wdir)
+    unitjob.gen_input_files()
+    logger = unitjob.get_logger()
+    assert isinstance(logger, logging.Logger)
+
+
+# ---------------------------------------------------------------------------
+# UnitJob.gen_run_command
+# ---------------------------------------------------------------------------
+
+def test_gen_run_command_basic(inline_env_input, do_nothing_sim_input, tmp_path):
+    unitjob = create_unitjob(do_nothing_sim_input, inline_env_input, tmp_path / 'wdir')
+    cmd = unitjob.gen_run_command()
+    assert 'asim-run' in cmd
+    assert 'sim_input.yaml' in cmd
+
+
+def test_gen_run_command_prefix_suffix(tmp_path):
+    env_input = {
+        'inline': {
+            'mode': {'use_slurm': False, 'interactive': True},
+        }
+    }
+    calc_input = {
+        'lj': {
+            'name': 'LennardJones',
+            'module': 'ase.calculators.lj',
+            'run_prefix': 'mpirun -n 4',
+            'run_suffix': '--some-flag',
+            'args': {},
+        }
+    }
+    sim_input = {
+        'asimmodule': 'do_nothing',
+        'env_id': 'inline',
+        'workdir': str(tmp_path / 'wdir'),
+        'args': {'calculator': {'calc_id': 'lj'}},
+    }
+    unitjob = UnitJob(sim_input, env_input=env_input, calc_input=calc_input)
+    cmd = unitjob.gen_run_command()
+    assert cmd.index('mpirun -n 4') < cmd.index('asim-run')
+    assert cmd.index('asim-run') < cmd.index('--some-flag')
+
+
+# ---------------------------------------------------------------------------
+# DistributedJob
+# ---------------------------------------------------------------------------
+
+def _make_distributed_sim_input(env_id, n=3):
+    subsim = {'asimmodule': 'do_nothing', 'env_id': env_id}
+    return {f'job{i}': dict(subsim) for i in range(n)}
+
+
+def test_distributed_job_init_inline(inline_env_input):
+    sim_input = _make_distributed_sim_input('inline', n=3)
+    djob = DistributedJob(sim_input, env_input=inline_env_input)
+    assert len(djob.unitjobs) == 3
+    assert djob.use_slurm is False
+    # Workdir names must be prefixed with 'id-'
+    for uj in djob.unitjobs:
+        assert uj.workdir.name.startswith('id-')
+
+
+def test_distributed_job_init_slurm(batch_env_input):
+    sim_input = _make_distributed_sim_input('batch', n=2)
+    djob = DistributedJob(sim_input, env_input=batch_env_input)
+    assert djob.use_slurm is True
+
+
+def test_distributed_job_init_too_many_jobs(inline_env_input):
+    sim_input = {f'job{i}': {'asimmodule': 'do_nothing', 'env_id': 'inline'} for i in range(1000)}
+    with pytest.raises(AssertionError):
+        DistributedJob(sim_input, env_input=inline_env_input)
+
+
+def test_distributed_job_gen_input_files(inline_env_input, tmp_path):
+    original_dir = Path('.').resolve()
+    os.chdir(tmp_path)
+    try:
+        sim_input = _make_distributed_sim_input('inline', n=2)
+        djob = DistributedJob(sim_input, env_input=inline_env_input)
+        djob.gen_input_files()
+        for uj in djob.unitjobs:
+            assert (uj.workdir / 'sim_input.yaml').exists()
+    finally:
+        os.chdir(original_dir)
+
+
+def test_distributed_job_submit_inline(inline_env_input, tmp_path):
+    original_dir = Path('.').resolve()
+    os.chdir(tmp_path)
+    try:
+        sim_input = _make_distributed_sim_input('inline', n=2)
+        djob = DistributedJob(sim_input, env_input=inline_env_input)
+        djob.submit()
+        for uj in djob.unitjobs:
+            assert uj.get_status()[1] == 'complete'
+    finally:
+        os.chdir(original_dir)
+
+
+# ---------------------------------------------------------------------------
+# ChainedJob
+# ---------------------------------------------------------------------------
+
+def _make_chained_sim_input(env_id, n=2):
+    return {f'step-{i}': {'asimmodule': 'do_nothing', 'env_id': env_id} for i in range(n)}
+
+
+def test_chained_job_init(inline_env_input):
+    sim_input = _make_chained_sim_input('inline', n=3)
+    cjob = ChainedJob(sim_input, env_input=inline_env_input)
+    assert len(cjob.unitjobs) == 3
+    for i, uj in enumerate(cjob.unitjobs):
+        assert str(uj.workdir) == f'step-{i}'
+
+
+def test_chained_job_init_bad_keys(inline_env_input):
+    sim_input = {'bad_key': {'asimmodule': 'do_nothing', 'env_id': 'inline'}}
+    with pytest.raises(AssertionError):
+        ChainedJob(sim_input, env_input=inline_env_input)
+
+
+def test_chained_job_get_last_output(tmp_path):
+    sim_input = _make_chained_sim_input('inline', n=2)
+    env_input = {'inline': {'mode': {'use_slurm': False, 'interactive': True}}}
+    chain_dir = tmp_path / 'chain'
+    chain_dir.mkdir()
+    cjob = ChainedJob(sim_input, env_input=env_input)
+    cjob.set_workdir(chain_dir)
+    cjob.unitjobs[-1].set_workdir(chain_dir / 'step-1')
+    cjob.unitjobs[-1].gen_input_files()
+    cjob.unitjobs[-1].update_output({'my_result': 42})
+    assert cjob.get_last_output()['my_result'] == 42
+
+
+# ---------------------------------------------------------------------------
+# load_job_from_directory, get_subjobs, load_job_tree
+# ---------------------------------------------------------------------------
+
+def test_load_job_from_directory(inline_env_input, do_nothing_sim_input, tmp_path):
+    wdir = tmp_path / 'wdir'
+    unitjob = create_unitjob(do_nothing_sim_input, inline_env_input, wdir)
+    unitjob.gen_input_files(write_env_input=True)
+    job = load_job_from_directory(wdir)
+    assert job.sim_input['asimmodule'] == do_nothing_sim_input['asimmodule']
+    assert job.workdir == wdir
+
+
+def test_load_job_from_directory_missing(tmp_path):
+    with pytest.raises(AssertionError):
+        load_job_from_directory(tmp_path / 'nonexistent')
+
+
+def test_get_subjobs(inline_env_input, do_nothing_sim_input, tmp_path):
+    root = tmp_path / 'root'
+    root.mkdir()
+    write_yaml(root / 'sim_input.yaml', do_nothing_sim_input)
+
+    # Two subdirs with sim_input.yaml, one without
+    for name in ('sub_a', 'sub_b', 'empty_sub'):
+        (root / name).mkdir()
+    write_yaml(root / 'sub_a' / 'sim_input.yaml', do_nothing_sim_input)
+    write_yaml(root / 'sub_b' / 'sim_input.yaml', do_nothing_sim_input)
+
+    subjobs = get_subjobs(root)
+    assert len(subjobs) == 2
+    assert all(p.name in ('sub_a', 'sub_b') for p in subjobs)
+    # Must be sorted
+    assert subjobs == sorted(subjobs)
+
+
+def test_load_job_tree_flat(inline_env_input, do_nothing_sim_input, tmp_path):
+    wdir = tmp_path / 'wdir'
+    unitjob = create_unitjob(do_nothing_sim_input, inline_env_input, wdir)
+    unitjob.gen_input_files(write_env_input=True)
+    tree = load_job_tree(wdir)
+    assert tree['workdir_name'] == wdir.name
+    assert tree['subjobs'] is None
+
+
+def test_load_job_tree_nested(inline_env_input, do_nothing_sim_input, tmp_path):
+    root = tmp_path / 'root'
+    root.mkdir()
+    write_yaml(root / 'sim_input.yaml', do_nothing_sim_input)
+    for name in ('sub_a', 'sub_b'):
+        subdir = root / name
+        subdir.mkdir()
+        write_yaml(subdir / 'sim_input.yaml', do_nothing_sim_input)
+
+    tree = load_job_tree(root)
+    assert tree['subjobs'] is not None
+    assert set(tree['subjobs'].keys()) == {'sub_a', 'sub_b'}
+    assert tree['subjobs']['sub_a']['subjobs'] is None

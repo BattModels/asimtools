@@ -12,6 +12,7 @@ args:
     asimmodule: singlepoint
     args:
       image: {}
-      calc_id: lj_Ar
+      calculator:
+        calc_id: lj_Ar
       properties: ['energy', 'forces']
 

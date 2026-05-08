@@ -1,7 +1,8 @@
 asimmodule: singlepoint
 workdir: vc-relax_results
 args:
-  calc_id: QE_Li_vc-relax
+  calculator:
+    calc_id: QE_Li_vc-relax
   image:
     name: Li
     builder: bulk

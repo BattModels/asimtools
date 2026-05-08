@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "asimtools"
 description = "A lightweight python package for managing and running atomic simulation workflows"
-version = "0.1.0"
+version = "0.3.0"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
@@ -38,15 +38,16 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
+where = ["src"]
 include = [
   "asimtools",
   "asimtools.*",
-  "asimtools.scripts.*.*",
 ]
 
 [project.optional-dependencies]
 dev = [
     "asimtools[tests, docs, phonons]",
+    "pylint",
 ]
 mlip = ["matgl>=1.1.2", "chgnet>=0.3.3", "mace-torch>=0.3.3"]
 phonons = ["phonopy>=2.20.0", "seekpath>=2.1.0"]
@@ -69,5 +70,5 @@ documentation = "https://battmodels.github.io/asimtools/"
 
 [tool.pytest.ini_options]
 log_cli_level = "warn"
-pythonpath = "asimtools"
+pythonpath = ["src"]
 testpaths = ["tests"]

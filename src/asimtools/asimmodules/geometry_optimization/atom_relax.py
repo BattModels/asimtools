@@ -1,0 +1,84 @@
+#!/usr/bin/env python
+'''
+Relaxes the given atomic structure using ASE's built-in structure
+optimizers
+'''
+
+from typing import Dict, Tuple, Optional
+import numpy as np
+import ase.optimize
+from ase.io.trajectory import Trajectory
+from asimtools.calculators import load_calc
+from asimtools.utils import get_atoms, get_logger, write_atoms
+
+def atom_relax(
+    calculator: Dict,
+    image: Dict,
+    optimizer: str = 'GPMin', #GPMin is fast in many cases according to ASE docs
+    properties: Tuple[str] = ('energy', 'forces'),
+    fmax: float = 0.02,
+    steps: int = 1000,
+    prefix: Optional[str] = None,
+) -> Dict:
+    """Relaxes the given tomic structure using ASE's built-in structure
+    optimizers
+
+    :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
+    :type calculator: Dict
+    :param image: Image specification, see :func:`asimtools.utils.get_atoms`
+    :type image: Dict
+    :param prefix: Prefix of output files, defaults to ''
+    :type prefix: str, optional
+    :param optimizer: ASE Optimizer class, defaults to 'GPMin'
+    :type optimizer: str, optional
+    :param fmax: Force convergence threshold in optimizer, defaults to 0.02
+    :type fmax: float, optional
+    :param steps: Maximum number of steps to run, defaults to 1000
+    :type steps: int, optional
+    :return: Dictionary of results
+    :rtype: Dict
+    """
+    calc = load_calc(calculator=calculator)
+    atoms = get_atoms(**image)
+    atoms.calc = calc
+    logger = get_logger()
+
+    if prefix is not None:
+        prefix = prefix + '_'
+    else:
+        prefix = ''
+
+    traj_file = prefix + 'atom_relax.traj'
+    dyn = getattr(ase.optimize, optimizer)(atoms)
+    traj = Trajectory(
+        traj_file,
+        'a',
+        atoms,
+        properties=properties
+    )
+    dyn.attach(traj)
+    try:
+        dyn.run(fmax=fmax, steps=steps)
+    except Exception:
+        logger.error('Failed to relax atoms')
+        raise
+
+    image_file = prefix + 'image_output.xyz'
+    write_atoms(
+        image_file,
+        atoms,
+        format='extxyz',
+    )
+
+    energy = float(atoms.get_potential_energy())
+    final_fmax = float(np.sqrt((atoms.get_forces() ** 2).sum(axis=1).max()))
+
+    results = {
+        'energy': energy,
+        'final_fmax': final_fmax,
+        'files':{
+            'image': image_file,
+            'traj': traj_file,
+        }
+    }
+    return results

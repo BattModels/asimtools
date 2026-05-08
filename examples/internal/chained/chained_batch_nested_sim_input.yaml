@@ -12,7 +12,8 @@ args:
             env_id: batch
             job_name: relax
             args:
-              calc_id: lj_Ar
+              calculator:
+                calc_id: lj_Ar
               image:
                 name: Ar
                 crystalstructure: fcc
@@ -37,7 +38,8 @@ args:
       asimmodule: geometry_optimization.cell_relax
       env_id: batch
       args:
-        calc_id: lj_Ar
+        calculator:
+          calc_id: lj_Ar
         image:
           image_file: ../step-0/id-0001__relax__/image_output.xyz
         fmax: 0.01
@@ -50,6 +52,7 @@ args:
       asimmodule: geometry_optimization.ase_cubic_eos_optimization
       env_id: batch
       args:
-        calc_id: lj_Ar
+        calculator:
+          calc_id: lj_Ar
         image:
           image_file: ../step-1/image_output.xyz

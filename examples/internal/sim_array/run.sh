@@ -29,3 +29,8 @@ asim-execute sim_array_calc_id_sim_input.yaml -c ../calc_input.yaml -e ../env_in
 # It also autmatically names the result directories (ids) corresponding to the
 # name of the file. You can do this with any input file, not just structures
 asim-execute sim_array_image_file_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml
+
+# Example 5:
+# This example runs the same calculator on Cu with different
+# crystal structures but uses a placeholder instead that is replaced by the array_values
+asim-execute sim_array_crystalstructure_sim_input.yaml -c ../calc_input.yaml -e ../env_input.yaml

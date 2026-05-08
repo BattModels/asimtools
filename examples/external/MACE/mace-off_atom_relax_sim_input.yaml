@@ -2,7 +2,8 @@ asimmodule: geometry_optimization.atom_relax
 env_id: 
 workdir: cyclobutane_relax_results
 args:
-  calc_id: MACE-OFF
+  calculator:
+    calc_id: MACE-OFF
   image:
     name: cyclobutane
     builder: molecule

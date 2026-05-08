@@ -1,9 +1,0 @@
-asimmodule: singlepoint
-workdir: vasp_results
-env_id: inline
-args:
-  calc_id: vasp
-  image:
-    name: Na
-    builder: bulk
-  properties: ['energy', 'forces']

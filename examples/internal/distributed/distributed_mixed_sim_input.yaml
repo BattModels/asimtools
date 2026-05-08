@@ -6,7 +6,8 @@ args:
       asimmodule: singlepoint
       env_id: inline # No array since one of them is not a slurm batch job
       args:
-        calc_id: lj_Ar
+        calculator:
+          calc_id: lj_Ar
         image:
           name: Ar
     id-0001:
@@ -14,7 +15,8 @@ args:
       asimmodule: geometry_optimization.atom_relax
       env_id: batch
       args:
-        calc_id: lj_Ar
+        calculator:
+          calc_id: lj_Ar
         image:
           name: Ar
     id-0002:
@@ -22,12 +24,15 @@ args:
       asimmodule: workflows.calc_array
       env_id: batch
       args:
-        calc_ids: [emt, lj_Cu]
-        env_ids: [inline, inline] # Must correspond to calc_id if list is given
+        calculators:
+          - calc_id: emt
+          - calc_id: lj_Cu
+        env_ids: [inline, inline] # Must correspond to calculator if list is given
         subsim_input:
           asimmodule: elastic_constants.cubic_energy_expansion
           args:
-            calc_id: emt
+            calculator:
+              calc_id: emt
             image:
               name: Cu
               a: 3.6

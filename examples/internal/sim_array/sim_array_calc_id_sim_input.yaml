@@ -1,13 +1,14 @@
 asimmodule: workflows.sim_array
 workdir: calc_id_results
 args:
-  key_sequence: [args, calc_id]
+  key_sequence: [args, calculator, calc_id]
   array_values: [emt, lj_Cu]
   env_ids: [inline, inline]
   template_sim_input:
     asimmodule: singlepoint
     args:
-      calc_id: {}
+      calculator:
+        calc_id: {}
       image:
         builder: bulk
         name: Cu

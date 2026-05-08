@@ -2,9 +2,17 @@
 Tests for utils.py
 '''
 from pathlib import Path
+from unittest.mock import patch, MagicMock
 import os
 import pytest
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import pandas as pd
 from ase.io import read
+from ase.calculators.emt import EMT
+from pymatgen.core import Structure, Molecule, IStructure, IMolecule
 from asimtools.utils import (
     join_names,
     get_atoms,
@@ -20,6 +28,14 @@ from asimtools.utils import (
     get_nth_label,
     get_str_btn,
     expand_wildcards,
+    write_atoms,
+    repeat_to_n,
+    strip_symbols,
+    get_axis_lims,
+    improve_plot,
+    write_csv_from_dict,
+    new_db,
+    check_if_slurm_job_is_running,
 )
 import ase.build
 
@@ -58,13 +74,86 @@ def test_join_names(test_input, expected):
      ase.build.fcc111('Al', size=(2,2,3))),
     ({'image_file': STRUCT_DIR / 'Ar.xyz'},
      ase.build.bulk('Ar')),
-    ({'image_file': STRUCT_DIR / 'Ar', 'format': 'cfg'},
+    ({'image_file': STRUCT_DIR / 'Ar.xyz'},
      ase.build.bulk('Ar')),
     ({'atoms': ase.build.bulk('Ar')}, ase.build.bulk('Ar')),
+    ({  
+        'interface': 'pymatgen',
+        'builder': 'Structure',
+        'lattice': [[3, 0, 0], [0, 3, 0], [0, 0, 3]],
+        'coords': [[0, 0, 0]],
+        'species': ['Ar'],
+        'return_type': 'pymatgen',
+    }, Structure(
+        lattice=[[3, 0, 0], [0, 3, 0], [0, 0, 3]],
+        coords=[[0, 0, 0]],
+        species=['Ar'],
+        coords_are_cartesian=False,
+    )),
+    ({  
+        'interface': 'pymatgen',
+        'builder': 'Structure',
+        'lattice': {'a': 3, 'b': 4, 'c': 5, 'alpha': 90, 'beta': 90, 'gamma': 90},
+        'coords': [[0, 0, 0]],
+        'species': ['Ar'],
+        'return_type': 'pymatgen',
+    }, Structure(
+        lattice=[[3, 0, 0], [0, 4, 0], [0, 0, 5]],
+        coords=[[0, 0, 0]],
+        species=['Ar'],
+        coords_are_cartesian=False,
+    )),
+    ({  
+        'interface': 'pymatgen',
+        'builder': 'IStructure',
+        'lattice': {'a': 3, 'b': 4, 'c': 5, 'alpha': 90, 'beta': 90, 'gamma': 90},
+        'coords': [[0, 0, 0]],
+        'species': ['Ar'],
+        'return_type': 'pymatgen',
+    }, IStructure(
+        lattice=[[3, 0, 0], [0, 4, 0], [0, 0, 5]],
+        coords=[[0, 0, 0]],
+        species=['Ar'],
+        coords_are_cartesian=False,
+    )),
+    ({
+        'interface': 'pymatgen',
+        'builder': 'Molecule',
+        'coords': [[0, 0, 0], [1.5, 1.5, 1.5], [1.5, -1.5, -1.5]],
+        'species': ['O', 'H', 'H'],
+        'spin_multiplicity': 1,
+        'return_type': 'pymatgen',
+    }, Molecule(
+        species=['O', 'H', 'H'],
+        coords=[[0, 0, 0], [1.5, 1.5, 1.5], [1.5, -1.5, -1.5]],
+        spin_multiplicity=1,
+    )),
+    ({
+        'interface': 'pymatgen',
+        'builder': 'IMolecule',
+        'coords': [[0, 0, 0], [1.5, 1.5, 1.5], [1.5, -1.5, -1.5]],
+        'species': ['O', 'H', 'H'],
+        'spin_multiplicity': 1,
+        'return_type': 'pymatgen',
+    }, IMolecule(
+        species=['O', 'H', 'H'],
+        coords=[[0, 0, 0], [1.5, 1.5, 1.5], [1.5, -1.5, -1.5]],
+        spin_multiplicity=1,
+    )),
+
 ])
 def test_get_atoms(test_input, expected):
     ''' Test getting atoms from different inputs '''
+    print('e', expected)
     assert get_atoms(**test_input) == expected
+
+def test_get_atoms_constraints(tmp_path):
+    atoms = ase.build.bulk('Cu').repeat((2,2,2))
+    constrained_atoms = get_atoms(
+        atoms=atoms, 
+        constraints=[{'constraint': 'FixAtoms', 'indices': [0, 1]}]
+    )
+    assert len(constrained_atoms.constraints) == 1
 
 @pytest.mark.parametrize("test_input, expected",[
     ({'image_file': str(STRUCT_DIR / 'images.xyz')},
@@ -101,12 +190,63 @@ def test_get_atoms(test_input, expected):
 ])
 def test_get_images(test_input, expected):
     ''' Test getting iterable of atoms from different inputs '''
-    print('++input:', get_images(**test_input))
-    print('++expected:', expected)
     input_images = get_images(**test_input)
     assert len(input_images) == len(expected)
     for image in input_images:
         assert image in expected
+
+@pytest.mark.parametrize("test_input, expected",[
+    (
+        {'image_file': str(STRUCT_DIR / 'adslab.xyz')},
+        ('surface_properties', 'bulk_wyckoff'),
+    ),
+])
+def test_write_atoms(test_input, expected, tmp_path):
+    init_atoms = get_atoms(**test_input)
+    testfile = tmp_path / 'test.xyz'
+    write_atoms(testfile, init_atoms)
+
+    with open(testfile, 'r') as f:
+        lines = f.readlines()
+    
+    for prop in expected:
+        assert prop in lines[1], f'"{prop}" not in file header'
+
+def test_write_atoms_constraints(tmp_path):
+    atoms = ase.build.bulk('Cu').repeat((2,2,2))
+    atoms.set_constraint(ase.constraints.FixAtoms(indices=[0, 1]))
+    write_atoms(tmp_path / 'test_constraints.xyz', atoms)
+    read_atoms = read(tmp_path / 'test_constraints.xyz')
+    assert len(read_atoms.constraints) > 0
+
+@pytest.mark.parametrize("test_input, expected",[
+    (
+        {'name': 'Cu', 'interface': 'ase', 'builder': 'bulk'},
+        ('forces', 'energy', 'stress'),
+    ),
+])
+def test_write_atoms_calc(test_input, expected, tmp_path):
+    init_atoms = get_atoms(**test_input)
+    init_atoms.calc = EMT()
+    init_atoms.get_potential_energy()
+    testfile = tmp_path / 'test.xyz'
+    write_atoms(testfile, init_atoms)
+
+    with open(testfile, 'r') as f:
+        lines = f.readlines()
+    
+    for prop in expected:
+        assert prop in lines[1], f'"{prop}" not in file header'
+
+def test_write_atoms_magmoms(tmp_path):
+    ''' Test write_atoms. 
+    Also test that when magmoms are provided by ASE which makes them nans
+    and kills jobs using VASP etc., we change them to zero '''
+    slab_ = read(STRUCT_DIR / 'adslab.xyz')
+    write_atoms(tmp_path / 'slab.xyz', slab_)
+    slab = read(tmp_path / 'slab.xyz')
+    assert not np.any(np.isnan(slab.arrays['initial_magmoms']))
+    assert 'surface_properties' in slab.arrays
 
 @pytest.mark.parametrize("test_input, expected",[
     (['l1', 'l2', 'l3'], {'l1': {'l2': {'l3': 'new_value'}}}),
@@ -118,6 +258,18 @@ def test_change_dict_value(test_input, expected):
     d = {'l1': {'l2': {'l3': 'l3_value'}}}
     new_d = change_dict_value(
         d, 'new_value', test_input, return_copy=True
+    )
+    assert new_d == expected
+    assert new_d != d
+
+@pytest.mark.parametrize("test_input, expected",[
+    (['l1', 'l2', 'l3'], {'l1': {'l2': {'l3': 'l3_NEW'}}}),
+])
+def test_change_dict_value_placeholder(test_input, expected):
+    ''' Test getting iterable of atoms from different inputs '''
+    d = {'l1': {'l2': {'l3': 'l3_PLACEHOLDER'}}}
+    new_d = change_dict_value(
+        d, 'NEW', test_input, return_copy=True, placeholder='PLACEHOLDER',
     )
     assert new_d == expected
     assert new_d != d
@@ -235,3 +387,116 @@ def test_expand_wildcards(test_input, expected, tmp_path):
     print(f'Found paths in {os.getcwd()}: {[f for f in Path(tmp_path).glob("*")]}')
     
     assert expand_wildcards(test_input, root_path=tmp_path) == expected
+
+def test_repeat_to_n():
+    ''' Test repeating unit cell to at least N atoms '''
+    atoms = ase.build.bulk('Cu', crystalstructure='fcc', cubic=True, a=2.0)
+    repeated_atoms = repeat_to_n(atoms, 16)
+    assert len(repeated_atoms) == 16
+    assert np.abs(repeated_atoms.get_cell()[0][0] - 2*2.0) < 1e-6
+    assert np.abs(repeated_atoms.get_cell()[1][1] - 2*2.0) < 1e-6
+    assert np.abs(repeated_atoms.get_cell()[2][2] - 1*2.0) < 1e-6
+    assert len(repeat_to_n(atoms, 15)) == 16
+    with pytest.raises(ValueError):
+        repeat_to_n(atoms, 16, max_dim=4)
+
+
+@pytest.mark.parametrize("test_input, expected", [
+    ('hello', 'hello'),
+    ('_hello_', 'hello'),
+    ('-hello-', 'hello'),
+    ('.hello.', 'hello'),
+    (' hello ', 'hello'),
+    ('_-hello-_', 'hello'),
+    ('', ''),
+])
+def test_strip_symbols(test_input, expected):
+    ''' Test stripping leading/trailing bad symbols from a string '''
+    assert strip_symbols(test_input) == expected
+
+
+@pytest.mark.parametrize("x, y, padding, expected_min, expected_max", [
+    ([0, 1], [0, 1], 0.1, -0.1, 1.1),
+    ([0, 2], [1, 3], 0.0, 0.0, 3.0),
+    ([-1, 1], [-1, 1], 0.5, -2.0, 2.0),
+])
+def test_get_axis_lims(x, y, padding, expected_min, expected_max):
+    ''' Test axis limit computation with padding '''
+    lims = get_axis_lims(x, y, padding=padding)
+    assert np.isclose(lims[0], expected_min)
+    assert np.isclose(lims[1], expected_max)
+
+
+def test_improve_plot():
+    ''' Test that improve_plot sets label and tick fontsizes '''
+    fig, ax = plt.subplots()
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_title('Title')
+    fontsize = 16
+    improve_plot(ax=ax, fontsize=fontsize)
+    assert ax.xaxis.label.get_fontsize() == fontsize + 2
+    assert ax.yaxis.label.get_fontsize() == fontsize + 2
+    assert ax.title.get_fontsize() == fontsize + 4
+    plt.close(fig)
+
+
+def test_improve_plot_with_legend():
+    ''' Test that improve_plot handles legends '''
+    fig, ax = plt.subplots()
+    ax.plot([0, 1], [0, 1], label='line')
+    ax.legend(title='legend_title')
+    improve_plot(ax=ax, fontsize=12)
+    leg = ax.get_legend()
+    assert leg is not None
+    plt.close(fig)
+
+
+@pytest.mark.parametrize("data, columns, header", [
+    ({'a': [1, 2, 3], 'b': [4, 5, 6]}, None, ''),
+    ({'a': [1, 2], 'b': [3, 4], 'c': [5, 6]}, ['a', 'c'], 'my header'),
+])
+def test_write_csv_from_dict(data, columns, header, tmp_path):
+    ''' Test writing a dict to CSV and reading it back '''
+    fpath = tmp_path / 'test.csv'
+    result_df = write_csv_from_dict(fpath, data, columns=columns, header=header)
+
+    used_columns = columns if columns is not None else list(data.keys())
+    assert list(result_df.columns) == used_columns
+
+    read_df = pd.read_csv(fpath, comment='#')
+    assert list(read_df.columns) == used_columns
+    for col in used_columns:
+        assert list(read_df[col]) == data[col]
+
+    if header:
+        with open(fpath, 'r', encoding='utf-8') as f:
+            first_line = f.readline()
+        assert header in first_line
+
+
+def test_new_db(tmp_path):
+    ''' Test creating a new ASE database '''
+    import ase.db
+    dbpath = tmp_path / 'test.db'
+    db = new_db(str(dbpath))
+    assert dbpath.exists()
+    atoms = ase.build.bulk('Cu')
+    db.write(atoms)
+    assert db.count() == 1
+
+
+def test_check_if_slurm_job_is_running_true():
+    ''' Test that a job ID found in squeue stdout returns True '''
+    mock_result = MagicMock()
+    mock_result.stdout = ' 12345 some other text'
+    with patch('asimtools.utils.subprocess.run', return_value=mock_result):
+        assert check_if_slurm_job_is_running(12345) is True
+
+
+def test_check_if_slurm_job_is_running_false():
+    ''' Test that a job ID not in squeue stdout returns False '''
+    mock_result = MagicMock()
+    mock_result.stdout = ' 99999 some other text'
+    with patch('asimtools.utils.subprocess.run', return_value=mock_result):
+        assert check_if_slurm_job_is_running(12345) is False

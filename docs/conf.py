@@ -12,7 +12,7 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../asimtools'))
+sys.path.insert(0, os.path.abspath('../src'))
 sys.path.insert(0, os.path.abspath('../'))
 
 
@@ -23,7 +23,7 @@ copyright = '2023, Mgcini Keith Phuthi'
 author = 'Mgcini Keith Phuthi'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+release = '0.2.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -48,6 +48,16 @@ extensions = [
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+# Mock optional heavy dependencies so autodoc can import all modules
+autodoc_mock_imports = [
+    'maml',
+    'mace',
+    'matgl',
+    'chgnet',
+    'phonopy',
+    'seekpath',
+]
+
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -59,7 +69,7 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = []
 
 # Intersphinx Mappings
 intersphinx_mapping = {

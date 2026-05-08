@@ -1,7 +1,8 @@
 asimmodule: singlepoint
 workdir: scf_results
 args:
-  calc_id: QE_Li
+  calculator:
+    calc_id: QE_Li
   image:
     name: Li
     builder: bulk

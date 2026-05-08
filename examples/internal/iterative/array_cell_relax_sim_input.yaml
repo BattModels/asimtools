@@ -7,7 +7,8 @@ args:
   template_sim_input:
     asimmodule: geometry_optimization.symmetric_cell_relax
     args:
-      calc_id: lj_Ar
+      calculator:
+        calc_id: lj_Ar
       image:
         image_file: ../Ar.cif
       optimizer: BFGS

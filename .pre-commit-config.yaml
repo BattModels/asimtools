@@ -1,0 +1,18 @@
+repos:
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: conda run -n asimtools-dev pylint
+        language: system
+        types: [python]
+        files: ^src/asimtools/
+        exclude: ^src/asimtools/asimmodules/
+        args: [--rcfile=.pylintrc]
+
+      - id: pytest
+        name: pytest
+        entry: conda run -n asimtools-dev pytest tests/unit/
+        language: system
+        pass_filenames: false
+        always_run: true

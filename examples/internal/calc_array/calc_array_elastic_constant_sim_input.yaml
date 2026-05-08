@@ -1,12 +1,15 @@
 asimmodule: workflows.calc_array
 workdir: env_results
 args:
-  calc_ids: [emt, lj_Cu]
-  env_ids: [inline, inline] # Must correspond to calc_id if list is given
+  calculators:
+    - calc_id: emt
+    - calc_id: lj_Cu
+  env_ids: [inline, inline] # Must correspond to calculator if list is given
   subsim_input:
     asimmodule: elastic_constants.cubic_energy_expansion
     args:
-      calc_id: emt
+      calculator:
+        calc_id: emt
       image:
         name: Cu
         a: 3.6

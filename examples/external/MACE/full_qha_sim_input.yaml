@@ -6,7 +6,8 @@ args:
     name: NaCl
     crystalstructure: rocksalt
     a: 5.641
-  calc_id: MACE64_cpu
+  calculator:
+    calc_id: MACE64_cpu
   calc_env_id: inline
   process_env_id: inline
   phonopy_save_path: phonopy_save.yaml # Specify path relative to this asimmodule's workdir

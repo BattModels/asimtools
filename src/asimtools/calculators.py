@@ -1,0 +1,475 @@
+'''
+Tools for loading and returning ASE calculator objects for use in simulations
+'''
+import importlib
+import logging
+from copy import deepcopy
+from typing import Dict, Optional
+from asimtools.utils import get_calc_input
+
+# pylint: disable=import-outside-toplevel
+# pylint: disable=import-error
+
+def load_calc(
+    calculator: Optional[Dict] = None,
+    calc_id: Optional[str] = None,
+    calc_input: Optional[Dict] = None,
+    calc_params: Optional[Dict] = None,
+):
+    """Loads a calculator using a calculator dict or legacy calc_id/calc_params
+    arguments.
+
+    :param calculator: Dictionary with either a ``calc_id`` key (to look up
+        from the global or supplied calc_input) or a ``calc_params`` key
+        (to use directly). Takes precedence over the legacy arguments if
+        provided, defaults to None
+    :type calculator: Optional[Dict], optional
+    :param calc_id: Deprecated — use ``calculator={'calc_id': ...}`` instead.
+        ID/key to use to load calculator from the supplied or global
+        calc_input file, defaults to None
+    :type calc_id: str, optional
+    :param calc_input: calc_input dictionary, same form as calc_input yaml \
+    :type calc_input: Optional[Dict], optional
+    :param calc_params: Deprecated — use ``calculator={'calc_params': ...}``
+        instead. calc_params dictionary for a single calculator,
+        defaults to None
+    :type calc_params: Optional[Dict], optional
+    :return: ASE calculator instance
+    :rtype: :class:`ase.calculators.calculators.Calculator`
+    """
+    if calculator is not None:
+        calc_id = calculator.get('calc_id', calc_id)
+        calc_params = calculator.get('calc_params', calc_params)
+
+    assert calc_id is not None or calc_params is not None, \
+        'Provide one of calc_id or calc_id and calc_input or calc_params'
+    if calc_id is not None:
+        if isinstance(calc_id, dict):
+            calc_input = {'custom': calc_id}
+            calc_id = 'custom'
+        else:
+            if calc_input is None:
+                calc_input = get_calc_input()
+        try:
+            calc_params = calc_input[calc_id]
+        except KeyError as exc:
+            msg = f'Calculator with calc_id: {calc_id} not found in'
+            msg += f'calc_input {list(calc_input)}'
+            raise KeyError(msg) from exc
+        except AttributeError as exc:
+            raise AttributeError('No calc_input found') from exc
+
+    name = calc_params.get('name', None)
+
+    if 'module' in calc_params:
+        loader = load_ase_calc
+    else:
+        try:
+            loader = external_calcs[name]
+        except KeyError as exc:
+            msg = 'Provide ASE module for calc or use'
+            msg += f' one of {external_calcs.keys()}'
+            raise KeyError(msg) from exc
+
+    calc = loader(calc_params=calc_params)
+    label = calc_params.get('label', name)
+    calc.label = label
+    logging.debug('Loaded calculator %s', calc_id)
+    return calc
+
+
+def load_nequip(calc_params):
+    """Load NequIP or Allegro calculator
+
+    https://github.com/mir-group/nequip/tree/main
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: NequIP ase calculator
+    :rtype: :class:`nequip.ase.nequip_calculator.NequIPCalculator`
+    """
+    from nequip.ase.nequip_calculator import NequIPCalculator
+    if calc_params.get('float64', False):
+        import torch
+        torch.set_default_dtype(torch.float64)
+    try:
+        calc = NequIPCalculator.from_deployed_model(**calc_params.get('args', {}))
+    except Exception as exc:
+        msg = f"Failed to load NequIP with parameters:\n {calc_params}"
+        raise RuntimeError(msg) from exc
+
+    return calc
+
+
+def load_dp(calc_params):
+    """Load Deep Potential Calculator
+
+    https://docs.deepmodeling.com/projects/deepmd/en/master/
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: DP calculator
+    :rtype: :class:`deepmd.calculator.DP`
+    """
+    from deepmd.calculator import DP
+
+    try:
+        calc = DP(**calc_params['args'])
+    except Exception:
+        logging.error("Failed to load DP with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
+
+def load_ase_calc(calc_params):
+    ''' Load any builtin ASE calculator '''
+    module_name = calc_params.get('module', '')
+    try:
+        module = importlib.import_module(module_name)
+    except:
+        logging.error("Check calc module and stderr")
+        raise
+    name = calc_params.get('name', None)
+    try:
+        calc_class = getattr(module, name)
+    except:
+        logging.error("Check calc name and stderr")
+        raise
+    calc_args = calc_params.get('args', {})
+    try:
+        calc = calc_class(**calc_args)
+    except:
+        logging.error("Check calc args and stderr")
+        raise
+    return calc
+
+def load_chgnet(calc_params):
+    """Load CHGNet Calculator
+
+    https://chgnet.lbl.gov/#tutorials-and-docs
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: CHGNet calculator
+    :rtype: :class:`chgnet.model.dynamics.CHGNetCalculator`
+    """
+    from chgnet.model.dynamics import CHGNetCalculator
+    if calc_params['args'].get('from_file', False):
+        calc_params = deepcopy(calc_params)
+        calc_params['args'].pop('from_file')
+        try:
+            calc = CHGNetCalculator.from_file(**calc_params['args'])
+        except Exception:
+            logging.error("Failed to load CHGNet from file with parameters:\
+                \n %s", calc_params)
+            raise
+    else:
+        try:
+            calc = CHGNetCalculator(**calc_params['args'])
+        except Exception:
+            logging.error("Failed to load CHGNet with parameters:\n %s", \
+                calc_params)
+            raise
+
+    return calc
+
+def load_mace_mp(calc_params):
+    """Load MACE Calculator
+
+    https://github.com/ACEsuit/mace?tab=readme-ov-file
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: MACE calculator
+    :rtype: :class:`mace.calculators.mace_mp`
+    """
+    from mace.calculators import mace_mp
+
+    try:
+        calc = mace_mp(**calc_params['args'])
+    except Exception:
+        logging.error("Failed to load MACE with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
+def load_mace(calc_params):
+    """Load MACE Calculator
+
+    https://github.com/ACEsuit/mace?tab=readme-ov-file
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: MACE calculator
+    :rtype: :class:`mace.calculators.mace_mp`
+    """
+    from mace.calculators import MACECalculator
+
+    try:
+        calc = MACECalculator(**calc_params['args'])
+    except Exception:
+        logging.error(
+            "Failed to load MACECalculator with parameters:\n %s", calc_params
+        )
+        raise
+
+    return calc
+
+def load_mace_off(calc_params):
+    """Load MACE Calculator
+
+    https://github.com/ACEsuit/mace?tab=readme-ov-file
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: MACE-OFF calculator
+    :rtype: :class:`mace.calculators.mace_mp`
+    """
+    from mace.calculators import mace_off
+
+    try:
+        calc = mace_off(**calc_params['args'])
+    except Exception:
+        logging.error("Failed to load MACE-OFF with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
+def load_espresso_profile(calc_params):
+    """Load Qunatum Espresso Calculator for ASE>3.22.1. If using older versions
+    such as the ones available on PyPI or conda-forge, just load it as an ASE
+    calculator. Until the new ASE version becomes an official release, we will
+    have to have both for compatibility. The interface however remains that of 
+    ASE <=3.22.1 within ASIMTools for consistency using the `command` keyword
+
+    https://wiki.fysik.dtu.dk/ase/releasenotes.html
+
+    :param calc_params: args to pass to loader
+    :type calc_params: Dict
+    :return: Espresso calculator
+    :rtype: :class:`ase.calculators.espresso.Espresso`
+    """
+    from ase.calculators.espresso import Espresso, EspressoProfile
+
+    if 'command' in calc_params['args']:
+        calc_params = deepcopy(calc_params)
+        command = calc_params['args'].pop('command')
+    else:
+        command = 'pw.x'
+    if 'pseudo_dir' in calc_params['args']:
+        pseudo_dir = calc_params['args'].pop('pseudo_dir')
+    else:
+        pseudo_dir = None
+
+    try:
+        calc = Espresso(
+            **calc_params['args'],
+            profile=EspressoProfile(command=command, pseudo_dir=pseudo_dir)
+        )
+    except Exception:
+        logging.error("Failed to load Espresso with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
+
+def load_m3gnet(calc_params):
+    """Load any M3GNet or MatGL calculator
+
+    :param calc_params: parameters to be passed to matgl.ext.ase.M3GNetCalculator.
+        Must include a key "model" that points to the model used to instantiate the potential
+    :type calc_params: Dict
+    :return: M3GNet calculator
+    :rtype: :class:`matgl.ext.ase.M3GNetCalculator`
+    """
+    from matgl.ext.ase import M3GNetCalculator
+    import matgl
+    calc_params = deepcopy(calc_params)
+    model = calc_params['args'].pop("model")
+    try:
+        pot = matgl.load_model(model)
+        calc = M3GNetCalculator(
+            pot,
+            **calc_params['args'],
+        )
+    except Exception:
+        logging.error("Failed to load M3GNet with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
+def load_matgl(calc_params):
+    """Load any MatGL calculator
+
+    :param calc_params: parameters to be passed to matgl.ext.ase.PESCalculator.
+        Must include a key "model" that points to the model used to instantiate the potential
+    :type calc_params: Dict
+    :return: MatGL calculator
+    :rtype: :class:`matgl.ext.ase.PESCalculator`
+    """
+    from matgl.ext.ase import PESCalculator
+    import matgl
+    calc_params = deepcopy(calc_params)
+    model = calc_params['args'].pop("model")
+
+    try:
+        pot = matgl.load_model(model)
+        calc = PESCalculator(
+            pot,
+            **calc_params['args'],
+        )
+    except Exception:
+        logging.error("Failed to load M3GNet with parameters:\n %s", calc_params)
+        raise
+
+    return calc
+
+def load_fairchem_v1(calc_params):
+    """Load any fairchemV1 calculator
+
+    :param calc_params: parameters to be passed to fairchem.core.OCPCalculator.
+        Must include a key "model" that points to the model files used to 
+        instantiate the potential
+    :type calc_params: Dict
+    :return: fairchem calculator
+    :rtype: :class:`fairchem.core.OCPCalculator`
+    """
+    from fairchem.core import OCPCalculator
+
+    try:
+        calc = OCPCalculator(**calc_params['args'])
+    except Exception:
+        logging.error(
+            "Failed to load OMAT24 with parameters:\n %s", calc_params
+        )
+        raise
+
+    return calc
+
+def load_fairchem_v2(calc_params):
+    """Load any fairchemV1 calculator
+
+    :param calc_params: parameters to be passed to fairchem.core.FAIRChemCalculator.
+        Must include a key "model" that points to the model files used to 
+        instantiate the potential
+    :type calc_params: Dict
+    :return: fairchem calculator
+    :rtype: :class:`fairchem.core.FAIRChemCalculator`
+
+    Examples
+    --------
+    >>> from asimtools.calculators import load_calc
+    >>> calc_params = {
+    ...     'name': 'fairchem',
+    ...     'args': {
+    ...         'model_name': 'uma-s-1',
+    ...         'device': 'cuda',
+    ...         'task_name': 'oc20' # Also 'omol','omat','oc20','odac' or 'omc'
+    ...     }
+    ... }
+    >>> calc = load_calc(calc_params=calc_params)
+
+    """
+    from fairchem.core.units.mlip_unit import load_predict_unit
+    from fairchem.core import pretrained_mlip, FAIRChemCalculator
+    og_calc_params = deepcopy(calc_params)
+    task_name = calc_params['args'].pop('task_name', None)
+    try:
+        predictor = pretrained_mlip.get_predict_unit(**calc_params['args'])
+    except Exception as exc:  # pylint: disable=broad-exception-caught
+        logging.error(
+            "Failed to load pretrained model trying predict unit"
+        )
+        try:
+            predictor = load_predict_unit(**calc_params['args'])
+        except Exception:
+            logging.error(
+                "Failed to load predictor unit with parameters:\n %s", \
+                    og_calc_params
+            )
+            raise exc from exc
+
+    try:
+        calc = FAIRChemCalculator(predictor, task_name=task_name)
+    except Exception:
+        logging.error(
+            "Failed to load FAIRChemCalculator with parameters:\n %s", \
+                og_calc_params
+        )
+        raise
+
+    return calc
+
+def load_ase_dftd3(calc_params):
+    """Load any calculator with DFTD3 correction as implemented in ASE
+
+    :param calc_params: Dictionary with 2 keys. First is `d3_args` which is 
+        passed to ase.calculators.dftd3.DFTD3 except for the dft argument. The
+        second is dft_calc_id or dft_calc_params which loads the calculator 
+        to be wrapped.
+    :type calc_params: Dict
+    :return: ASE calculator
+    :rtype: :class:`ase.calculators.calculators.Calculator`
+    """
+    from ase.calculators.dftd3 import DFTD3
+    d3_args = calc_params['args'].get('d3_args', {})
+    if 'dft' in d3_args:
+        raise ValueError('Do not specify dft arg for DFTD3, specify calc_id')
+
+    dft_calc_id = calc_params['args'].get('dft_calc_id', None)
+    dft_calc_params = calc_params['args'].get('dft_calc_params', None)
+    if ( (dft_calc_id is not None) and (dft_calc_params is not None) ):
+        raise ValueError('Provide only one of dft_calc_id or dft_calc_params')
+
+    if ( (dft_calc_id is not None) or (dft_calc_params is not None) ):
+        dft = load_calc(calc_id=dft_calc_id, calc_params=dft_calc_params)
+    else:
+        dft = None
+    try:
+        calc = DFTD3(dft=dft, **d3_args)
+    except Exception:
+        logging.error(
+            "Failed to load d3 calculator with parameters:\n %s", calc_params
+        )
+        raise
+
+    return calc
+
+def load_aqcat(calc_params):
+    """Load AQCat Calculator
+    :param calc_params: args to pass to loader, including checkpoint_path
+    :type calc_params: Dict
+    :return: AQCat calculator
+    :rtype: :class:`fairchem.core.common.relaxation.ase_utils.patched_calc`
+    """
+    from fairchem.core.common.relaxation.ase_utils import patched_calc
+
+    try:
+        calc = patched_calc(**calc_params['args'])
+    except Exception:
+        logging.error(
+            "Failed to load AQCat FAIRChemCalculator with parameters:\n %s", \
+                calc_params['args']
+        )
+        raise
+
+    return calc
+
+external_calcs = {
+    'NequIP': load_nequip,
+    'Allegro': load_nequip,
+    'DeepPotential': load_dp,
+    'CHGNet': load_chgnet,
+    'MACE': load_mace_mp,
+    'MACECalculator': load_mace,
+    'EspressoProfile': load_espresso_profile,
+    'M3GNet': load_m3gnet,
+    'MatGL': load_matgl,
+    'OMAT24': load_fairchem_v1,
+    'fairchemV1': load_fairchem_v1,
+    'fairchemV2': load_fairchem_v2,
+    'fairchem': load_fairchem_v2,
+    'ASEDFTD3': load_ase_dftd3,
+    'AQCat': load_aqcat
+}

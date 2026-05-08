@@ -61,6 +61,18 @@ FILE_DIR = Path(os.path.join(
         ),
         (
             {
+                "arange_args": (0,4,1),
+                "as_integers": True,
+            },
+            [
+                'id-0000__value-0__',
+                'id-0001__value-1__',
+                'id-0002__value-2__',
+                'id-0003__value-3__'
+            ]
+        ),
+        (
+            {
                 "linspace_args": (0,3,4)
             },
             [

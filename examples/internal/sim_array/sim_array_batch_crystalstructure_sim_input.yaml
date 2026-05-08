@@ -16,7 +16,8 @@ args:
   template_sim_input:
     asimmodule: singlepoint
     args:
-      calc_id: lj_Cu
+      calculator:
+        calc_id: lj_Cu
       image: {} # You can set a placeholder here or not specify. 
         # I usually put something that would cause an error to make sure 
         # it is substituted correctly

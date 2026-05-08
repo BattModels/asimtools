@@ -2,7 +2,8 @@ asimmodule: ../ase_eos.py
 env_id: inline
 workdir: Cu_results
 args:
-  calc_id: emt
+  calculator:
+    calc_id: emt
   image:
     name: Cu
     cubic: true
