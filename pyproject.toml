@@ -47,6 +47,7 @@ include = [
 [project.optional-dependencies]
 dev = [
     "asimtools[tests, docs, phonons]",
+    "pylint",
 ]
 mlip = ["matgl>=1.1.2", "chgnet>=0.3.3", "mace-torch>=0.3.3"]
 phonons = ["phonopy>=2.20.0", "seekpath>=2.1.0"]

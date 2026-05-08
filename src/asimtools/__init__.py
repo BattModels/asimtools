@@ -1,5 +1,6 @@
 '''asimtools: lightweight atomic simulation workflow manager.'''
-from asimtools._version import __version__
+from importlib.metadata import version
+__version__ = version("asimtools")
 from asimtools.job import Job, UnitJob, DistributedJob, ChainedJob
 from asimtools.calculators import load_calc
 from asimtools.utils import (
