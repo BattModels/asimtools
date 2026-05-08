@@ -217,7 +217,7 @@ class Job():
         if slurm_params is None:
             slurm_params = self.env.get('slurm', {})
 
-        txt = '#!/usr/bin/env bash\n\n'
+        txt = '#!/usr/bin/env sh\n\n'
         flags = slurm_params.get('flags', [])
         if isinstance(flags, dict):
             flag_list = []
@@ -647,32 +647,29 @@ class DistributedJob(Job):
             ]
         )
 
-        txt += '\necho "Job started on `hostname` at `date`"\n'
-        txt += 'CUR_DIR=`pwd`\n'
+        txt += '\necho "Job started on $(hostname) at $(date)"\n'
+        txt += 'CUR_DIR=$(pwd)\n'
         txt += 'echo "LAUNCHDIR: ${CUR_DIR}"\n'
-        txt += f'G={group_size} #Group size\n'
+        txt += f'G={group_size}\n'
         txt += 'N=${SLURM_ARRAY_TASK_ID}\n'
-        txt += 'WORKDIRS=($(ls -dv ./id-*))\n'
-        seqtxt = '$(seq $(($G*$N)) $(($G*$N+$G-1)) )'
-        txt += f'for i in {seqtxt}; do\n'
-        txt += '    WORKDIR=${WORKDIRS[$i]}\n'
-        txt += '    cd ${WORKDIR};\n'
-        # else:
-        #     txt += '\nif [[ ! -z ${SLURM_ARRAY_TASK_ID} ]]; then\n'
-        #     txt += '    fls=( id-* )\n'
-        #     txt += '    WORKDIR=${fls[${SLURM_ARRAY_TASK_ID}]}\n'
-        #     txt += 'fi\n\n'
-        # txt += 'cd ${WORKDIR}\n'
-        txt += '    ' + '\n'.join(slurm_params.get('precommands', [])) + '\n'
-        txt += '\n    '.join(
+        txt += 'START=$((G*N))\n'
+        txt += 'END=$((G*N+G-1))\n'
+        txt += 'i=0\n'
+        txt += 'for WORKDIR in $(ls -dv ./id-*); do\n'
+        txt += '    if [ $i -ge $START ] && [ $i -le $END ]; then\n'
+        txt += '        cd ${WORKDIR}\n'
+        txt += '        ' + '\n        '.join(slurm_params.get('precommands', [])) + '\n'
+        txt += '        ' + '\n        '.join(
             self.unitjobs[0].calc_params.get('precommands', [])
         ) + '\n'
-        txt += '    echo "WORKDIR: ${WORKDIR}"\n'
-        txt += '    ' + self.unitjobs[0].gen_run_command() + '\n'
-        txt += '    ' + '\n'.join(slurm_params.get('postcommands', [])) + '\n'
-        txt += '    cd ${CUR_DIR}\n'
+        txt += '        echo "WORKDIR: ${WORKDIR}"\n'
+        txt += '        ' + self.unitjobs[0].gen_run_command() + '\n'
+        txt += '        ' + '\n        '.join(slurm_params.get('postcommands', [])) + '\n'
+        txt += '        cd ${CUR_DIR}\n'
+        txt += '    fi\n'
+        txt += '    i=$((i+1))\n'
         txt += 'done\n'
-        txt += 'echo "Job ended at `date`"'
+        txt += 'echo "Job ended at $(date)"'
 
         if write:
             slurm_file = self.workdir / 'job_array.sh'
@@ -846,7 +843,7 @@ class DistributedJob(Job):
             # Only for testing purposes
             print('SLURM command:', command)
             os.environ['SLURM_ARRAY_TASK_ID'] = '0'
-            command = ['bash', 'job_array.sh']
+            command = ['sh', 'job_array.sh']
 
         completed_process = subprocess.run(
             command, check=False, capture_output=True, text=True,
