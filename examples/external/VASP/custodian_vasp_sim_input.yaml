@@ -1,0 +1,10 @@
+asimmodule: vasp.custodian_vasp
+workdir: custodian_vasp_results
+env_id: n36 # Specify your own env
+args:
+  image:
+    name: Na
+    builder: bulk
+  mpset: MPRelaxSet
+  command: srun --mpi=pmi2 vasp_std
+  handlers: ["VaspErrorHandler"]

@@ -6,51 +6,74 @@ VASP must be installed
 
 Author: mkphuthi@github.com
 '''
-from typing import Dict, Optional, Sequence
+from typing import Dict, Optional
 import os
-import subprocess
 import logging
-import shutil
 from ase.io import read
 from pymatgen.io.vasp import Poscar, Incar, Potcar, Kpoints, VaspInput
 import pymatgen.io.vasp.sets
+from custodian.custodian import Custodian
+import custodian.vasp.handlers
+from custodian.vasp.jobs import VaspJob
 from asimtools.utils import (
     get_atoms,
-    get_str_btn,
 )
 
 def execute_vasp_run_command(
     command: str,
+    max_errors: int = 10,
+    vasp_job_kwargs: Optional[Dict] = None,
+    handlers: list[str] = ["VaspErrorHandler", "UnconvergedErrorHandler"],
+    handler_kwargs: list[dict] = None,
 ) -> None:
     command = command.split(' ')
-    completed_process = subprocess.run(
-            command, check=False, capture_output=True, text=True,
-        )
+    if vasp_job_kwargs is None:
+        vasp_job_kwargs = {}
 
-    with open('vasp_stdout.txt', 'a+', encoding='utf-8') as f:
-        f.write(completed_process.stdout)
+    vaspjob = VaspJob(
+        vasp_cmd=command,
+        output_file="vasp_stdout.txt",
+        stderr_file="vasp_stderr.txt",
+        final=vasp_job_kwargs.pop('final', True),
+        backup=vasp_job_kwargs.pop('backup', False),
+        **vasp_job_kwargs
+    )
 
-    if completed_process.returncode != 0:
-        err_txt = f'VASP failed with error code: {completed_process.returncode}'
-        err_txt += '\nSee vasp_stderr.txt for details.'
+    if handler_kwargs is not None:
+        assert len(handlers) == len(handler_kwargs), \
+            "Num. handlers ({len(handlers)}) must equal num. handler_kwargs " \
+            "({len(handler_kwargs)})"
+    else:
+        handler_kwargs = [{} for handler in handlers]
+
+    handler_objs = []
+    for i, handler in enumerate(handlers):
+        try:
+            handler_cls = getattr(custodian.vasp.handlers, handler)
+        except AttributeError as e:
+            print(f"{handler} isn't valid handler from ustodian.vasp.handlers")
+        handler_objs.append(handler_cls(
+            output_filename="vasp_stdout.txt",
+            **handler_kwargs[i]
+        ))
+
+    jobs = [vaspjob]
+    c = Custodian(handler_objs, jobs, max_errors=max_errors)
+    custodian_output = c.run()
+
+    if custodian_output[0]['nonzero_return_code']:
+        err_txt = f'VASP failed with custodian'
+        err_txt += '\nSee vasp_stderr.txt, OUTCAR etc. for details.'
         logging.error(err_txt)
         with open('vasp_stderr.txt', 'a+', encoding='utf-8') as f:
-            f.write(completed_process.stderr)
-        completed_process.check_returncode()
-        if "ZBRENT: fatal error in bracketing" in completed_process.stderr:
-            filenum = 0
-            while os.path.exists(f'OUTCAR.{filenum}'):
-                filenum += 1
-            shutil.move('OUTCAR', f'OUTCAR.{filenum}')
-            shutil.move('POSCAR', f'POSCAR.{filenum}')
-            shutil.move('CONTCAR', f'POSCAR')
-            execute_vasp_run_command(command)
+            f.write(str(custodian_output))
+
     else:
         logging.info(
-            f'VASP run completed with code {completed_process.returncode}.'
+            f'VASP run completed.'
         )
 
-def vasp(
+def custodian_vasp(
     image: Optional[Dict],
     user_incar_settings: Optional[Dict] = None,
     user_kpoints_settings: Optional[Dict] = None,
@@ -62,6 +85,9 @@ def vasp(
     prev_calc: Optional[os.PathLike] = None,
     write_image_output: bool = True,
     run_vasp: bool = True,
+    max_errors: int = 10,
+    vasp_job_kwargs: Optional[Dict] = None,
+    handlers: list[str] = ["VaspErrorHandler", "UnconvergedErrorHandler"]
 ) -> Dict:
     """Run VASP with given input files and specified image
 
@@ -92,7 +118,7 @@ def vasp(
         :mod:`pymatgen.io.vasp.sets`, defaults to None
     :type mpset: str, optional
     :param write_image_output: Whether to write output image in standard 
-        asimtools format to file, defaults to False
+        asimtools format to file, defaults to True
     :type write_image_output: bool, optional
     :param run_vasp: Whether to run VASP after writing input files,
         defaults to True
@@ -152,28 +178,14 @@ def vasp(
     vasp_input.write_input("./")
 
     if run_vasp:
-        optimization_failed = False
-        execute_vasp_run_command(command)
-        incar = vasp_input.incar
-        ibrion = incar.get('IBRION', -1)
-        nsw = incar.get('NSW', 0)
-        # Don't write result if running a relaxation that didn't finish
-        if ibrion in (1,2,3):
-            if nsw > 0:
-                with open('OUTCAR', 'r') as f:
-                    lines = f.readlines()
-                lines = lines[::-1]
-                for line in lines:
-                    if 'Ionic step' in line:
-                        last_step = int(get_str_btn(line, 'Ionic step', '--'))
-                        if last_step == nsw:
-                            optimization_failed = True
-                            raise RuntimeError(
-                                'VASP relaxation did not complete. '
-                                'Check OUTCAR for details.'
-                            )
+        execute_vasp_run_command(
+            command,
+            max_errors=max_errors,
+            vasp_job_kwargs=vasp_job_kwargs,
+            handlers=handlers,
+        )
 
-        if write_image_output and not optimization_failed:
+        if write_image_output:
             atoms_output = read('OUTCAR')
             atoms_output.write(
                 'image_output.xyz',

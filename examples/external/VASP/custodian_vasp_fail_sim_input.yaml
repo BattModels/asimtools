@@ -1,0 +1,19 @@
+asimmodule: vasp.custodian_vasp
+workdir: custodian_vasp_fail_results
+env_id: n8 # Specify your own env
+args:
+  image:
+    name: Na
+    builder: bulk
+  mpset: MPRelaxSet
+  user_kpoints_settings:
+    reciprocal_density: 0.01
+  user_incar_settings:
+    ISMEAR: -5 # This should trigger an error due to few KPOINTS for tetrahedron method that custodian should
+    ISPIN: 1
+  vasp_job_kwargs:
+    backup: true
+  command: srun --mpi=pmi2 vasp_std
+  # handlers: ["VaspErrorHandler"]
+  handlers: []
+

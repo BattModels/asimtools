@@ -1,0 +1,32 @@
+asimmodule: vasp.custodian_chain_vasp
+workdir: custodian_vasp_chain_results
+env_id: n8 # Specify your own env
+args:
+  image:
+    name: Na
+    builder: bulk
+  mpset: MPRelaxSet
+  command: srun --mpi=pmi2 vasp_std
+  handlers: ["VaspErrorHandler"]
+  vasp_job_kwargs_set:
+    - backup: true
+      suffix: .relax1
+      settings_override:
+        - dict: "INCAR"
+          action:
+            _set:
+              KSPACING: 0.4
+              ENCUT: 400
+        - "file": "INCAR.orig"
+          "action": {"_file_copy": {"dest": "INCAR"}}
+    - backup: true
+      suffix: .relax2
+      settings_override:
+        - dict: "INCAR"
+          action:
+            _set:
+              ISTART: 1
+              KSPACING: 0.22
+              ENCUT: 520
+        - "file": "CONTCAR.relax1"
+          "action": {"_file_copy": {"dest": "POSCAR"}}
