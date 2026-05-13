@@ -49,9 +49,21 @@ Key parameters
 +-----------------------------+--------------------------------------------------+
 | ``file_pattern``            | Glob pattern; files matching it become values.   |
 +-----------------------------+--------------------------------------------------+
+| ``file_regex``              | Regex pattern matched against full file paths;   |
+|                             | matching files become the array values.          |
++-----------------------------+--------------------------------------------------+
+| ``file_regex_kwargs``       | Extra kwargs for                                 |
+|                             | :func:`~asimtools.utils.find_files_by_regex`     |
+|                             | (e.g. ``search_dir``, ``recursive``).            |
++-----------------------------+--------------------------------------------------+
 | ``labels``                  | ``"values"`` (default) uses the value itself;    |
 |                             | ``"files"`` extracts a label from the file path; |
+|                             | ``"str_btn"`` extracts text between two anchors; |
+|                             | ``"regex"`` extracts a capture group via regex;  |
 |                             | a list provides explicit directory names.        |
++-----------------------------+--------------------------------------------------+
+| ``regex_label_args``        | Dict with ``pattern`` and optional ``group``     |
+|                             | (default 1) used when ``labels='regex'``.        |
 +-----------------------------+--------------------------------------------------+
 | ``placeholder``             | Replace this sentinel string inside the value    |
 |                             | rather than the whole value.                     |
@@ -105,6 +117,33 @@ Example — sweep over a set of structure files
            calc_id: my_mlip
          image:
            image_file: PLACEHOLDER
+
+Example — iterate over files found by regex with regex-extracted labels
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: yaml
+
+   asimmodule: workflows.sim_array
+   env_id: batch
+   workdir: results/model_sweep
+   args:
+     key_sequence: [args, image, image_file]
+     file_regex: 'bulk_\w+_relaxed\.xyz'
+     file_regex_kwargs:
+       search_dir: data/structures
+     labels: regex
+     regex_label_args:
+       pattern: 'bulk_(\w+)_relaxed'
+       group: 1
+     template_sim_input:
+       asimmodule: singlepoint
+       env_id: batch
+       args:
+         calculator:
+           calc_id: my_mlip
+         image:
+           image_file: PLACEHOLDER
+         properties: [energy, forces, stress]
 
 Example — sweep two parameters simultaneously
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,7 +205,12 @@ Key parameters
 |                             | image path (default ``[args, image,               |
 |                             | image_file]``).                                   |
 +-----------------------------+---------------------------------------------------+
-| ``labels``                  | Source of directory name for each job.            |
+| ``labels``                  | ``"files"`` uses the filename; ``"str_btn"``      |
+|                             | extracts text between two anchors; ``"regex"``    |
+|                             | extracts a capture group; or an explicit list.    |
++-----------------------------+---------------------------------------------------+
+| ``regex_label_args``        | Dict with ``pattern`` and optional ``group``      |
+|                             | (default 1) used when ``labels='regex'``.         |
 +-----------------------------+---------------------------------------------------+
 | ``env_ids``                 | Per-image environments (or a single string).      |
 +-----------------------------+---------------------------------------------------+
@@ -209,6 +253,29 @@ Example — relax all structures in an xyz file
          calculator:
            calc_id: my_mlip
 
+Example — extract job labels from image paths using regex
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: yaml
+
+   asimmodule: workflows.image_array
+   env_id: batch
+   workdir: results/bulk_sp
+   args:
+     images:
+       pattern: data/structures/bulk_*_relaxed.xyz
+     labels: regex
+     regex_label_args:
+       pattern: 'bulk_(\w+)_relaxed'
+       group: 1
+     template_sim_input:
+       asimmodule: singlepoint
+       env_id: batch
+       args:
+         calculator:
+           calc_id: my_mlip
+         properties: [energy, forces, stress]
+
 ----
 
 calc\_array
@@ -246,6 +313,16 @@ Key parameters
 | ``array_values`` /          | Values to sweep (same semantics as               |
 | ``linspace_args`` /         | ``sim_array``).                                  |
 | ``arange_args``             |                                                  |
++-----------------------------+--------------------------------------------------+
+| ``file_regex``              | Regex pattern; matching file paths become the    |
+|                             | values swept into the calculator dict.           |
++-----------------------------+--------------------------------------------------+
+| ``file_regex_kwargs``       | Extra kwargs for                                 |
+|                             | :func:`~asimtools.utils.find_files_by_regex`     |
+|                             | (e.g. ``search_dir``, ``recursive``).            |
++-----------------------------+--------------------------------------------------+
+| ``regex_label_args``        | Dict with ``pattern`` and optional ``group``     |
+|                             | (default 1) used when ``labels='regex'``.        |
 +-----------------------------+--------------------------------------------------+
 | ``calc_ids``                | *Deprecated* — list of calc_id strings.          |
 |                             | Auto-converted to ``calculators``.               |
@@ -293,6 +370,34 @@ Example — converge DFT cutoff energy
        args:
          image: {name: Fe}
          properties: [energy]
+
+Example — compare ML model checkpoints found by regex
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: yaml
+
+   asimmodule: workflows.calc_array
+   env_id: batch
+   workdir: results/checkpoint_comparison
+   args:
+     template_calculator:
+       calc_params:
+         name: mace
+         model: PLACEHOLDER
+     key_sequence: [model]
+     file_regex: 'model_epoch\d+\.model'
+     file_regex_kwargs:
+       search_dir: training/checkpoints
+     labels: regex
+     regex_label_args:
+       pattern: 'model_(epoch\d+)\.model'
+       group: 1
+     subsim_input:
+       asimmodule: singlepoint
+       env_id: batch
+       args:
+         image: {name: Cu}
+         properties: [energy, forces]
 
 ----
 
@@ -491,12 +596,46 @@ Key parameters
 | ``array_values`` / ``linspace_args`` | Values to iterate over.                   |
 | / ``arange_args``                 |                                              |
 +-----------------------------------+----------------------------------------------+
+| ``file_regex``                    | Regex pattern; matching file paths become    |
+|                                   | the values iterated over in sequence.        |
++-----------------------------------+----------------------------------------------+
+| ``file_regex_kwargs``             | Extra kwargs for                             |
+|                                   | :func:`~asimtools.utils.find_files_by_regex` |
+|                                   | (e.g. ``search_dir``, ``recursive``).        |
++-----------------------------------+----------------------------------------------+
+| ``regex_label_args``              | Dict with ``pattern`` and optional ``group`` |
+|                                   | (default 1) used when ``labels='regex'``.    |
++-----------------------------------+----------------------------------------------+
 | ``dependent_file``                | Filename (relative to each step's workdir)   |
 |                                   | to pass as input to the next step.           |
 +-----------------------------------+----------------------------------------------+
 | ``dependent_file_key_sequence``   | Key path in the next step's sim_input where  |
 |                                   | the file path is injected.                   |
 +-----------------------------------+----------------------------------------------+
+
+Example — run sequentially over files found by regex, feeding each output to the next
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: yaml
+
+   asimmodule: workflows.iterative
+   env_id: batch
+   workdir: results/sequential_relax
+   args:
+     key_sequence: [args, image, image_file]
+     file_regex: 'frame_\d{4}\.xyz'
+     file_regex_kwargs:
+       search_dir: data/trajectory_frames
+     dependent_file: final.xyz
+     dependent_file_key_sequence: [args, image, image_file]
+     template_sim_input:
+       asimmodule: geometry_optimization.atom_relax
+       env_id: batch
+       args:
+         calculator:
+           calc_id: my_mlip
+         image:
+           image_file: PLACEHOLDER
 
 Example — sequential geometry relaxations at increasing pressures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

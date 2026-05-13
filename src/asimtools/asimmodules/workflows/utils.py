@@ -2,19 +2,23 @@ from typing import Dict, Sequence, Optional, Union
 from glob import glob
 from pathlib import Path
 from natsort import natsorted
+import re
 import numpy as np
-from asimtools.utils import get_str_btn, get_nth_label
+from asimtools.utils import get_str_btn, get_nth_label, find_files_by_regex
 
 def prepare_array_vals(
     key_sequence: Optional[Sequence[str]] = None,
     array_values: Optional[Sequence] = None,
     file_pattern: Optional[str] = None,
+    file_regex: str | None = None,
+    file_regex_kwargs: dict | None = None,
     linspace_args: Optional[Sequence] = None,
     arange_args: Optional[Sequence] = None,
     env_ids: Optional[Union[Sequence[str],str]] = None,
     labels: Optional[Union[Sequence,str]] = 'values',
     label_prefix: Optional[str] = None,
     str_btn_args: Optional[Dict] = None,
+    regex_label_args: dict | None = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
     as_integers: Optional[bool] = False,
@@ -27,20 +31,32 @@ def prepare_array_vals(
     :param array_values: values to be iterated over in each simulation,
         defaults to None
     :type array_values: Optional[Sequence], optional
-    :param file_pattern: pattern of files to be iterated over in each
+    :param file_pattern: glob pattern of files to be iterated over in each
         simulation, defaults to None
     :type file_pattern: Optional[str], optional
+    :param file_regex: regex pattern matched against full file paths to be
+        iterated over in each simulation, defaults to None
+    :type file_regex: str, optional
+    :param file_regex_kwargs: kwargs forwarded to
+        :func:`asimtools.utils.find_files_by_regex` (e.g. ``search_dir``,
+        ``recursive``), defaults to None
+    :type file_regex_kwargs: dict, optional
     :param linspace_args: arguments to pass to :func:`numpy.linspace` to be
         iterated over in each simulation, defaults to None
     :type linspace_args: Optional[Sequence], optional
     :param arange_args: arguments to pass to :func:`numpy.arange` to be
         iterated over in each simulation, defaults to None
     :type arange_args: Optional[Sequence], optional
-    :param labels: Custom labels to use for each simulation. If "str_btn" 
-        provide arguments to :func:`asimtools.utils.get_str_btn` as additional
-        str_btn_args keyword. If labels is an integer N, the Nth label in the 
-        file_pattern or array_values is used, defaults to None
+    :param labels: Custom labels to use for each simulation. If ``'str_btn'``,
+        provide arguments via ``str_btn_args``. If ``'regex'``, provide a
+        pattern and optional group via ``regex_label_args``. If an integer N,
+        the Nth label in the file_pattern or array_values is used, defaults to
+        ``'values'``
     :type labels: Sequence, optional
+    :param regex_label_args: Dict with keys ``pattern`` (required) and
+        ``group`` (optional, default 1) used when ``labels='regex'`` to extract
+        a label from each array value via :func:`re.search`, defaults to None
+    :type regex_label_args: dict, optional
     :param label_prefix: Prefix to add before labels which can make extracting 
         data from file paths easier, defaults to None
     :type label_prefix: str, optional
@@ -63,10 +79,10 @@ def prepare_array_vals(
     :rtype: Dict
     """
     possible_values = [
-        array_values, file_pattern, linspace_args, arange_args
+        array_values, file_pattern, file_regex, linspace_args, arange_args
     ]
     possible_strs = [
-        'array_values','file_pattern','linspace_args','arange_args'
+        'array_values', 'file_pattern', 'file_regex', 'linspace_args', 'arange_args'
     ]
     assert possible_values.count(None) + 1 == len(possible_values), \
         f'Provide only one of {[str(v) for v in possible_strs]}'
@@ -74,6 +90,9 @@ def prepare_array_vals(
     if file_pattern is not None:
         array_values = natsorted(glob(str(file_pattern)))
         assert len(array_values) > 0, f'No file_pattern matching {file_pattern}'
+    elif file_regex is not None:
+        array_values = find_files_by_regex(file_regex, **(file_regex_kwargs or {}))
+        assert len(array_values) > 0, f'No files matching regex "{file_regex}"'
     elif linspace_args is not None:
         array_values = np.linspace(*linspace_args)
         array_values = [float(v) for v in array_values]
@@ -89,6 +108,18 @@ def prepare_array_vals(
     if labels == 'str_btn':
         assert str_btn_args is not None, 'Provide str_btn_args for labels'
         labels = [get_str_btn(s, *str_btn_args) for s in array_values]
+    elif labels == 'regex':
+        assert regex_label_args is not None, 'Provide regex_label_args for labels'
+        pattern = regex_label_args['pattern']
+        group = regex_label_args.get('group', 1)
+        labels = []
+        for v in array_values:
+            m = re.search(pattern, str(v))
+            if m is None:
+                raise ValueError(
+                    f'regex pattern "{pattern}" did not match value "{v}"'
+                )
+            labels.append(m.group(group))
     elif labels == 'values':
         if key_sequence is not None:
             labels = [f'{key_sequence[-1]}-{val}' for val in array_values]
@@ -112,7 +143,7 @@ def prepare_array_vals(
         f'of labels ({len(labels)})'
     
     # File patterns should be resolved fully for placeholders to work
-    if file_pattern is not None:
+    if file_pattern is not None or file_regex is not None:
         array_values = [str(Path(v).resolve()) for v in array_values]
 
     if secondary_array_values is not None:

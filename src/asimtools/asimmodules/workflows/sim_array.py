@@ -19,6 +19,8 @@ def sim_array(
     key_sequence: Optional[Sequence[str]] = None,
     array_values: Optional[Sequence] = None,
     file_pattern: Optional[str] = None,
+    file_regex: str | None = None,
+    file_regex_kwargs: dict | None = None,
     linspace_args: Optional[Sequence] = None,
     arange_args: Optional[Sequence] = None,
     placeholder: Optional[str] = None,
@@ -28,6 +30,7 @@ def sim_array(
     labels: Optional[Union[Sequence,str]] = 'values',
     label_prefix: Optional[str] = None,
     str_btn_args: Optional[Dict] = None,
+    regex_label_args: dict | None = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
     secondary_placeholders: Optional[Sequence] = None,
@@ -47,9 +50,15 @@ def sim_array(
     :param array_values: values to be iterated over in each simulation,
         defaults to None
     :type array_values: Optional[Sequence], optional
-    :param file_pattern: pattern of files to be iterated over in each
+    :param file_pattern: glob pattern of files to be iterated over in each
         simulation, defaults to None
     :type file_pattern: Optional[str], optional
+    :param file_regex: regex pattern matched against full file paths to be
+        iterated over, defaults to None
+    :type file_regex: str, optional
+    :param file_regex_kwargs: kwargs forwarded to
+        :func:`asimtools.utils.find_files_by_regex`, defaults to None
+    :type file_regex_kwargs: dict, optional
     :param linspace_args: arguments to pass to :func:`numpy.linspace` to be
         iterated over in each simulation, defaults to None
     :type linspace_args: Optional[Sequence], optional
@@ -61,9 +70,15 @@ def sim_array(
     :type placeholder: Optional[str], optional
     :param labels: Custom labels to use for each simulation, defaults to None
     :type labels: Sequence, optional
-    :param label_prefix: Prefix to add before labels which can make extracting 
+    :param label_prefix: Prefix to add before labels which can make extracting
         data from file paths easier, defaults to None
     :type label_prefix: str, optional
+    :param str_btn_args: args passed to :func:`asimtools.utils.get_str_btn`
+        when ``labels='str_btn'``, defaults to None
+    :type str_btn_args: dict, optional
+    :param regex_label_args: dict with ``pattern`` and optional ``group``
+        (default 1) used when ``labels='regex'``, defaults to None
+    :type regex_label_args: dict, optional
     :param env_ids: Environment(s) to be used for each simulation, must either
         be a list with as many env_ids as array values or a string with the
         env_id to be used by all simulations, defaults to None
@@ -101,12 +116,15 @@ def sim_array(
         key_sequence=key_sequence,
         array_values=array_values,
         file_pattern=file_pattern,
+        file_regex=file_regex,
+        file_regex_kwargs=file_regex_kwargs,
         linspace_args=linspace_args,
         arange_args=arange_args,
         env_ids=env_ids,
         labels=labels,
         label_prefix=label_prefix,
         str_btn_args=str_btn_args,
+        regex_label_args=regex_label_args,
         secondary_key_sequences=secondary_key_sequences,
         secondary_array_values=secondary_array_values,
         as_integers=as_integers,

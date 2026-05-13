@@ -24,6 +24,8 @@ def calc_array(
     key_sequence: Optional[Sequence[str]] = None,
     array_values: Optional[Sequence] = None,
     file_pattern: Optional[str] = None,
+    file_regex: str | None = None,
+    file_regex_kwargs: dict | None = None,
     linspace_args: Optional[Sequence] = None,
     arange_args: Optional[Sequence] = None,
     label_prefix: Optional[str] = None,
@@ -32,6 +34,7 @@ def calc_array(
     env_input: Optional[Dict] = None,
     labels: Optional[Union[Sequence,str]] = 'values',
     str_btn_args: Optional[Dict] = None,
+    regex_label_args: dict | None = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
     array_max: Optional[int] = None,
@@ -62,9 +65,18 @@ def calc_array(
         :param array_values: values to be iterated over in each simulation,
         defaults to None
     :type array_values: Optional[Sequence], optional
-    :param file_pattern: pattern of files to be iterated over in each
+    :param file_pattern: glob pattern of files to be iterated over in each
         simulation, defaults to None
     :type file_pattern: Optional[str], optional
+    :param file_regex: regex pattern matched against full file paths to be
+        iterated over, defaults to None
+    :type file_regex: str, optional
+    :param file_regex_kwargs: kwargs forwarded to
+        :func:`asimtools.utils.find_files_by_regex`, defaults to None
+    :type file_regex_kwargs: dict, optional
+    :param regex_label_args: dict with ``pattern`` and optional ``group``
+        (default 1) used when ``labels='regex'``, defaults to None
+    :type regex_label_args: dict, optional
     :param linspace_args: arguments to pass to :func:`numpy.linspace` to be
         iterated over in each simulation, defaults to None
     :type linspace_args: Optional[Sequence], optional
@@ -102,17 +114,14 @@ def calc_array(
     if template_calculator is None and template_calc_id is not None:
         template_calculator = {'calc_id': template_calc_id}
 
-    print([
-            array_values, linspace_args, arange_args, file_pattern
-        ])
     using_array_values = key_sequence is not None\
         and template_calculator is not None\
         and [
-            array_values, linspace_args, arange_args, file_pattern
-        ].count(None) == 3
+            array_values, linspace_args, arange_args, file_pattern, file_regex
+        ].count(None) == 4
     err_txt = 'Specify either a sequence of "calculators" or all of '
     err_txt += '"key_sequence", "template_calculator" and one of ['
-    err_txt += '"array_values", "linspace_args", "arange_args", "file_pattern"'
+    err_txt += '"array_values", "linspace_args", "arange_args", "file_pattern", "file_regex"'
     err_txt += '] to iterate over'
     assert calculators is not None or using_array_values, err_txt
 
@@ -131,12 +140,15 @@ def calc_array(
             key_sequence=key_sequence,
             array_values=array_values,
             file_pattern=file_pattern,
+            file_regex=file_regex,
+            file_regex_kwargs=file_regex_kwargs,
             linspace_args=linspace_args,
             arange_args=arange_args,
             env_ids=env_ids,
             labels=labels,
             label_prefix=label_prefix,
             str_btn_args=str_btn_args,
+            regex_label_args=regex_label_args,
             secondary_key_sequences=secondary_key_sequences,
             secondary_array_values=secondary_array_values,
         )

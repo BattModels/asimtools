@@ -96,10 +96,15 @@ def surface_energies(
         mindex = slab.miller_index
         miller = f'{mindex[0]}{mindex[1]}{mindex[2]}'
         if millers == 'all' or miller in millers:
-            logging.info('Calculating for %s', miller)
+            slab_idx = 0
+            while f'{miller}_{slab_idx}' in slab_dict:
+                slab_idx += 1
+            slab_name = f'{miller}_{slab_idx}'
+
+            logging.info('Calculating for %s with index %s', miller, slab_idx)
             atoms = AAA.get_atoms(big_slab)
-            atoms.write(f'miller-{miller}.xyz')
-            slab_dict[miller] = {}
+            atoms.write(f'miller-{slab_name}.xyz')
+            slab_dict[slab_name] = {}
 
             if atom_relax_args is not None:
                 relax_results = atom_relax(
@@ -120,20 +125,18 @@ def surface_energies(
                 assert atoms.cell[2][2] > pymargs['min_vacuum_size'] + \
                     pymargs['min_slab_size'], \
                     f'Check layer number and vacuum for {miller}'
-                assert miller not in slab_dict, \
-                    f'Multiple terminations for {miller}'
 
                 converged, surf_en, slab_en, area = get_surface_energy(
                     atoms, load_calc(calculator=calculator), bulk_e_per_atom
                 )
 
                 if converged:
-                    slab_dict[miller]['surf_energy'] = float(surf_en)
-                    slab_dict[miller]['natoms'] = len(atoms)
-                    slab_dict[miller]['slab_energy'] = float(slab_en)
+                    slab_dict[slab_name]['surf_energy'] = float(surf_en)
+                    slab_dict[slab_name]['natoms'] = len(atoms)
+                    slab_dict[slab_name]['slab_energy'] = float(slab_en)
                     slab_dict['bulk_energy_per_atom'] = float(bulk_e_per_atom)
-                    slab_dict[miller]['area'] = float(area)
-                    atoms.write(f'{miller}.xyz')
+                    slab_dict[slab_name]['area'] = float(area)
+                    atoms.write(f'{slab_name}.xyz')
                 else:
                     logging.warning('Slab %s not converged', miller)
 

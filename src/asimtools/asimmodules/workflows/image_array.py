@@ -25,6 +25,7 @@ def image_array(
     labels: Optional[Union[Sequence,str]] = None,
     label_prefix: Optional[str] = None,
     str_btn_args: Optional[Dict] = None,
+    regex_label_args: dict | None = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
     group_size: int = 1,
@@ -41,7 +42,11 @@ def image_array(
     :param template_sim_input: sim_input of asimmodule to be run, defaults to None
     :type template_sim_input: Optional[Dict], optional
     :param str_btn_args: args to pass to :func:`asimtools.utils.get_str_btn`
+        when ``labels='str_btn'``, defaults to None
     :type str_btn_args: Optional[Sequence], optional
+    :param regex_label_args: dict with ``pattern`` and optional ``group``
+        (default 1) used when ``labels='regex'``, defaults to None
+    :type regex_label_args: dict, optional
     :param calc_input: calc_input to override global file, defaults to None
     :type calc_input: Optional[Dict], optional
     :param env_input: env_input to override global file, defaults to None
@@ -86,6 +91,7 @@ def image_array(
         labels=labels,
         label_prefix=label_prefix,
         str_btn_args=str_btn_args,
+        regex_label_args=regex_label_args,
         secondary_key_sequences=secondary_key_sequences,
         secondary_array_values=secondary_array_values,
     )

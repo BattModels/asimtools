@@ -50,6 +50,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `tests/unit/test_utils.py`: 10 new tests covering `find_files_by_regex`
   (match, no-match, non-recursive, recursive, natsort) and both `get_atoms` /
   `get_images` regex paths including error cases
+- `workflows/utils.py`: `prepare_array_vals` gains `file_regex` /
+  `file_regex_kwargs` parameters as a regex alternative to `file_pattern` for
+  selecting files to iterate over, and `labels='regex'` with `regex_label_args`
+  dict (`pattern`, `group`) for extracting labels from array values via regex
+- `tests/unit/test_workflow_utils.py`: 22 unit tests for `prepare_array_vals`
+  covering all value sources, label modes, env_ids, secondary values, path
+  resolution, and error cases including the new `file_regex` and `labels='regex'`
+  paths
 
 ## [0.3.0] - 2026-05-07
 

@@ -7,8 +7,8 @@ Author: mkphuthi@github.com
 
 '''
 
-from typing import Dict, Sequence, Optional, Union
 import os
+from typing import Dict, Sequence, Optional, Union
 from pathlib import Path
 from copy import deepcopy
 from asimtools.job import ChainedJob
@@ -22,12 +22,15 @@ def iterative(
     key_sequence: Optional[Sequence[str]] = None,
     array_values: Optional[Sequence] = None,
     file_pattern: Optional[str] = None,
+    file_regex: str | None = None,
+    file_regex_kwargs: dict | None = None,
     linspace_args: Optional[Sequence] = None,
     arange_args: Optional[Sequence] = None,
     env_ids: Optional[Union[Sequence[str],str]] = None,
     calc_input: Optional[Dict] = None,
     env_input: Optional[Dict] = None,
     str_btn_args: Optional[Dict] = None,
+    regex_label_args: dict | None = None,
     secondary_key_sequences: Optional[Sequence] = None,
     secondary_array_values: Optional[Sequence] = None,
 ) -> Dict:
@@ -45,6 +48,12 @@ def iterative(
     :param file_pattern: pattern of files to be iterated over in each
         simulation, defaults to None
     :type file_pattern: Optional[str], optional
+    :param file_regex: regex pattern matched against full file paths to be
+        iterated over, defaults to None
+    :type file_regex: str, optional
+    :param file_regex_kwargs: kwargs forwarded to
+        :func:`asimtools.utils.find_files_by_regex`, defaults to None
+    :type file_regex_kwargs: dict, optional
     :param linspace_args: arguments to pass to :func:`numpy.linspace` to be
         iterated over in each simulation, defaults to None
     :type linspace_args: Optional[Sequence], optional
@@ -60,6 +69,9 @@ def iterative(
         be a list with as many env_ids as array values or a string with the
         env_id to be used by all simulations, defaults to None
     :type env_ids: Optional[Union[Sequence[str],str]], optional
+    :param regex_label_args: dict with ``pattern`` and optional ``group``
+        (default 1) used when ``labels='regex'``, defaults to None
+    :type regex_label_args: dict, optional
     :param secondary_key_sequences: list of other keys to iterate over in
         tandem with key_sequence to allow changing multiple key-value pairs,
         defaults to None
@@ -82,12 +94,13 @@ def iterative(
         key_sequence=key_sequence,
         array_values=array_values,
         file_pattern=file_pattern,
+        file_regex=file_regex,
+        file_regex_kwargs=file_regex_kwargs,
         linspace_args=linspace_args,
         arange_args=arange_args,
         env_ids=env_ids,
-        # labels=None,
-        # label_prefix=label_prefix,
         str_btn_args=str_btn_args,
+        regex_label_args=regex_label_args,
         secondary_key_sequences=secondary_key_sequences,
         secondary_array_values=secondary_array_values,
     )
