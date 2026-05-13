@@ -6,7 +6,6 @@ VASP must be installed
 
 Author: mkphuthi@github.com
 '''
-from typing import Dict, Optional
 import os
 import logging
 from ase.io import read
@@ -22,13 +21,15 @@ from asimtools.utils import (
 def execute_vasp_run_command(
     command: str,
     max_errors: int = 10,
-    vasp_job_kwargs: Optional[Dict] = None,
-    handlers: list[str] = ["VaspErrorHandler", "UnconvergedErrorHandler"],
-    handler_kwargs: list[dict] = None,
+    vasp_job_kwargs: dict | None = None,
+    handlers: list[str] | None = None,
+    handler_kwargs: list[dict] | None = None,
 ) -> None:
     command = command.split(' ')
     if vasp_job_kwargs is None:
         vasp_job_kwargs = {}
+    if handlers is None:
+        handlers = ["VaspErrorHandler", "UnconvergedErrorHandler"]
 
     vaspjob = VaspJob(
         vasp_cmd=command,
@@ -40,9 +41,11 @@ def execute_vasp_run_command(
     )
 
     if handler_kwargs is not None:
-        assert len(handlers) == len(handler_kwargs), \
-            "Num. handlers ({len(handlers)}) must equal num. handler_kwargs " \
-            "({len(handler_kwargs)})"
+        if len(handlers) != len(handler_kwargs):
+            raise ValueError(
+                f"Num. handlers ({len(handlers)}) must equal num. "
+                f"handler_kwargs ({len(handler_kwargs)})"
+            )
     else:
         handler_kwargs = [{} for handler in handlers]
 
@@ -50,8 +53,8 @@ def execute_vasp_run_command(
     for i, handler in enumerate(handlers):
         try:
             handler_cls = getattr(custodian.vasp.handlers, handler)
-        except AttributeError as e:
-            print(f"{handler} isn't valid handler from ustodian.vasp.handlers")
+        except AttributeError:
+            raise ValueError(f"{handler} is not a valid handler from custodian.vasp.handlers")
         handler_objs.append(handler_cls(
             output_filename="vasp_stdout.txt",
             **handler_kwargs[i]
@@ -74,21 +77,22 @@ def execute_vasp_run_command(
         )
 
 def custodian_vasp(
-    image: Optional[Dict],
-    user_incar_settings: Optional[Dict] = None,
-    user_kpoints_settings: Optional[Dict] = None,
+    image: dict | None,
+    user_incar_settings: dict | None = None,
+    user_kpoints_settings: dict | None = None,
     user_potcar_functional: str = 'PBE_64',
-    potcar: Optional[Dict] = None,
-    vaspinput_kwargs: Optional[Dict] = None,
+    potcar: dict | None = None,
+    vaspinput_kwargs: dict | None = None,
     command: str = 'srun vasp_std',
-    mpset: Optional[str] = None,
-    prev_calc: Optional[os.PathLike] = None,
-    write_image_output: bool = True,
+    mpset: str | None = None,
+    prev_calc: os.PathLike | None = None,
+    image_output_file: str | None = 'OUTCAR',
     run_vasp: bool = True,
     max_errors: int = 10,
-    vasp_job_kwargs: Optional[Dict] = None,
-    handlers: list[str] = ["VaspErrorHandler", "UnconvergedErrorHandler"]
-) -> Dict:
+    vasp_job_kwargs: dict | None = None,
+    handlers: list[str] | None = None,
+    handler_kwargs: list[dict] | None = None,
+) -> dict:
     """Run VASP with given input files and specified image
 
     :param image: Initial image for VASP calculation. Image specification,
@@ -117,9 +121,12 @@ def custodian_vasp(
     :param mpset: Materials Project VASP set to use see 
         :mod:`pymatgen.io.vasp.sets`, defaults to None
     :type mpset: str, optional
-    :param write_image_output: Whether to write output image in standard 
-        asimtools format to file, defaults to True
-    :type write_image_output: bool, optional
+    :param image_output_file: File to read output image from and write in
+        standard asimtools format, set to None to skip, defaults to 'OUTCAR'
+    :type image_output_file: str, optional
+    :param handler_kwargs: List of kwargs dicts for each handler, must match
+        length of handlers, defaults to None
+    :type handler_kwargs: list[dict], optional
     :param run_vasp: Whether to run VASP after writing input files,
         defaults to True
     :type run_vasp: bool, optional
@@ -164,9 +171,6 @@ def custodian_vasp(
         else:
             kpoints=None
 
-        if vaspinput_args is None:
-            vaspinput_args = {}
-
         vasp_input = VaspInput(
             incar=incar,
             kpoints=kpoints,
@@ -183,10 +187,11 @@ def custodian_vasp(
             max_errors=max_errors,
             vasp_job_kwargs=vasp_job_kwargs,
             handlers=handlers,
+            handler_kwargs=handler_kwargs,
         )
 
-        if write_image_output:
-            atoms_output = read('OUTCAR')
+        if image_output_file:
+            atoms_output = read(image_output_file)
             atoms_output.write(
                 'image_output.xyz',
                 format='extxyz',
