@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- `job.py`: `dry_run=True` now works for `DistributedJob` — sub-job input files
+  are written by `gen_input_files()` but submission is skipped, matching the
+  existing `submit: false` filter in `submit_sh_array` and `submit_slurm_array`
+
+### Added
+- `workflows/calc_array.py`, `workflows/iterative.py`: `file_regex`,
+  `file_regex_kwargs`, and `regex_label_args` parameters forwarded to
+  `prepare_array_vals`, consistent with `sim_array` and `image_array`
+- `docs/workflows.rst`: `file_regex` / `regex_label_args` parameter rows and
+  regex label examples added to all four array workflow sections
+- `tests/scripts/test_asim_execute.py`: `test_asim_execute_dry_run` — verifies
+  that `dry_run=True` on a UnitJob writes `sim_input.yaml` but leaves status
+  `'clean'`
+- `tests/scripts/test_asim_check.py`: `dry_run` parametrize on
+  `test_get_subjobs` and `test_load_job_tree` — when `True`, sub-job dirs are
+  created but status stays `'clean'` rather than `'complete'`
+
 ## [0.3.1] - 2026-05-13
 
 ### Fixed
