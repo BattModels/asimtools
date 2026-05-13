@@ -386,6 +386,14 @@ For a detailed description of the API and examples, see
     repeat: [3,3,3]
     rattle_stdev: 0.01
 
+  # Find a single file whose full path matches a regular expression.
+  # regex_kwargs are forwarded to find_files_by_regex (search_dir, recursive).
+  # Raises an error if zero or more than one file matches.
+  image:
+    regex: 'bulk_Na.*relaxed\.xyz'
+    regex_kwargs:
+      search_dir: /path/to/results
+
   # You can even supply an atoms object directly so that the interface is
   # universal. This is most useful in the asimmodule code itself.
   image:
@@ -429,6 +437,14 @@ For a detailed description of the API, see :func:`asimtools.utils.get_images`
     - /path/to/my/structure/files/*.cif
     - /path/to/my/other/structure/files/*.cfg
   
+  # You can read all files whose full path matches a regular expression.
+  # regex_kwargs are forwarded to find_files_by_regex (search_dir, recursive).
+  images:
+    regex: 'bulk_.*_relaxed\.xyz'
+    regex_kwargs:
+      search_dir: /path/to/results
+      recursive: true
+
   # You can even supply a list of atoms objects directly so that the interface
   # is universal. This is most useful in the asimmodule code itself.
   images:

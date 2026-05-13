@@ -40,6 +40,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `vasp/utils.py`: `write_vasp_inputs` helper with full docstring and unit tests
 - `tests/unit/vasp/test_vasp_utils.py`: 8 unit tests covering mpset, prev_calc,
   manual construction, kpoints, kwargs forwarding, and error paths
+- `utils.py`: `find_files_by_regex(regex, search_dir='.', recursive=False)`
+  finds files whose full path matches a regex, returned in natural sort order
+- `get_atoms`: new `regex` / `regex_kwargs` parameters — finds a single file by
+  regex and reads it; raises `ValueError` if zero or more than one file matches
+- `get_images`: new `regex` / `regex_kwargs` parameters — finds all matching
+  files and reads them with the same `index` and `skip_failed` semantics as the
+  existing `pattern` branch
+- `tests/unit/test_utils.py`: 10 new tests covering `find_files_by_regex`
+  (match, no-match, non-recursive, recursive, natsort) and both `get_atoms` /
+  `get_images` regex paths including error cases
 
 ## [0.3.0] - 2026-05-07
 
