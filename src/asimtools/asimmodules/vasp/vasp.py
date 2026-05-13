@@ -11,12 +11,8 @@ import subprocess
 import logging
 import shutil
 from ase.io import read
-from pymatgen.io.vasp import Poscar, Incar, Potcar, Kpoints, VaspInput
-import pymatgen.io.vasp.sets
-from asimtools.utils import (
-    get_atoms,
-    get_str_btn,
-)
+from asimtools.utils import get_str_btn
+from asimtools.asimmodules.vasp.utils import write_vasp_inputs
 
 def execute_vasp_run_command(
     command: str,
@@ -98,54 +94,16 @@ def vasp(
     :type run_vasp: bool, optional
     """
 
-    if vaspinput_kwargs is None:
-        vaspinput_kwargs = {}
-
-    struct = get_atoms(**image, return_type='pymatgen')
-    if mpset is not None:
-        try:
-            set_ = getattr(pymatgen.io.vasp.sets, mpset)
-        except:
-            raise ImportError(
-                f'Unknown mpset: {mpset}. See available sets in pymatgen.')
-
-        if prev_calc is not None:
-            vasp_input = set_.from_prev_calc(
-                prev_calc,
-                user_incar_settings=user_incar_settings,
-                user_kpoints_settings=user_kpoints_settings,
-                user_potcar_functional=user_potcar_functional,
-                **vaspinput_kwargs
-            )
-        else:
-            vasp_input = set_(
-                struct,
-                user_incar_settings=user_incar_settings,
-                user_kpoints_settings=user_kpoints_settings,
-                user_potcar_functional=user_potcar_functional,
-                **vaspinput_kwargs
-            )
-        
-    else:
-
-        incar = Incar(user_incar_settings)
-        incar.check_params()
-        if potcar is not None:
-            potcar = Potcar(potcar)
-        if user_kpoints_settings is not None:
-            kpoints = Kpoints(user_kpoints_settings)
-        else:
-            kpoints=None
-
-        vasp_input = VaspInput(
-            incar=incar,
-            kpoints=kpoints,
-            poscar=Poscar(struct),
-            potcar=potcar,
-            **vaspinput_kwargs
-        )
-
-    vasp_input.write_input("./")
+    vasp_input = write_vasp_inputs(
+        image,
+        mpset=mpset,
+        user_incar_settings=user_incar_settings,
+        user_kpoints_settings=user_kpoints_settings,
+        user_potcar_functional=user_potcar_functional,
+        potcar=potcar,
+        vaspinput_kwargs=vaspinput_kwargs,
+        prev_calc=prev_calc,
+    )
 
     if run_vasp:
         optimization_failed = False

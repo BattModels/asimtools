@@ -6,11 +6,11 @@ args:
   image:
     name: Na
     builder: bulk
-  incar:
+  user_incar_settings:
     ENCUT: 480
     KSPACING: 0.7
-    IBRION: -1 
-  kpoints:
+    IBRION: -1
+  user_kpoints_settings:
     kpts: [[1,1,1]]
   potcar: 
     Na: PBE
