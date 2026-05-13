@@ -293,17 +293,18 @@ file. An example of a ``sim_input.yaml`` is shown below:
 
 .. code-block:: yaml
 
-    asimmodule: singlepoint 
+    asimmodule: singlepoint
     env_id: inline
     overwrite: false
     submit: true
+    dry_run: false
     workdir: results
     precommands:
         - export MY_ENV_VAR=3
     args:
         arg1: value_1
         arg2: value_2
-        ... 
+        ...
 
 The parameters are:
 
@@ -539,6 +540,26 @@ provide the ``asim-check`` utility which can be run using:
 
 This will print the job tree, including statuses and work directories of the
 jobs whose root directory is specified as ``workdir`` in ``sim_input.yaml``.
+
+Before submitting a large workflow, it is good practice to do a dry run first.
+Setting ``dry_run: true`` in your ``sim_input.yaml`` writes all input files to
+the work directory without actually submitting any jobs. Unlike ``submit:
+false``, the flag is automatically stripped from the written ``sim_input.yaml``
+files, so you can inspect the generated inputs and then resubmit with a plain
+``asim-execute`` call — no manual editing required.
+
+.. code-block:: yaml
+
+    # Write inputs but do not submit
+    asimmodule: workflows.sim_array
+    env_id: batch
+    dry_run: true
+    workdir: results
+    args:
+      ...
+
+After confirming the inputs look correct, remove ``dry_run: true`` (or set it
+to ``false``) and rerun ``asim-execute``.
 
 In many cases, there may be mistakes in one of your configuration files leading
 to a failed workflow. In these cases there are a few ways you could resolve the
