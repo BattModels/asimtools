@@ -744,7 +744,8 @@ class DistributedJob(Job):
 
         unitjobs = [] # Track jobs that are supposed to be submitted
         for unitjob in self.unitjobs:
-            if unitjob.sim_input.get('submit', True):
+            if unitjob.sim_input.get('submit', True) and \
+                    not unitjob.sim_input.get('dry_run', False):
                 unitjobs.append(unitjob)
 
         njobs = len(unitjobs)
@@ -796,7 +797,8 @@ class DistributedJob(Job):
 
         unitjobs = [] # Track jobs that are supposed to be submitted
         for unitjob in self.unitjobs:
-            if unitjob.sim_input.get('submit', True):
+            if unitjob.sim_input.get('submit', True) and \
+                    not unitjob.sim_input.get('dry_run', False):
                 unitjobs.append(unitjob)
 
         njobs = len(unitjobs)
