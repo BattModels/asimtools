@@ -4,6 +4,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.1] - 2026-05-13
+
+### Fixed
+- `vasp/utils.py`: new shared `write_vasp_inputs` helper eliminates duplicated
+  VASP input-writing logic across `vasp.py`, `custodian_vasp.py`, and
+  `custodian_chain_vasp.py`
+- `vasp.py`, `custodian_vasp.py`, `custodian_chain_vasp.py`: `vaspinput_args`
+  `NameError` in the no-mpset branch (was `vaspinput_kwargs`); dead reassignment
+  removed
+- `custodian_vasp.py`, `custodian_chain_vasp.py`: `handler_cls` could be
+  unbound after a failed `getattr`; now raises `ValueError` immediately
+- `custodian_chain_vasp.py`: `.pop()` on `vasp_job_kwargs` dicts mutated the
+  caller's data; replaced with `.get()` and filtered `**kwargs`
+- `custodian_chain_vasp.py`: error check only inspected `custodian_output[0]`;
+  now checks all jobs with `any(...)`
+- `custodian_vasp.py`: `handler_kwargs` was accepted by
+  `execute_vasp_run_command` but not exposed in `custodian_vasp`'s signature or
+  forwarded at the call site
+
+### Changed
+- `vasp.py`, `custodian_vasp.py`, `custodian_chain_vasp.py`: `write_image_output: bool`
+  replaced by `image_output_file: str | None = 'OUTCAR'` — pass `None` to skip
+  writing, or a custom filename to read from a non-default output file
+- `custodian_vasp.py`, `custodian_chain_vasp.py`: mutable default `handlers`
+  list replaced by `None` with an in-body default
+- `custodian_vasp.py`, `custodian_chain_vasp.py`: `assert` for handler count
+  validation replaced by `ValueError`
+- All three VASP asimmodules: type annotations updated to use built-in
+  `dict/list` and `X | Y` union syntax, removing `typing` imports
+- `vasp_mixed_sim_input.yaml`: corrected `incar:` → `user_incar_settings:` and
+  `kpoints:` → `user_kpoints_settings:` to match the function signature
+
+### Added
+- `vasp/utils.py`: `write_vasp_inputs` helper with full docstring and unit tests
+- `tests/unit/vasp/test_vasp_utils.py`: 8 unit tests covering mpset, prev_calc,
+  manual construction, kpoints, kwargs forwarding, and error paths
+
 ## [0.3.0] - 2026-05-07
 
 ### Breaking changes
