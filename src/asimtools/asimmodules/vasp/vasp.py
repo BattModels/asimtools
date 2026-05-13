@@ -6,7 +6,6 @@ VASP must be installed
 
 Author: mkphuthi@github.com
 '''
-from typing import Dict, Optional, Sequence
 import os
 import subprocess
 import logging
@@ -51,18 +50,18 @@ def execute_vasp_run_command(
         )
 
 def vasp(
-    image: Optional[Dict],
-    user_incar_settings: Optional[Dict] = None,
-    user_kpoints_settings: Optional[Dict] = None,
+    image: dict | None,
+    user_incar_settings: dict | None = None,
+    user_kpoints_settings: dict | None = None,
     user_potcar_functional: str = 'PBE_64',
-    potcar: Optional[Dict] = None,
-    vaspinput_kwargs: Optional[Dict] = None,
+    potcar: dict | None = None,
+    vaspinput_kwargs: dict | None = None,
     command: str = 'srun vasp_std',
-    mpset: Optional[str] = None,
-    prev_calc: Optional[os.PathLike] = None,
-    write_image_output: bool = True,
+    mpset: str | None = None,
+    prev_calc: os.PathLike | None = None,
+    image_output_file: str | None = 'OUTCAR',
     run_vasp: bool = True,
-) -> Dict:
+) -> dict:
     """Run VASP with given input files and specified image
 
     :param image: Initial image for VASP calculation. Image specification,
@@ -91,9 +90,9 @@ def vasp(
     :param mpset: Materials Project VASP set to use see 
         :mod:`pymatgen.io.vasp.sets`, defaults to None
     :type mpset: str, optional
-    :param write_image_output: Whether to write output image in standard 
-        asimtools format to file, defaults to False
-    :type write_image_output: bool, optional
+    :param image_output_file: File to read output image from and write in
+        standard asimtools format, set to None to skip, defaults to 'OUTCAR'
+    :type image_output_file: str, optional
     :param run_vasp: Whether to run VASP after writing input files,
         defaults to True
     :type run_vasp: bool, optional
@@ -138,9 +137,6 @@ def vasp(
         else:
             kpoints=None
 
-        if vaspinput_args is None:
-            vaspinput_args = {}
-
         vasp_input = VaspInput(
             incar=incar,
             kpoints=kpoints,
@@ -173,8 +169,8 @@ def vasp(
                                 'Check OUTCAR for details.'
                             )
 
-        if write_image_output and not optimization_failed:
-            atoms_output = read('OUTCAR')
+        if image_output_file and not optimization_failed:
+            atoms_output = read(image_output_file)
             atoms_output.write(
                 'image_output.xyz',
                 format='extxyz',
