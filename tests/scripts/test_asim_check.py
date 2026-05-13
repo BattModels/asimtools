@@ -27,13 +27,17 @@ def test_parse_command_line(sim_input, tmp_path):
     assert Path(rootdir) == Path(tmp_path)
     assert max_level == 2
 
+@pytest.mark.parametrize("dry_run", [False, True])
 @pytest.mark.parametrize("calc_input",["lj_argon_calc_input"])
 @pytest.mark.parametrize("env_input",["inline_env_input"])
 @pytest.mark.parametrize("sim_input",["lj_distributed_sim_input"])
-def test_get_subjobs(env_input, calc_input, sim_input, tmp_path, request):
+def test_get_subjobs(env_input, calc_input, sim_input, dry_run, tmp_path, request):
     env_input = request.getfixturevalue(env_input)
     calc_input = request.getfixturevalue(calc_input)
     sim_input = request.getfixturevalue(sim_input)
+    if dry_run:
+        for subsim in sim_input['args']['subsim_inputs'].values():
+            subsim['dry_run'] = True
     wdir = tmp_path / 'wdir'
     unitjob = create_unitjob(sim_input, env_input, wdir, calc_input=calc_input)
     unitjob.submit()
@@ -41,18 +45,23 @@ def test_get_subjobs(env_input, calc_input, sim_input, tmp_path, request):
     dirs = glob(str(wdir / 'id*'))
     assert len(dirs) == len(sim_input['args']['subsim_inputs'])
 
+    expected_status = 'clean' if dry_run else 'complete'
     ac_dirs = get_subjobs(wdir)
     assert len(ac_dirs) == len(sim_input['args']['subsim_inputs'])
     for d in ac_dirs:
-        assert load_job_from_directory(d).get_status()[1] == 'complete'
+        assert load_job_from_directory(d).get_status()[1] == expected_status
 
+@pytest.mark.parametrize("dry_run", [False, True])
 @pytest.mark.parametrize("calc_input",["lj_argon_calc_input"])
 @pytest.mark.parametrize("env_input",["inline_env_input"])
 @pytest.mark.parametrize("sim_input",["lj_distributed_sim_input"])
-def test_load_job_tree(env_input, calc_input, sim_input, tmp_path, request):
+def test_load_job_tree(env_input, calc_input, sim_input, dry_run, tmp_path, request):
     env_input = request.getfixturevalue(env_input)
     calc_input = request.getfixturevalue(calc_input)
     sim_input = request.getfixturevalue(sim_input)
+    if dry_run:
+        for subsim in sim_input['args']['subsim_inputs'].values():
+            subsim['dry_run'] = True
     wdir = tmp_path / 'wdir'
     unitjob = create_unitjob(sim_input, env_input, wdir, calc_input=calc_input)
     unitjob.submit()
@@ -60,7 +69,7 @@ def test_load_job_tree(env_input, calc_input, sim_input, tmp_path, request):
     jd = load_job_tree(wdir)
     print(jd)
     assert jd['workdir_name'] == 'wdir'
-    assert len(jd['subjobs']) == len(sim_input['args']['subsim_inputs']) 
+    assert len(jd['subjobs']) == len(sim_input['args']['subsim_inputs'])
     for sj in jd['subjobs']:
         assert jd['subjobs'][sj]['subjobs'] is None
         assert jd['subjobs'][sj].get('workdir_name', False)
