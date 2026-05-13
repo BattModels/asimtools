@@ -36,6 +36,7 @@ from asimtools.utils import (
     write_csv_from_dict,
     new_db,
     check_if_slurm_job_is_running,
+    find_files_by_regex,
 )
 import ase.build
 
@@ -500,3 +501,101 @@ def test_check_if_slurm_job_is_running_false():
     mock_result.stdout = ' 99999 some other text'
     with patch('asimtools.utils.subprocess.run', return_value=mock_result):
         assert check_if_slurm_job_is_running(12345) is False
+
+
+# ── find_files_by_regex ───────────────────────────────────────────────────────
+
+def test_find_files_by_regex_matches(tmp_path):
+    ''' Files whose full path matches the regex are returned '''
+    (tmp_path / 'bulk_Na.xyz').write_text('')
+    (tmp_path / 'bulk_Li.xyz').write_text('')
+    (tmp_path / 'surface_Na.xyz').write_text('')
+    matches = find_files_by_regex(r'bulk_.*\.xyz', search_dir=tmp_path)
+    assert len(matches) == 2
+    assert all('bulk_' in m for m in matches)
+
+
+def test_find_files_by_regex_no_match(tmp_path):
+    ''' Returns empty list when nothing matches '''
+    (tmp_path / 'bulk_Na.xyz').write_text('')
+    matches = find_files_by_regex(r'surface_.*\.xyz', search_dir=tmp_path)
+    assert matches == []
+
+
+def test_find_files_by_regex_non_recursive(tmp_path):
+    ''' Non-recursive search does not descend into subdirectories '''
+    subdir = tmp_path / 'sub'
+    subdir.mkdir()
+    (subdir / 'bulk_Na.xyz').write_text('')
+    matches = find_files_by_regex(r'bulk_.*\.xyz', search_dir=tmp_path, recursive=False)
+    assert matches == []
+
+
+def test_find_files_by_regex_recursive(tmp_path):
+    ''' Recursive search finds files in subdirectories '''
+    subdir = tmp_path / 'sub'
+    subdir.mkdir()
+    (subdir / 'bulk_Na.xyz').write_text('')
+    matches = find_files_by_regex(r'bulk_.*\.xyz', search_dir=tmp_path, recursive=True)
+    assert len(matches) == 1
+
+
+def test_find_files_by_regex_natsorted(tmp_path):
+    ''' Results are returned in natural sort order '''
+    for name in ['bulk_10.xyz', 'bulk_2.xyz', 'bulk_1.xyz']:
+        (tmp_path / name).write_text('')
+    matches = find_files_by_regex(r'bulk_\d+\.xyz', search_dir=tmp_path)
+    basenames = [Path(m).name for m in matches]
+    assert basenames == ['bulk_1.xyz', 'bulk_2.xyz', 'bulk_10.xyz']
+
+
+# ── get_atoms with regex ──────────────────────────────────────────────────────
+
+def test_get_atoms_regex(tmp_path):
+    ''' get_atoms regex finds a single matching file and reads it '''
+    expected = ase.build.bulk('Ar')
+    expected.write(str(tmp_path / 'bulk_Ar.xyz'), format='extxyz')
+    atoms = get_atoms(regex=r'bulk_Ar\.xyz', regex_kwargs={'search_dir': tmp_path})
+    assert atoms == expected
+
+
+def test_get_atoms_regex_multiple_matches_raises(tmp_path):
+    ''' get_atoms raises ValueError when regex matches more than one file '''
+    for name in ['bulk_Ar.xyz', 'bulk_Cu.xyz']:
+        ase.build.bulk('Ar').write(str(tmp_path / name), format='extxyz')
+    with pytest.raises(ValueError, match='matched 2 files'):
+        get_atoms(regex=r'bulk_.*\.xyz', regex_kwargs={'search_dir': tmp_path})
+
+
+def test_get_atoms_regex_no_match_raises(tmp_path):
+    ''' get_atoms raises ValueError when regex matches no files '''
+    with pytest.raises(ValueError, match='matched 0 files'):
+        get_atoms(regex=r'surface_.*\.xyz', regex_kwargs={'search_dir': tmp_path})
+
+
+# ── get_images with regex ─────────────────────────────────────────────────────
+
+def test_get_images_regex(tmp_path):
+    ''' get_images regex finds all matching files and returns their atoms '''
+    expected = [ase.build.bulk('Ar'), ase.build.bulk('Cu'), ase.build.bulk('Fe')]
+    for atoms in expected:
+        atoms.write(
+            str(tmp_path / f'bulk_{atoms.get_chemical_formula()}.xyz'),
+            format='extxyz',
+        )
+    result = get_images(regex=r'bulk_.*\.xyz', regex_kwargs={'search_dir': tmp_path})
+    assert len(result) == 3
+    for atoms in result:
+        assert atoms in expected
+
+
+def test_get_images_regex_skip_failed(tmp_path):
+    ''' get_images regex skips unreadable files when skip_failed=True '''
+    ase.build.bulk('Ar').write(str(tmp_path / 'bulk_Ar.xyz'), format='extxyz')
+    (tmp_path / 'bulk_bad.xyz').write_text('not valid xyz content')
+    result = get_images(
+        regex=r'bulk_.*\.xyz',
+        regex_kwargs={'search_dir': tmp_path},
+        skip_failed=True,
+    )
+    assert len(result) == 1

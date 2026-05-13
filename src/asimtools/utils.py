@@ -8,6 +8,7 @@ from typing import (
 from copy import deepcopy
 from glob import glob
 import os
+import re
 import logging
 import subprocess
 from pathlib import Path
@@ -243,6 +244,8 @@ def get_atoms(  # pylint: disable=too-many-arguments,too-many-positional-argumen
     interface: str = 'ase',
     builder: Optional[str] = 'bulk',
     atoms: Optional[Atoms] = None,
+    regex: str | None = None,
+    regex_kwargs: dict | None = None,
     repeat: Optional[Tuple[int, int, int]] = None,
     repeat_to_n_args: Optional[Dict] = None,
     rattle_stdev: Optional[float] = None,
@@ -398,13 +401,21 @@ def get_atoms(  # pylint: disable=too-many-arguments,too-many-positional-argumen
     if interface == 'ase':
         assert image_file is not None or \
             len(kwargs) > 0 or \
-            atoms is not None, \
-            "Specify atoms, image_file or use ase.build tools if using \
+            atoms is not None or \
+            regex is not None, \
+            "Specify atoms, image_file, regex or use ase.build tools if using \
                 ASE interface"
         if image_file is not None:
             assert Path(image_file).exists(), \
                 f'The image_file {image_file} does not exist from {os.getcwd()}'
             atoms = read(image_file, **kwargs)
+        elif regex is not None:
+            matches = find_files_by_regex(regex, **(regex_kwargs or {}))
+            if len(matches) != 1:
+                raise ValueError(
+                    f'regex "{regex}" matched {len(matches)} files, expected 1'
+                )
+            atoms = read(matches[0], **kwargs)
         elif atoms is None:
             builder_func = getattr(ase.build, builder)
             try:
@@ -555,6 +566,8 @@ def get_images(  # pylint: disable=too-many-positional-arguments
     pattern: str = None,
     patterns: List[str] = None,
     images: Iterable[Atoms] = None,
+    regex: str | None = None,
+    regex_kwargs: dict | None = None,
     index: Union[str, int] = ':',
     skip_failed: bool = False,
     **kwargs
@@ -652,8 +665,9 @@ def get_images(  # pylint: disable=too-many-positional-arguments
     assert (image_file is not None) or \
         (pattern is not None) or \
         (patterns is not None) or \
-        (images is not None), \
-        "Please specify file, pattern or iterable"
+        (images is not None) or \
+        (regex is not None), \
+        "Please specify file, pattern, regex or iterable"
 
     if image_file is not None:
         image_file = Path(image_file).resolve()
@@ -682,6 +696,22 @@ def get_images(  # pylint: disable=too-many-positional-arguments
                 new_images = [new_images]
             images += new_images
 
+    elif regex is not None:
+        matches = find_files_by_regex(regex, **(regex_kwargs or {}))
+        images = []
+        for fpath in matches:
+            fpath = Path(fpath).resolve()
+            try:
+                new_images = read(fpath, index=index, **kwargs)
+            except Exception as exc:  # pylint: disable=broad-exception-caught
+                if not skip_failed:
+                    raise IOError(
+                        f"Failed to read {fpath} from {os.getcwd()}"
+                    ) from exc
+                new_images = []
+            if not isinstance(new_images, list):
+                new_images = [new_images]
+            images += new_images
     elif patterns is not None:
         images = []
         for pat in patterns:
@@ -961,6 +991,30 @@ def get_nth_label(
     string = str(string)
     start = find_nth(string, '__', n=n*2+1)
     return get_str_btn(string, '__', '__', start_index=start)
+
+def find_files_by_regex(
+    regex: str,
+    search_dir: str | os.PathLike = '.',
+    recursive: bool = False,
+) -> list[str]:
+    """Find files whose full path matches a regex pattern.
+
+    :param regex: Regular expression matched against each file's full path
+    :type regex: str
+    :param search_dir: Directory to search in, defaults to '.'
+    :type search_dir: str | os.PathLike, optional
+    :param recursive: Whether to descend into subdirectories, defaults to False
+    :type recursive: bool, optional
+    :return: Natsorted list of matching file paths
+    :rtype: list[str]
+    """
+    search_dir = Path(search_dir)
+    if recursive:
+        candidates = (p for p in search_dir.rglob('*') if p.is_file())
+    else:
+        candidates = (p for p in search_dir.iterdir() if p.is_file())
+    matches = [str(p) for p in candidates if re.search(regex, str(p))]
+    return natsorted(matches)
 
 def expand_wildcards(dct: Dict, root_path: os.PathLike = None) -> Dict:
     """Expands paths in a dictionary
