@@ -474,16 +474,16 @@ class UnitJob(Job):
                 print(STOP_MESSAGE)
             return None
 
-        if not self.sim_input.get('submit', True):
-            logger.warning('Keyword submit=False, skipping submission in \
-                %s', self.workdir)
-            return None
-
         if self.sim_input.get('dry_run', False):
             logger.warning(
                 'dry_run=True: input files written but job not submitted in %s',
                 self.workdir
             )
+            return None
+
+        if not self.sim_input.get('submit', True):
+            logger.warning('Keyword submit=False, skipping submission in \
+                %s', self.workdir)
             return None
 
         cur_dir = Path('.').resolve()
