@@ -14,12 +14,12 @@ import ase.optimize
 from ase.filters import StrainFilter
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
-from asimtools.utils import get_atoms, join_names, write_atoms
+from asimtools.utils import get_atoms, join_names, write_atoms, get_logger
 
 def cell_relax(
     calculator: Dict,
     image: Dict,
-    optimizer: str = 'BFGS',
+    optimizer: str = 'LBFGS',
     fmax: float = 0.002,
     steps: int = 1000,
     mask: Optional[Sequence] = None,
@@ -44,6 +44,7 @@ def cell_relax(
     :return: Dictionary of results including, final energy, stress and output files
     :rtype: Dict
     """
+    logger = get_logger()
     calc = load_calc(calculator=calculator)
     atoms = get_atoms(**image)
     atoms.calc = calc
@@ -64,27 +65,32 @@ def cell_relax(
     )
     dyn.attach(traj)
     try:
-        dyn.run(fmax=fmax, steps=steps)
+        converged = dyn.run(fmax=fmax, steps=steps)
     except Exception:
         print('Failed to optimize atoms')
         raise
 
-    image_file = join_names([prefix, 'image_output.xyz'])[:-2]
-    write_atoms(
-        image_file,
-        atoms,
-        format='extxyz',
-    )
-
     energy = float(atoms.get_potential_energy())
     final_fmax = float(atoms.get_stress().max())
 
-    results = {
-        'energy': energy,
-        'final_fmax': final_fmax,
-        'files':{
-            'image': image_file,
-            'traj': traj_file,
+    if converged:
+        image_file = prefix + 'image_output.xyz'
+        write_atoms(
+            image_file,
+            atoms,
+            format='extxyz',
+        )
+
+        results = {
+            'energy': energy,
+            'final_fmax': final_fmax,
+            'converged': converged,
+            'files':{
+                'image': image_file,
+                'traj': traj_file,
+            }
         }
-    }
-    return results
+        return results
+    else:
+        logger.error('Failed to relax atoms below fmax={}'.format(final_fmax))
+        raise ValueError(f'Only relaxed below fmax={final_fmax}')

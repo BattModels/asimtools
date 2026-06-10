@@ -348,7 +348,7 @@ def load_fairchem_v1(calc_params):
     return calc
 
 def load_fairchem_v2(calc_params):
-    """Load any fairchemV1 calculator
+    """Load any fairchemV2 calculator
 
     :param calc_params: parameters to be passed to fairchem.core.FAIRChemCalculator.
         Must include a key "model" that points to the model files used to 
@@ -365,7 +365,7 @@ def load_fairchem_v2(calc_params):
     ...     'args': {
     ...         'model_name': 'uma-s-1',
     ...         'device': 'cuda',
-    ...         'task_name': 'oc20' # Also 'omol','omat','oc20','odac' or 'omc'
+    ...         'task_name': 'oc20' # Also 'omol','omat','oc20','odac' or 'omc',
     ...     }
     ... }
     >>> calc = load_calc(calc_params=calc_params)
@@ -373,8 +373,22 @@ def load_fairchem_v2(calc_params):
     """
     from fairchem.core.units.mlip_unit import load_predict_unit
     from fairchem.core import pretrained_mlip, FAIRChemCalculator
+    from fairchem.core.units.mlip_unit.api.inference import InferenceSettings
+    import torch
+
     og_calc_params = deepcopy(calc_params)
     task_name = calc_params['args'].pop('task_name', None)
+    base_precision_dtype = calc_params['args'].pop(
+        'base_precision_dtype', 'float32'
+    )
+
+    if base_precision_dtype == 'float64':
+        base_precision_dtype = torch.float64
+    else:
+        base_precision_dtype = torch.float32
+
+    settings = InferenceSettings(base_precision_dtype=base_precision_dtype)
+    calc_params['args']['inference_settings'] = settings
     try:
         predictor = pretrained_mlip.get_predict_unit(**calc_params['args'])
     except Exception as exc:  # pylint: disable=broad-exception-caught
@@ -391,7 +405,10 @@ def load_fairchem_v2(calc_params):
             raise exc from exc
 
     try:
-        calc = FAIRChemCalculator(predictor, task_name=task_name)
+        calc = FAIRChemCalculator(
+            predictor,
+            task_name=task_name,
+        )
     except Exception:
         logging.error(
             "Failed to load FAIRChemCalculator with parameters:\n %s", \
@@ -400,6 +417,7 @@ def load_fairchem_v2(calc_params):
         raise
 
     return calc
+
 
 def load_ase_dftd3(calc_params):
     """Load any calculator with DFTD3 correction as implemented in ASE
@@ -471,5 +489,5 @@ external_calcs = {
     'fairchemV2': load_fairchem_v2,
     'fairchem': load_fairchem_v2,
     'ASEDFTD3': load_ase_dftd3,
-    'AQCat': load_aqcat
+    'AQCat': load_aqcat,
 }

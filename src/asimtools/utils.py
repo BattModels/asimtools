@@ -859,6 +859,7 @@ def change_dict_value(
                 placeholder, new_value
             )
         return dct
+
     new_d = change_dict_value(
         dct[key_sequence[0]],
         new_value,

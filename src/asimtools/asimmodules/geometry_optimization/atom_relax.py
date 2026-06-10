@@ -14,7 +14,7 @@ from asimtools.utils import get_atoms, get_logger, write_atoms
 def atom_relax(
     calculator: Dict,
     image: Dict,
-    optimizer: str = 'GPMin', #GPMin is fast in many cases according to ASE docs
+    optimizer: str = 'LBFGS',
     properties: Tuple[str] = ('energy', 'forces'),
     fmax: float = 0.02,
     steps: int = 1000,
@@ -58,27 +58,34 @@ def atom_relax(
     )
     dyn.attach(traj)
     try:
-        dyn.run(fmax=fmax, steps=steps)
+        converged = dyn.run(fmax=fmax, steps=steps)
     except Exception:
-        logger.error('Failed to relax atoms')
+        logger.error('Failed to run dynamics')
         raise
-
-    image_file = prefix + 'image_output.xyz'
-    write_atoms(
-        image_file,
-        atoms,
-        format='extxyz',
-    )
 
     energy = float(atoms.get_potential_energy())
     final_fmax = float(np.sqrt((atoms.get_forces() ** 2).sum(axis=1).max()))
 
-    results = {
-        'energy': energy,
-        'final_fmax': final_fmax,
-        'files':{
-            'image': image_file,
-            'traj': traj_file,
+    if converged:
+        image_file = prefix + 'image_output.xyz'
+        write_atoms(
+            image_file,
+            atoms,
+            format='extxyz',
+        )
+
+        results = {
+            'energy': energy,
+            'final_fmax': final_fmax,
+            'converged': converged,
+            'files':{
+                'image': image_file,
+                'traj': traj_file,
+            }
         }
-    }
-    return results
+        return results
+    else:
+        logger.error('Failed to relax atoms below fmax={}'.format(final_fmax))
+        raise ValueError(f'Only relaxed below fmax={final_fmax}')
+
+    

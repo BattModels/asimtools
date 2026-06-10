@@ -15,7 +15,7 @@ from asimtools.utils import get_atoms, write_atoms
 def symmetric_cell_relax(
     calculator: Dict,
     image: Dict,
-    optimizer: str = 'BFGS',
+    optimizer: str = 'LBFGS',
     fmax: float = 0.003, #Roughly 0.48GPa
     optimizer_args: Optional[Dict] = None,
     fixsymmetry_args: Optional[Dict] = None,
@@ -62,28 +62,32 @@ def symmetric_cell_relax(
     )
     dyn.attach(traj)
     try:
-        dyn.run(fmax=fmax)
+        converged = dyn.run(fmax=fmax)
     except Exception:
         print('Failed to optimize atoms')
         raise
 
-    image_file = 'image_output.xyz'
-    atoms.constraints = [] # write doesn't work with FixSymmetry constraint
-    write_atoms(
-        image_file,
-        atoms,
-        format='extxyz',
-    )
-
     energy = float(atoms.get_potential_energy())
     final_fmax = float(atoms.get_stress().max())
 
-    results = {
-        'energy': energy,
-        'final_fmax': final_fmax,
-        'files':{
-            'image': image_file,
-            'traj': traj_file,
+    if converged:
+        image_file = 'image_output.xyz'
+        write_atoms(
+            image_file,
+            atoms,
+            format='extxyz',
+        )
+
+        results = {
+            'energy': energy,
+            'final_fmax': final_fmax,
+            'converged': converged,
+            'files':{
+                'image': image_file,
+                'traj': traj_file,
+            }
         }
-    }
-    return results
+        return results
+    else:
+        logger.error('Failed to relax atoms below fmax={}'.format(final_fmax))
+        raise ValueError(f'Only relaxed below fmax={final_fmax}')

@@ -9,16 +9,17 @@ import ase.optimize
 from ase.filters import ExpCellFilter
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
-from asimtools.utils import get_atoms, write_atoms
+from asimtools.utils import get_atoms, write_atoms, get_logger, join_names
 
 def optimize(
     calculator: Dict,
     image: Dict,
-    optimizer: str = 'BFGS',
+    optimizer: str = 'LBFGS',
     fmax: float = 0.003, #Roughly 0.48GPa
     optimizer_args: Optional[Dict] = None,
     steps: int = 1000,
     expcellfilter_args: Optional[Dict] = None,
+    prefix: Optional[str] = None,
 ) -> Dict:
     """Relaxes cell (and atoms) using ase.constraints.ExpCellFilter while retaining symmetry
 
@@ -39,10 +40,16 @@ def optimize(
     :return: Results including relaxed structure energy
     :rtype: Dict
     """
+    logger = get_logger()
     if expcellfilter_args is None:
         expcellfilter_args = {}
     if optimizer_args is None:
         optimizer_args = {}
+
+    if prefix is not None:
+        prefix = prefix + '_'
+    else:
+        prefix = ''
 
     calc = load_calc(calculator=calculator)
     atoms = get_atoms(**image)
@@ -51,7 +58,7 @@ def optimize(
     ecf = ExpCellFilter(atoms, **expcellfilter_args)
 
     dyn = getattr(ase.optimize, optimizer)(ecf)
-    traj_file = 'optimize.traj'
+    traj_file = join_names([prefix, 'optimize.traj'])[:-2] # Don't include __
     traj = Trajectory(
         traj_file,
         'a', # If there are multiple relaxations, we keep all trajectories
@@ -59,28 +66,36 @@ def optimize(
         properties=['energy', 'forces', 'stress'],
     )
     dyn.attach(traj)
+
     try:
-        dyn.run(fmax=fmax, steps=steps)
+        converged = dyn.run(fmax=fmax, steps=steps)
     except Exception:
         print('Failed to optimize atoms')
         raise
 
-    image_file = 'image_output.xyz'
-    write_atoms(
-        image_file,
-        atoms,
-        format='extxyz',
-    )
-
     energy = float(atoms.get_potential_energy())
-    final_fmax = float(atoms.get_stress().max())
+    final_fmax = float(np.sqrt((atoms.get_forces() ** 2).sum(axis=1).max()))
+    final_smax = float(atoms.get_stress().max())
 
-    results = {
-        'energy': energy,
-        'final_fmax': final_fmax,
-        'files':{
-            'image': image_file,
-            'traj': traj_file,
+    if converged:
+        image_file = prefix + 'image_output.xyz'
+        write_atoms(
+            image_file,
+            atoms,
+            format='extxyz',
+        )
+
+        results = {
+            'energy': energy,
+            'final_fmax': final_fmax,
+            'final_smax': final_smax,
+            'converged': converged,
+            'files':{
+                'image': image_file,
+                'traj': traj_file,
+            }
         }
-    }
-    return results
+        return results
+    else:
+        logger.error('Failed to relax atoms below fmax={}'.format(final_fmax))
+        raise ValueError(f'Only relaxed below fmax={final_fmax}')
