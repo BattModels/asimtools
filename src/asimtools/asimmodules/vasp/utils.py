@@ -54,6 +54,9 @@ def write_vasp_inputs(
 
     struct = get_atoms(**image, return_type='pymatgen')
 
+    # sort_structure only applies to pymatgen mpset paths; None = not specified
+    sort_structure = vaspinput_kwargs.pop('sort_structure', None)
+
     if mpset is not None:
         try:
             set_ = getattr(pymatgen.io.vasp.sets, mpset)
@@ -67,6 +70,7 @@ def write_vasp_inputs(
                 user_incar_settings=user_incar_settings,
                 user_kpoints_settings=user_kpoints_settings,
                 user_potcar_functional=user_potcar_functional,
+                sort_structure=False if sort_structure is None else sort_structure,
                 **vaspinput_kwargs
             )
         else:
@@ -75,9 +79,15 @@ def write_vasp_inputs(
                 user_incar_settings=user_incar_settings,
                 user_kpoints_settings=user_kpoints_settings,
                 user_potcar_functional=user_potcar_functional,
+                sort_structure=False if sort_structure is None else sort_structure,
                 **vaspinput_kwargs
             )
     else:
+        if sort_structure is not None:
+            raise ValueError(
+                'sort_structure only applies when an mpset is given; the '
+                'no-mpset path uses Poscar(struct), which never sorts.'
+            )
         incar = Incar(user_incar_settings)
         incar.check_params()
         if potcar is not None:
