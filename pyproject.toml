@@ -29,9 +29,9 @@ dependencies = [
     "pandas",
     "pyyaml",
     "pymatgen",
-    "ase>=3.22.1", 
-    # Recommended to use the master branch of the ASE>=3.23 from gitlab but only 
-    # required for lammps to handle masses correctly so far
+    "ase>=3.23",
+    # ASE>=3.23 is required for ase.filters.FrechetCellFilter (used by the
+    # geometry_optimization asimmodules) and for lammps to handle masses correctly
     "colorama",
     "natsort",
     "mp-api",

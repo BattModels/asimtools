@@ -1,20 +1,16 @@
 #!/usr/bin/env python
 '''
-Relaxes structure using ASE
+Relaxes the cell of a structure using ASE's StrainFilter, keeping the
+fractional atomic coordinates fixed.
 
 Author: mkphuthi@github.com
 '''
 
-#pylint: disable=unused-argument
-#pylint: disable=too-many-locals
-#pylint: disable=too-many-arguments
-
 from typing import Dict, Optional, Sequence
-import ase.optimize
 from ase.filters import StrainFilter
-from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
-from asimtools.utils import get_atoms, join_names, write_atoms, get_logger
+from asimtools.utils import get_atoms, get_logger
+from asimtools.asimmodules.geometry_optimization.utils import run_optimization
 
 def cell_relax(
     calculator: Dict,
@@ -23,25 +19,28 @@ def cell_relax(
     fmax: float = 0.002,
     steps: int = 1000,
     mask: Optional[Sequence] = None,
+    optimizer_args: Optional[Dict] = None,
     prefix: Optional[str] = None,
 ) -> Dict:
-    """Relax cell using ASE Optimizer
+    """Relax cell using ASE's StrainFilter
 
     :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
     :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
-    :param prefix: Prefix to output files, defaults to ''
-    :type prefix: str, optional
-    :param optimizer: Optimizer class to use from ase.optimize, defaults to 'BFGS'
+    :param optimizer: Optimizer class name from ase.optimize, defaults to 'LBFGS'
     :type optimizer: str, optional
-    :param fmax: Maximum stress in eV/$\AA^3$, defaults to 0.002
+    :param fmax: Maximum stress in eV/$\\AA^3$, defaults to 0.002
     :type fmax: float, optional
     :param steps: Maximum number of steps to run, defaults to 1000
     :type steps: int, optional
     :param mask: Mask to constrain cell deformation while relaxing, defaults to None
     :type mask: Optional[Sequence], optional
-    :return: Dictionary of results including, final energy, stress and output files
+    :param optimizer_args: Extra arguments for the optimizer class, defaults to None
+    :type optimizer_args: Optional[Dict], optional
+    :param prefix: Prefix to output files, defaults to None
+    :type prefix: str, optional
+    :return: Dictionary of results including final energy, stress and output files
     :rtype: Dict
     """
     logger = get_logger()
@@ -49,48 +48,18 @@ def cell_relax(
     atoms = get_atoms(**image)
     atoms.calc = calc
 
-    if prefix is not None:
-        prefix = prefix + '_'
-    else:
-        prefix = ''
-
-    traj_file = join_names([prefix, 'cell_relax.traj'])[:-2] # Don't include __
     sf = StrainFilter(atoms, mask=mask)
-    dyn = getattr(ase.optimize, optimizer)(sf)
-    traj = Trajectory(
-        traj_file,
-        'a',
+
+    return run_optimization(
         atoms,
-        properties=['energy', 'forces', 'stress'],
+        optimizer=optimizer,
+        fmax=fmax,
+        steps=steps,
+        optimize_obj=sf,
+        prefix=prefix,
+        label='cell_relax',
+        properties=('energy', 'forces', 'stress'),
+        optimizer_args=optimizer_args,
+        report_stress=True,
+        logger=logger,
     )
-    dyn.attach(traj)
-    try:
-        converged = dyn.run(fmax=fmax, steps=steps)
-    except Exception:
-        print('Failed to optimize atoms')
-        raise
-
-    energy = float(atoms.get_potential_energy())
-    final_fmax = float(atoms.get_stress().max())
-
-    if converged:
-        image_file = prefix + 'image_output.xyz'
-        write_atoms(
-            image_file,
-            atoms,
-            format='extxyz',
-        )
-
-        results = {
-            'energy': energy,
-            'final_fmax': final_fmax,
-            'converged': converged,
-            'files':{
-                'image': image_file,
-                'traj': traj_file,
-            }
-        }
-        return results
-    else:
-        logger.error('Failed to relax atoms below fmax={}'.format(final_fmax))
-        raise ValueError(f'Only relaxed below fmax={final_fmax}')

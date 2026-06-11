@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 '''
-Relaxes both atoms and cell coordinates simultaneously.
+Relaxes both atomic positions and cell simultaneously using ASE's
+FrechetCellFilter. Use symmetric_cell_relax to additionally retain symmetry.
 
 Author: mkphuthi@github.com
 '''
 from typing import Dict, Optional
-import ase.optimize
-from ase.filters import ExpCellFilter
-from ase.io.trajectory import Trajectory
+from ase.filters import FrechetCellFilter
 from asimtools.calculators import load_calc
-from asimtools.utils import get_atoms, write_atoms, get_logger, join_names
+from asimtools.utils import get_atoms, get_logger
+from asimtools.asimmodules.geometry_optimization.utils import run_optimization
 
 def optimize(
     calculator: Dict,
@@ -18,16 +18,16 @@ def optimize(
     fmax: float = 0.003, #Roughly 0.48GPa
     optimizer_args: Optional[Dict] = None,
     steps: int = 1000,
-    expcellfilter_args: Optional[Dict] = None,
+    cellfilter_args: Optional[Dict] = None,
     prefix: Optional[str] = None,
 ) -> Dict:
-    """Relaxes cell (and atoms) using ase.constraints.ExpCellFilter while retaining symmetry
+    """Relaxes cell and atomic positions using ase.filters.FrechetCellFilter
 
     :param calculator: Calculator specification, see :func:`asimtools.calculators.load_calc`
     :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
-    :param optimizer: Any optimizer from ase.optimize, defaults to 'BFGS'
+    :param optimizer: Any optimizer class name from ase.optimize, defaults to 'LBFGS'
     :type optimizer: str, optional
     :param fmax: fmax in optimizer, defaults to 0.003 which is ~0.48GPa
     :type fmax: float, optional
@@ -35,67 +35,33 @@ def optimize(
     :type optimizer_args: Optional[Dict], optional
     :param steps: Max. number of steps to run, defaults to 1000
     :type steps: int, optional
-    :param expcellfilter_args: arguments for ase.constraints.ExpCellFilter, defaults to None
-    :type expcellfilter_args: Optional[Dict], optional
-    :return: Results including relaxed structure energy
+    :param cellfilter_args: arguments for ase.filters.FrechetCellFilter, defaults to None
+    :type cellfilter_args: Optional[Dict], optional
+    :param prefix: Prefix of output files, defaults to None
+    :type prefix: str, optional
+    :return: Results including relaxed structure energy, fmax, stress and files
     :rtype: Dict
     """
+    if cellfilter_args is None:
+        cellfilter_args = {}
+
     logger = get_logger()
-    if expcellfilter_args is None:
-        expcellfilter_args = {}
-    if optimizer_args is None:
-        optimizer_args = {}
-
-    if prefix is not None:
-        prefix = prefix + '_'
-    else:
-        prefix = ''
-
     calc = load_calc(calculator=calculator)
     atoms = get_atoms(**image)
     atoms.calc = calc
 
-    ecf = ExpCellFilter(atoms, **expcellfilter_args)
+    ecf = FrechetCellFilter(atoms, **cellfilter_args)
 
-    dyn = getattr(ase.optimize, optimizer)(ecf)
-    traj_file = join_names([prefix, 'optimize.traj'])[:-2] # Don't include __
-    traj = Trajectory(
-        traj_file,
-        'a', # If there are multiple relaxations, we keep all trajectories
+    return run_optimization(
         atoms,
-        properties=['energy', 'forces', 'stress'],
+        optimizer=optimizer,
+        fmax=fmax,
+        steps=steps,
+        optimize_obj=ecf,
+        prefix=prefix,
+        label='optimize',
+        properties=('energy', 'forces', 'stress'),
+        optimizer_args=optimizer_args,
+        report_stress=True,
+        logger=logger,
     )
-    dyn.attach(traj)
-
-    try:
-        converged = dyn.run(fmax=fmax, steps=steps)
-    except Exception:
-        print('Failed to optimize atoms')
-        raise
-
-    energy = float(atoms.get_potential_energy())
-    final_fmax = float(np.sqrt((atoms.get_forces() ** 2).sum(axis=1).max()))
-    final_smax = float(atoms.get_stress().max())
-
-    if converged:
-        image_file = prefix + 'image_output.xyz'
-        write_atoms(
-            image_file,
-            atoms,
-            format='extxyz',
-        )
-
-        results = {
-            'energy': energy,
-            'final_fmax': final_fmax,
-            'final_smax': final_smax,
-            'converged': converged,
-            'files':{
-                'image': image_file,
-                'traj': traj_file,
-            }
-        }
-        return results
-    else:
-        logger.error('Failed to relax atoms below fmax={}'.format(final_fmax))
-        raise ValueError(f'Only relaxed below fmax={final_fmax}')

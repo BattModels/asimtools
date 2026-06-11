@@ -7,14 +7,13 @@ author: mkphuthi@github.com
 '''
 
 from typing import Dict, Optional, Sequence
-import logging
 import matplotlib.pyplot as plt
 import pandas as pd
 from ase.eos import EquationOfState, calculate_eos
 from ase.io import read
 from ase.io.trajectory import Trajectory
 from asimtools.calculators import load_calc
-from asimtools.utils import get_atoms
+from asimtools.utils import get_atoms, get_logger
 
 def ase_cubic_eos_optimization(
     calculator: Dict,
@@ -24,6 +23,7 @@ def ase_cubic_eos_optimization(
     eps: Optional[float] = 0.04,
     scales: Optional[Sequence] = None,
     plot: Optional[bool] = True,
+    prefix: Optional[str] = None,
 ) -> Dict:
     """Generate the energy-volume equation of state (energy calculations not parallelized)
 
@@ -31,7 +31,7 @@ def ase_cubic_eos_optimization(
     :type calculator: Dict
     :param image: Image specification, see :func:`asimtools.utils.get_atoms`
     :type image: Dict
-    :param npoints: Number of energy points to calculate, must be >5, defaults to 5
+    :param npoints: Number of energy points to calculate, should be >=5, defaults to 5
     :type npoints: Optional[int], optional
     :param eos_string: eos_string as specified for :func:`ase.eos.calculate_eos`, defaults to 'sj'
     :type eos_string: Optional[str], optional
@@ -41,27 +41,31 @@ def ase_cubic_eos_optimization(
     :type eps: Optional[float], optional
     :param plot: Whether to plot eos or not, defaults to True
     :type plot: Optional[bool], optional
+    :param prefix: Prefix of output files, defaults to None
+    :type prefix: str, optional
     :return: Equilibrium energy, volume, bulk modulus and factor by which to scale lattice parameter to get equilibrium  structure
     :rtype: Dict
     """
+    logger = get_logger()
+    prefix = prefix + '_' if prefix else ''
     calc = load_calc(calculator=calculator)
     atoms = get_atoms(**image)
     atoms.calc = calc
     v_init = atoms.get_volume()
-    traj_file = 'eos.traj'
+    traj_file = f'{prefix}eos.traj'
     if scales is not None:
-        traj = Trajectory('eos.traj', 'w')
+        traj = Trajectory(traj_file, 'w')
         volumes = []
         energies = []
-        images = []
         for scale in scales:
             scaled_atoms = atoms.copy()
             cell = scaled_atoms.cell
             scaled_atoms.set_cell(cell * scale, scale_atoms=True)
-            scaled_atoms.set_calculator(calc)
+            scaled_atoms.calc = calc
             volumes.append(scaled_atoms.get_volume())
             energies.append(scaled_atoms.get_potential_energy())
             traj.write(scaled_atoms)
+        traj.close()
 
         eos = EquationOfState(volumes, energies)
     else:
@@ -81,12 +85,12 @@ def ase_cubic_eos_optimization(
         eos_dict['volume_scale_factors'].append(v_factor)
 
     eos_df = pd.DataFrame(eos_dict)
-    eos_df.to_csv('eos.csv')
+    eos_df.to_csv(f'{prefix}eos.csv')
 
     eos.eos_string = eos_string
     v0, e0, B = eos.fit()  # find minimum
 
-    logging.info('Successfully fit EOS')
+    logger.info('Successfully fit EOS')
     # Do one more calculation at the minimum and write to disk
     new_cell = atoms.cell.copy()
     x = (v0 / atoms.get_volume())**(1 / 3) # scale cell by this much
@@ -96,11 +100,11 @@ def ase_cubic_eos_optimization(
     atoms.info['B'] = B
     atoms.info['v0'] = v0
     atoms.info['scale'] = x
-    atoms.write('eos_image_output.xyz')
+    atoms.write(f'{prefix}eos_image_output.xyz')
 
     if plot:
         eos.plot()
-        plt.savefig('eos.png')
+        plt.savefig(f'{prefix}eos.png')
 
     results = {
         'v0': float(v0),
