@@ -273,6 +273,58 @@ def test_slurm_asimmodule(flags, tmp_path):
             assert 'asim-run' in line
             assert line.index('test_run_suffix') > line.index('asim-run')
 
+# ---------------------------------------------------------------------------
+# Slurm job_name handling (_gen_slurm_batch_preamble)
+# ---------------------------------------------------------------------------
+
+def _sbatch_job_names(preamble_txt):
+    """Extract every job name from '#SBATCH -J ...' / '--job-name=...' lines."""
+    names = []
+    for line in preamble_txt.splitlines():
+        line = line.strip()
+        if not line.startswith('#SBATCH'):
+            continue
+        flag = line[len('#SBATCH'):].strip()
+        if flag.startswith('-J'):
+            names.append(flag[len('-J'):].strip())
+        elif flag.startswith('--job-name'):
+            names.append(flag.split('=', 1)[1].strip())
+    return names
+
+
+def _batch_env(flags):
+    return {'batch': {
+        'mode': {'use_slurm': True, 'interactive': False},
+        'slurm': {'flags': flags},
+    }}
+
+
+@pytest.mark.parametrize("flags, expected", [
+    ([], 'do_nothing'),                  # default -> asimmodule name
+    (['-n 1'], 'do_nothing'),
+    (['-J env_name'], 'env_name'),       # existing flag preserved
+    (['--job-name=env_name'], 'env_name'),
+    ({'-J': 'env_name'}, 'env_name'),    # dict flags
+])
+def test_slurm_job_name_default_when_unset(flags, expected, tmp_path):
+    sim_input = {'asimmodule': 'do_nothing'}
+    unitjob = create_unitjob(sim_input, _batch_env(flags), tmp_path / 'wdir')
+    assert _sbatch_job_names(unitjob._gen_slurm_batch_preamble()) == [expected]
+
+
+@pytest.mark.parametrize("flags", [
+    [],
+    ['-n 1'],
+    ['-J env_name'],                     # override beats an env -J flag
+    ['--job-name=env_name'],
+    {'-J': 'env_name'},                  # override beats a dict -J flag
+])
+def test_slurm_job_name_overrides(flags, tmp_path):
+    sim_input = {'asimmodule': 'do_nothing', 'job_name': 'my_job'}
+    unitjob = create_unitjob(sim_input, _batch_env(flags), tmp_path / 'wdir')
+    # Exactly one job name, and it is the sim_input job_name
+    assert _sbatch_job_names(unitjob._gen_slurm_batch_preamble()) == ['my_job']
+
 class FloatingJob(UnitJob):
     '''A job that can be in any status without being written to disk'''
     def __init__(self, sim_input, env_input, calc_input=None, status='clean'):
