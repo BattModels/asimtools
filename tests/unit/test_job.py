@@ -630,6 +630,29 @@ def test_distributed_job_submit_inline(inline_env_input, tmp_path):
         os.chdir(original_dir)
 
 
+def test_distributed_job_default_job_name_from_label(inline_env_input):
+    sim_input = {
+        'label_a': {'asimmodule': 'do_nothing', 'env_id': 'inline'},
+        'label_b': {'asimmodule': 'do_nothing', 'env_id': 'inline'},
+    }
+    djob = DistributedJob(sim_input, env_input=inline_env_input)
+    job_names = [uj.sim_input['job_name'] for uj in djob.unitjobs]
+    assert job_names == ['label_a', 'label_b']          # label -> job_name
+    # workdir still gets the id- prefix; job_name stays the raw label
+    assert djob.unitjobs[0].workdir.name.startswith('id-')
+
+
+def test_distributed_job_explicit_job_name_preserved(inline_env_input):
+    sim_input = {
+        'label_a': {'asimmodule': 'do_nothing', 'env_id': 'inline',
+                    'job_name': 'custom'},
+        'label_b': {'asimmodule': 'do_nothing', 'env_id': 'inline'},
+    }
+    djob = DistributedJob(sim_input, env_input=inline_env_input)
+    job_names = [uj.sim_input['job_name'] for uj in djob.unitjobs]
+    assert job_names == ['custom', 'label_b']           # setdefault respects override
+
+
 # ---------------------------------------------------------------------------
 # ChainedJob
 # ---------------------------------------------------------------------------

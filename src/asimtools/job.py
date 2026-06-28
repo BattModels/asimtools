@@ -576,6 +576,13 @@ class DistributedJob(Job):
             {njobs} jobs! Having that many jobs is not very efficient. Try \
             grouping jobs together using the group_size argument to workflows.'
 
+        # By default, name each job after its label (the sub-sim_input key) so
+        # that slurm/job.sh job names are human-readable. An explicit job_name
+        # still wins. Done before renaming so the raw label is captured and
+        # carried into the id-* sub-jobs.
+        for sim_id, subsim_input in sim_input.items():
+            subsim_input.setdefault('job_name', sim_id)
+
         sim_id_changed = False
         for i, (sim_id, subsim_input) in enumerate(sim_input.items()):
             assert 'asimmodule' in subsim_input, 'Check sim_input format,\
