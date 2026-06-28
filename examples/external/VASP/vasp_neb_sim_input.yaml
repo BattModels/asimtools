@@ -1,0 +1,25 @@
+# This example shows how to set up and run a VASP NEB calculation. The
+# `images` argument is passed to asimtools.utils.get_images and should contain
+# the initial band, i.e. the two endpoints plus any intermediate images. The
+# first and last images are treated as the fixed endpoints and each image is
+# written to its own numbered VASP NEB directory (00, 01, ..., 0N). The IMAGES
+# INCAR tag is set automatically to the number of intermediate images.
+asimmodule: vasp.vasp_neb
+workdir: vasp_neb_results
+env_id: n24 # Specify your own env
+args:
+  images:
+    image_file: initial_band.xyz # ASE-readable file containing the band
+  user_incar_settings:
+    ENCUT: 480
+    KSPACING: 0.5
+    IBRION: 3   # Required for NEB (with POTIM: 0 for VTST optimizers)
+    POTIM: 0
+    NSW: 50
+    SPRING: -5  # Spring constant between images
+    LCLIMB: True # Use the climbing image NEB (requires VTST build)
+  user_kpoints_settings:
+    kpts: [[1,1,1]]
+  potcar:
+    Na: PBE
+  command: srun --mpi=pmi2 vasp_std
