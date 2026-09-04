@@ -454,6 +454,41 @@ def load_ase_dftd3(calc_params):
 
     return calc
 
+def load_sevennet_d3(calc_params):
+    """Load any calculator with SevenNet's D3 correction
+
+    :param calc_params: Dictionary with 2 keys. First is `d3_args` which is 
+        passed to ase.calculators.dftd3.DFTD3 except for the dft argument. The
+        second is dft_calc_id or dft_calc_params which loads the calculator 
+        to be wrapped.
+    :type calc_params: Dict
+    :return: ASE calculator
+    :rtype: :class:`ase.calculators.calculators.Calculator`
+    """
+    from sevenn.calculator import D3Calculator
+    from ase.calculators.mixing import SumCalculator
+    d3_args = calc_params['args'].get('d3_args', {})
+    
+    dft_calc_id = calc_params['args'].get('dft_calc_id', None)
+    dft_calc_params = calc_params['args'].get('dft_calc_params', None)
+    if ( (dft_calc_id is not None) and (dft_calc_params is not None) ):
+        raise ValueError('Provide only one of dft_calc_id or dft_calc_params')
+
+    if ( (dft_calc_id is not None) or (dft_calc_params is not None) ):
+        dft_calc = load_calc(calc_id=dft_calc_id, calc_params=dft_calc_params)
+    else:
+        dft_calc = None
+    try:
+        d3_calc = D3Calculator(**d3_args)
+    except Exception:
+        logging.error(
+            "Failed to load d3 calculator with parameters:\n %s", d3_args
+        )
+        raise
+    if dft_calc is not None:
+        return SumCalculator([dft_calc, d3_calc])
+    return d3_calc
+
 def load_aqcat(calc_params):
     """Load AQCat Calculator
     :param calc_params: args to pass to loader, including checkpoint_path
@@ -489,5 +524,6 @@ external_calcs = {
     'fairchemV2': load_fairchem_v2,
     'fairchem': load_fairchem_v2,
     'ASEDFTD3': load_ase_dftd3,
+    'SevenNetD3': load_sevennet_d3,
     'AQCat': load_aqcat,
 }
