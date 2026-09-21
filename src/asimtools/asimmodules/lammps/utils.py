@@ -1,9 +1,15 @@
 '''Utility functions for reading and processing LAMMPS output files.'''
 from pathlib import Path
+from typing import Sequence
+import os
 import numpy as np
 
 
-def read_lammps_log(logfile, skip_failed=False):
+def read_lammps_log(
+    logfile: os.PathLike,
+    skip_runs: Sequence[int] = None,
+    skip_failed: bool = False
+):
     '''Read a LAMMPS log file and return thermodynamic data and metadata.'''
     with open(logfile, 'r', encoding='utf-8') as f:
         logtxt = f.readlines()
@@ -32,6 +38,9 @@ def read_lammps_log(logfile, skip_failed=False):
                 except ValueError:
                     pass
 
+    if skip_runs is not None:
+        starts = [s for i, s in enumerate(starts) if i not in skip_runs]
+        stops = [s for i, s in enumerate(stops) if i not in skip_runs]
     if skip_failed and (len(starts) != len(stops) or len(starts) == 0):
         print(f"Incomplete run for {Path(logfile).resolve()}")
         return False
