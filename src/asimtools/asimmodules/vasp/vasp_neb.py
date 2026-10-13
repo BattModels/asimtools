@@ -10,17 +10,28 @@ the fixed endpoints and the directories in between hold the intermediate
 images. The shared INCAR, KPOINTS and POTCAR live in the root directory and
 the ``IMAGES`` INCAR tag is set to the number of intermediate images.
 
+VASP does not compute the endpoints in NEB mode, so ``00/OUTCAR`` and
+``0N/OUTCAR`` must hold converged endpoint calculations. With
+``relax_endpoints`` they are produced here by relaxing the endpoints with
+:func:`asimtools.asimmodules.vasp.vasp.vasp`; otherwise they must already exist
+(e.g. from a previous run) or an exception is raised.
+
 Author: mkphuthi@github.com
 '''
 import os
+import shutil
 import logging
 from copy import deepcopy
+import numpy as np
 from ase.io import read
+from ase.geometry import find_mic
 from pymatgen.io.ase import AseAtomsAdaptor
 from pymatgen.io.vasp import Poscar
 from asimtools.utils import get_images
 from asimtools.asimmodules.vasp.utils import write_vasp_inputs
-from asimtools.asimmodules.vasp.vasp import execute_vasp_run_command
+from asimtools.asimmodules.vasp.vasp import execute_vasp_run_command, vasp
+
+NEB_ONLY_TAGS = ('IMAGES', 'ICHAIN', 'SPRING', 'LCLIMB', 'LTANGENTOLD', 'LNEBCELL')
 
 def vasp_neb(
     images: dict,
@@ -33,7 +44,9 @@ def vasp_neb(
     mpset: str | None = None,
     prev_calc: os.PathLike | None = None,
     image_output_file: str | None = 'OUTCAR',
-    run_vasp: bool = True,
+    run_neb: bool = True,
+    relax_endpoints: bool = False,
+    relax_vasp_args: dict | None = None,
 ) -> dict:
     """Set up and run a VASP NEB calculation for the given initial band
 
@@ -71,9 +84,23 @@ def vasp_neb(
         directory and write in standard asimtools format, set to None to skip,
         defaults to 'OUTCAR'
     :type image_output_file: str, optional
-    :param run_vasp: Whether to run VASP after writing input files,
+    :param run_neb: Whether to run the VASP NEB after writing input files,
         defaults to True
-    :type run_vasp: bool, optional
+    :type run_neb: bool, optional
+    :param relax_endpoints: Relax the first and last images with
+        :func:`asimtools.asimmodules.vasp.vasp.vasp` in ``relax_initial`` and
+        ``relax_final`` before setting up the NEB, defaults to False. If False,
+        converged endpoint OUTCARs must already exist in the endpoint
+        directories
+    :type relax_endpoints: bool, optional
+    :param relax_vasp_args: Arguments passed to
+        :func:`asimtools.asimmodules.vasp.vasp.vasp` for the endpoint
+        relaxations. By default the relaxations use the same arguments as the
+        NEB with the NEB-only INCAR tags removed; ``user_incar_settings`` given
+        here is merged into those INCAR settings and any other key replaces
+        the NEB value. The endpoint convergence check uses ``-EDIFFG`` of the
+        resulting relaxation INCAR settings, defaults to None
+    :type relax_vasp_args: dict, optional
     """
 
     band = get_images(**images)
@@ -81,10 +108,79 @@ def vasp_neb(
         'NEB requires at least 3 images (2 endpoints + 1 intermediate)'
 
     n_intermediate = len(band) - 2
+    image_dirs = [f'{i:02d}' for i in range(len(band))]
+    user_incar_settings = deepcopy(user_incar_settings) or {}
+
+    relax_vasp_args = deepcopy(relax_vasp_args) or {}
+    for key in ('image', 'run_vasp'):
+        if key in relax_vasp_args:
+            raise ValueError(f'{key} is set by vasp_neb, not relax_vasp_args')
+    relax_incar = {
+        k: v for k, v in user_incar_settings.items() if k not in NEB_ONLY_TAGS
+    }
+    relax_incar.update(relax_vasp_args.pop('user_incar_settings', None) or {})
+    relax_args = {
+        'user_incar_settings': relax_incar,
+        'user_kpoints_settings': user_kpoints_settings,
+        'user_potcar_functional': user_potcar_functional,
+        'potcar': potcar,
+        'vaspinput_kwargs': vaspinput_kwargs,
+        'command': command,
+        'mpset': mpset,
+        'prev_calc': prev_calc,
+        'image_output_file': image_output_file,
+    }
+    relax_args.update(relax_vasp_args)
+
+    ediffg = relax_incar.get('EDIFFG')
+    if ediffg is None or ediffg >= 0:
+        raise ValueError(
+            'Endpoint convergence check needs a force criterion: set a '
+            f'negative EDIFFG for the relaxation, got {ediffg}'
+        )
+    fmax_tol = -ediffg
+
+    endpoints = ((0, 'relax_initial'), (-1, 'relax_final'))
+    if relax_endpoints:
+        for idx, relax_dir in endpoints:
+            os.makedirs(relax_dir, exist_ok=True)
+            cwd = os.getcwd()
+            os.chdir(relax_dir)
+            try:
+                vasp({'atoms': band[idx]}, run_vasp=True, **relax_args)
+            finally:
+                os.chdir(cwd)
+            os.makedirs(image_dirs[idx], exist_ok=True)
+            shutil.copy(
+                os.path.join(relax_dir, 'OUTCAR'),
+                os.path.join(image_dirs[idx], 'OUTCAR'),
+            )
+
+    # Endpoints must have converged OUTCARs whether relaxed now or previously
+    for idx, _ in endpoints:
+        outcar = os.path.join(image_dirs[idx], 'OUTCAR')
+        if not os.path.exists(outcar):
+            raise FileNotFoundError(
+                f'No endpoint OUTCAR found at {outcar}, set relax_endpoints '
+                'to True to compute it'
+            )
+        relaxed = read(outcar)
+        relaxed.set_constraint(band[idx].constraints)
+        fmax = np.linalg.norm(relaxed.get_forces(), axis=1).max()
+        if fmax > fmax_tol:
+            raise RuntimeError(
+                f'Endpoint {outcar} is not converged: fmax {fmax:.4f} > '
+                f'{fmax_tol} eV/Ang'
+            )
+        # Undo VASP's wrapping so the endpoint stays continuous with the band
+        disp, _ = find_mic(
+            relaxed.positions - band[idx].positions, band[idx].cell, pbc=True
+        )
+        relaxed.positions = band[idx].positions + disp
+        band[idx] = relaxed
 
     # Set the IMAGES INCAR tag to the number of intermediate images unless the
     # user explicitly specified it
-    user_incar_settings = deepcopy(user_incar_settings) or {}
     user_incar_settings.setdefault('IMAGES', n_intermediate)
 
     # Write the shared INCAR, KPOINTS and POTCAR to the root directory using
@@ -105,15 +201,12 @@ def vasp_neb(
     if os.path.exists('POSCAR'):
         os.remove('POSCAR')
 
-    image_dirs = []
-    for i, atoms in enumerate(band):
-        image_dir = f'{i:02d}'
+    for image_dir, atoms in zip(image_dirs, band):
         os.makedirs(image_dir, exist_ok=True)
         struct = AseAtomsAdaptor.get_structure(atoms)
         Poscar(struct).write_file(os.path.join(image_dir, 'POSCAR'))
-        image_dirs.append(image_dir)
 
-    if run_vasp:
+    if run_neb:
         execute_vasp_run_command(command)
 
         if image_output_file:
